@@ -19,7 +19,7 @@ package com.android.certifications.niap;
 import android.content.res.Resources;
 import android.util.Log;
 
-import androidx.security.niap.net.SecureURL;
+import com.android.certifications.niap.niapsec.net.SecureURL;
 
 import java.io.BufferedReader;
 import java.io.IOException;

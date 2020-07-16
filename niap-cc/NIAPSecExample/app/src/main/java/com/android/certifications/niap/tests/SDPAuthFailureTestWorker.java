@@ -19,6 +19,8 @@ package com.android.certifications.niap.tests;
 import android.content.Context;
 
 import com.android.certifications.niap.TestUtil;
+import com.android.certifications.niap.niapsec.SecureConfig;
+import com.android.certifications.niap.niapsec.context.SecureContextCompat;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,8 +32,6 @@ import java.util.concurrent.Executors;
 import javax.crypto.Cipher;
 
 import androidx.annotation.NonNull;
-import androidx.security.niap.SecureConfig;
-import androidx.security.niap.context.SecureContextCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 

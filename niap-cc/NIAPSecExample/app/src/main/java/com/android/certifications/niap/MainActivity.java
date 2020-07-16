@@ -17,7 +17,6 @@
 package com.android.certifications.niap;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -30,18 +29,17 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.security.niap.SecureConfig;
-import androidx.security.niap.biometric.BiometricSupport;
-import androidx.security.niap.crypto.SecureCipher;
-import androidx.security.niap.net.SecureURL;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
+import com.android.certifications.niap.niapsec.SecureConfig;
+import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
+import com.android.certifications.niap.niapsec.crypto.SecureCipher;
+import com.android.certifications.niap.niapsec.net.SecureURL;
 import com.android.certifications.niap.niapsecexample.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -65,10 +63,10 @@ import static com.android.certifications.niap.EncryptedDataService.STOP_FOREGROU
  * available for decryption (encryption in this case is OK).
  *
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity {
 
     private static String TAG = "MainActivity";
-    public static Activity thisActivity;
+    public static FragmentActivity thisActivity;
     private TextView textView;
     private CheckBox runInBackgroundCheckBox;
     private boolean serviceRunning = false;
@@ -80,8 +78,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         thisActivity = this;
         textView = (TextView) findViewById(R.id.output_textview);
         runInBackgroundCheckBox = findViewById(R.id.run_in_background);
