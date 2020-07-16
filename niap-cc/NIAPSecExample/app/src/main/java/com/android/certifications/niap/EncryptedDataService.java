@@ -26,11 +26,12 @@ import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
+import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
+import com.android.certifications.niap.niapsec.biometric.BiometricSupportImpl;
+import com.android.certifications.niap.niapsec.crypto.SecureCipher;
+
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.security.niap.biometric.BiometricSupport;
-import androidx.security.niap.biometric.BiometricSupportImpl;
-import androidx.security.niap.crypto.SecureCipher;
 
 import java.io.File;
 

@@ -22,12 +22,12 @@ import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 
-import androidx.security.niap.biometric.BiometricSupport;
-import androidx.security.niap.context.SecureContextCompat;
-import androidx.security.niap.crypto.EphemeralSecretKey;
-import androidx.security.niap.crypto.SecureCipher;
-import androidx.security.niap.crypto.SecureKeyGenerator;
-import androidx.security.niap.crypto.SecureKeyStore;
+import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
+import com.android.certifications.niap.niapsec.context.SecureContextCompat;
+import com.android.certifications.niap.niapsec.crypto.EphemeralSecretKey;
+import com.android.certifications.niap.niapsec.crypto.SecureCipher;
+import com.android.certifications.niap.niapsec.crypto.SecureKeyGenerator;
+import com.android.certifications.niap.niapsec.crypto.SecureKeyStore;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

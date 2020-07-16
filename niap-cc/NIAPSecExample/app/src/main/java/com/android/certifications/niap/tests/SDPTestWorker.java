@@ -20,6 +20,11 @@ import android.content.Context;
 
 import com.android.certifications.niap.MainActivity;
 import com.android.certifications.niap.TestUtil;
+import com.android.certifications.niap.niapsec.SecureConfig;
+import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
+import com.android.certifications.niap.niapsec.biometric.BiometricSupportImpl;
+import com.android.certifications.niap.niapsec.context.SecureContextCompat;
+import com.android.certifications.niap.niapsec.crypto.SecureKeyGenerator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,11 +36,6 @@ import java.util.concurrent.Executors;
 import javax.crypto.Cipher;
 
 import androidx.annotation.NonNull;
-import androidx.security.niap.SecureConfig;
-import androidx.security.niap.biometric.BiometricSupport;
-import androidx.security.niap.biometric.BiometricSupportImpl;
-import androidx.security.niap.context.SecureContextCompat;
-import androidx.security.niap.crypto.SecureKeyGenerator;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
