@@ -46,12 +46,12 @@ import androidx.work.WorkerParameters;
  * does require that the user authorize using the devices default unlock implementation which can
  * be a device pin or password, fingerprint, or face identification.
  */
-public class SDPTestWorker extends Worker {
+public class SDPDeviceCredentialTestWorker extends Worker {
 
     private static final String FILE_NAME = "test_file";
     private static final String KEY_PAIR_ALIAS = "key_pair_alias";
 
-    public SDPTestWorker(Context context, WorkerParameters parameters) {
+    public SDPDeviceCredentialTestWorker(Context context, WorkerParameters parameters) {
         super(context, parameters);
 
         try {
@@ -67,16 +67,18 @@ public class SDPTestWorker extends Worker {
             // Write SDP File
             BiometricSupport biometricSupport = new BiometricSupportImpl(
                     MainActivity.thisActivity,
-                    getApplicationContext(), false) {
+                    getApplicationContext(), true) {
                 @Override
                 public void onAuthenticationSucceeded() {
-                    TestUtil.logSuccess(getClass(), "SDP Biometric Unlock Succeeded, " +
-                            "private key available for decryption through the AndroidKeyStore.");
+                    TestUtil.logSuccess(getClass(), "SDP Device Credential Unlock " +
+                            "Succeeded, private key available for decryption through the " +
+                            "AndroidKeyStore.");
                 }
 
                 @Override
                 public void onAuthenticationFailed() {
-                    TestUtil.logFailure(getClass(), "SDP Biometric Unlock failed, " +
+                    TestUtil.logFailure(getClass(),
+                            "SDP Device Credential Unlock failed, " +
                             "file not available for decryption.");
                 }
 
@@ -86,7 +88,8 @@ public class SDPTestWorker extends Worker {
                 }
             };
 
-            SecureConfig secureConfig = SecureConfig.getStrongConfig(biometricSupport);
+            SecureConfig secureConfig =
+                    SecureConfig.getStrongDeviceCredentialConfig(biometricSupport);
             secureConfig.setDebugLoggingEnabled(true);
             SecureKeyGenerator keyGenerator = SecureKeyGenerator.getInstance(secureConfig);
             TestUtil.logSuccess(getClass(), "Generated RSA with provider AndroidKeyStore.",

@@ -34,6 +34,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkContinuation;
 import androidx.work.WorkManager;
 
 import com.android.certifications.niap.niapsec.SecureConfig;
@@ -41,6 +42,7 @@ import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
 import com.android.certifications.niap.niapsec.crypto.SecureCipher;
 import com.android.certifications.niap.niapsec.net.SecureURL;
 import com.android.certifications.niap.niapsecexample.R;
+import com.android.certifications.niap.tests.SDPDeviceCredentialTestWorker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.android.certifications.niap.tests.SDPAuthFailureTestWorker;
@@ -69,6 +71,9 @@ public class MainActivity extends FragmentActivity {
     public static FragmentActivity thisActivity;
     private TextView textView;
     private CheckBox runInBackgroundCheckBox;
+    private CheckBox useDeviceCredentialCheckBox;
+    private CheckBox testNoAuthCheckBox;
+
     private boolean serviceRunning = false;
     public static UpdateViewModel viewModel;
     private BiometricSupport biometricSupport;
@@ -81,6 +86,8 @@ public class MainActivity extends FragmentActivity {
         thisActivity = this;
         textView = (TextView) findViewById(R.id.output_textview);
         runInBackgroundCheckBox = findViewById(R.id.run_in_background);
+        useDeviceCredentialCheckBox = findViewById(R.id.use_device_credential);
+        testNoAuthCheckBox = findViewById(R.id.test_failure_sdp);
         viewModel = ViewModelProviders.of(this).get(UpdateViewModel.class);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -131,16 +138,27 @@ public class MainActivity extends FragmentActivity {
             Log.i(TAG, "!!!!!!!!!!LOCK DEVICE NOW...!!!!");
             initialDelay = 6;
         }
-        OneTimeWorkRequest sdpTestWorker = new OneTimeWorkRequest.Builder(SDPTestWorker.class)
-                .setInitialDelay(initialDelay, TimeUnit.SECONDS)
-                .build();
-        OneTimeWorkRequest sdpFailureTestWorker =
-                new OneTimeWorkRequest.Builder(SDPAuthFailureTestWorker.class)
-                        .build();
-        WorkManager.getInstance()
-                .beginWith(sdpTestWorker)
-                .then(sdpFailureTestWorker)
-                .enqueue();
+        OneTimeWorkRequest sdpTestWorker;
+        if(useDeviceCredentialCheckBox.isChecked()) {
+            sdpTestWorker = new OneTimeWorkRequest.Builder(SDPDeviceCredentialTestWorker.class)
+                    .setInitialDelay(initialDelay, TimeUnit.SECONDS)
+                    .build();
+        } else {
+            sdpTestWorker = new OneTimeWorkRequest.Builder(SDPTestWorker.class)
+                    .setInitialDelay(initialDelay, TimeUnit.SECONDS)
+                    .build();
+        }
+
+        WorkContinuation workContinuation =
+                WorkManager.getInstance(getApplicationContext()).beginWith(sdpTestWorker);
+        if(testNoAuthCheckBox.isChecked()) {
+            OneTimeWorkRequest sdpFailureTestWorker =
+                    new OneTimeWorkRequest.Builder(SDPAuthFailureTestWorker.class)
+                            .build();
+            workContinuation.then(sdpFailureTestWorker);
+        }
+        workContinuation.enqueue();
+
 
         try {
             new AsyncTask<Void, Void, Void>() {
@@ -172,7 +190,15 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void testOAEP() {
-        EncryptionManager encryptionManager = new EncryptionManager(this, biometricSupport);
+        SecureConfig config;
+        if(useDeviceCredentialCheckBox.isChecked()) {
+                config = SecureConfig.getStrongDeviceCredentialConfig(biometricSupport);
+            } else {
+                config = SecureConfig.getStrongConfig(biometricSupport);
+            }
+        EncryptionManager encryptionManager = new EncryptionManager(this,
+                        config,
+                        biometricSupport);
         Log.i(TAG, "Creating Keypair OAEP_TESTING_RSA");
         encryptionManager.createSensitiveDataAsymmetricKeyPair("OAEP_TESTING_RSA");
         Log.i(TAG, "Created Keypair OAEP_TESTING_RSA");
@@ -180,7 +206,7 @@ public class MainActivity extends FragmentActivity {
 
         Log.i(TAG, "Encrypting " + new String(clearText));
 
-        SecureCipher secureCipher = SecureCipher.getDefault(biometricSupport);
+        SecureCipher secureCipher = SecureCipher.getDefault(config);
         secureCipher.encryptSensitiveDataAsymmetric(
                 "OAEP_TESTING_RSA",
                 clearText,
