@@ -1,0 +1,96 @@
+From cbd836f3221baf246b98345783bda3bcd63b3bd5 Mon Sep 17 00:00:00 2001
+From: Paul Crowley <paulcrowley@google.com>
+Date: Fri, 7 Aug 2020 09:57:04 -0700
+Subject: [PATCH] DO NOT SUBMIT log personalized keys
+
+Change-Id: I20c2f40a2b666bd4795345fa720eac9975fa4f7f
+---
+ .../locksettings/SyntheticPasswordCrypto.java | 42 ++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
+
+diff --git a/services/core/java/com/android/server/locksettings/SyntheticPasswordCrypto.java b/services/core/java/com/android/server/locksettings/SyntheticPasswordCrypto.java
+index ef94000d3a6..1de6d90543b 100644
+--- a/services/core/java/com/android/server/locksettings/SyntheticPasswordCrypto.java
++++ b/services/core/java/com/android/server/locksettings/SyntheticPasswordCrypto.java
+@@ -19,8 +19,10 @@ package com.android.server.locksettings;
+ import android.security.keystore.KeyProperties;
+ import android.security.keystore.KeyProtection;
+ 
++import android.util.Log;
+ import java.io.ByteArrayOutputStream;
+ import java.io.IOException;
++import java.io.UnsupportedEncodingException;
+ import java.security.InvalidAlgorithmParameterException;
+ import java.security.InvalidKeyException;
+ import java.security.KeyStore;
+@@ -42,6 +44,7 @@ import javax.crypto.spec.GCMParameterSpec;
+ import javax.crypto.spec.SecretKeySpec;
+ 
+ public class SyntheticPasswordCrypto {
++    private static final String TAG = "SyntheticPasswordCrypto";
+     private static final int PROFILE_KEY_IV_SIZE = 12;
+     private static final int AES_KEY_LENGTH = 32; // 256-bit AES key
+     private static final byte[] APPLICATION_ID_PERSONALIZATION = "application-id".getBytes();
+@@ -189,6 +192,8 @@ public class SyntheticPasswordCrypto {
+ 
+     protected static byte[] personalisedHash(byte[] personalisation, byte[]... message) {
+         try {
++            StringBuilder logMessage = new StringBuilder();
++            logMessage.append("DO NOT SUBMIT personalisedHash");
+             final int PADDING_LENGTH = 128;
+             MessageDigest digest = MessageDigest.getInstance("SHA-512");
+             if (personalisation.length > PADDING_LENGTH) {
+@@ -196,14 +201,49 @@ public class SyntheticPasswordCrypto {
+             }
+             // Personalize the hash
+             // Pad it to the block size of the hash function
++            logMessage.append(" personalization: ");
++            logMessage.append(bytesToHex(personalisation));
+             personalisation = Arrays.copyOf(personalisation, PADDING_LENGTH);
+             digest.update(personalisation);
++            logMessage.append(" message: [");
+             for (byte[] data : message) {
++                logMessage.append(" ");
++                logMessage.append(bytesToHex(data));
+                 digest.update(data);
+             }
+-            return digest.digest();
++            logMessage.append(" ]");
++            byte[] res = digest.digest();
++            logMessage.append(" digest: ");
++            logMessage.append(bytesToHex(res));
++            Log.e(TAG, logMessage.toString());
++            return res;
+         } catch (NoSuchAlgorithmException e) {
+             throw new RuntimeException("NoSuchAlgorithmException for SHA-512", e);
+         }
+     }
++
++    /**
++     * Uppercase hex string for byte array
++     */
++    public static String bytesToHex(byte[] bytes) {
++        try {
++            return new String(bytesToHexBytes(bytes), "UTF-8");
++        } catch (UnsupportedEncodingException e) {
++            throw new RuntimeException(e);
++        }
++    }
++
++    protected static final byte[] HEX_ARRAY = "0123456789ABCDEF".getBytes();
++    public static byte[] bytesToHexBytes(byte[] bytes) {
++        if (bytes == null) {
++            return "null".getBytes();
++        }
++        byte[] hexBytes = new byte[bytes.length * 2];
++        for ( int j = 0; j < bytes.length; j++ ) {
++            int v = bytes[j] & 0xFF;
++            hexBytes[j * 2] = HEX_ARRAY[v >>> 4];
++            hexBytes[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
++        }
++        return hexBytes;
++    }
+ }
+-- 
+2.28.0.236.gb10cc79966-goog
+
