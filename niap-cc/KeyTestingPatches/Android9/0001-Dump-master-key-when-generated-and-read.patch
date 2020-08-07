@@ -1,0 +1,72 @@
+From 7a28909f0343b8b3452ead03901de98c0f35ed72 Mon Sep 17 00:00:00 2001
+From: Branden Archer <brarcher@google.com>
+Date: Fri, 7 Aug 2020 12:01:04 -0700
+Subject: [PATCH] Dump master key when generated and read
+
+Change-Id: Ie06f47ebb3155a995a291286d559ca9979a4e4ac
+---
+ keystore/user_state.cpp | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/keystore/user_state.cpp b/keystore/user_state.cpp
+index aab6175..d90aeeb 100644
+--- a/keystore/user_state.cpp
++++ b/keystore/user_state.cpp
+@@ -20,6 +20,8 @@
+ 
+ #include <dirent.h>
+ #include <fcntl.h>
++#include <iomanip>
++#include <sstream>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <sys/stat.h>
+@@ -140,6 +142,18 @@ ResponseCode UserState::writeMasterKey(const android::String8& pw) {
+     return masterKeyBlob.writeBlob(mMasterKeyFile, passwordKey, STATE_NO_ERROR);
+ }
+ 
++static std::string hexEncode(const std::vector<uint8_t>& input) {
++    std::stringstream hexStream;
++    for (std::vector<uint8_t>::const_iterator it = input.begin(); it != input.end(); ++it) {
++        char raw[20] = {0};
++        snprintf(raw, sizeof(raw), "%02x", *it);
++        hexStream << raw;
++    }
++    std::string result;
++    hexStream >> result;
++    return result;
++}
++
+ ResponseCode UserState::readMasterKey(const android::String8& pw) {
+     int in = TEMP_FAILURE_RETRY(open(mMasterKeyFile, O_RDONLY));
+     if (in < 0) {
+@@ -187,6 +201,8 @@ ResponseCode UserState::readMasterKey(const android::String8& pw) {
+         if (response == ResponseCode::NO_ERROR) {
+             mMasterKey = std::vector<uint8_t>(masterKeyBlob.getValue(),
+                                               masterKeyBlob.getValue() + masterKeyBlob.getLength());
++            std::string hexKeyBlob = hexEncode(mMasterKey);
++            ALOGI("CKM.4 keystore daemon Master key read: %s %lu", hexKeyBlob.c_str(), mMasterKey.size());
+             setupMasterKeys();
+         }
+         return response;
+@@ -255,6 +271,8 @@ void UserState::generateKeyFromPassword(std::vector<uint8_t>& key, const android
+ 
+     PKCS5_PBKDF2_HMAC(reinterpret_cast<const char*>(pw.string()), pw.length(), salt, saltSize, 8192,
+                       digest, key.size(), key.data());
++    std::string hexKey = hexEncode(key);
++    ALOGI("CKM.4 keystore daemon Password key: %s", hexKey.c_str());
+ }
+ 
+ bool UserState::generateSalt() {
+@@ -269,6 +287,8 @@ bool UserState::generateMasterKey() {
+     if (!generateSalt()) {
+         return false;
+     }
++    std::string hexKey = hexEncode(mMasterKey);
++    ALOGI("CKM.4 keystore daemon Master key generate: %s %lu", hexKey.c_str(), mMasterKey.size());
+     return true;
+ }
+ 
+-- 
+2.28.0.236.gb10cc79966-goog
+
