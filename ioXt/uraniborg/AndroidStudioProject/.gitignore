@@ -1,0 +1,39 @@
+#built application files
+*.apk
+*.ap_
+*.aab
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+bin/
+gen/
+out/
+
+# log files
+*.log
+
+# Local configuration files (sdk path, etc)
+local.properties
+
+# Mac junks
+.DS_Store
+
+# Android Studio
+*.iml
+.idea
+.gradle
+build/
+.navigation
+captures/
+output.json
+
+#Signing files
+.signing/
+
+# Proguard related
+proguard/

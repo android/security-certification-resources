@@ -1,0 +1,27 @@
+# files for dex VM
+*.dex
+
+# Java class file (these are largely generated)
+*.class
+
+# other generated files
+bin/
+gen/
+
+# Local config files (sdk path, etc)
+local.properties
+
+# Mac junks
+.DS_Store
+
+# Python related
+*.pyc
+
+# Some files specific to Android Studio
+*.iml
+.idea
+.gradle
+build/
+.navigation
+captures/
+output.json
