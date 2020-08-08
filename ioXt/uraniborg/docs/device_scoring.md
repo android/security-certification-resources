@@ -4,7 +4,9 @@ An angle of analysis for the data that is collected via Hubble is to attempt to
 score security and privacy risks that users are exposed to via the type and the
 manner that apps are preloaded on each device/build.
 
-In order to do this, we have developed a risk scoring framework that allows
+In order to do this, we have developed a
+[risk scoring framework](Uraniborg's%20Preloaded%20App%20Risks%20Scoring%20Metrics%20%282020-08%29%20v1.0.pdf)
+(also available [here](https://www.android-device-security.org/publications/)) that allows
 individual risk categories to be defined and then summed as a device risk score.
 
 In order for users to more easily grasp and make use of the final risk score, we
@@ -14,9 +16,9 @@ high level of risk. And the score is bounded to a maximum value, of which is
 currently defined to be `10`.
 
 ## General Note
-We are working in tandem with a university consortium to develop a fine-grained
-formula for each risk category, in addition to the identification of new
-categories as we proceed.
+We are working in tandem with a [university consortium](https://www.android-device-security.org/)
+to develop a fine-grained formula for each risk category, in addition to the
+identification of new categories as we proceed.
 
 Note that this aspect of the work (scoring) is an active work-in-progress that
 may progress/evolve very quickly. We also do appreciate any feedback that you
@@ -30,7 +32,7 @@ that is collected via Hubble:
   - Here we try to evaluate how much risk is posed by the introduction of additional
     APKs that are signed using the platform key.
 - Risky Privileged Permissions Risk
-  - Here we try to evaluate how much risk is posed by the pre-granting of permissions
+  - Here we try to evaluate how much risk is posed by the pregranting of permissions
     that is done by the OEM.
 - Cleartext Traffic Risk
   - Here we try to evaluate how much risk is the user exposed to due to the APKs

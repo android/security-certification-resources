@@ -1,13 +1,21 @@
 # Uraniborg
 
 Uraniborg is a public observatory/repository that collects and hosts information
-about pre-installed apps. Users can use tools in this repository to get a
+about preinstalled apps. Users can use tools in this repository to get a
 "snapshot" on the state of installed devices. When used on a new device prior to
-or skipping accounts set-up, the state of pre-isntalled packages on the device
+or skipping accounts set-up, the state of preinstalled packages on the device
 can be obtained.
 
 This repository currently contains code that can be used to build an explorer
 app (APK) called Hubble.
+
+It also contains code that can be used to score device preload risks. In this
+effort, we collaborated with a team of university experts from the University of
+Cambridge, University of Strathclyde, and Johannes Kepler University in Linz,
+who created a formula that considers the risk of platform signed apps,
+pregranted permissions on preloaded apps, and apps communicating using cleartext
+traffic. A whitepaper of the scoring framework is also available at:
+https://www.android-device-security.org/publications/
 
 The name of this project and its components are mainly inspired by the field of
 astronomy.
