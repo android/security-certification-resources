@@ -55,6 +55,18 @@
             android:layout_height="wrap_content"
             android:text="Delay Start for 5 seconds"/>
 
+        <CheckBox
+            android:id="@+id/use_device_credential"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Use Device Credential (no biometrics)"/>
+
+        <CheckBox
+            android:id="@+id/test_failure_sdp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Test SDP No Auth Failure"/>
+
         <TextView
             android:id="@+id/output_textview"
             android:maxLines="20"
