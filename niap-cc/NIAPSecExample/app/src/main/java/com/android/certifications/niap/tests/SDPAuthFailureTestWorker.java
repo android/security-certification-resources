@@ -17,6 +17,7 @@
 package com.android.certifications.niap.tests;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.certifications.niap.TestUtil;
 import com.android.certifications.niap.niapsec.SecureConfig;
@@ -27,13 +28,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPairGenerator;
-import java.util.concurrent.Executors;
 
 import javax.crypto.Cipher;
 
 import androidx.annotation.NonNull;
-import androidx.work.Worker;
-import androidx.work.WorkerParameters;
+import androidx.core.content.ContextCompat;
 
 /**
  * Worker class that runs a test to encrypt and decrypt data with the NIAPSEC library and fails
@@ -43,30 +42,32 @@ import androidx.work.WorkerParameters;
  * authorization in order to show that the key is not available without unlocking the device on
  * demand.
  */
-public class SDPAuthFailureTestWorker extends Worker {
+public class SDPAuthFailureTestWorker implements TestWorker {
 
     private static final String FILE_NAME = "test_file_fail";
     private static final String KEY_PAIR_ALIAS = "key_pair_alias";
 
-    public SDPAuthFailureTestWorker(Context context, WorkerParameters parameters) {
-        super(context, parameters);
+    private static final String TAG = "SDPDeviceCredentialTestWorker";
+    private Context context;
 
+    public SDPAuthFailureTestWorker(Context context) {
+        this.context = context;
         try {
-            new File(getApplicationContext().getFilesDir(), FILE_NAME).delete();
+            Log.i(TAG, "Deleting previous run file.");
+            new File(context.getFilesDir(), FILE_NAME).delete();
         } catch (Exception ex) {
         }
     }
 
     @NonNull
-    @Override
-    public Result doWork() {
+    public boolean doWork() {
         try {
 
             // Write SDP File
             TestUtil.logSuccess(getClass(), "Using RSA with previously generated " +
                             "KeyPair from AndroidKeyStore.", KeyPairGenerator.class);
 
-            SecureContextCompat secureContext = new SecureContextCompat(getApplicationContext(),
+            SecureContextCompat secureContext = new SecureContextCompat(context,
                     SecureConfig.getStrongConfig());
 
             TestUtil.logSuccess(getClass(), "Opening encrypted stream to SDP " +
@@ -81,7 +82,7 @@ public class SDPAuthFailureTestWorker extends Worker {
             outputStream.flush();
             outputStream.close();
 
-            FileInputStream rawInputStream = getApplicationContext().openFileInput(FILE_NAME);
+            FileInputStream rawInputStream = context.openFileInput(FILE_NAME);
             byte[] fileContents = new byte[rawInputStream.available()];
             rawInputStream.read(fileContents);
             rawInputStream.close();
@@ -93,7 +94,7 @@ public class SDPAuthFailureTestWorker extends Worker {
             // Read file
             secureContext.openEncryptedFileInput(
                     FILE_NAME,
-                    Executors.newSingleThreadExecutor(),
+                    ContextCompat.getMainExecutor(context),
                     inputStream -> {
                 try {
                     byte[] encodedData = new byte[inputStream.available()];
@@ -115,13 +116,13 @@ public class SDPAuthFailureTestWorker extends Worker {
                 }
             });
 
-            return Result.success();
+            return true;
         } catch (Exception ex) {
             TestUtil.logFailure(getClass(), ex.getMessage());
             TestUtil.logFailure(getClass(), "Key user not authenticated, could not " +
                     "decrypt SDP file.");
         }
         TestUtil.logFailure(getClass(), "Unknown Error, please check the logs.");
-        return Result.failure();
+        return false;
     }
 }

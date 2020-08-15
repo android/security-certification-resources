@@ -17,6 +17,7 @@
 package com.android.certifications.niap.tests;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.certifications.niap.MainActivity;
 import com.android.certifications.niap.TestUtil;
@@ -31,13 +32,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPairGenerator;
-import java.util.concurrent.Executors;
 
 import javax.crypto.Cipher;
 
-import androidx.annotation.NonNull;
-import androidx.work.Worker;
-import androidx.work.WorkerParameters;
+import androidx.core.content.ContextCompat;
 
 /**
  * Worker class that runs a test to encrypt and decrypt data with the NIAPSEC library.
@@ -46,28 +44,29 @@ import androidx.work.WorkerParameters;
  * does require that the user authorize using the devices default unlock implementation which can
  * be a device pin or password, fingerprint, or face identification.
  */
-public class SDPDeviceCredentialTestWorker extends Worker {
+public class SDPDeviceCredentialTestWorker implements TestWorker {
 
     private static final String FILE_NAME = "test_file";
     private static final String KEY_PAIR_ALIAS = "key_pair_alias";
 
-    public SDPDeviceCredentialTestWorker(Context context, WorkerParameters parameters) {
-        super(context, parameters);
+    private static final String TAG = "SDPDeviceCredentialTestWorker";
+    private Context context;
 
+    public SDPDeviceCredentialTestWorker(Context context) {
+        this.context = context;
         try {
-            new File(getApplicationContext().getFilesDir(), FILE_NAME).delete();
+            Log.i(TAG, "Deleting previous run file.");
+            new File(context.getFilesDir(), FILE_NAME).delete();
         } catch (Exception ex) {
         }
     }
 
-    @NonNull
-    @Override
-    public Result doWork() {
+    public boolean doWork() {
         try {
             // Write SDP File
             BiometricSupport biometricSupport = new BiometricSupportImpl(
                     MainActivity.thisActivity,
-                    getApplicationContext(), true) {
+                    context, true) {
                 @Override
                 public void onAuthenticationSucceeded() {
                     TestUtil.logSuccess(getClass(), "SDP Device Credential Unlock " +
@@ -97,7 +96,7 @@ public class SDPDeviceCredentialTestWorker extends Worker {
             keyGenerator.generateAsymmetricKeyPair(KEY_PAIR_ALIAS);
 
             SecureContextCompat secureContext = new SecureContextCompat(
-                    getApplicationContext(),
+                    context,
                     secureConfig);
 
             TestUtil.logSuccess(
@@ -120,7 +119,7 @@ public class SDPDeviceCredentialTestWorker extends Worker {
             outputStream.close();
 
 
-            FileInputStream rawInputStream = getApplicationContext().openFileInput(FILE_NAME);
+            FileInputStream rawInputStream = context.openFileInput(FILE_NAME);
             byte[] fileContents = new byte[rawInputStream.available()];
             rawInputStream.read(fileContents);
             rawInputStream.close();
@@ -131,7 +130,7 @@ public class SDPDeviceCredentialTestWorker extends Worker {
             // Read file
             secureContext.openEncryptedFileInput(
                     FILE_NAME,
-                    Executors.newSingleThreadExecutor(),
+                    ContextCompat.getMainExecutor(context),
                     inputStream -> {
                         try {
                             byte[] encodedData = new byte[inputStream.available()];
@@ -157,13 +156,13 @@ public class SDPDeviceCredentialTestWorker extends Worker {
                         }
                     });
 
-            return Result.success();
+            return true;
         } catch (Exception ex) {
             ex.printStackTrace();
             TestUtil.logFailure(getClass(), ex.getMessage());
         }
         TestUtil.logFailure(getClass(), "Unknown Error, please check the logs.");
-        return Result.failure();
+        return false;
     }
 
 

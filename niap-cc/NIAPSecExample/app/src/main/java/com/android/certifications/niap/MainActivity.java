@@ -33,9 +33,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkContinuation;
-import androidx.work.WorkManager;
 
 import com.android.certifications.niap.niapsec.SecureConfig;
 import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
@@ -43,13 +40,13 @@ import com.android.certifications.niap.niapsec.crypto.SecureCipher;
 import com.android.certifications.niap.niapsec.net.SecureURL;
 import com.android.certifications.niap.niapsecexample.R;
 import com.android.certifications.niap.tests.SDPDeviceCredentialTestWorker;
+import com.android.certifications.niap.tests.TestWorker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.android.certifications.niap.tests.SDPAuthFailureTestWorker;
 import com.android.certifications.niap.tests.SDPTestWorker;
 
 import java.net.URLConnection;
-import java.util.concurrent.TimeUnit;
 
 import static com.android.certifications.niap.EncryptedDataService.START_FOREGROUND_ACTION;
 import static com.android.certifications.niap.EncryptedDataService.STOP_FOREGROUND_ACTION;
@@ -138,26 +135,17 @@ public class MainActivity extends FragmentActivity {
             Log.i(TAG, "!!!!!!!!!!LOCK DEVICE NOW...!!!!");
             initialDelay = 6;
         }
-        OneTimeWorkRequest sdpTestWorker;
+        TestWorker sdpTestWorker;
         if(useDeviceCredentialCheckBox.isChecked()) {
-            sdpTestWorker = new OneTimeWorkRequest.Builder(SDPDeviceCredentialTestWorker.class)
-                    .setInitialDelay(initialDelay, TimeUnit.SECONDS)
-                    .build();
+            sdpTestWorker = new SDPDeviceCredentialTestWorker(getApplicationContext());
         } else {
-            sdpTestWorker = new OneTimeWorkRequest.Builder(SDPTestWorker.class)
-                    .setInitialDelay(initialDelay, TimeUnit.SECONDS)
-                    .build();
+            sdpTestWorker = new SDPTestWorker(getApplicationContext());
         }
-
-        WorkContinuation workContinuation =
-                WorkManager.getInstance(getApplicationContext()).beginWith(sdpTestWorker);
+        sdpTestWorker.doWork();
         if(testNoAuthCheckBox.isChecked()) {
-            OneTimeWorkRequest sdpFailureTestWorker =
-                    new OneTimeWorkRequest.Builder(SDPAuthFailureTestWorker.class)
-                            .build();
-            workContinuation.then(sdpFailureTestWorker);
+            TestWorker sdpFailureTestWorker = new SDPAuthFailureTestWorker(getApplicationContext());
+            sdpFailureTestWorker.doWork();
         }
-        workContinuation.enqueue();
 
 
         try {
