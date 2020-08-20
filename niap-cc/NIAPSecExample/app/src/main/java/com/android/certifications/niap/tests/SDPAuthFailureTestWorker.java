@@ -75,7 +75,7 @@ public class SDPAuthFailureTestWorker implements TestWorker {
             TestUtil.logSuccess(getClass(), "Writing Data: " + TestUtil.DATA,
                     FileOutputStream.class);
             FileOutputStream outputStream = secureContext.openEncryptedFileOutput(FILE_NAME,
-                    Context.MODE_PRIVATE, KEY_PAIR_ALIAS);
+                    Context.MODE_PRIVATE, KEY_PAIR_ALIAS,  true);
             TestUtil.logSuccess(getClass(), "Writing SDP file encrypted contents to " +
                     FILE_NAME, Cipher.class);
             outputStream.write(TestUtil.DATA.getBytes(StandardCharsets.UTF_8));
@@ -95,6 +95,7 @@ public class SDPAuthFailureTestWorker implements TestWorker {
             secureContext.openEncryptedFileInput(
                     FILE_NAME,
                     ContextCompat.getMainExecutor(context),
+                    true,
                     inputStream -> {
                 try {
                     byte[] encodedData = new byte[inputStream.available()];

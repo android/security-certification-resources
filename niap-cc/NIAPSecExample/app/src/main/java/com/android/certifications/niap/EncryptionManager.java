@@ -162,7 +162,7 @@ public class EncryptionManager {
                 FileOutputStream outputStream = secureContext.openEncryptedFileOutput(
                         fileName,
                         Context.MODE_PRIVATE,
-                        fileName.substring(0, fileName.indexOf(".")));
+                        fileName.substring(0, fileName.indexOf(".")), false);
                 outputStream.write(encryptedData);
                 UpdateViewModel.updateStatus.postValue(
                         "Saving " + encryptedData.length + " bytes to file " + fileName);
@@ -207,6 +207,7 @@ public class EncryptionManager {
             secureContext.openEncryptedFileInput(
                     fileName,
                     Executors.newSingleThreadExecutor(),
+                    true,
                     inputStream -> {
                 try {
                     byte[] fileData = new byte[inputStream.available()];
@@ -221,7 +222,8 @@ public class EncryptionManager {
                                         .openEncryptedFileOutput(
                                                 fileName,
                                                 Context.MODE_PRIVATE,
-                                                fileName.substring(0, fileName.indexOf(".")));
+                                                fileName.substring(0, fileName.indexOf(".")),
+                                                false);
                                 outputStream.write(convertedData);
                                 outputStream.flush();
                                 outputStream.close();
@@ -249,6 +251,7 @@ public class EncryptionManager {
             secureContext.openEncryptedFileInput(
                     fileName,
                     Executors.newSingleThreadExecutor(),
+                    true,
                     inputStream -> {
                 try {
 

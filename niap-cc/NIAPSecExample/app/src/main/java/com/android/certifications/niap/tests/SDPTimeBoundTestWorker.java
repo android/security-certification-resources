@@ -25,6 +25,7 @@ import com.android.certifications.niap.niapsec.SecureConfig;
 import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
 import com.android.certifications.niap.niapsec.biometric.BiometricSupportImpl;
 import com.android.certifications.niap.niapsec.context.SecureContextCompat;
+import com.android.certifications.niap.niapsec.crypto.SecureCipher;
 import com.android.certifications.niap.niapsec.crypto.SecureKeyGenerator;
 
 import java.io.File;
@@ -35,6 +36,7 @@ import java.security.KeyPairGenerator;
 
 import javax.crypto.Cipher;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 /**
@@ -43,16 +45,19 @@ import androidx.core.content.ContextCompat;
  * This test should be successful after running the application. Please note that, this test
  * does require that the user authorize using the devices default unlock implementation which can
  * be a device pin or password, fingerprint, or face identification.
+ * <p>
+ * This test unlocks the key prior to usage, and uses no lambda's or callbacks to ensure memory can
+ * be properly destroyed.
  */
-public class SDPDeviceCredentialTestWorker implements TestWorker {
+public class SDPTimeBoundTestWorker implements TestWorker, SecureCipher.SecureAuthCallback {
 
     private static final String FILE_NAME = "test_file";
     private static final String KEY_PAIR_ALIAS = "key_pair_alias";
 
-    private static final String TAG = "SDPDeviceCredentialTestWorker";
+    private static final String TAG = "SDPTimeBoundTestWorker";
     private Context context;
 
-    public SDPDeviceCredentialTestWorker(Context context) {
+    public SDPTimeBoundTestWorker(Context context) {
         this.context = context;
         try {
             Log.i(TAG, "Deleting previous run file.");
@@ -61,44 +66,52 @@ public class SDPDeviceCredentialTestWorker implements TestWorker {
         }
     }
 
+    @NonNull
     public boolean doWork() {
+        SecureConfig secureConfig = SecureConfig.getStrongDeviceCredentialConfig(null);
+        secureConfig.setDebugLoggingEnabled(true);
+        SecureKeyGenerator keyGenerator = SecureKeyGenerator.getInstance(secureConfig);
+        TestUtil.logSuccess(getClass(), "Generated RSA with provider AndroidKeyStore.",
+                KeyPairGenerator.class);
+        keyGenerator.generateAsymmetricKeyPair(KEY_PAIR_ALIAS);
+        // Write SDP File
+        BiometricSupport biometricSupport = new BiometricSupportImpl(
+                MainActivity.thisActivity,
+                context, true) {
+            @Override
+            public void onAuthenticationSucceeded() {
+                TestUtil.logSuccess(getClass(), "SDP Biometric Unlock Succeeded, " +
+                        "private key available for decryption through the AndroidKeyStore.");
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                TestUtil.logFailure(getClass(), "SDP Biometric Unlock failed, " +
+                        "file not available for decryption.");
+            }
+
+            @Override
+            public void onMessage(String message) {
+                TestUtil.logSuccess(getClass(), message);
+            }
+        };
+        biometricSupport.authenticateDeviceCredential(this);
+        return true;
+    }
+
+    @Override
+    public void authComplete(BiometricSupport.BiometricStatus status) {
+        Log.i(TAG, "AuthComplete Callback.");
+        SecureConfig secureConfig = SecureConfig.getStrongConfig();
+        secureConfig.setDebugLoggingEnabled(true);
+        runTest(secureConfig);
+    }
+
+    public boolean runTest(SecureConfig secureConfig) {
         try {
-            // Write SDP File
-            BiometricSupport biometricSupport = new BiometricSupportImpl(
-                    MainActivity.thisActivity,
-                    context, true) {
-                @Override
-                public void onAuthenticationSucceeded() {
-                    TestUtil.logSuccess(getClass(), "SDP Device Credential Unlock " +
-                            "Succeeded, private key available for decryption through the " +
-                            "AndroidKeyStore.");
-                }
-
-                @Override
-                public void onAuthenticationFailed() {
-                    TestUtil.logFailure(getClass(),
-                            "SDP Device Credential Unlock failed, " +
-                            "file not available for decryption.");
-                }
-
-                @Override
-                public void onMessage(String message) {
-                    TestUtil.logSuccess(getClass(), message);
-                }
-            };
-
-            SecureConfig secureConfig =
-                    SecureConfig.getStrongDeviceCredentialConfig(biometricSupport);
-            secureConfig.setDebugLoggingEnabled(true);
-            SecureKeyGenerator keyGenerator = SecureKeyGenerator.getInstance(secureConfig);
-            TestUtil.logSuccess(getClass(), "Generated RSA with provider AndroidKeyStore.",
-                    KeyPairGenerator.class);
-            keyGenerator.generateAsymmetricKeyPair(KEY_PAIR_ALIAS);
-
             SecureContextCompat secureContext = new SecureContextCompat(
                     context,
                     secureConfig);
-
             TestUtil.logSuccess(
                     getClass(),
                     "Opening encrypted stream to SDP " + FILE_NAME,
@@ -109,7 +122,7 @@ public class SDPDeviceCredentialTestWorker implements TestWorker {
                     FileOutputStream.class);
             FileOutputStream outputStream = secureContext.openEncryptedFileOutput(
                     FILE_NAME,
-                    Context.MODE_PRIVATE, KEY_PAIR_ALIAS, true);
+                    Context.MODE_PRIVATE, KEY_PAIR_ALIAS, false);
             TestUtil.logSuccess(
                     getClass(),
                     "Writing SDP file encrypted contents to " + FILE_NAME,
@@ -125,13 +138,11 @@ public class SDPDeviceCredentialTestWorker implements TestWorker {
             rawInputStream.close();
             TestUtil.logSuccess(getClass(), "SDP File Contents: " +
                     new String(fileContents, StandardCharsets.UTF_8), FileInputStream.class);
-
-
             // Read file
             secureContext.openEncryptedFileInput(
                     FILE_NAME,
                     ContextCompat.getMainExecutor(context),
-                    true,
+                    false,
                     inputStream -> {
                         try {
                             byte[] encodedData = new byte[inputStream.available()];
@@ -165,6 +176,4 @@ public class SDPDeviceCredentialTestWorker implements TestWorker {
         TestUtil.logFailure(getClass(), "Unknown Error, please check the logs.");
         return false;
     }
-
-
 }

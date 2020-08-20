@@ -40,6 +40,7 @@ import com.android.certifications.niap.niapsec.crypto.SecureCipher;
 import com.android.certifications.niap.niapsec.net.SecureURL;
 import com.android.certifications.niap.niapsecexample.R;
 import com.android.certifications.niap.tests.SDPDeviceCredentialTestWorker;
+import com.android.certifications.niap.tests.SDPTimeBoundTestWorker;
 import com.android.certifications.niap.tests.TestWorker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -137,7 +138,7 @@ public class MainActivity extends FragmentActivity {
         }
         TestWorker sdpTestWorker;
         if(useDeviceCredentialCheckBox.isChecked()) {
-            sdpTestWorker = new SDPDeviceCredentialTestWorker(getApplicationContext());
+            sdpTestWorker = new SDPTimeBoundTestWorker(getApplicationContext());
         } else {
             sdpTestWorker = new SDPTestWorker(getApplicationContext());
         }
