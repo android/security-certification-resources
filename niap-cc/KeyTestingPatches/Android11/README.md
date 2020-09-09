@@ -1,4 +1,6 @@
-These patches are based off of tag `android-10.0.0_r41`.
+These patches are based off of the android11-release branch
+at this revision of platform/manifest:
+9e79d8ab6fff81b5a62df67487661663219bb063
 
 Here are the paths that the patches apply to:
 
