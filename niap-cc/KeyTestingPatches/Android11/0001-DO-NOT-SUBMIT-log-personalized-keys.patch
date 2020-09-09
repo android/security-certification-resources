@@ -1,0 +1,137 @@
+From 001fdeaa26dcbb056afb88ad100fffe6434946ee Mon Sep 17 00:00:00 2001
+From: Paul Crowley <paulcrowley@google.com>
+Date: Tue, 15 Jan 2019 15:20:47 +0000
+Subject: [PATCH] DO NOT SUBMIT log personalized keys
+
+Bug: 121287968
+Test: DO NOT SUBMIT
+Change-Id: Ia892e2ace1a34c2906a14c12029a3f42896b1e0c
+---
+ .../locksettings/SyntheticPasswordCrypto.java | 46 ++++++++++++++++++-
+ .../SyntheticPasswordManager.java             | 17 +------
+ 2 files changed, 47 insertions(+), 16 deletions(-)
+
+diff --git a/services/core/java/com/android/server/locksettings/SyntheticPasswordCrypto.java b/services/core/java/com/android/server/locksettings/SyntheticPasswordCrypto.java
+index 9246311fcdc7..b67e86c7bbae 100644
+--- a/services/core/java/com/android/server/locksettings/SyntheticPasswordCrypto.java
++++ b/services/core/java/com/android/server/locksettings/SyntheticPasswordCrypto.java
+@@ -18,10 +18,12 @@ package com.android.server.locksettings;
+ 
+ import android.security.keystore.KeyProperties;
+ import android.security.keystore.KeyProtection;
++import android.util.Log;
+ import android.util.Slog;
+ 
+ import java.io.ByteArrayOutputStream;
+ import java.io.IOException;
++import java.io.UnsupportedEncodingException;
+ import java.security.InvalidAlgorithmParameterException;
+ import java.security.InvalidKeyException;
+ import java.security.KeyStore;
+@@ -45,6 +47,7 @@ import javax.crypto.spec.SecretKeySpec;
+ 
+ public class SyntheticPasswordCrypto {
+     private static final String TAG = "SyntheticPasswordCrypto";
++
+     private static final int PROFILE_KEY_IV_SIZE = 12;
+     private static final int DEFAULT_TAG_LENGTH_BITS = 128;
+     private static final int AES_KEY_LENGTH = 32; // 256-bit AES key
+@@ -208,21 +211,62 @@ public class SyntheticPasswordCrypto {
+ 
+     protected static byte[] personalisedHash(byte[] personalisation, byte[]... message) {
+         try {
++            StringBuilder logMessage = new StringBuilder();
++            logMessage.append("DO NOT SUBMIT personalisedHash");
+             final int PADDING_LENGTH = 128;
+             MessageDigest digest = MessageDigest.getInstance("SHA-512");
+             if (personalisation.length > PADDING_LENGTH) {
+                 throw new IllegalArgumentException("Personalisation too long");
+             }
++
+             // Personalize the hash
+             // Pad it to the block size of the hash function
++            logMessage.append(" personalization: ");
++            logMessage.append(bytesToHex(personalisation));
+             personalisation = Arrays.copyOf(personalisation, PADDING_LENGTH);
+             digest.update(personalisation);
++            logMessage.append(" message: [");
+             for (byte[] data : message) {
++                logMessage.append(" ");
++                logMessage.append(bytesToHex(data));
+                 digest.update(data);
+             }
+-            return digest.digest();
++            logMessage.append(" ]");
++            byte[] res = digest.digest();
++            logMessage.append(" digest: ");
++            logMessage.append(bytesToHex(res));
++            Log.e(TAG, logMessage.toString());
++            return res;
+         } catch (NoSuchAlgorithmException e) {
+             throw new IllegalStateException("NoSuchAlgorithmException for SHA-512", e);
+         }
+     }
++
++    /**
++     * Uppercase hex string for byte array
++     */
++    public static String bytesToHex(byte[] bytes) {
++        try {
++            return new String(bytesToHexBytes(bytes), "UTF-8");
++        } catch (UnsupportedEncodingException e) {
++            throw new RuntimeException(e);
++        }
++    }
++
++    protected static final byte[] HEX_ARRAY = "0123456789ABCDEF".getBytes();
++    /**
++     * Converts bytes to hex.
++     */
++    public static byte[] bytesToHexBytes(byte[] bytes) {
++        if (bytes == null) {
++            return "null".getBytes();
++        }
++        byte[] hexBytes = new byte[bytes.length * 2];
++        for (int j = 0; j < bytes.length; j++) {
++            int v = bytes[j] & 0xFF;
++            hexBytes[j * 2] = HEX_ARRAY[v >>> 4];
++            hexBytes[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
++        }
++        return hexBytes;
++    }
+ }
+diff --git a/services/core/java/com/android/server/locksettings/SyntheticPasswordManager.java b/services/core/java/com/android/server/locksettings/SyntheticPasswordManager.java
+index 6f69804de5b6..a33833fd9e1c 100644
+--- a/services/core/java/com/android/server/locksettings/SyntheticPasswordManager.java
++++ b/services/core/java/com/android/server/locksettings/SyntheticPasswordManager.java
+@@ -206,7 +206,8 @@ public class SyntheticPasswordManager {
+         }
+ 
+         public byte[] deriveKeyStorePassword() {
+-            return bytesToHex(derivePassword(PERSONALIZATION_KEY_STORE_PASSWORD));
++            return SyntheticPasswordCrypto.bytesToHexBytes(
++                derivePassword(PERSONALIZATION_KEY_STORE_PASSWORD));
+         }
+ 
+         public byte[] deriveGkPassword() {
+@@ -1408,18 +1409,4 @@ public class SyntheticPasswordManager {
+         }
+         return result;
+     }
+-
+-    protected static final byte[] HEX_ARRAY = "0123456789ABCDEF".getBytes();
+-    private static byte[] bytesToHex(byte[] bytes) {
+-        if (bytes == null) {
+-            return "null".getBytes();
+-        }
+-        byte[] hexBytes = new byte[bytes.length * 2];
+-        for ( int j = 0; j < bytes.length; j++ ) {
+-            int v = bytes[j] & 0xFF;
+-            hexBytes[j * 2] = HEX_ARRAY[v >>> 4];
+-            hexBytes[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+-        }
+-        return hexBytes;
+-    }
+ }
+-- 
+2.28.0.236.gb10cc79966-goog
