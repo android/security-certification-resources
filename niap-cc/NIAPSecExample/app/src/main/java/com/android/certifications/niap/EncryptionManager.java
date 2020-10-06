@@ -123,7 +123,7 @@ public class EncryptionManager {
             Log.i(TAG, "Device Locked: Encrypted Data using Asymmetric Key");
             EphemeralSecretKey secretKey = createEphemeralKey();
             SecureCipher secureCipher = SecureCipher.getDefault(secureConfig);
-            Pair<byte[], byte[]> encryptedData = secureCipher.encryptEphemeralData(secretKey, data);
+            Pair<byte[], byte[]> encryptedData = secureCipher.encryptEphemeralData(secretKey, data, asymKeyPairAlias);
             encryptEphemeralKeyAsymmetric(secretKey, asymKeyPairAlias,
                     (byte[] encryptedEphemeralKey) -> {
                 byte[] encodedData = secureCipher.encodeEphemeralData(

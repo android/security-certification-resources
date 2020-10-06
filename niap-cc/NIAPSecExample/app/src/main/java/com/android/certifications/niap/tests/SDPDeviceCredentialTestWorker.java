@@ -118,7 +118,6 @@ public class SDPDeviceCredentialTestWorker implements TestWorker {
             outputStream.flush();
             outputStream.close();
 
-
             FileInputStream rawInputStream = context.openFileInput(FILE_NAME);
             byte[] fileContents = new byte[rawInputStream.available()];
             rawInputStream.read(fileContents);
