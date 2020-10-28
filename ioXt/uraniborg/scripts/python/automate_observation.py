@@ -21,10 +21,14 @@ also detects execution state and result and automates the 'downloading' of
 Hubble data back to host.
 """
 import argparse
+import io   # to convert regular buffer to in-memory bytes buffer for tarfileobj
 import json
 import logging
 import os
+import shutil  # to help move files
 import sys
+import tarfile  # to untar decompressed adb backup file
+import zlib  # to decompress adb backup
 
 import syscall_wrapper
 
@@ -368,9 +372,43 @@ def classify_directory_using_build_fingerprint(adb_wrapper,
   """
   # need to grab the build.txt to a tmp location
   tmp_file = "/tmp/device_build.txt"
+  adb_pull_failed = False
   if not adb_wrapper.pull("{}/build.txt".format(source), tmp_file):
     logger.error("Failed to pull build.txt from device results dir.")
-    return None
+    adb_pull_failed = True
+
+  if adb_pull_failed:
+    logger.debug("Attempting to grab files using adb backup instead...")
+    compressed_backup_filepath = "/tmp/hubble_results.ab"
+    decompressed_backup_filepath = "/tmp/hubble_results.tar"
+    logger.warning("Manual intervention required: Please select "
+                   "`Back up my data` to proceed")
+    if not adb_wrapper.backup(compressed_backup_filepath, HUBBLE_PACKAGE_NAME):
+      logger.error("Failed to use `adb backup` to pull result files.")
+      return None
+
+    # now we have to decompress the backup file
+    logger.debug("Reading from %s into buffer...", compressed_backup_filepath)
+    compressed_backup_filecontent = ""
+    with open(compressed_backup_filepath, "rb") as f_in:
+      compressed_backup_filecontent = f_in.read()
+
+    # we'll need to skip 24 bytes to skip the Android backup header
+    logger.debug("Decompressing backup file...")
+    decompressed_content = zlib.decompress(compressed_backup_filecontent[24:])
+    with open(decompressed_backup_filepath, "wb") as f_out:
+      f_out.write(decompressed_content)
+
+    tarfile_obj = io.BytesIO(decompressed_content)
+    tar_obj = tarfile.open(fileobj=tarfile_obj)
+    base_result_path = "/tmp/untarred_hubble_results"
+    logger.debug("Extracting result files into %s", base_result_path)
+    tar_obj.extractall(base_result_path)
+
+    # we overwrite tmp_file to reuse existing logic
+    tmp_file = os.path.join(base_result_path, "apps", HUBBLE_PACKAGE_NAME,
+                            "ef", "results", "build.txt")
+    logger.debug("tmp_file: %s", tmp_file)
 
   build_info = ""
   with open(tmp_file, "r") as f_in:
@@ -391,8 +429,16 @@ def classify_directory_using_build_fingerprint(adb_wrapper,
       logger.debug("{} does not exist yet! Using it!".format(target_dir))
       break
 
-  if adb_wrapper.pull(source, target_dir):
+  if adb_pull_failed:
+    source_dir = os.path.join("/tmp/untarred_hubble_results/apps",
+                              HUBBLE_PACKAGE_NAME,
+                              "ef",
+                              "results")
+    shutil.move(source_dir, target_dir)
     return target_dir
+  else:
+    if adb_wrapper.pull(source, target_dir):
+      return target_dir
   return None
 
 

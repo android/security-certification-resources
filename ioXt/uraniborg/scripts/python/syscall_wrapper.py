@@ -426,6 +426,29 @@ class AdbWrapper:
       return False
     return True
 
+  def backup(self, backup_filepath, package_name):
+    """Calls 'adb backup -f' to pull result files.
+
+    Note that this is not a generic adb backup implementation.
+
+    Args:
+      backup_filepath: The path to save the backup file to.
+      package_name: The name of the package to back-up.
+
+    Returns:
+      A boolean indicating the success of the operation.
+    """
+    logger = self._logger
+    cmd = self.adb_command[:]
+    cmd.extend(["backup", "-f", backup_filepath, package_name])
+    logger.debug("cmd: %s", cmd)
+    sw = self.syscall_wrapper
+    sw.call_returnable_command(cmd)
+    if sw.error_occured:
+      logger.error("%s failed: %s", cmd, sw.error_message)
+      return False
+    return True
+
 
 class DeviceInfo:
   """A class representing basic information about a physical device.
