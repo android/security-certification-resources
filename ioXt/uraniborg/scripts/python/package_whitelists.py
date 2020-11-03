@@ -45,6 +45,7 @@ class BaselinePackages:
       27: "data/O-AOSP.json",
       28: "data/P-AOSP.json",
       29: "data/Q-GSI.json",
+      30: "data/R-GSI.json",
   }
 
   @staticmethod
