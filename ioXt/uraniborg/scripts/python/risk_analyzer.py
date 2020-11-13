@@ -176,6 +176,9 @@ class PlatformSignature(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger):
+    if api_level == 30:
+      logger.debug("Returning RPlatformSignature")
+      return RPlatformSignature(logger)
     if api_level == 29:
       logger.debug("Returning QPlatformSignature")
       return QPlatformSignature(logger)
@@ -278,6 +281,11 @@ class QPlatformSignature(PlatformSignature):
   BASE_SCORE = 49
 
 
+class RPlatformSignature(PlatformSignature):
+  API_LEVEL = 30
+  BASE_SCORE = 49
+
+
 class SystemUid(RiskAnalyzer):
   """Analyzer for system uid risks.
   """
@@ -290,6 +298,9 @@ class SystemUid(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger):
+    if api_level == 30:
+      logger.debug("Returning RSystemUid")
+      return RSystemUid(logger)
     if api_level == 29:
       logger.debug("Returning QSystemUid")
       return QSystemUid(logger)
@@ -355,6 +366,11 @@ class PSystemUid(SystemUid):
 class QSystemUid(SystemUid):
   API_LEVEL = 29
   BASE_SCORE = 23
+
+
+class RSystemUid(SystemUid):
+  API_LEVEL = 30
+  BASE_SCORE = 24
 
 
 class RiskyPermissions(RiskAnalyzer):
@@ -455,6 +471,8 @@ class RiskyPermissions(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger, google_discount=False):
+    if api_level == 30:
+      return RRiskyPermissions(logger, google_discount)
     if api_level == 29:
       return QRiskyPermissions(logger, google_discount)
     elif api_level == 28:
@@ -653,6 +671,12 @@ class QRiskyPermissions(RiskyPermissions):
   UNGRANTED_SCORE = 190
 
 
+class RRiskyPermissions(RiskyPermissions):
+  API_LEVEL = 30
+  BASE_SCORE = 462.5
+  UNGRANTED_SCORE = 187.5
+
+
 class CleartextTraffic(RiskAnalyzer):
   """Cleartext traffic risk analyzer.
 
@@ -664,6 +688,8 @@ class CleartextTraffic(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger, google_discount=False):
+    if api_level == 30:
+      return RCleartextTraffic(logger, google_discount)
     if api_level == 29:
       return QCleartextTraffic(logger, google_discount)
     elif api_level == 28:
@@ -762,6 +788,10 @@ class PCleartextTraffic(CleartextTraffic):
 
 
 class QCleartextTraffic(CleartextTraffic):
+  BASE_SCORE = 8
+
+
+class RCleartextTraffic(CleartextTraffic):
   BASE_SCORE = 8
 
 
