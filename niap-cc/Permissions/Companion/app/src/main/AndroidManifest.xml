@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2020 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.android.certifications.niap.permissions.companion">
+
+    <!-- The app does not use this permission, but it is requested so that it can be revoked during
+         the REVOKE_RUNTIME_PERMISSIONS test. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name="com.android.certifications.niap.permissions.companion.MainActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindIncallServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_INCALL_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindAttentionServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_ATTENTION_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindPrintRecommendationServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_PRINT_RECOMMENDATION_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindKeyguardAppwidgetService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_KEYGUARD_APPWIDGET" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindDeviceAdminService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindPrintServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_PRINT_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindRuntimePermissionPresenterServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_RUNTIME_PERMISSION_PRESENTER_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindVrListenerServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_VR_LISTENER_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindDreamServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_DREAM_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindCarrierServicesService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CARRIER_SERVICES" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindQuickSettingsTileService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindTvInputService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_TV_INPUT" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindAutofillService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_AUTOFILL" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindWallpaperService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_WALLPAPER" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindIntentFilterVerifierService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_INTENT_FILTER_VERIFIER" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindTelecomConnectionServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindCallRedirectionServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CALL_REDIRECTION_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindVoiceInteractionService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_VOICE_INTERACTION" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindCacheQuotaServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CACHE_QUOTA_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindResolverRankerServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_RESOLVER_RANKER_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindCarrierMessagingClientServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CARRIER_MESSAGING_CLIENT_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindConnectionServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CONNECTION_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindQuickAccessWalletServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_QUICK_ACCESS_WALLET_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindVpnServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_VPN_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindAppwidgetService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_APPWIDGET" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindNotificationListenerServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindScreeningServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_SCREENING_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindMidiDeviceServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_MIDI_DEVICE_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindRemoteDisplayService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_REMOTE_DISPLAY" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindAutofillServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindJobServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindCompanionDeviceManagerServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_COMPANION_DEVICE_MANAGER_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindPackageVerifierService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_PACKAGE_VERIFIER" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindRouteProviderService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_ROUTE_PROVIDER" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindCarrierMessagingServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CARRIER_MESSAGING_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindEuiccServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_EUICC_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindVisualVoicemailServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_VISUAL_VOICEMAIL_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindTvRemoteServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_TV_REMOTE_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindConditionProviderServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CONDITION_PROVIDER_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindAutofillFieldClassificationServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_AUTOFILL_FIELD_CLASSIFICATION_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindContentSuggestionsServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CONTENT_SUGGESTIONS_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindNotificationAssistantServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_NOTIFICATION_ASSISTANT_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindSoundTriggerDetectionServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_SOUND_TRIGGER_DETECTION_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindPrintSpoolerServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_PRINT_SPOOLER_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindDirectorySearchService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_DIRECTORY_SEARCH" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindTelephonyNetworkServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_TELEPHONY_NETWORK_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindControlsService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CONTROLS" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindSettingsSuggestionsServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_SETTINGS_SUGGESTIONS_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindTrustAgentService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_TRUST_AGENT" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindRemoteviewsService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindTelephonyDataServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_TELEPHONY_DATA_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindCellBroadcastServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CELL_BROADCAST_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindAccessibilityServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindInputMethodService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_INPUT_METHOD" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindExternalStorageServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_EXTERNAL_STORAGE_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindTextclassifierServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_TEXTCLASSIFIER_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindNfcServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_NFC_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindPhoneAccountSuggestionServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_PHONE_ACCOUNT_SUGGESTION_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindImsServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_IMS_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindTextServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_TEXT_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindExplicitHealthCheckServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_EXPLICIT_HEALTH_CHECK_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindNetworkRecommendationServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_NETWORK_RECOMMENDATION_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindChooserTargetServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CHOOSER_TARGET_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindInlineSuggestionRenderServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_INLINE_SUGGESTION_RENDER_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindContentCaptureServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_CONTENT_CAPTURE_SERVICE" />
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindAugmentedAutofillServiceService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_AUGMENTED_AUTOFILL_SERVICE" />
+    </application>
+
+</manifest>
