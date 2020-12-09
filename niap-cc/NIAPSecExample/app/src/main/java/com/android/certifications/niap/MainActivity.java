@@ -36,10 +36,10 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.android.certifications.niap.niapsec.SecureConfig;
 import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
+import com.android.certifications.niap.niapsec.biometric.ConfirmCredentialImpl;
 import com.android.certifications.niap.niapsec.crypto.SecureCipher;
 import com.android.certifications.niap.niapsec.net.SecureURL;
 import com.android.certifications.niap.niapsecexample.R;
-import com.android.certifications.niap.tests.SDPDeviceCredentialTestWorker;
 import com.android.certifications.niap.tests.SDPTimeBoundTestWorker;
 import com.android.certifications.niap.tests.TestWorker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -107,6 +107,18 @@ public class MainActivity extends FragmentActivity {
                 });
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ConfirmCredentialImpl.INTENT_CONFIRM_AUTHENTICATE) {
+            if (resultCode == RESULT_OK) {
+                ConfirmCredentialImpl.onActivityResultCallback(true);
+            } else {
+                ConfirmCredentialImpl.onActivityResultCallback(false);
+            }
+        }
     }
 
     @Override

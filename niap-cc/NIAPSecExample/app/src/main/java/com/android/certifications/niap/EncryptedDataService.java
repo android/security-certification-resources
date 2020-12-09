@@ -28,7 +28,7 @@ import android.util.Log;
 
 import com.android.certifications.niap.niapsec.SecureConfig;
 import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
-import com.android.certifications.niap.niapsec.biometric.BiometricSupportImpl;
+import com.android.certifications.niap.niapsec.biometric.ConfirmCredentialImpl;
 import com.android.certifications.niap.niapsec.crypto.SecureCipher;
 
 import androidx.annotation.Nullable;
@@ -73,8 +73,7 @@ public class EncryptedDataService extends IntentService {
     public void onCreate() {
         super.onCreate();
         this.viewModel = MainActivity.viewModel;
-        biometricSupport = new BiometricSupportImpl(MainActivity.thisActivity,
-                getApplicationContext(), false) {
+        biometricSupport = new ConfirmCredentialImpl(MainActivity.thisActivity) {
             @Override
             public void onAuthenticationSucceeded() {
                 showMessage(BIOMETRIC_AUTH + " Succeeded!");

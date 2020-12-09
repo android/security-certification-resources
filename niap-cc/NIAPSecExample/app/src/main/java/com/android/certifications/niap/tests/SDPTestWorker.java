@@ -23,7 +23,7 @@ import com.android.certifications.niap.MainActivity;
 import com.android.certifications.niap.TestUtil;
 import com.android.certifications.niap.niapsec.SecureConfig;
 import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
-import com.android.certifications.niap.niapsec.biometric.BiometricSupportImpl;
+import com.android.certifications.niap.niapsec.biometric.ConfirmCredentialImpl;
 import com.android.certifications.niap.niapsec.context.SecureContextCompat;
 import com.android.certifications.niap.niapsec.crypto.SecureKeyGenerator;
 
@@ -66,9 +66,8 @@ public class SDPTestWorker implements TestWorker {
     public boolean doWork() {
         try {
             // Write SDP File
-            BiometricSupport biometricSupport = new BiometricSupportImpl(
-                    MainActivity.thisActivity,
-                    context, false) {
+            BiometricSupport biometricSupport = new ConfirmCredentialImpl(
+                    MainActivity.thisActivity) {
                 @Override
                 public void onAuthenticationSucceeded() {
                     TestUtil.logSuccess(getClass(), "SDP Biometric Unlock Succeeded, " +
