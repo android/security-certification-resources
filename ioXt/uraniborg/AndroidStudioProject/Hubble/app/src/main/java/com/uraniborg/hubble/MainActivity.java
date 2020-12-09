@@ -14,6 +14,7 @@
 
 package com.uraniborg.hubble;
 
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -27,6 +28,8 @@ import android.os.SystemClock;
 import android.util.Base64;
 import android.util.Log;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -41,7 +44,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
   final String TAG = "HUBBLE";
-  private final String VERSION = "1.0.0";   // NOTE: to be updated for every Hubble release
+  private final String VERSION = "1.1.0";   // NOTE: to be updated for every Hubble release
 
   private HashMap<String, PackageMetadata> mAllPackages;
   private HashMap<String, byte[]> mAllCertificates;
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
   private BuildInfo mBuildInfo;
   private PackageManager mPackageManager;
   private DevicePropertiesInfo mDeviceProps;
+  private Executor mExecutor;
 
   private static String HEADER_FMT = "{ \"version\": \"%s\", \"%s\": %d,\n\"%s\": [\n";
   private static String FOOTER_STR = "\n]\n}";
@@ -65,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     mHardwareInfo = new HardwareInfo();
     mBuildInfo = new BuildInfo();
     mDeviceProps = new DevicePropertiesInfo();
+    mExecutor = Executors.newSingleThreadExecutor();
 
     mPackageManager = getPackageManager();
     if (mPackageManager == null) {
@@ -401,30 +406,37 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    long start = SystemClock.elapsedRealtime();
+    final TextView textView = findViewById(R.id.textView);
+    textView.setText(R.string.scan_start);
+
     initialize();
 
-    getInstalledPackagesInformation();
-    getAllCertificates();
-    getAllBinaries();
-    getAllLibraries();
-    getHardwareInformation();
-    getBuildInformation();
-    getDeviceProperties();
+    mExecutor.execute(() -> {
+      final long start = SystemClock.elapsedRealtime();
 
-    long stop = SystemClock.elapsedRealtime();
-    long duration = stop - start;
+      getInstalledPackagesInformation();
+      getAllCertificates();
+      getAllBinaries();
+      getAllLibraries();
+      getHardwareInformation();
+      getBuildInformation();
+      getDeviceProperties();
 
-    writePackagesToFile();
-    writeCertsToFile();
-    writeBinsToFile();
-    writeLibsToFile();
-    writeHardwareToFile();
-    writeBuildToFile();
-    writeDevicePropsToFile();
+      final long duration = SystemClock.elapsedRealtime() - start;
 
-    Log.d(TAG, String.format("Execution took %d ms.", duration));
-    Log.w(TAG, String.format("Build version: %d", Build.VERSION.SDK_INT));
-    Log.w(TAG, String.format("Results are available at: %s", Utilities.getResultStorageDirectory(this)));
+      writePackagesToFile();
+      writeCertsToFile();
+      writeBinsToFile();
+      writeLibsToFile();
+      writeHardwareToFile();
+      writeBuildToFile();
+      writeDevicePropsToFile();
+
+      Log.d(TAG, String.format("Execution took %d ms.", duration));
+      Log.w(TAG, String.format("Build version: %d", Build.VERSION.SDK_INT));
+      Log.w(TAG,
+              String.format("Results are available at: %s", Utilities.getResultStorageDirectory(this)));
+      runOnUiThread(() -> textView.setText(getResources().getString(R.string.scan_end)));
+    });
   }
 }
