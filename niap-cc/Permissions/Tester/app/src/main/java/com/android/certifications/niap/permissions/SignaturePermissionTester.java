@@ -1762,8 +1762,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.WRITE_SECURE_SETTINGS,
                 new PermissionTest(false, () -> {
-                    // mTransacts.invokeTransact(TransactIds.WINDOW_SERVICE, TransactIds.WINDOW_DESCRIPTOR, 8,
-                    // 1, 1080, 2160);
                     Settings.Secure.putString(mContentResolver, "TEST_KEY", "TEST_VALUE");
                 }));
 

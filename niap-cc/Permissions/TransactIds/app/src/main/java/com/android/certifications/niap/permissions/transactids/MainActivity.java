@@ -146,6 +146,8 @@ public class MainActivity extends AppCompatActivity {
                     descriptorTransacts);
             queryTransactId(Transacts.ACTIVITY_DESCRIPTOR, Transacts.getIntentForIntentSender,
                     descriptorTransacts);
+            queryTransactId(Transacts.ACTIVITY_DESCRIPTOR, Transacts.getTaskDescription,
+                    descriptorTransacts);
             queryTransactId(Transacts.ACTIVITY_DESCRIPTOR, Transacts.inputDispatchingTimedOut,
                     descriptorTransacts);
             queryTransactId(Transacts.ACTIVITY_DESCRIPTOR, Transacts.performIdleMaintenance,
