@@ -44,6 +44,7 @@
             android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE" />
 
     </application>
+
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />

@@ -402,7 +402,7 @@ public class Transacts {
      * Initializes the mapping of transact names to their expected IDs for a device running Android
      * 9 / API level 28.
      */
-    public class PTransacts extends Transacts {
+    private static class PTransacts extends Transacts {
         public PTransacts() {
             super();
             mDeviceApiLevel = Build.VERSION_CODES.P;
@@ -520,24 +520,27 @@ public class Transacts {
             mDescriptorTransacts.put(NETWORK_MANAGEMENT_DESCRIPTOR, transactIds);
 
             transactIds = new HashMap<>();
-            transactIds.put(unhandledBack, 7);
-            transactIds.put(inputDispatchingTimedOut, 159);
             transactIds.put(bindBackupAgent, 88);
-            transactIds.put(setFrontActivityScreenCompatMode, 123);
             transactIds.put(performIdleMaintenance, 180);
-            transactIds.put(startActivityFromRecents, 198);
             transactIds.put(setDumpHeapDebugLimit, 225);
             transactIds.put(updateLockTaskPackages, 228);
             transactIds.put(getGrantedUriPermissions, 263);
             transactIds.put(setHasTopUi, 285);
-            transactIds.put(releasePersistableUriPermission, 182);
             transactIds.put(dismissKeyguard, 289);
-            transactIds.put(requestBugReport, 156);
             transactIds.put(resumeAppSwitches, 87);
             transactIds.put(getContentProviderExternal, 138);
             transactIds.put(getIntentForIntentSender, 161);
-            transactIds.put(getFrontActivityScreenCompatMode, 122);
+            transactIds.put(getTaskDescription, 80);
             transactIds.put(getAssistContextExtras, 162);
+            transactIds.put(unhandledBack, 7);
+            transactIds.put(inputDispatchingTimedOut, 159);
+            transactIds.put(setFrontActivityScreenCompatMode, 123);
+            transactIds.put(setAlwaysFinish, 38);
+            transactIds.put(startActivityFromRecents, 198);
+            transactIds.put(releasePersistableUriPermission, 182);
+            transactIds.put(requestBugReport, 156);
+            transactIds.put(getFrontActivityScreenCompatMode, 122);
+            transactIds.put(setProcessLimit, 47);
             transactIds.put(signalPersistentProcesses, 55);
             transactIds.put(updateConfiguration, 43);
             transactIds.put(appNotRespondingViaProvider, 184);
@@ -570,8 +573,8 @@ public class Transacts {
             mDescriptorTransacts.put(WINDOW_DESCRIPTOR, transactIds);
 
             transactIds = new HashMap<>();
-            transactIds.put(noteOperation, 2);
             transactIds.put(setUserRestriction, 20);
+            transactIds.put(noteOperation, 2);
             mDescriptorTransacts.put(APP_OPS_DESCRIPTOR, transactIds);
 
             transactIds = new HashMap<>();
@@ -582,12 +585,12 @@ public class Transacts {
             mDescriptorTransacts.put(ACCESSIBILITY_DESCRIPTOR, transactIds);
 
             transactIds = new HashMap<>();
-            transactIds.put(setBackupEnabled, 7);
-            mDescriptorTransacts.put(BACKUP_DESCRIPTOR, transactIds);
-
-            transactIds = new HashMap<>();
             transactIds.put(setBindAppWidgetPermission, 20);
             mDescriptorTransacts.put(APPWIDGET_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(setBackupEnabled, 7);
+            mDescriptorTransacts.put(BACKUP_DESCRIPTOR, transactIds);
 
             transactIds = new HashMap<>();
             transactIds.put(reportEnabledTrustAgentsChanged, 3);
@@ -644,7 +647,7 @@ public class Transacts {
      * Initializes the mapping of transact names to their expected IDs for a device running Android
      * 10 / API level 29.
      */
-    private class QTransacts extends Transacts {
+    private static class QTransacts extends Transacts {
         public QTransacts() {
             super();
             mDeviceApiLevel = Build.VERSION_CODES.Q;
@@ -923,7 +926,7 @@ public class Transacts {
      * Initializes the mapping of transact names to their expected IDs for a device running Android
      * 11 / API level 30.
      */
-    public class RTransacts extends Transacts {
+    private static class RTransacts extends Transacts {
         public RTransacts() {
             super();
             mDeviceApiLevel = Build.VERSION_CODES.R;
@@ -1222,11 +1225,11 @@ public class Transacts {
             // class created by the app under the TransactIds/ directory. This will allow the tester
             // to use the specific transact IDs for the device under test.
             case Build.VERSION_CODES.P:
-                return new Transacts().new PTransacts();
+                return new PTransacts();
             case Build.VERSION_CODES.Q:
-                return new Transacts().new QTransacts();
+                return new QTransacts();
             case Build.VERSION_CODES.R:
-                return new Transacts().new RTransacts();
+                return new RTransacts();
             default:
                 throw new IllegalArgumentException(
                         "The provided API level, " + apiLevel + ", is not supported");

@@ -42,6 +42,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mStatusTextView;
     private Button mSetupButton;
+    private boolean mGmsAvailable;
     /**
      * Used to ensure the GMS location settings are configured as required for the location tests.
      */
@@ -91,8 +94,15 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "Running permission tester companion setup on build " + Build.FINGERPRINT);
 
-        mLocationRequest = LocationRequest.create().setPriority(
-                LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(1000);
+        mGmsAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
+                == ConnectionResult.SUCCESS;
+        mGmsAvailable = false;
+        if (mGmsAvailable) {
+            mLocationRequest = LocationRequest.create().setPriority(
+                    LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(1000);
+        } else {
+            Log.d(TAG, "GMS is not available on this device");
+        }
 
         mStatusTextView = findViewById(R.id.statusTextView);
         mSetupButton = findViewById(R.id.setupButton);
@@ -119,12 +129,14 @@ public class MainActivity extends AppCompatActivity {
             boolean result;
             setupLocusTest();
             result = setupMediaLocationTest();
-            // if the location settings are not correct then prompt the user for correction before
-            // attempting to set up the location tests.
-            if (!verifyLocationSettings()) {
-                return false;
+            if (mGmsAvailable) {
+                // if the location settings are not correct then prompt the user for correction
+                // before attempting to set up the location tests.
+                if (!verifyLocationSettings()) {
+                    return false;
+                }
+                result = result && setupLocationTest();
             }
-            result = result && setupLocationTest();
             return result;
         }
 
@@ -307,10 +319,11 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Sets up the device for the ACCESS_LOCUS_ID_USAGE_STATS test.
      *
-     * <p>The ACCESS_LOCUS_ID_USAGE_STATS permission allows an app to query for locus events created
-     * by other apps. This method generates a locus event to ensure there is an event on the device
-     * for which the permission test can query. For additional details about locus events see
-     * <a href="https://developer.android.com/reference/android/content/LocusId">LocusId</a>.
+     * <p>The ACCESS_LOCUS_ID_USAGE_STATS permission allows an app to query for locus events
+     * created by other apps. This method generates a locus event to ensure there is an event
+     * on the device for which the permission test can query. For additional details about locus
+     * events see <a href="https://developer.android.com/reference/android/content/LocusId">
+     * LocusId</a>.
      */
     private void setupLocusTest() {
         // While locus events were introduced in Android 10 the ACCESS_LOCUS_ID_USAGE_STATS

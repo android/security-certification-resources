@@ -73,7 +73,7 @@ public class Constants {
      * used for the BIND permission tests and sets up the environment for a number of other tests
      * run by this app.
      */
-    public static final String COMPANION_PACKAGE = "com.google.permissions.tester.companion";
+    public static final String COMPANION_PACKAGE = "com.android.certifications.niap.permissions.companion";
     /**
      * The name of the Google Play Services package.
      */
