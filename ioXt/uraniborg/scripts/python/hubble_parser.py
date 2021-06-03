@@ -83,6 +83,25 @@ class HubbleParser:
     # do a bit of sanity check
     logger.debug("normalize: %s", self.normalize)
 
+  def parse_hubble_json(self, packages, build, hardware):
+    """
+    Consume hubble output as json format.
+
+    Args:
+      packages: the json content from packages.txt of hubble output.
+      build: the json content from build.txt of hubble output.
+      hardware: the json content from hardware of hubble output.
+
+    Returns:
+      True if json content is valid.
+      False if not.
+    """
+    if not packages or not build or not hardware:
+      return False
+    self.packages = pacakges
+    self.build = build
+    self.hardware = hardware
+
   def parse_hubble_output(self, directory):
     """Consumes all hubble output and parses them into Python data structure.
 
