@@ -84,13 +84,12 @@ class HubbleParser:
     logger.debug("normalize: %s", self.normalize)
 
   def parse_hubble_json(self, packages, build, hardware):
-    """
-    Consume hubble output as json format.
+    """Consumes hubble output as json format.
 
     Args:
       packages: the json content from packages.txt of hubble output.
       build: the json content from build.txt of hubble output.
-      hardware: the json content from hardware of hubble output.
+      hardware: the json content from hardware.txt of hubble output.
 
     Returns:
       True if json content is valid.
