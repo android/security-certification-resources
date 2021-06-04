@@ -96,8 +96,9 @@ class HubbleParser:
       False if not.
     """
     if not packages or not build or not hardware:
+      self.logger.error("Missing required hubble output")
       return False
-    self.packages = pacakges
+    self.packages = packages
     self.build = build
     self.hardware = hardware
 
