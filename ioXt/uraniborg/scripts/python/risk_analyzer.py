@@ -651,7 +651,7 @@ class RiskyPermissions(RiskAnalyzer):
 
   def get_packages(self):
     """Returns all considered risky permissions packages."""
-    return self.platform_apps
+    return self.risky_apps
 
 
 # NOTE TO IMPLEMENTORS:
