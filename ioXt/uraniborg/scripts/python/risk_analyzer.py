@@ -155,7 +155,9 @@ class RiskAnalyzer(ABC):
     logger = self.logger
     numerator = self.compute_base_score(hubble, True)
     denominator = self.compute_base_score(hubble, False)
-    r = numerator / denominator
+    r = 0
+    if denominator:
+      r = numerator / denominator
     logger.debug("r = %2.2f / %2.2f = %2.4f", numerator, denominator, r)
     return r * self.PHI
 
@@ -250,6 +252,8 @@ class PlatformSignature(RiskAnalyzer):
           num_platform_signed_app -= 1
           logger.debug("-%s but has no code. Running total: %d", package_name,
                        num_platform_signed_app)
+        else:
+          self.platform_apps.append(package)
     return num_platform_signed_app
 
   def compute_score(self, hubble, normalize):
@@ -257,6 +261,10 @@ class PlatformSignature(RiskAnalyzer):
     # implemented yourself) to compute the weighted score for the metric you are
     # measuring.
     return self._cambridge(hubble, normalize)
+
+  def get_packages(self):
+    """Returns all considered platform signature packages."""
+    return self.platform_apps
 
 
 # NOTE TO IMPLEMENTORS:
@@ -511,6 +519,7 @@ class RiskyPermissions(RiskAnalyzer):
   def __init__(self, logger, google_discount):
     self.logger = logger
     self.google_discount = google_discount
+    self.risky_apps = []
 
   def _compute_fair_permission_score(self, permissions):
     """Account for permissions within the same group.
@@ -610,11 +619,12 @@ class RiskyPermissions(RiskAnalyzer):
           logger.debug("!%s seems to be GMS but signature doesn't match!",
                        package_name)
 
+      self.risky_apps.append(package)
       risk_score = self._compute_fair_permission_score(
           package["permissionsGranted"])
       # handle special permissions
       risk_score["special"] = 0
-      for special_permission in package["permissionsSpecial"]:
+      for special_permission in package.get("permissionsSpecial", []):
         risk_score["special"] += RiskyPermissions.map_permission_to_score(
             special_permission)
 
@@ -638,6 +648,10 @@ class RiskyPermissions(RiskAnalyzer):
 
   def compute_score(self, hubble, normalize):
     return self._cambridge(hubble, normalize)
+
+  def get_packages(self):
+    """Returns all considered risky permissions packages."""
+    return self.platform_apps
 
 
 # NOTE TO IMPLEMENTORS:
@@ -704,6 +718,7 @@ class CleartextTraffic(RiskAnalyzer):
   def __init__(self, logger, google_discount):
     self.logger = logger
     self.google_discount = google_discount
+    self.cleartext_traffic_apps = []
 
   def compute_base_score(self, hubble, normalize):
     """Computes the base score of cleartext traffic risk.
@@ -752,6 +767,8 @@ class CleartextTraffic(RiskAnalyzer):
           logger.debug("-%s has no INTERNET permission? Discounting...",
                        package_name)
           total_score -= 1
+        else:
+          self.cleartext_traffic_apps.append(package)
     return total_score
 
   def compute_score(self, hubble, normalize):
@@ -773,6 +790,10 @@ class CleartextTraffic(RiskAnalyzer):
       probability x damage_potential.
     """
     return self._cambridge(hubble, normalize)
+
+  def get_packages(self):
+    """Returns all considered cleartext traffic packages."""
+    return self.cleartext_traffic_apps
 
 
 class NCleartextTraffic(CleartextTraffic):
