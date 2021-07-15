@@ -50,6 +50,14 @@ class RiskAnalyzer(ABC):
   PHI = 0
   LAMBDA_I = 0.25
 
+
+  def __init__(self):
+    self.related_apps = []
+
+  def get_related_apps(self):
+    """Returns a list of apps which are considered by the analyzer."""
+    return self.related_apps
+
   @staticmethod
   def convert_to_odds(probability):
     return probability / (1 - probability)
@@ -155,7 +163,9 @@ class RiskAnalyzer(ABC):
     logger = self.logger
     numerator = self.compute_base_score(hubble, True)
     denominator = self.compute_base_score(hubble, False)
-    r = numerator / denominator
+    r = 0.0
+    if denominator:
+      r = numerator / denominator
     logger.debug("r = %2.2f / %2.2f = %2.4f", numerator, denominator, r)
     return r * self.PHI
 
@@ -171,6 +181,7 @@ class PlatformSignature(RiskAnalyzer):
   LAMBDA_I = 0.25
 
   def __init__(self, logger):
+    super().__init__()
     self.logger = logger
     self.platform_apps = []
 
@@ -250,6 +261,8 @@ class PlatformSignature(RiskAnalyzer):
           num_platform_signed_app -= 1
           logger.debug("-%s but has no code. Running total: %d", package_name,
                        num_platform_signed_app)
+        else:
+          self.related_apps.append(package)
     return num_platform_signed_app
 
   def compute_score(self, hubble, normalize):
@@ -293,6 +306,7 @@ class SystemUid(RiskAnalyzer):
   LAMBDA_I = 0.25
 
   def __init__(self, logger):
+    super().__init__()
     self.logger = logger
     self.system_uid_apps = []
 
@@ -509,6 +523,7 @@ class RiskyPermissions(RiskAnalyzer):
     return 0
 
   def __init__(self, logger, google_discount):
+    super().__init__()
     self.logger = logger
     self.google_discount = google_discount
 
@@ -621,16 +636,21 @@ class RiskyPermissions(RiskAnalyzer):
       ungranted_score = self._compute_fair_permission_score(
           package["permissionsNotGranted"])
 
+      is_related = False
       for score_type in risk_score:
         if risk_score[score_type]:
           logger.debug("+%s added %d points as %s pregranted score.",
                        package_name, risk_score[score_type], score_type)
+          is_related = True
         total_granted_score += risk_score[score_type]
       for score_type in ungranted_score:
         if ungranted_score[score_type]:
           logger.debug("/%s added %d points as %s ungranted score.",
                        package_name, ungranted_score[score_type], score_type)
         total_ungranted_score += ungranted_score[score_type]
+
+      if is_related:
+          self.related_apps.append(package)
 
     logger.debug("Total pregranted perms score: %2.2f", total_granted_score)
     logger.debug("Total ungranted perms score: %2.2f", total_ungranted_score)
@@ -702,6 +722,7 @@ class CleartextTraffic(RiskAnalyzer):
       raise Exception("API Level not handled!")
 
   def __init__(self, logger, google_discount):
+    super().__init__()
     self.logger = logger
     self.google_discount = google_discount
 
@@ -752,6 +773,8 @@ class CleartextTraffic(RiskAnalyzer):
           logger.debug("-%s has no INTERNET permission? Discounting...",
                        package_name)
           total_score -= 1
+        else:
+          self.related_apps.append(package)
     return total_score
 
   def compute_score(self, hubble, normalize):
@@ -802,6 +825,7 @@ class HostileDownloader(RiskAnalyzer):
   LAMBDA_I = 0.25
 
   def __init__(self, logger, google_discount=True):
+    super().__init__()
     self.logger = logger
     self.google_discount = google_discount
     self.installer_apps = []
