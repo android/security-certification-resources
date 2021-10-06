@@ -228,6 +228,9 @@ class PlatformSignature(RiskAnalyzer):
     baseline = BaselinePackages.get_instance(hubble.get_api_level())
     hubble.platform_apps = []
     hubble.system_uid_apps = []
+    update_apps = False
+    if not self.related_apps and normalize:
+      update_apps = True
     for package in packages:
       package_name = package["name"]
 
@@ -261,7 +264,7 @@ class PlatformSignature(RiskAnalyzer):
           num_platform_signed_app -= 1
           logger.debug("-%s but has no code. Running total: %d", package_name,
                        num_platform_signed_app)
-        else:
+        elif update_apps:
           self.related_apps.append(package)
     return num_platform_signed_app
 
@@ -579,6 +582,9 @@ class RiskyPermissions(RiskAnalyzer):
     baseline = BaselinePackages.get_instance(hubble.get_api_level())
 
     gms_packages = GMS.PACKAGES if self.google_discount else []
+    update_apps = False
+    if not self.related_apps and normalize:
+      update_apps = True
     for package in packages:
       package_name = package["name"]
 
@@ -649,7 +655,7 @@ class RiskyPermissions(RiskAnalyzer):
                        package_name, ungranted_score[score_type], score_type)
         total_ungranted_score += ungranted_score[score_type]
 
-      if is_related:
+      if update_apps and is_related:
           self.related_apps.append(package)
 
     logger.debug("Total pregranted perms score: %2.2f", total_granted_score)
@@ -742,6 +748,9 @@ class CleartextTraffic(RiskAnalyzer):
     baseline = BaselinePackages.get_instance(hubble.get_api_level())
     gms_packages = GMS.PACKAGES if self.google_discount else []
     total_score = 0
+    update_apps = False
+    if not self.related_apps and normalize:
+      update_apps = True
     for package in packages:
       package_name = package["name"]
 
@@ -773,7 +782,7 @@ class CleartextTraffic(RiskAnalyzer):
           logger.debug("-%s has no INTERNET permission? Discounting...",
                        package_name)
           total_score -= 1
-        else:
+        elif update_apps:
           self.related_apps.append(package)
     return total_score
 
