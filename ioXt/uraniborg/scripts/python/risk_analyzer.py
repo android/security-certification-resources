@@ -228,6 +228,7 @@ class PlatformSignature(RiskAnalyzer):
     baseline = BaselinePackages.get_instance(hubble.get_api_level())
     hubble.platform_apps = []
     hubble.system_uid_apps = []
+    self.related_apps = []
     for package in packages:
       package_name = package["name"]
 
@@ -579,6 +580,7 @@ class RiskyPermissions(RiskAnalyzer):
     baseline = BaselinePackages.get_instance(hubble.get_api_level())
 
     gms_packages = GMS.PACKAGES if self.google_discount else []
+    self.related_apps = []
     for package in packages:
       package_name = package["name"]
 
@@ -742,6 +744,7 @@ class CleartextTraffic(RiskAnalyzer):
     baseline = BaselinePackages.get_instance(hubble.get_api_level())
     gms_packages = GMS.PACKAGES if self.google_discount else []
     total_score = 0
+    self.related_apps = []
     for package in packages:
       package_name = package["name"]
 
