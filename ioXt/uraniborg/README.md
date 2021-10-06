@@ -38,6 +38,7 @@ Below are links to more specific documentations.
 
 ### Risk Analysis
 - [Scoring device preload risks](docs/device_scoring.md)
+- [Adding new baseline for new OS release](docs/adding_new_baseline.md)
 
 ## Disclaimer
 This is not an officially supported Google product.
