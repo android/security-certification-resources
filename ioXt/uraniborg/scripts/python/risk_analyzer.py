@@ -187,6 +187,9 @@ class PlatformSignature(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger):
+    if api_level == 31:
+      logger.debug("Returning SPlatformSignature")
+      return SPlatformSignature(logger)
     if api_level == 30:
       logger.debug("Returning RPlatformSignature")
       return RPlatformSignature(logger)
@@ -277,6 +280,7 @@ class PlatformSignature(RiskAnalyzer):
 
 # NOTE TO IMPLEMENTORS:
 # BASE_SCORE is calculated by doing a run with normalize=False on baseline data.
+#  But it is not used in the final risk formula today.
 class NPlatformSignature(PlatformSignature):
   API_LEVEL = 25
   BASE_SCORE = 38
@@ -302,6 +306,11 @@ class RPlatformSignature(PlatformSignature):
   BASE_SCORE = 49
 
 
+class SPlatformSignature(PlatformSignature):
+  API_LEVEL = 31
+  BASE_SCORE = 45
+
+
 class SystemUid(RiskAnalyzer):
   """Analyzer for system uid risks.
   """
@@ -315,6 +324,9 @@ class SystemUid(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger):
+    if api_level == 31:
+      logger.debug("Returning SSystemUid")
+      return SSystemUid(logger)
     if api_level == 30:
       logger.debug("Returning RSystemUid")
       return RSystemUid(logger)
@@ -388,6 +400,11 @@ class QSystemUid(SystemUid):
 class RSystemUid(SystemUid):
   API_LEVEL = 30
   BASE_SCORE = 24
+
+
+class SSystemUid(SystemUid):
+  API_LEVEL = 31
+  BASE_SCORE = 25
 
 
 class RiskyPermissions(RiskAnalyzer):
@@ -488,6 +505,8 @@ class RiskyPermissions(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger, google_discount=False):
+    if api_level == 31:
+      return SRiskyPermissions(logger, google_discount)
     if api_level == 30:
       return RRiskyPermissions(logger, google_discount)
     if api_level == 29:
@@ -703,6 +722,12 @@ class RRiskyPermissions(RiskyPermissions):
   UNGRANTED_SCORE = 187.5
 
 
+class SRiskyPermissions(RiskyPermissions):
+  API_LEVEL = 31
+  BASE_SCORE = 485
+  UNGRANTED_SCORE = 175
+
+
 class CleartextTraffic(RiskAnalyzer):
   """Cleartext traffic risk analyzer.
 
@@ -714,6 +739,8 @@ class CleartextTraffic(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger, google_discount=False):
+    if api_level == 31:
+      return SCleartextTraffic(logger, google_discount)
     if api_level == 30:
       return RCleartextTraffic(logger, google_discount)
     if api_level == 29:
@@ -824,6 +851,10 @@ class QCleartextTraffic(CleartextTraffic):
 
 
 class RCleartextTraffic(CleartextTraffic):
+  BASE_SCORE = 8
+
+
+class SCleartextTraffic(CleartextTraffic):
   BASE_SCORE = 8
 
 
