@@ -1,0 +1,29 @@
+From fab1ffc6628b83f32406a6a26f775c613cec99cd Mon Sep 17 00:00:00 2001
+From: Paul Crowley <paulcrowley@google.com>
+Date: Thu, 24 Jan 2019 11:23:50 +0000
+Subject: [PATCH] DO NOT SUBMIT log disk encryption keys
+
+Bug: 121287968
+Test: DO NOT SUBMIT
+Change-Id: I1232ca6aff48b858e6e9fbbda70e96b2f80987a7
+---
+ KeyStorage.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/KeyStorage.cpp b/KeyStorage.cpp
+index 951536b..6d9f34f 100644
+--- a/KeyStorage.cpp
++++ b/KeyStorage.cpp
+@@ -572,6 +572,10 @@ bool retrieveKey(const std::string& dir, const KeyAuthentication& auth, KeyBuffe
+     } else {
+         if (!decryptWithoutKeymaster(appId, encryptedMessage, key)) return false;
+     }
++    KeyBuffer hexKey;
++    StrToHex(*key, hexKey);
++    hexKey.push_back('\0');
++    LOG(DEBUG) << "DO NOT SUBMIT log of key in " << dir << " " << hexKey.data();
+     return true;
+ }
+ 
+-- 
+2.28.0.236.gb10cc79966-goog
