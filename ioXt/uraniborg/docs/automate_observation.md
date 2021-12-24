@@ -15,7 +15,7 @@ In order to automate the data extraction process, which is covered by
 `automate_observation.py` python script. Make sure that your test/target device
 is connected via ADB, and issue the following command from your terminal:
 
-`python3 automate_observations.py`
+`python3 automate_observation.py`
 
 Upon successful execution, you should see messages like:
 ```
