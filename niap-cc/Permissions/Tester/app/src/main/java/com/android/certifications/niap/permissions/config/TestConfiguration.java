@@ -21,6 +21,7 @@ import android.app.Activity;
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.Constants;
 import com.android.certifications.niap.permissions.InstallPermissionTester;
+import com.android.certifications.niap.permissions.InternalPermissionTester;
 import com.android.certifications.niap.permissions.PrivilegedPermissionTester;
 import com.android.certifications.niap.permissions.R;
 import com.android.certifications.niap.permissions.RuntimePermissionTester;
@@ -54,6 +55,7 @@ public interface TestConfiguration {
         if (Constants.USE_PRIVILEGED_PERMISSION_TESTER) {
             permissionTesters.add(new PrivilegedPermissionTester(this, activity));
         }
+        permissionTesters.add(new InternalPermissionTester(this, activity));
         permissionTesters.add(new InstallPermissionTester(this, activity));
         return permissionTesters;
     }
@@ -99,6 +101,14 @@ public interface TestConfiguration {
     }
 
     /**
+     * Returns an {@link Optional} containing a {@link List} of internal permissions to test, or
+     * {@link Optional#empty()}} if all internal permissions should be tested.
+     */
+    default Optional<List<String>> getInternalPermissions() {
+        return Optional.empty();
+    }
+
+    /**
      * Returns an {@link Optional} containing a {@link List} of permissions to test, or {@link
      * Optional#empty()} if all permissions should be tested.
      *
@@ -114,6 +124,14 @@ public interface TestConfiguration {
      * or {@link Optional#empty()} if no signature permissions should be skipped.
      */
     default Optional<Set<String>> getSkippedSignaturePermissions() {
+        return Optional.empty();
+    }
+
+    /**
+     * Returns an {@link Optional} containing a {@link Set} of internal permissions to be skipped,
+     * or {@link Optional#empty()} if no internal permissions should be skipped.
+     */
+    default Optional<Set<String>> getSkippedInternalPermissions() {
         return Optional.empty();
     }
 

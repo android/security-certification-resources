@@ -141,8 +141,8 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
 
             Intent notificationIntent = new Intent(mContext, MainActivity.class);
-            PendingIntent pendingIntent =
-                    PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
+            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, notificationIntent,
+                    PendingIntent.FLAG_IMMUTABLE);
             Notification notification =
                     new Notification.Builder(mContext, TAG)
                             .setContentTitle(resources.getText(R.string.status_notification_title))

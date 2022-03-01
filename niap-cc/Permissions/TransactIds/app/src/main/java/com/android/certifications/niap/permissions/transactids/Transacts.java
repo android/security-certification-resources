@@ -38,6 +38,8 @@ public class Transacts {
     public static final String ACCESSIBILITY_DESCRIPTOR =
             "android.view.accessibility.IAccessibilityManager";
 
+    public static final String ACTIVITY_CLIENT_DESCRIPTOR = "android.app.IActivityClientController";
+
     public static final String ACTIVITY_SERVICE = Context.ACTIVITY_SERVICE;
     public static final String ACTIVITY_DESCRIPTOR = "android.app.IActivityManager";
 
@@ -57,6 +59,9 @@ public class Transacts {
     public static final String AUDIO_SERVICE = Context.AUDIO_SERVICE;
     public static final String AUDIO_DESCRIPTOR = "android.media.IAudioService";
 
+    public static final String AUTH_SERVICE = "auth";
+    public static final String AUTH_DESCRIPTOR = "android.hardware.biometrics.IAuthService";
+
     public static final String BACKUP_SERVICE = "backup";
     public static final String BACKUP_DESCRIPTOR = "android.app.backup.IBackupManager";
 
@@ -70,6 +75,13 @@ public class Transacts {
     public static final String CAMERA_SERVICE = "media.camera";
     public static final String CAMERA_DESCRIPTOR = "android.hardware.ICameraService";
 
+    public static final String CLIPBOARD_SERVICE = Context.CLIPBOARD_SERVICE;
+    public static final String CLIPBOARD_DESCRIPTOR = "android.content.IClipboard";
+
+    public static final String COMPANION_DEVICE_SERVICE = Context.COMPANION_DEVICE_SERVICE;
+    public static final String COMPANION_DEVICE_DESCRIPTOR =
+            "android.companion.ICompanionDeviceManager";
+
     public static final String CONNECTIVITY_SERVICE = Context.CONNECTIVITY_SERVICE;
     public static final String CONNECTIVITY_DESCRIPTOR = "android.net.IConnectivityManager";
 
@@ -80,8 +92,15 @@ public class Transacts {
     public static final String DEVICE_POLICY_SERVICE = Context.DEVICE_POLICY_SERVICE;
     public static final String DEVICE_POLICY_DESCRIPTOR = "android.app.admin.IDevicePolicyManager";
 
+    public static final String DEVICE_STATE_SERVICE = "device_state";
+    public static final String DEVICE_STATE_DESCRIPTOR = "android.hardware.devicestate.IDeviceStateManager";
+
     public static final String DISPLAY_SERVICE = Context.DISPLAY_SERVICE;
     public static final String DISPLAY_DESCRIPTOR = "android.hardware.display.IDisplayManager";
+
+    public static final String DOMAIN_VERIFICATION_SERVICE = Context.DOMAIN_VERIFICATION_SERVICE;
+    public static final String DOMAIN_VERIFICATION_DESCRIPTOR =
+            "android.content.pm.verify.domain.IDomainVerificationManager";
 
     public static final String DREAMS_SERVICE = "dreams";
     public static final String DREAMS_DESCRIPTOR = "android.service.dreams.IDreamManager";
@@ -101,11 +120,23 @@ public class Transacts {
     public static final String FINGERPRINT_DESCRIPTOR =
             "android.hardware.fingerprint.IFingerprintService";
 
+    public static final String FONT_SERVICE = "font";
+    public static final String FONT_DESCRIPTOR = "com.android.internal.graphics.fonts.IFontManager";
+
+    public static final String GAME_SERVICE = Context.GAME_SERVICE;
+    public static final String GAME_DESCRIPTOR = "android.app.IGameManagerService";
+
     public static final String INPUT_SERVICE = Context.INPUT_SERVICE;
     public static final String INPUT_DESCRIPTOR = "android.hardware.input.IInputManager";
 
     public static final String ISUB_SERVICE = "isub";
     public static final String ISUB_DESCRIPTOR = "com.android.internal.telephony.ISub";
+
+    public static final String KEY_CHAIN_DESCRIPTOR = "android.security.IKeyChainService";
+
+    public static final String LOCK_SETTINGS_SERVICE = "lock_settings";
+    public static final String LOCK_SETTINGS_DESCRIPTOR =
+            "com.android.internal.widget.ILockSettings";
 
     public static final String MEDIA_PROJECTION_SERVICE = Context.MEDIA_PROJECTION_SERVICE;
     public static final String MEDIA_PROJECTION_DESCRIPTOR =
@@ -117,6 +148,10 @@ public class Transacts {
     public static final String MOUNT_SERVICE = "mount";
     public static final String MOUNT_DESCRIPTOR = "android.os.storage.IStorageManager";
 
+    public static final String MUSIC_RECOGNITION_SERVICE = "music_recognition";
+    public static final String MUSIC_RECOGNITION_DESCRIPTOR =
+            "android.media.musicrecognition.IMusicRecognitionManager";
+
     public static final String NET_POLICY_SERVICE = "netpolicy";
     public static final String NET_POLICY_DESCRIPTOR = "android.net.INetworkPolicyManager";
 
@@ -127,11 +162,21 @@ public class Transacts {
     public static final String NETWORK_STATS_SERVICE = Context.NETWORK_STATS_SERVICE;
     public static final String NETWORK_STATS_DESCRIPTOR = "android.net.INetworkStatsService";
 
+    public static final String NFC_SERVICE = Context.NFC_SERVICE;
+    public static final String NFC_DESCRIPTOR = "android.nfc.INfcAdapter";
+
     public static final String NOTIFICATION_SERVICE = Context.NOTIFICATION_SERVICE;
     public static final String NOTIFICATION_DESCRIPTOR = "android.app.INotificationManager";
 
     public static final String PACKAGE_SERVICE = "package";
     public static final String PACKAGE_DESCRIPTOR = "android.content.pm.IPackageManager";
+
+    public static final String PEOPLE_SERVICE = Context.PEOPLE_SERVICE;
+    public static final String PEOPLE_DESCRIPTOR = "android.app.people.IPeopleManager";
+
+    public static final String PERMISSION_CHECKER_SERVICE = "permission_checker";
+    public static final String PERMISSION_CHECKER_DESCRIPTOR =
+            "android.permission.IPermissionChecker";
 
     public static final String PERMISSION_MANAGER_SERVICE = "permissionmgr";
     public static final String PERMISSION_MANAGER_DESCRIPTOR =
@@ -144,9 +189,17 @@ public class Transacts {
     public static final String POWER_SERVICE = Context.POWER_SERVICE;
     public static final String POWER_DESCRIPTOR = "android.os.IPowerManager";
 
+    public static final String REBOOT_READINESS_SERVICE = "reboot_readiness";
+    public static final String REBOOT_READINESS_DESCRIPTOR =
+            "android.scheduling.IRebootReadinessManager";
+
     public static final String RESOURCE_MANAGER_SERVICE = "media.resource_manager";
     public static final String RESOURCE_MANAGER_DESCRIPTOR =
             "android.media.IResourceManagerService";
+
+    public static final String RESOURCE_OBSERVER_SERVICE = "media.resource_observer";
+    public static final String RESOURCE_OBSERVER_DESCRIPTOR =
+            "android.media.IResourceObserverService";
 
     public static final String ROLE_SERVICE = Context.ROLE_SERVICE;
     public static final String ROLE_DESCRIPTOR = "android.app.role.IRoleManager";
@@ -163,9 +216,19 @@ public class Transacts {
     public static final String SLICE_SERVICE = "slice";
     public static final String SLICE_DESCRIPTOR = "android.app.slice.ISliceManager";
 
+    public static final String SMART_SPACE_SERVICE = "smartspace";
+    public static final String SMART_SPACE_DESCRIPTOR = "android.app.smartspace.ISmartspaceManager";
+
     public static final String SOUND_TRIGGER_SERVICE = "soundtrigger";
     public static final String SOUND_TRIGGER_DESCRIPTOR =
             "com.android.internal.app.ISoundTriggerService";
+
+    public static final String SOUND_TRIGGER_SESSION_DESCRIPTOR =
+            "com.android.internal.app.ISoundTriggerSession";
+
+    public static final String SPEECH_RECOGNITION_SERVICE = "speech_recognition";
+    public static final String SPEECH_RECOGNITION_DESCRIPTOR =
+            "android.speech.IRecognitionServiceManager";
 
     public static final String STATUS_BAR_SERVICE = "statusbar";
     public static final String STATUS_BAR_DESCRIPTOR =
@@ -174,17 +237,38 @@ public class Transacts {
     public static final String SURFACE_FLINGER_SERVICE = "SurfaceFlinger";
     public static final String SURFACE_FLINGER_DESCRIPTOR = "android.ui.ISurfaceComposer";
 
+    public static final String TELEPHONY_IMS_SERVICE = "telephony_ims";
+    public static final String TELEPHONY_IMS_DESCRIPTOR =
+            "android.telephony.ims.aidl.IImsRcsController";
+
     public static final String TELEPHONY_SERVICE = Context.TELEPHONY_SERVICE;
     public static final String TELEPHONY_DESCRIPTOR = "com.android.internal.telephony.ITelephony";
 
+    public static final String TIME_DETECTOR_SERVICE = "time_detector";
+    public static final String TIME_DETECTOR_DESCRIPTOR =
+            "android.app.timedetector.ITimeDetectorService";
+
+    public static final String TRANSLATION_SERVICE = "translation";
+    public static final String TRANSLATION_DESCRIPTOR =
+            "android.view.translation.ITranslationManager";
+
     public static final String TRUST_SERVICE = "trust";
     public static final String TRUST_DESCRIPTOR = "android.app.trust.ITrustManager";
+
+    public static final String TV_INPUT_SERVICE = "tv_input";
+    public static final String TV_INPUT_DESCRIPTOR = "android.media.tv.ITvInputManager";
+
+    public static final String UI_MODE_SERVICE = Context.UI_MODE_SERVICE;
+    public static final String UI_MODE_DESCRIPTOR = "android.app.IUiModeManager";
 
     public static final String URI_GRANTS_SERVICE = "uri_grants";
     public static final String URI_GRANTS_DESCRIPTOR = "android.app.IUriGrantsManager";
 
     public static final String USB_SERVICE = Context.USB_SERVICE;
     public static final String USB_DESCRIPTOR = "android.hardware.usb.IUsbManager";
+
+    public static final String UWB_SERVICE = "uwb";
+    public static final String UWB_DESCRIPTOR = "android.uwb.IUwbAdapter";
 
     public static final String VIBRATOR_SERVICE = Context.VIBRATOR_SERVICE;
     public static final String VIBRATOR_DESCRIPTOR = "android.os.IVibratorService";
@@ -193,11 +277,15 @@ public class Transacts {
     public static final String VOICE_INTERACTION_DESCRIPTOR =
             "com.android.internal.app.IVoiceInteractionManagerService";
 
+    public static final String VPN_SERVICE = Context.VPN_MANAGEMENT_SERVICE;
+    public static final String VPN_DESCRIPTOR = "android.net.IVpnManager";
+
     public static final String VR_SERVICE = "vrmanager";
     public static final String VR_DESCRIPTOR = "android.service.vr.IVrManager";
 
     public static final String WALLPAPER_SERVICE = Context.WALLPAPER_SERVICE;
     public static final String WALLPAPER_DESCRIPTOR = "android.app.IWallpaperManager";
+
     public static final String WIFI_SERVICE = Context.WIFI_SERVICE;
     public static final String WIFI_DESCRIPTOR = "android.net.wifi.IWifiManager";
 
@@ -372,6 +460,77 @@ public class Transacts {
             "addOnRoleHoldersChangedListenerAsUser";
     public static final String forceUpdate = "forceUpdate";
     public static final String showCpu = "showCpu";
+    public static final String isControllerAlwaysOnSupported = "isControllerAlwaysOnSupported";
+    public static final String removeOverridesOnReleaseBuilds = "removeOverridesOnReleaseBuilds";
+    public static final String getNearbyNotificationStreamingPolicy =
+            "getNearbyNotificationStreamingPolicy";
+    public static final String restartWifiSubsystem = "restartWifiSubsystem";
+    public static final String set = "set";
+    public static final String removeRequestRebootReadinessStatusListener =
+            "removeRequestRebootReadinessStatusListener";
+    public static final String attachAsMiddleman = "attachAsMiddleman";
+    public static final String suggestExternalTime = "suggestExternalTime";
+
+    // The following are the transacts required for new permissions in Android 12.
+    public static final String injectCamera = "injectCamera";
+    public static final String clearSystemUpdatePolicyFreezePeriodRecord =
+            "clearSystemUpdatePolicyFreezePeriodRecord";
+    public static final String cancelRequest = "cancelRequest";
+    public static final String forceSecurityLogs = "forceSecurityLogs";
+    public static final String createInputConsumer = "createInputConsumer";
+    public static final String setKeepUninstalledPackages = "setKeepUninstalledPackages";
+    public static final String removeCredentialManagementApp = "removeCredentialManagementApp";
+    public static final String getAvailableGameModes = "getAvailableGameModes";
+    public static final String destroySmartspaceSession = "destroySmartspaceSession";
+    public static final String setTemporaryComponent = "setTemporaryComponent";
+    public static final String setToastRateLimitingEnabled = "setToastRateLimitingEnabled";
+    public static final String setOverrideCountryCode = "setOverrideCountryCode";
+    public static final String setRefreshRateSwitchingType = "setRefreshRateSwitchingType";
+    public static final String shouldAlwaysRespectAppRequestedMode =
+            "shouldAlwaysRespectAppRequestedMode";
+    public static final String getDeviceVolumeBehavior = "getDeviceVolumeBehavior";
+    public static final String isAmbientDisplaySuppressedForTokenByApp =
+            "isAmbientDisplaySuppressedForTokenByApp";
+    public static final String getActiveProjectionTypes = "getActiveProjectionTypes";
+    public static final String resetAppErrors = "resetAppErrors";
+    public static final String verifyCredential = "verifyCredential";
+    public static final String getUiPackage = "getUiPackage";
+    public static final String setDomainVerificationLinkHandlingAllowed =
+            "setDomainVerificationLinkHandlingAllowed";
+    public static final String getEnabledNotificationListeners = "getEnabledNotificationListeners";
+    public static final String setBatteryDischargePrediction = "setBatteryDischargePrediction";
+    public static final String getCapabilitiesAndConfig = "getCapabilitiesAndConfig";
+    public static final String unregisterObserver = "unregisterObserver";
+    public static final String checkPermission = "checkPermission";
+    public static final String requestProjection = "requestProjection";
+    public static final String getFontConfig = "getFontConfig";
+    public static final String getSpecificationInfo = "getSpecificationInfo";
+    public static final String beginRecognition = "beginRecognition";
+    public static final String updateUiTranslationState = "updateUiTranslationState";
+    public static final String getCurrentTunedInfos = "getCurrentTunedInfos";
+    public static final String getWindowOrganizerController = "getWindowOrganizerController";
+    public static final String getPrimaryClipSource = "getPrimaryClipSource";
+    public static final String isConversation = "isConversation";
+    public static final String unregisterCoexCallback = "unregisterCoexCallback";
+    public static final String setCoexUnsafeChannels = "setCoexUnsafeChannels";
+    public static final String updateState = "updateState";
+    public static final String isSensorPrivacyEnabled = "isSensorPrivacyEnabled";
+    public static final String queryValidVerificationPackageNames =
+            "queryValidVerificationPackageNames";
+    public static final String requestAvailability = "requestAvailability";
+    public static final String createAssociation = "createAssociation";
+    public static final String setBypassingRoleQualification = "setBypassingRoleQualification";
+    public static final String destroySipDelegate = "destroySipDelegate";
+    public static final String attachAsOriginator = "attachAsOriginator";
+    public static final String setDynamicPowerSaveHint = "setDynamicPowerSaveHint";
+    public static final String resetLockout = "resetLockout";
+    public static final String isAutoRevokeExempted = "isAutoRevokeExempted";
+    public static final String isUidNetworkingBlocked = "isUidNetworkingBlocked";
+    public static final String isSessionRunning = "isSessionRunning";
+    public static final String getActivityClientController = "getActivityClientController";
+    public static final String getModuleProperties = "getModuleProperties";
+    public static final String triggerNetworkRegistration = "triggerNetworkRegistration";
+    public static final String getUidOps = "getUidOps";
 
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an

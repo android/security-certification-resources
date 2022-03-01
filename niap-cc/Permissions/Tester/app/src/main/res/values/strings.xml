@@ -17,6 +17,7 @@
   <string name="app_name">Permissions Tester</string>
   <string name="service_channel_name">Test Service Channel</string>
   <string name="tester_channel_name">Test Notification Channel</string>
+  <string name="test_notification_message">Test Notification</string>
   <string name="service_notification_title">PermissionsTester Service</string>
   <string name="service_notification_message">Notification to test FOREGROUND_SERVICE permission</string>
   <string name="status_notification_title">Permission Tester Status</string>
@@ -32,7 +33,6 @@
   <string name="run_non_platform_tests">Run Non-Platform Tests</string>
   <string name="run_access_media_location_test">Run ACCESS_MEDIA_LOCATION Test</string>
   <string name="run_permission_dependent_tests">Run Permission Dependent Tests</string>
-  <string name="run_radio_scan_without_location_test">Run RADIO_SCAN_WITHOUT_LOCATION Test</string>
   <string name="run_manage_biometric_dialog_test">Run MANAGE_BIOMETRIC_DIALOG Test</string>
   <string name="run_gms_tests">Run GMS Tests</string>
   <string name="run_debug_tests">Run Debug Tests</string>

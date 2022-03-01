@@ -30,7 +30,8 @@
             android:launchMode="singleTop" />
         <activity
             android:name=".activities.MainActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -44,6 +45,9 @@
             android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE" />
 
     </application>
+
+    <uses-feature android:name="android.software.companion_device_setup"
+        android:required="false" />
 
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -648,6 +652,113 @@
     <uses-permission android:name="android.permission.WHITELIST_AUTO_REVOKE_PERMISSIONS" />
     <uses-permission android:name="com.android.permission.USE_INSTALLER_V2" />
 
+    <!-- New permissions for Android 12 -->
+    <uses-permission android:name="android.permission.HIDE_OVERLAY_WINDOWS" />
+    <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
+    <uses-permission android:name="android.permission.REQUEST_COMPANION_PROFILE_WATCH" />
+    <uses-permission android:name="android.permission.REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.UWB_RANGING" />
+
+    <uses-permission android:name="android.permission.ACCESS_BLOBS_ACROSS_USERS" />
+    <uses-permission android:name="android.permission.ACCESS_TUNED_INFO" />
+    <uses-permission android:name="android.permission.ADD_TRUSTED_DISPLAY" />
+    <uses-permission android:name="android.permission.ASSOCIATE_INPUT_DEVICE_TO_DISPLAY" />
+    <uses-permission android:name="android.permission.BATTERY_PREDICTION" />
+    <uses-permission android:name="android.permission.BIND_CALL_DIAGNOSTIC_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_COMPANION_DEVICE_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_DISPLAY_HASHING_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_DOMAIN_VERIFICATION_AGENT" />
+    <uses-permission android:name="android.permission.BIND_GBA_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_HOTWORD_DETECTION_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_MUSIC_RECOGNITION_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_RESUME_ON_REBOOT_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_ROTATION_RESOLVER_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_TIME_ZONE_PROVIDER_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_TRANSLATION_SERVICE" />
+    <uses-permission android:name="android.permission.BROADCAST_CLOSE_SYSTEM_DIALOGS" />
+    <uses-permission android:name="android.permission.CAMERA_INJECT_EXTERNAL_CAMERA" />
+    <uses-permission android:name="android.permission.CAPTURE_BLACKOUT_CONTENT" />
+    <uses-permission android:name="android.permission.CAPTURE_TUNER_AUDIO_INPUT" />
+    <uses-permission android:name="android.permission.CLEAR_FREEZE_PERIOD" />
+    <uses-permission android:name="android.permission.CONTROL_DEVICE_STATE" />
+    <uses-permission android:name="android.permission.CONTROL_OEM_PAID_NETWORK_PREFERENCE" />
+    <uses-permission android:name="android.permission.CONTROL_UI_TRACING" />
+    <uses-permission android:name="android.permission.DISABLE_SYSTEM_SOUND_EFFECTS" />
+    <uses-permission android:name="android.permission.FORCE_DEVICE_POLICY_MANAGER_LOGS" />
+    <uses-permission android:name="android.permission.GET_PEOPLE_TILE_PREVIEW" />
+    <uses-permission android:name="android.permission.GET_RUNTIME_PERMISSION_GROUP_MAPPING" />
+    <uses-permission android:name="android.permission.INPUT_CONSUMER" />
+    <uses-permission android:name="android.permission.INSTALL_LOCATION_TIME_ZONE_PROVIDER_SERVICE" />
+    <uses-permission android:name="android.permission.INSTALL_TEST_ONLY_PACKAGE" />
+    <uses-permission android:name="android.permission.KEEP_UNINSTALLED_PACKAGES" />
+    <uses-permission android:name="android.permission.MANAGE_ACTIVITY_TASKS" />
+    <uses-permission android:name="android.permission.MANAGE_APP_HIBERNATION" />
+    <uses-permission android:name="android.permission.MANAGE_CREDENTIAL_MANAGEMENT_APP" />
+    <uses-permission android:name="android.permission.MANAGE_GAME_MODE" />
+    <uses-permission android:name="android.permission.MANAGE_MEDIA" />
+    <uses-permission android:name="android.permission.MANAGE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.MANAGE_MUSIC_RECOGNITION" />
+    <uses-permission android:name="android.permission.MANAGE_NOTIFICATION_LISTENERS" />
+    <uses-permission android:name="android.permission.MANAGE_ONGOING_CALLS" />
+    <uses-permission android:name="android.permission.MANAGE_ROTATION_RESOLVER" />
+    <uses-permission android:name="android.permission.MANAGE_SEARCH_UI" />
+    <uses-permission android:name="android.permission.MANAGE_SMARTSPACE" />
+    <uses-permission android:name="android.permission.MANAGE_SPEECH_RECOGNITION" />
+    <uses-permission android:name="android.permission.MANAGE_TIME_AND_ZONE_DETECTION" />
+    <uses-permission android:name="android.permission.MANAGE_TOAST_RATE_LIMITING" />
+    <uses-permission android:name="android.permission.MANAGE_UI_TRANSLATION" />
+    <uses-permission android:name="android.permission.MANAGE_WIFI_COUNTRY_CODE" />
+    <uses-permission android:name="android.permission.MODIFY_REFRESH_RATE_SWITCHING_TYPE" />
+    <uses-permission android:name="android.permission.NFC_SET_CONTROLLER_ALWAYS_ON" />
+    <uses-permission android:name="android.permission.OVERRIDE_COMPAT_CHANGE_CONFIG_ON_RELEASE_BUILD" />
+    <uses-permission android:name="android.permission.OVERRIDE_DISPLAY_MODE_REQUESTS" />
+    <uses-permission android:name="android.permission.QUERY_AUDIO_STATE" />
+    <uses-permission android:name="android.permission.READ_DREAM_SUPPRESSION" />
+    <uses-permission android:name="android.permission.READ_NEARBY_STREAMING_POLICY" />
+    <uses-permission android:name="android.permission.READ_PEOPLE_DATA" />
+    <uses-permission android:name="android.permission.READ_PROJECTION_STATE" />
+    <uses-permission android:name="android.permission.REGISTER_MEDIA_RESOURCE_OBSERVER" />
+    <uses-permission android:name="android.permission.RENOUNCE_PERMISSIONS" />
+    <uses-permission android:name="android.permission.RESET_APP_ERRORS" />
+    <uses-permission android:name="android.permission.RESTART_WIFI_SUBSYSTEM" />
+    <uses-permission android:name="android.permission.ROTATE_SURFACE_FLINGER" />
+    <uses-permission android:name="android.permission.SCHEDULE_PRIORITIZED_ALARM" />
+    <uses-permission android:name="android.permission.SEND_CATEGORY_CAR_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SET_AND_VERIFY_LOCKSCREEN_CREDENTIALS" />
+    <uses-permission android:name="android.permission.SET_CLIP_SOURCE" />
+    <uses-permission android:name="android.permission.SIGNAL_REBOOT_READINESS" />
+    <uses-permission android:name="android.permission.SOUNDTRIGGER_DELEGATE_IDENTITY" />
+    <uses-permission android:name="android.permission.SOUND_TRIGGER_RUN_IN_BATTERY_SAVER" />
+    <uses-permission android:name="android.permission.START_FOREGROUND_SERVICES_FROM_BACKGROUND" />
+    <uses-permission android:name="android.permission.SUGGEST_EXTERNAL_TIME" />
+    <uses-permission android:name="android.permission.SYSTEM_APPLICATION_OVERLAY" />
+    <uses-permission android:name="android.permission.TEST_BIOMETRIC" />
+    <uses-permission android:name="android.permission.TOGGLE_AUTOMOTIVE_PROJECTION" />
+    <uses-permission android:name="android.permission.UNLIMITED_TOASTS" />
+    <uses-permission android:name="android.permission.UPDATE_DOMAIN_VERIFICATION_USER_SELECTION" />
+    <uses-permission android:name="android.permission.UPDATE_FONTS" />
+    <uses-permission android:name="android.permission.USE_ICC_AUTH_WITH_DEVICE_IDENTIFIER" />
+    <uses-permission android:name="android.permission.UWB_PRIVILEGED" />
+    <uses-permission android:name="android.permission.VIRTUAL_INPUT_DEVICE" />
+    <uses-permission android:name="android.permission.WIFI_ACCESS_COEX_UNSAFE_CHANNELS" />
+    <uses-permission android:name="android.permission.WIFI_UPDATE_COEX_UNSAFE_CHANNELS" />
+    <uses-permission android:name="com.android.permission.USE_SYSTEM_DATA_LOADERS" />
+
+    <uses-permission android:name="android.permission.ACCESS_RCS_USER_CAPABILITY_EXCHANGE" />
+    <uses-permission android:name="android.permission.ASSOCIATE_COMPANION_DEVICES" />
+    <uses-permission android:name="android.permission.BACKGROUND_CAMERA" />
+    <uses-permission android:name="android.permission.BYPASS_ROLE_QUALIFICATION" />
+    <uses-permission android:name="android.permission.DOMAIN_VERIFICATION_AGENT" />
+    <uses-permission android:name="android.permission.MANAGE_HOTWORD_DETECTION" />
+    <uses-permission android:name="android.permission.OBSERVE_SENSOR_PRIVACY" />
+    <uses-permission android:name="android.permission.PERFORM_IMS_SINGLE_REGISTRATION" />
+    <uses-permission android:name="android.permission.RECORD_BACKGROUND_AUDIO" />
+
     <!-- The following permissions are added to verify only apps signed by the signing key used to
          sign GMS or the platform are assigned these permissions. -->
     <uses-permission android:name="com.google.android.gms.auth.api.phone.permission.SEND" />
@@ -704,6 +815,12 @@
     <uses-permission android:name="com.google.android.gms.cloudsave.BIND_EVENT_BROADCAST" />
     <uses-permission android:name="com.google.android.gms.WRITE_VERIFY_APPS_CONSENT" />
     <uses-permission android:name="com.google.android.gms.googlehelp.LAUNCH_SUPPORT_SCREENSHARE" />
+
+    <uses-permission android:name="com.android.vending.APP_ERRORS_SERVICE" />
+    <uses-permission android:name="com.google.android.gms.auth.cryptauth.permission.CABLEV2_SERVER_LINK" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="com.google.android.gms.vehicle.permission.SHARED_AUTO_SENSOR_DATA" />
+
 
     <!-- TODO: Additional signature permissions that are declared by the packages preinstalled on
          the device under test should be added here. -->

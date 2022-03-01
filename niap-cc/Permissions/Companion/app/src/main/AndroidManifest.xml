@@ -367,6 +367,53 @@
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_AUGMENTED_AUTOFILL_SERVICE" />
+
+        <!-- The following services are required for new permissions in Android 12. -->
+        <service android:name=".services.TestBindCallDiagnosticServiceService"
+            android:permission="android.permission.BIND_CALL_DIAGNOSTIC_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindCompanionDeviceServiceService"
+            android:permission="android.permission.BIND_COMPANION_DEVICE_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindDisplayHashingServiceService"
+            android:permission="android.permission.BIND_DISPLAY_HASHING_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindDomainVerificationAgentService"
+            android:permission="android.permission.BIND_DOMAIN_VERIFICATION_AGENT"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindGbaServiceService"
+            android:permission="android.permission.BIND_GBA_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindHotwordDetectionServiceService"
+            android:permission="android.permission.BIND_HOTWORD_DETECTION_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindMusicRecognitionServiceService"
+            android:permission="android.permission.BIND_MUSIC_RECOGNITION_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindResumeOnRebootServiceService"
+            android:permission="android.permission.BIND_RESUME_ON_REBOOT_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindRotationResolverServiceService"
+            android:permission="android.permission.BIND_ROTATION_RESOLVER_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindTimeZoneProviderServiceService"
+            android:permission="android.permission.BIND_TIME_ZONE_PROVIDER_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindTranslationServiceService"
+            android:permission="android.permission.BIND_TRANSLATION_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+
     </application>
 
 </manifest>

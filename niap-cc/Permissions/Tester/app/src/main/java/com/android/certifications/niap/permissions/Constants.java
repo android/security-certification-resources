@@ -75,6 +75,11 @@ public class Constants {
      */
     public static final String COMPANION_PACKAGE = "com.android.certifications.niap.permissions.companion";
     /**
+     * The package name of the app implementing IKeyChainService; this app uses certain signature
+     * level permissions to guard KeyChain operations.
+     */
+    public static final String KEY_CHAIN_PACKAGE = "com.android.keychain";
+    /**
      * The name of the Google Play Services package.
      */
     public static final String GMS_PACKAGE_NAME = "com.google.android.gms";

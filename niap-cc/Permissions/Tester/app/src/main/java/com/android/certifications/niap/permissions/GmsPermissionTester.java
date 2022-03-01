@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.pm.PermissionInfo;
 import android.location.Location;
 import android.util.SparseArray;
 
@@ -31,10 +32,16 @@ import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
+import com.android.certifications.niap.permissions.utils.PermissionUtils;
 
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.ActivityRecognitionClient;
 import com.google.android.gms.location.ActivityRecognitionResult;
+import com.google.android.gms.location.ActivityTransition;
+import com.google.android.gms.location.ActivityTransitionRequest;
+import com.google.android.gms.location.ActivityTransitionResult;
+import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -49,6 +56,7 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
 
 import java.io.IOException;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +65,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 /**
  * Google Play Services / GMS allows app developers to take advantage of Google-powered features
@@ -66,7 +75,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class GmsPermissionTester extends BasePermissionTester {
     private static final String TAG = "GmsPermissionTester";
-    private static final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
+    private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
 
     /**
      * Map of permission to a Runnable that can be used to verify the client library API that is
@@ -165,6 +174,11 @@ public class GmsPermissionTester extends BasePermissionTester {
         GMS_SIGNATURE_PERMISSIONS.add("com.google.android.gms.WRITE_VERIFY_APPS_CONSENT");
         GMS_SIGNATURE_PERMISSIONS.add(
                 "com.google.android.gms.googlehelp.LAUNCH_SUPPORT_SCREENSHARE");
+        GMS_SIGNATURE_PERMISSIONS.add("com.android.vending.APP_ERRORS_SERVICE");
+        GMS_SIGNATURE_PERMISSIONS.add(
+                "com.google.android.gms.auth.cryptauth.permission.CABLEV2_SERVER_LINK");
+        GMS_SIGNATURE_PERMISSIONS.add(
+                "com.google.android.gms.vehicle.permission.SHARED_AUTO_SENSOR_DATA");
     }
 
     public GmsPermissionTester(TestConfiguration configuration, Activity activity) {
@@ -180,9 +194,13 @@ public class GmsPermissionTester extends BasePermissionTester {
                     BroadcastReceiver receiver = new BroadcastReceiver() {
                         @Override
                         public void onReceive(Context context, Intent intent) {
-                            ActivityRecognitionResult result =
+                            mLogger.logDebug("onReceive invoked with intent: " + intent);
+                            ActivityTransitionResult result =
+                                    ActivityTransitionResult.extractResult(intent);
+                            ActivityRecognitionResult result2 =
                                     ActivityRecognitionResult.extractResult(
                                             intent);
+
                             // The countdown on the latch should only occur if the provided
                             // intent includes a valid activity update.
                             if (result != null) {
@@ -199,24 +217,29 @@ public class GmsPermissionTester extends BasePermissionTester {
                             new IntentFilter(ACTIVITY_RECOGNITION_TEST));
                     Intent intent = new Intent(ACTIVITY_RECOGNITION_TEST);
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
-                            0);
+                            PendingIntent.FLAG_MUTABLE);
 
-                    // The ActivityRecognitionClient will not throw a SecurityException if the
-                    // caller does not have the ACTIVITY_RECOGNITION permission, instead activity
-                    // updates will not be sent to the client without the permission.
+                    // The ActivityRecognitionClient will throw a SecurityException when waiting for
+                    // the Task from the #requestActivityUpdates to complete.
                     ActivityRecognitionClient activityClient = ActivityRecognition.getClient(
                             mContext);
-                    activityClient.requestActivityUpdates(1000, pendingIntent);
-                    boolean broadcastReceived = false;
+                    Task<Void> activityRecognitionTask = activityClient.requestActivityUpdates(0, pendingIntent);
                     try {
-                        broadcastReceived = latch[0].await(15, TimeUnit.SECONDS);
-                    } catch (InterruptedException e) {
-                        mLogger.logError("Caught an InterruptedException: ", e);
-                    }
-                    activityClient.removeActivityUpdates(pendingIntent);
-                    mContext.unregisterReceiver(receiver);
-                    if (!broadcastReceived) {
-                        throw new SecurityException("An activity update was not received");
+                        Tasks.await(activityRecognitionTask, 10, TimeUnit.SECONDS);
+                    } catch (ExecutionException | TimeoutException | InterruptedException e) {
+                        // The ExecutionException typically wraps an ApiException with the message
+                        // from a SecurityException if the permission is not granted. If the
+                        // SecurityException text is in the message then treat the API call as
+                        // having failed due to the permission not being granted.
+                        if (e.getMessage().contains("SecurityException")) {
+                            throw new SecurityException(e);
+                        } else {
+                            throw new UnexpectedPermissionTestFailureException(e);
+                        }
+                    } finally {
+                        activityClient.removeActivityTransitionUpdates(pendingIntent);
+                        activityClient.removeActivityUpdates(pendingIntent);
+                        mContext.unregisterReceiver(receiver);
                     }
                 }));
 
@@ -249,7 +272,7 @@ public class GmsPermissionTester extends BasePermissionTester {
                             new IntentFilter(ACCESS_COARSE_LOCATION_TEST));
                     Intent intent = new Intent(ACCESS_COARSE_LOCATION_TEST);
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
-                            0);
+                            PendingIntent.FLAG_MUTABLE);
 
                     LocationRequest locationRequest = LocationRequest.create().setPriority(
                             LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(1000);
@@ -322,7 +345,7 @@ public class GmsPermissionTester extends BasePermissionTester {
                             new IntentFilter(ACCESS_BACKGROUND_LOCATION_TEST));
                     Intent intent = new Intent(ACCESS_BACKGROUND_LOCATION_TEST);
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
-                            0);
+                            PendingIntent.FLAG_IMMUTABLE);
 
                     GeofencingClient geofencingClient = LocationServices.getGeofencingClient(
                             mContext);
@@ -409,6 +432,7 @@ public class GmsPermissionTester extends BasePermissionTester {
     @Override
     public boolean runPermissionTests() {
         boolean allTestsPassed = true;
+        List<String> gmsDeclaredPermissions = getAllGmsDeclaredSignaturePermissions();
         List<String> defaultPermissions = new ArrayList<>(mPermissionTasks.keySet());
         defaultPermissions.addAll(GMS_SIGNATURE_PERMISSIONS);
         List<String> permissions = mConfiguration.getPermissions().orElse(defaultPermissions);
@@ -423,6 +447,11 @@ public class GmsPermissionTester extends BasePermissionTester {
                     allTestsPassed = false;
                 }
             } else {
+                if (!gmsDeclaredPermissions.contains(permission)) {
+                    mLogger.logDebug("Permission " + permission
+                            + " is not declared as a signature permission on this version of GMS");
+                    continue;
+                }
                 boolean permissionGranted = mContext.checkSelfPermission(permission)
                         == PackageManager.PERMISSION_GRANTED;
                 if (permissionGranted != (signatureMatch || mPlatformSignatureMatch)) {
@@ -440,5 +469,21 @@ public class GmsPermissionTester extends BasePermissionTester {
                     "!!! FAILED - one or more GMS permission tests failed");
         }
         return allTestsPassed;
+    }
+
+    /**
+     * Returns all of the signature protection level permissions declared by GMS.
+     */
+    private List<String> getAllGmsDeclaredSignaturePermissions() {
+        List<PermissionInfo> permissions = PermissionUtils.getAllDeclaredPermissions(mContext);
+        return permissions
+                .stream()
+                .filter(permission ->
+                        Constants.GMS_PACKAGE_NAME.equals(permission.packageName)
+                                && permission.getProtection()
+                                == PermissionInfo.PROTECTION_SIGNATURE)
+                .map(permission -> permission.name)
+                .collect(Collectors.toList());
+
     }
 }
