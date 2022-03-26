@@ -20,6 +20,8 @@ import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.ADD_VOICEMAIL;
 import static android.Manifest.permission.ANSWER_PHONE_CALLS;
+import static android.Manifest.permission.BLUETOOTH_ADMIN;
+import static android.Manifest.permission.BLUETOOTH_CONNECT;
 import static android.Manifest.permission.BODY_SENSORS;
 import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.CAMERA;
@@ -42,6 +44,12 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.WallpaperManager;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.le.AdvertiseCallback;
+import android.bluetooth.le.AdvertiseData;
+import android.bluetooth.le.AdvertiseSettings;
+import android.bluetooth.le.AdvertisingSetCallback;
+import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -83,6 +91,8 @@ import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
+import com.android.certifications.niap.permissions.utils.SignaturePermissions;
+import com.android.certifications.niap.permissions.utils.Transacts;
 
 import java.io.File;
 import java.io.IOException;
@@ -445,6 +455,71 @@ public class RuntimePermissionTester extends BasePermissionTester {
                     throw new SecurityException(
                             "Unable to obtain the location data from any image");
                 }));
+
+        // New permissions added to Android 12.
+        // The following are the new runtime permissions for Android 12.
+        mPermissionTasks.put(Manifest.permission.BLUETOOTH_ADVERTISE,
+                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                    if (!enableBluetoothAdapter(bluetoothAdapter)) {
+                        throw new BypassTestException(
+                                "The bluetooth adapter must be enabled for this test");
+                    }
+                    AdvertiseSettings settings = new AdvertiseSettings.Builder()
+                            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
+                            .setConnectable(false)
+                            .build();
+                    AdvertiseData data = new AdvertiseData.Builder()
+                            .setIncludeDeviceName(true)
+                            .build();
+                    AdvertiseCallback callback = new AdvertiseCallback() {
+                        @Override
+                        public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+                            super.onStartSuccess(settingsInEffect);
+                            mLogger.logDebug(
+                                    "onStartSuccess: settingsInEffect = " + settingsInEffect);
+                        }
+
+                        @Override
+                        public void onStartFailure(int errorCode) {
+                            super.onStartFailure(errorCode);
+                            mLogger.logDebug("onStartFailure: errorCode = " + errorCode);
+                        }
+                    };
+                    BluetoothLeAdvertiser advertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
+                    advertiser.startAdvertising(settings, data, callback);
+                    advertiser.stopAdvertising(callback);
+                }));
+
+        mPermissionTasks.put(Manifest.permission.BLUETOOTH_CONNECT,
+                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    BluetoothAdapter.getDefaultAdapter().getName();
+                }));
+
+        mPermissionTasks.put(Manifest.permission.BLUETOOTH_SCAN,
+                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                    if (!enableBluetoothAdapter(bluetoothAdapter)) {
+                        throw new BypassTestException(
+                                "The bluetooth adapter must be enabled for this test");
+                    }
+                    BluetoothAdapter.getDefaultAdapter().getScanMode();
+                }));
+
+        mPermissionTasks.put(Manifest.permission.UWB_RANGING,
+                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    // The API guarded by this permission is also guarded by the signature
+                    // permission UWB_PRIVILEGED, so if this signature permission is not granted
+                    // then skip this test.
+                    if (!isPermissionGranted(SignaturePermissions.permission.UWB_PRIVILEGED)) {
+                        throw new BypassTestException(
+                                "The UWB_PRIVILEGED permission must be granted for this test");
+                    }
+                    // The UwbManager with the API guarded by this permission is hidden, so a
+                    // direct transact is required.
+                    mTransacts.invokeTransact(Transacts.UWB_SERVICE, Transacts.UWB_DESCRIPTOR,
+                            Transacts.getSpecificationInfo);
+                }));
     }
 
     @Override
@@ -464,5 +539,35 @@ public class RuntimePermissionTester extends BasePermissionTester {
             StatusLogger.logInfo("!!! FAILED - one or more runtime permission tests failed");
         }
         return allTestsPassed;
+    }
+
+    /**
+     * Enables the specified {@code bluetoothAdapter} if the required permission is granted.
+     *
+     * @param bluetoothAdapter the adapter to be enabled
+     * @return {@code true} if the adapter is successfully enabled
+     */
+    private boolean enableBluetoothAdapter(BluetoothAdapter bluetoothAdapter) {
+        // If the bluetooth adapter is enabled then no further work is required.
+        if (bluetoothAdapter.isEnabled()) {
+            return true;
+        }
+        // Android 12+ requires the BLUETOOTH_CONNECT permission to enable a bluetooth adapter.
+        boolean canEnable = mDeviceApiLevel < Build.VERSION_CODES.S
+                ? isPermissionGranted(BLUETOOTH_ADMIN) : isPermissionGranted(BLUETOOTH_CONNECT);
+        if (!canEnable) {
+            return false;
+        }
+        mLogger.logDebug(
+                "The bluetooth adapter is not enabled, but the permission required to enable it "
+                        + "has been granted; enabling now");
+        bluetoothAdapter.enable();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            mLogger.logDebug("Caught an InterruptedException waiting for the"
+                    + " bluetooth adapter to be enabled");
+        }
+        return bluetoothAdapter.isEnabled();
     }
 }

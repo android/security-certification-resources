@@ -50,8 +50,8 @@ public class TestService extends Service {
             switch (permission) {
                 case Manifest.permission.FOREGROUND_SERVICE: {
                     Intent notificationIntent = new Intent(this, MainActivity.class);
-                    PendingIntent pendingIntent =
-                            PendingIntent.getActivity(this, 0, notificationIntent, 0);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                            notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
                     // Create a NotificationChannel to be used to start the service in the
                     // foreground.

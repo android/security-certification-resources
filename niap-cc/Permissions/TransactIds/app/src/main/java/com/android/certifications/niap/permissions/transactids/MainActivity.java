@@ -117,6 +117,11 @@ public class MainActivity extends AppCompatActivity {
             transactIds.put(Transacts.bootFinished, "1");
             transactIds.put(Transacts.showCpu, "1000");
             descriptorTransacts.put(Transacts.SURFACE_FLINGER_DESCRIPTOR, transactIds);
+            // Special case: IResourceObserverService is a native service that cannot be queried
+            // directly through reflection, 2 is the transact ID for unregisterObserver.
+            transactIds = new HashMap<>();
+            transactIds.put(Transacts.unregisterObserver, "2");
+            descriptorTransacts.put(Transacts.RESOURCE_OBSERVER_DESCRIPTOR, transactIds);
 
             // This is the full list of direct binder transacts invoked by the Permission Test Tool
             // for all supported API levels. Any new transacts should be added to this list to
@@ -404,6 +409,131 @@ public class MainActivity extends AppCompatActivity {
                     descriptorTransacts);
             queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.thawRotation,
                     descriptorTransacts);
+
+            // The following are the transacts required for new permissions in Android 12.
+            queryTransactId(Transacts.CAMERA_DESCRIPTOR, Transacts.injectCamera,
+                    descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
+                    Transacts.clearSystemUpdatePolicyFreezePeriodRecord, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_STATE_DESCRIPTOR, Transacts.cancelRequest,
+                    descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.forceSecurityLogs,
+                    descriptorTransacts);
+            queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.createInputConsumer,
+                    descriptorTransacts);
+            queryTransactId(Transacts.PACKAGE_DESCRIPTOR, Transacts.setKeepUninstalledPackages,
+                    descriptorTransacts);
+            queryTransactId(Transacts.KEY_CHAIN_DESCRIPTOR, Transacts.removeCredentialManagementApp,
+                    descriptorTransacts);
+            queryTransactId(Transacts.GAME_DESCRIPTOR, Transacts.getAvailableGameModes,
+                    descriptorTransacts);
+            queryTransactId(Transacts.SMART_SPACE_DESCRIPTOR, Transacts.destroySmartspaceSession,
+                    descriptorTransacts);
+            queryTransactId(Transacts.SPEECH_RECOGNITION_DESCRIPTOR,
+                    Transacts.setTemporaryComponent, descriptorTransacts);
+            queryTransactId(Transacts.NOTIFICATION_DESCRIPTOR,
+                    Transacts.setToastRateLimitingEnabled, descriptorTransacts);
+            queryTransactId(Transacts.WIFI_DESCRIPTOR, Transacts.setOverrideCountryCode,
+                    descriptorTransacts);
+            queryTransactId(Transacts.DISPLAY_DESCRIPTOR, Transacts.setRefreshRateSwitchingType,
+                    descriptorTransacts);
+            queryTransactId(Transacts.DISPLAY_DESCRIPTOR,
+                    Transacts.shouldAlwaysRespectAppRequestedMode, descriptorTransacts);
+            queryTransactId(Transacts.AUDIO_DESCRIPTOR, Transacts.getDeviceVolumeBehavior,
+                    descriptorTransacts);
+            queryTransactId(Transacts.POWER_DESCRIPTOR,
+                    Transacts.isAmbientDisplaySuppressedForTokenByApp, descriptorTransacts);
+            queryTransactId(Transacts.UI_MODE_DESCRIPTOR, Transacts.getActiveProjectionTypes,
+                    descriptorTransacts);
+            queryTransactId(Transacts.ACTIVITY_DESCRIPTOR, Transacts.resetAppErrors,
+                    descriptorTransacts);
+            queryTransactId(Transacts.LOCK_SETTINGS_DESCRIPTOR, Transacts.verifyCredential,
+                    descriptorTransacts);
+            queryTransactId(Transacts.AUTH_DESCRIPTOR, Transacts.getUiPackage, descriptorTransacts);
+            queryTransactId(Transacts.DOMAIN_VERIFICATION_DESCRIPTOR,
+                    Transacts.setDomainVerificationLinkHandlingAllowed, descriptorTransacts);
+            queryTransactId(Transacts.NOTIFICATION_DESCRIPTOR,
+                    Transacts.getEnabledNotificationListeners, descriptorTransacts);
+            queryTransactId(Transacts.POWER_DESCRIPTOR, Transacts.setBatteryDischargePrediction,
+                    descriptorTransacts);
+            queryTransactId(Transacts.TIME_DETECTOR_DESCRIPTOR,
+                    Transacts.getCapabilitiesAndConfig, descriptorTransacts);
+            queryTransactId(Transacts.NFC_DESCRIPTOR, Transacts.isControllerAlwaysOnSupported,
+                    descriptorTransacts);
+            queryTransactId(Transacts.PLATFORM_COMPAT_DESCRIPTOR,
+                    Transacts.removeOverridesOnReleaseBuilds, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
+                    Transacts.getNearbyNotificationStreamingPolicy, descriptorTransacts);
+            queryTransactId(Transacts.PERMISSION_CHECKER_DESCRIPTOR, Transacts.checkPermission,
+                    descriptorTransacts);
+            queryTransactId(Transacts.WIFI_DESCRIPTOR, Transacts.restartWifiSubsystem,
+                    descriptorTransacts);
+            queryTransactId(Transacts.ALARM_DESCRIPTOR, Transacts.set, descriptorTransacts);
+            queryTransactId(Transacts.REBOOT_READINESS_DESCRIPTOR,
+                    Transacts.removeRequestRebootReadinessStatusListener, descriptorTransacts);
+            queryTransactId(Transacts.SOUND_TRIGGER_DESCRIPTOR, Transacts.attachAsMiddleman,
+                    descriptorTransacts);
+            queryTransactId(Transacts.TIME_DETECTOR_DESCRIPTOR, Transacts.suggestExternalTime,
+                    descriptorTransacts);
+            queryTransactId(Transacts.UI_MODE_DESCRIPTOR, Transacts.requestProjection,
+                    descriptorTransacts);
+            queryTransactId(Transacts.FONT_DESCRIPTOR, Transacts.getFontConfig,
+                    descriptorTransacts);
+            queryTransactId(Transacts.UWB_DESCRIPTOR, Transacts.getSpecificationInfo,
+                    descriptorTransacts);
+            queryTransactId(Transacts.MUSIC_RECOGNITION_DESCRIPTOR, Transacts.beginRecognition,
+                    descriptorTransacts);
+            queryTransactId(Transacts.TRANSLATION_DESCRIPTOR, Transacts.updateUiTranslationState,
+                    descriptorTransacts);
+            queryTransactId(Transacts.TV_INPUT_DESCRIPTOR, Transacts.getCurrentTunedInfos,
+                    descriptorTransacts);
+            queryTransactId(Transacts.ACTIVITY_TASK_DESCRIPTOR,
+                    Transacts.getWindowOrganizerController, descriptorTransacts);
+            queryTransactId(Transacts.CLIPBOARD_DESCRIPTOR, Transacts.getPrimaryClipSource,
+                    descriptorTransacts);
+            queryTransactId(Transacts.PEOPLE_DESCRIPTOR, Transacts.isConversation,
+                    descriptorTransacts);
+            queryTransactId(Transacts.WIFI_DESCRIPTOR, Transacts.unregisterCoexCallback,
+                    descriptorTransacts);
+            queryTransactId(Transacts.WIFI_DESCRIPTOR, Transacts.setCoexUnsafeChannels,
+                    descriptorTransacts);
+            queryTransactId(Transacts.VOICE_INTERACTION_DESCRIPTOR, Transacts.updateState,
+                    descriptorTransacts);
+            queryTransactId(Transacts.SENSOR_PRIVACY_DESCRIPTOR, Transacts.isSensorPrivacyEnabled,
+                    descriptorTransacts);
+            queryTransactId(Transacts.DOMAIN_VERIFICATION_DESCRIPTOR,
+                    Transacts.queryValidVerificationPackageNames, descriptorTransacts);
+            queryTransactId(Transacts.TELEPHONY_IMS_DESCRIPTOR, Transacts.requestAvailability,
+                    descriptorTransacts);
+            queryTransactId(Transacts.COMPANION_DEVICE_DESCRIPTOR, Transacts.createAssociation,
+                    descriptorTransacts);
+            queryTransactId(Transacts.ROLE_DESCRIPTOR, Transacts.setBypassingRoleQualification,
+                    descriptorTransacts);
+            queryTransactId(Transacts.TELEPHONY_IMS_DESCRIPTOR,
+                    Transacts.triggerNetworkRegistration, descriptorTransacts);
+            queryTransactId(Transacts.VPN_DESCRIPTOR, Transacts.getAlwaysOnVpnPackage,
+                    descriptorTransacts);
+            queryTransactId(Transacts.SOUND_TRIGGER_DESCRIPTOR, Transacts.attachAsOriginator,
+                    descriptorTransacts);
+            queryTransactId(Transacts.SOUND_TRIGGER_SESSION_DESCRIPTOR,
+                    Transacts.getModuleProperties, descriptorTransacts);
+            queryTransactId(Transacts.POWER_DESCRIPTOR, Transacts.setDynamicPowerSaveHint,
+                    descriptorTransacts);
+            queryTransactId(Transacts.FINGERPRINT_DESCRIPTOR, Transacts.resetLockout,
+                    descriptorTransacts);
+            queryTransactId(Transacts.PERMISSION_MANAGER_DESCRIPTOR, Transacts.isAutoRevokeExempted,
+                    descriptorTransacts);
+            queryTransactId(Transacts.NET_POLICY_DESCRIPTOR, Transacts.isUidNetworkingBlocked,
+                    descriptorTransacts);
+            queryTransactId(Transacts.VOICE_INTERACTION_DESCRIPTOR, Transacts.isSessionRunning,
+                    descriptorTransacts);
+            queryTransactId(Transacts.ACTIVITY_TASK_DESCRIPTOR,
+                    Transacts.getActivityClientController, descriptorTransacts);
+            queryTransactId(Transacts.ACTIVITY_CLIENT_DESCRIPTOR, Transacts.dismissKeyguard,
+                    descriptorTransacts);
+            queryTransactId(Transacts.CONNECTIVITY_DESCRIPTOR, Transacts.pendingRequestForNetwork,
+                    descriptorTransacts);
+            queryTransactId(Transacts.APP_OPS_DESCRIPTOR, Transacts.getUidOps, descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
         }

@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mStatusTextView;
     private Button mSetupButton;
     private boolean mGmsAvailable;
+
     /**
      * Used to ensure the GMS location settings are configured as required for the location tests.
      */
@@ -96,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
 
         mGmsAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
                 == ConnectionResult.SUCCESS;
-        mGmsAvailable = false;
         if (mGmsAvailable) {
             mLocationRequest = LocationRequest.create().setPriority(
                     LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(1000);

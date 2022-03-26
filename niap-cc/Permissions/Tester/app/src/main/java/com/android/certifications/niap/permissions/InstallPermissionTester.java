@@ -27,6 +27,8 @@ import static android.Manifest.permission.CHANGE_WIFI_STATE;
 import static android.Manifest.permission.DISABLE_KEYGUARD;
 import static android.Manifest.permission.EXPAND_STATUS_BAR;
 import static android.Manifest.permission.FOREGROUND_SERVICE;
+import static android.Manifest.permission.HIDE_OVERLAY_WINDOWS;
+import static android.Manifest.permission.HIGH_SAMPLING_RATE_SENSORS;
 import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.KILL_BACKGROUND_PROCESSES;
 import static android.Manifest.permission.MANAGE_OWN_CALLS;
@@ -37,8 +39,11 @@ import static android.Manifest.permission.QUERY_ALL_PACKAGES;
 import static android.Manifest.permission.READ_SYNC_SETTINGS;
 import static android.Manifest.permission.READ_SYNC_STATS;
 import static android.Manifest.permission.REORDER_TASKS;
+import static android.Manifest.permission.REQUEST_COMPANION_PROFILE_WATCH;
 import static android.Manifest.permission.REQUEST_DELETE_PACKAGES;
+import static android.Manifest.permission.REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE;
 import static android.Manifest.permission.REQUEST_PASSWORD_COMPLEXITY;
+import static android.Manifest.permission.SCHEDULE_EXACT_ALARM;
 import static android.Manifest.permission.SET_WALLPAPER;
 import static android.Manifest.permission.SET_WALLPAPER_HINTS;
 import static android.Manifest.permission.TRANSMIT_IR;
@@ -55,6 +60,7 @@ import static com.android.certifications.niap.permissions.utils.ReflectionUtils.
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlarmManager;
 import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -64,10 +70,13 @@ import android.app.WallpaperManager;
 import android.app.admin.DevicePolicyManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.companion.AssociationRequest;
+import android.companion.CompanionDeviceManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
@@ -75,6 +84,10 @@ import android.content.pm.VersionedPackage;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.hardware.ConsumerIrManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.hardware.biometrics.BiometricManager;
 import android.hardware.fingerprint.FingerprintManager;
 import android.media.AudioManager;
@@ -88,6 +101,8 @@ import android.net.wifi.WifiManager;
 import android.nfc.NfcAdapter;
 import android.nfc.cardemulation.CardEmulation;
 import android.os.Build;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -166,7 +181,10 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         // android.permission.AUTHENTICATE_ACCOUNTS has been removed.
 
-        mPermissionTasks.put(BLUETOOTH, new PermissionTest(false, () -> {
+        // Starting in Android 12 the install BLUETOOTH permission is no longer used and has instead
+        // been replaced by the new runtime BLUETOOTH permissions.
+        mPermissionTasks.put(BLUETOOTH,
+                new PermissionTest(false, Build.VERSION_CODES.P, Build.VERSION_CODES.R, () -> {
             if (mBluetoothAdapter == null) {
                 throw new BypassTestException(
                         "A bluetooth adapter is not available to run this test");
@@ -174,7 +192,10 @@ public class InstallPermissionTester extends BasePermissionTester {
             mBluetoothAdapter.getAddress();
         }));
 
-        mPermissionTasks.put(BLUETOOTH_ADMIN, new PermissionTest(false, () -> {
+        // Starting in Android 12 the BLUETOOTH_ADMIN permission is no longer used and has instead
+        // been replaced by the new runtime BLUETOOTH permissions.
+        mPermissionTasks.put(BLUETOOTH_ADMIN,
+                new PermissionTest(false, Build.VERSION_CODES.P, Build.VERSION_CODES.R, () -> {
             if (mBluetoothAdapter == null) {
                 throw new BypassTestException(
                         "A bluetooth adapter is not available to run this test");
@@ -230,8 +251,12 @@ public class InstallPermissionTester extends BasePermissionTester {
             } catch (InterruptedException e) {
                 mLogger.logDebug("Caught an InterruptedException: ", e);
             }
-            invokeReflectionCall(statusBarManager.getClass(), "collapsePanels",
-                    statusBarManager, null);
+            // Starting in Android 12 this API is no longer available without the signature
+            // permission STATUS_BAR.
+            if (mDeviceApiLevel < Build.VERSION_CODES.S) {
+                invokeReflectionCall(statusBarManager.getClass(), "collapsePanels",
+                        statusBarManager, null);
+            }
         }));
 
         // andorid.permission.FLASHLIGHT has been removed.
@@ -359,7 +384,8 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(REQUEST_DELETE_PACKAGES, new PermissionTest(false, () -> {
             Intent intent = new Intent(mActivity, TestActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
+            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent,
+                    PendingIntent.FLAG_IMMUTABLE);
             // Use a version of this package that does not exist on the device to make this a
             // noop after the permission check.
             VersionedPackage versionedPackage = new VersionedPackage(mPackageName, 0);
@@ -465,8 +491,8 @@ public class InstallPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(USE_FULL_SCREEN_INTENT,
                 new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
                     Intent notificationIntent = new Intent(mContext, MainActivity.class);
-                    PendingIntent pendingIntent =
-                            PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
+                            notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
                     Resources resources = mContext.getResources();
                     CharSequence channelName = resources.getString(R.string.tester_channel_name);
@@ -530,6 +556,82 @@ public class InstallPermissionTester extends BasePermissionTester {
                     } catch (PackageManager.NameNotFoundException e) {
                         throw new SecurityException(e);
                     }
+                }));
+
+        // The following are the new install permissions for Android 12.
+        mPermissionTasks.put(HIDE_OVERLAY_WINDOWS,
+                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    // The API guarded by this permission must be run on the UI thread if the
+                    // permission is granted, but if the permission is not granted the resulting
+                    // SecurityException will crash the app. If the permission is not granted then
+                    // run the API here where the SecurityException can be handled, and if the
+                    // permission is granted then run it on the UI thread since an exception should
+                    // not be thrown in that case.
+                    if (mContext.checkSelfPermission(HIDE_OVERLAY_WINDOWS) != PackageManager.PERMISSION_GRANTED) {
+                        mActivity.getWindow().setHideOverlayWindows(true);
+                    } else {
+                        mActivity.runOnUiThread(
+                                () -> mActivity.getWindow().setHideOverlayWindows(true));
+                    }
+                }));
+
+        // HIGH_SAMPLING_RATE_SENSORS will only throw a SecurityException if the package is
+        // debuggable.
+
+        mPermissionTasks.put(REQUEST_COMPANION_PROFILE_WATCH,
+                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    if (!mPackageManager.hasSystemFeature(
+                            PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
+                        throw new BypassTestException(
+                                "Device does not have the "
+                                        + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
+                                        + "for this test");
+                    }
+                    AssociationRequest request = new AssociationRequest.Builder().setDeviceProfile(
+                            AssociationRequest.DEVICE_PROFILE_WATCH).build();
+                    CompanionDeviceManager.Callback callback =
+                            new CompanionDeviceManager.Callback() {
+                                @Override
+                                public void onDeviceFound(IntentSender intentSender) {
+                                    mLogger.logDebug(
+                                            "onDeviceFound: intentSender = " + intentSender);
+                                }
+
+                                @Override
+                                public void onFailure(CharSequence charSequence) {
+                                    mLogger.logDebug("onFailure: charSequence = " + charSequence);
+                                }
+                            };
+                    CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
+                            CompanionDeviceManager.class);
+                    companionDeviceManager.associate(request, callback, null);
+                }));
+
+        mPermissionTasks.put(REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE,
+                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    // Note: this could potentially be a fragile test since there is no companion
+                    // device associated with this app so when the permission is granted the call
+                    // results in a RuntimeException in the binder call, but during testing this
+                    // Exception was not thrown back to this test. If in a future release this test
+                    // fails because the Exception crosses the binder call then this test will need
+                    // to differentiate between a SecurityException and the RuntimeException.
+                    CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
+                            CompanionDeviceManager.class);
+                    companionDeviceManager.startObservingDevicePresence("11:22:33:44:55:66");
+                }));
+
+        // UPDATE_PACKAGES_WITHOUT_USER_ACTION requires a package that can be used for the update
+        // and only determines whether the user will be prompted to allow the update.
+
+        mPermissionTasks.put(SCHEDULE_EXACT_ALARM,
+                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    Intent intent = new Intent(mContext, MainActivity.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent,
+                            PendingIntent.FLAG_IMMUTABLE);
+                    AlarmManager alarmManager = mContext.getSystemService(AlarmManager.class);
+                    alarmManager.setExact(AlarmManager.RTC, System.currentTimeMillis() + 60 * 1000,
+                            pendingIntent);
+                    alarmManager.cancel(pendingIntent);
                 }));
     }
 

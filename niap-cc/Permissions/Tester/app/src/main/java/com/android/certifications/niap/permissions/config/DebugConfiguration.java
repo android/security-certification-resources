@@ -16,8 +16,6 @@
 
 package com.android.certifications.niap.permissions.config;
 
-import static com.android.certifications.niap.permissions.utils.SignaturePermissions.permission;
-
 import android.app.Activity;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
@@ -25,7 +23,6 @@ import com.android.certifications.niap.permissions.R;
 import com.android.certifications.niap.permissions.SignaturePermissionTester;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,11 +49,31 @@ class DebugConfiguration implements TestConfiguration {
     }
 
     @Override
+    public Optional<List<String>> getInstallPermissions() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<List<String>> getRuntimePermissions() {
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<List<String>> getSignaturePermissions() {
         // Returning a single signature permission will allow debug of the test for that one
         // permission; this is useful during development when creating tests for new permissions
         // declared in a release.
-        return Optional.of(Collections.singletonList(permission.BIND_QUICK_SETTINGS_TILE));
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<List<String>> getInternalPermissions() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<List<String>> getPermissions() {
+        return Optional.empty();
     }
 
     @Override

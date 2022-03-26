@@ -21,6 +21,8 @@ import android.accounts.Account;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.Build;
@@ -28,13 +30,18 @@ import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Parcel;
 import android.os.ParcelUuid;
+import android.os.Parcelable;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
+import com.android.certifications.niap.permissions.log.Logger;
+import com.android.certifications.niap.permissions.log.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provides utility methods and constants for invoking transacts against system services. Clients
@@ -46,10 +53,15 @@ import java.util.Map;
  * #invokeTransact(String, String, String, Object...)}.
  */
 public class Transacts {
+    private static final String TAG = "PermissionTesterTransacts";
+    private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
+
     // Following are the service and descriptor values for exported system services.
     public static final String ACCESSIBILITY_SERVICE = Context.ACCESSIBILITY_SERVICE;
     public static final String ACCESSIBILITY_DESCRIPTOR =
             "android.view.accessibility.IAccessibilityManager";
+
+    public static final String ACTIVITY_CLIENT_DESCRIPTOR = "android.app.IActivityClientController";
 
     public static final String ACTIVITY_SERVICE = Context.ACTIVITY_SERVICE;
     public static final String ACTIVITY_DESCRIPTOR = "android.app.IActivityManager";
@@ -70,6 +82,9 @@ public class Transacts {
     public static final String AUDIO_SERVICE = Context.AUDIO_SERVICE;
     public static final String AUDIO_DESCRIPTOR = "android.media.IAudioService";
 
+    public static final String AUTH_SERVICE = "auth";
+    public static final String AUTH_DESCRIPTOR = "android.hardware.biometrics.IAuthService";
+
     public static final String BACKUP_SERVICE = "backup";
     public static final String BACKUP_DESCRIPTOR = "android.app.backup.IBackupManager";
 
@@ -83,6 +98,13 @@ public class Transacts {
     public static final String CAMERA_SERVICE = "media.camera";
     public static final String CAMERA_DESCRIPTOR = "android.hardware.ICameraService";
 
+    public static final String CLIPBOARD_SERVICE = Context.CLIPBOARD_SERVICE;
+    public static final String CLIPBOARD_DESCRIPTOR = "android.content.IClipboard";
+
+    public static final String COMPANION_DEVICE_SERVICE = Context.COMPANION_DEVICE_SERVICE;
+    public static final String COMPANION_DEVICE_DESCRIPTOR =
+            "android.companion.ICompanionDeviceManager";
+
     public static final String CONNECTIVITY_SERVICE = Context.CONNECTIVITY_SERVICE;
     public static final String CONNECTIVITY_DESCRIPTOR = "android.net.IConnectivityManager";
 
@@ -93,8 +115,16 @@ public class Transacts {
     public static final String DEVICE_POLICY_SERVICE = Context.DEVICE_POLICY_SERVICE;
     public static final String DEVICE_POLICY_DESCRIPTOR = "android.app.admin.IDevicePolicyManager";
 
+    public static final String DEVICE_STATE_SERVICE = "device_state";
+    public static final String DEVICE_STATE_DESCRIPTOR =
+            "android.hardware.devicestate.IDeviceStateManager";
+
     public static final String DISPLAY_SERVICE = Context.DISPLAY_SERVICE;
     public static final String DISPLAY_DESCRIPTOR = "android.hardware.display.IDisplayManager";
+
+    public static final String DOMAIN_VERIFICATION_SERVICE = Context.DOMAIN_VERIFICATION_SERVICE;
+    public static final String DOMAIN_VERIFICATION_DESCRIPTOR =
+            "android.content.pm.verify.domain.IDomainVerificationManager";
 
     public static final String DREAMS_SERVICE = "dreams";
     public static final String DREAMS_DESCRIPTOR = "android.service.dreams.IDreamManager";
@@ -114,11 +144,23 @@ public class Transacts {
     public static final String FINGERPRINT_DESCRIPTOR =
             "android.hardware.fingerprint.IFingerprintService";
 
+    public static final String FONT_SERVICE = "font";
+    public static final String FONT_DESCRIPTOR = "com.android.internal.graphics.fonts.IFontManager";
+
+    public static final String GAME_SERVICE = Context.GAME_SERVICE;
+    public static final String GAME_DESCRIPTOR = "android.app.IGameManagerService";
+
     public static final String INPUT_SERVICE = Context.INPUT_SERVICE;
     public static final String INPUT_DESCRIPTOR = "android.hardware.input.IInputManager";
 
     public static final String ISUB_SERVICE = "isub";
     public static final String ISUB_DESCRIPTOR = "com.android.internal.telephony.ISub";
+
+    public static final String KEY_CHAIN_DESCRIPTOR = "android.security.IKeyChainService";
+
+    public static final String LOCK_SETTINGS_SERVICE = "lock_settings";
+    public static final String LOCK_SETTINGS_DESCRIPTOR =
+            "com.android.internal.widget.ILockSettings";
 
     public static final String MEDIA_PROJECTION_SERVICE = Context.MEDIA_PROJECTION_SERVICE;
     public static final String MEDIA_PROJECTION_DESCRIPTOR =
@@ -130,6 +172,10 @@ public class Transacts {
     public static final String MOUNT_SERVICE = "mount";
     public static final String MOUNT_DESCRIPTOR = "android.os.storage.IStorageManager";
 
+    public static final String MUSIC_RECOGNITION_SERVICE = "music_recognition";
+    public static final String MUSIC_RECOGNITION_DESCRIPTOR =
+            "android.media.musicrecognition.IMusicRecognitionManager";
+
     public static final String NET_POLICY_SERVICE = "netpolicy";
     public static final String NET_POLICY_DESCRIPTOR = "android.net.INetworkPolicyManager";
 
@@ -140,11 +186,21 @@ public class Transacts {
     public static final String NETWORK_STATS_SERVICE = Context.NETWORK_STATS_SERVICE;
     public static final String NETWORK_STATS_DESCRIPTOR = "android.net.INetworkStatsService";
 
+    public static final String NFC_SERVICE = Context.NFC_SERVICE;
+    public static final String NFC_DESCRIPTOR = "android.nfc.INfcAdapter";
+
     public static final String NOTIFICATION_SERVICE = Context.NOTIFICATION_SERVICE;
     public static final String NOTIFICATION_DESCRIPTOR = "android.app.INotificationManager";
 
     public static final String PACKAGE_SERVICE = "package";
     public static final String PACKAGE_DESCRIPTOR = "android.content.pm.IPackageManager";
+
+    public static final String PEOPLE_SERVICE = Context.PEOPLE_SERVICE;
+    public static final String PEOPLE_DESCRIPTOR = "android.app.people.IPeopleManager";
+
+    public static final String PERMISSION_CHECKER_SERVICE = "permission_checker";
+    public static final String PERMISSION_CHECKER_DESCRIPTOR =
+            "android.permission.IPermissionChecker";
 
     public static final String PERMISSION_MANAGER_SERVICE = "permissionmgr";
     public static final String PERMISSION_MANAGER_DESCRIPTOR =
@@ -157,9 +213,17 @@ public class Transacts {
     public static final String POWER_SERVICE = Context.POWER_SERVICE;
     public static final String POWER_DESCRIPTOR = "android.os.IPowerManager";
 
+    public static final String REBOOT_READINESS_SERVICE = "reboot_readiness";
+    public static final String REBOOT_READINESS_DESCRIPTOR =
+            "android.scheduling.IRebootReadinessManager";
+
     public static final String RESOURCE_MANAGER_SERVICE = "media.resource_manager";
     public static final String RESOURCE_MANAGER_DESCRIPTOR =
             "android.media.IResourceManagerService";
+
+    public static final String RESOURCE_OBSERVER_SERVICE = "media.resource_observer";
+    public static final String RESOURCE_OBSERVER_DESCRIPTOR =
+            "android.media.IResourceObserverService";
 
     public static final String ROLE_SERVICE = Context.ROLE_SERVICE;
     public static final String ROLE_DESCRIPTOR = "android.app.role.IRoleManager";
@@ -176,9 +240,19 @@ public class Transacts {
     public static final String SLICE_SERVICE = "slice";
     public static final String SLICE_DESCRIPTOR = "android.app.slice.ISliceManager";
 
+    public static final String SMART_SPACE_SERVICE = "smartspace";
+    public static final String SMART_SPACE_DESCRIPTOR = "android.app.smartspace.ISmartspaceManager";
+
     public static final String SOUND_TRIGGER_SERVICE = "soundtrigger";
     public static final String SOUND_TRIGGER_DESCRIPTOR =
             "com.android.internal.app.ISoundTriggerService";
+
+    public static final String SOUND_TRIGGER_SESSION_DESCRIPTOR =
+            "com.android.internal.app.ISoundTriggerSession";
+
+    public static final String SPEECH_RECOGNITION_SERVICE = "speech_recognition";
+    public static final String SPEECH_RECOGNITION_DESCRIPTOR =
+            "android.speech.IRecognitionServiceManager";
 
     public static final String STATUS_BAR_SERVICE = "statusbar";
     public static final String STATUS_BAR_DESCRIPTOR =
@@ -187,11 +261,29 @@ public class Transacts {
     public static final String SURFACE_FLINGER_SERVICE = "SurfaceFlinger";
     public static final String SURFACE_FLINGER_DESCRIPTOR = "android.ui.ISurfaceComposer";
 
+    public static final String TELEPHONY_IMS_SERVICE = "telephony_ims";
+    public static final String TELEPHONY_IMS_DESCRIPTOR =
+            "android.telephony.ims.aidl.IImsRcsController";
+
     public static final String TELEPHONY_SERVICE = Context.TELEPHONY_SERVICE;
     public static final String TELEPHONY_DESCRIPTOR = "com.android.internal.telephony.ITelephony";
 
+    public static final String TIME_DETECTOR_SERVICE = "time_detector";
+    public static final String TIME_DETECTOR_DESCRIPTOR =
+            "android.app.timedetector.ITimeDetectorService";
+
+    public static final String TRANSLATION_SERVICE = "translation";
+    public static final String TRANSLATION_DESCRIPTOR =
+            "android.view.translation.ITranslationManager";
+
     public static final String TRUST_SERVICE = "trust";
     public static final String TRUST_DESCRIPTOR = "android.app.trust.ITrustManager";
+
+    public static final String TV_INPUT_SERVICE = "tv_input";
+    public static final String TV_INPUT_DESCRIPTOR = "android.media.tv.ITvInputManager";
+
+    public static final String UI_MODE_SERVICE = Context.UI_MODE_SERVICE;
+    public static final String UI_MODE_DESCRIPTOR = "android.app.IUiModeManager";
 
     public static final String URI_GRANTS_SERVICE = "uri_grants";
     public static final String URI_GRANTS_DESCRIPTOR = "android.app.IUriGrantsManager";
@@ -199,12 +291,18 @@ public class Transacts {
     public static final String USB_SERVICE = Context.USB_SERVICE;
     public static final String USB_DESCRIPTOR = "android.hardware.usb.IUsbManager";
 
+    public static final String UWB_SERVICE = "uwb";
+    public static final String UWB_DESCRIPTOR = "android.uwb.IUwbAdapter";
+
     public static final String VIBRATOR_SERVICE = Context.VIBRATOR_SERVICE;
     public static final String VIBRATOR_DESCRIPTOR = "android.os.IVibratorService";
 
     public static final String VOICE_INTERACTION_SERVICE = "voiceinteraction";
     public static final String VOICE_INTERACTION_DESCRIPTOR =
             "com.android.internal.app.IVoiceInteractionManagerService";
+
+    public static final String VPN_SERVICE = Context.VPN_MANAGEMENT_SERVICE;
+    public static final String VPN_DESCRIPTOR = "android.net.IVpnManager";
 
     public static final String VR_SERVICE = "vrmanager";
     public static final String VR_DESCRIPTOR = "android.service.vr.IVrManager";
@@ -387,6 +485,76 @@ public class Transacts {
     // This should map to an invalid transaction ID for the SurfaceFlinger; this invalid ID triggers
     // a check for the HARDWARE_TEST permission.
     public static final String showCpu = "showCpu";
+
+    // The following are the transacts required for new permissions in Android 12.
+    public static final String injectCamera = "injectCamera";
+    public static final String clearSystemUpdatePolicyFreezePeriodRecord =
+            "clearSystemUpdatePolicyFreezePeriodRecord";
+    public static final String cancelRequest = "cancelRequest";
+    public static final String forceSecurityLogs = "forceSecurityLogs";
+    public static final String createInputConsumer = "createInputConsumer";
+    public static final String setKeepUninstalledPackages = "setKeepUninstalledPackages";
+    public static final String removeCredentialManagementApp = "removeCredentialManagementApp";
+    public static final String getAvailableGameModes = "getAvailableGameModes";
+    public static final String destroySmartspaceSession = "destroySmartspaceSession";
+    public static final String setTemporaryComponent = "setTemporaryComponent";
+    public static final String setToastRateLimitingEnabled = "setToastRateLimitingEnabled";
+    public static final String setOverrideCountryCode = "setOverrideCountryCode";
+    public static final String setRefreshRateSwitchingType = "setRefreshRateSwitchingType";
+    public static final String shouldAlwaysRespectAppRequestedMode =
+            "shouldAlwaysRespectAppRequestedMode";
+    public static final String getDeviceVolumeBehavior = "getDeviceVolumeBehavior";
+    public static final String isAmbientDisplaySuppressedForTokenByApp =
+            "isAmbientDisplaySuppressedForTokenByApp";
+    public static final String getActiveProjectionTypes = "getActiveProjectionTypes";
+    public static final String resetAppErrors = "resetAppErrors";
+    public static final String verifyCredential = "verifyCredential";
+    public static final String getUiPackage = "getUiPackage";
+    public static final String setDomainVerificationLinkHandlingAllowed =
+            "setDomainVerificationLinkHandlingAllowed";
+    public static final String getEnabledNotificationListeners = "getEnabledNotificationListeners";
+    public static final String setBatteryDischargePrediction = "setBatteryDischargePrediction";
+    public static final String getCapabilitiesAndConfig = "getCapabilitiesAndConfig";
+    public static final String isControllerAlwaysOnSupported = "isControllerAlwaysOnSupported";
+    public static final String removeOverridesOnReleaseBuilds = "removeOverridesOnReleaseBuilds";
+    public static final String getNearbyNotificationStreamingPolicy =
+            "getNearbyNotificationStreamingPolicy";
+    public static final String unregisterObserver = "unregisterObserver";
+    public static final String checkPermission = "checkPermission";
+    public static final String restartWifiSubsystem = "restartWifiSubsystem";
+    public static final String set = "set";
+    public static final String removeRequestRebootReadinessStatusListener =
+            "removeRequestRebootReadinessStatusListener";
+    public static final String attachAsMiddleman = "attachAsMiddleman";
+    public static final String suggestExternalTime = "suggestExternalTime";
+    public static final String requestProjection = "requestProjection";
+    public static final String getFontConfig = "getFontConfig";
+    public static final String getSpecificationInfo = "getSpecificationInfo";
+    public static final String beginRecognition = "beginRecognition";
+    public static final String updateUiTranslationState = "updateUiTranslationState";
+    public static final String getCurrentTunedInfos = "getCurrentTunedInfos";
+    public static final String getWindowOrganizerController = "getWindowOrganizerController";
+    public static final String getPrimaryClipSource = "getPrimaryClipSource";
+    public static final String isConversation = "isConversation";
+    public static final String unregisterCoexCallback = "unregisterCoexCallback";
+    public static final String setCoexUnsafeChannels = "setCoexUnsafeChannels";
+    public static final String updateState = "updateState";
+    public static final String isSensorPrivacyEnabled = "isSensorPrivacyEnabled";
+    public static final String queryValidVerificationPackageNames =
+            "queryValidVerificationPackageNames";
+    public static final String requestAvailability = "requestAvailability";
+    public static final String createAssociation = "createAssociation";
+    public static final String setBypassingRoleQualification = "setBypassingRoleQualification";
+    public static final String attachAsOriginator = "attachAsOriginator";
+    public static final String setDynamicPowerSaveHint = "setDynamicPowerSaveHint";
+    public static final String resetLockout = "resetLockout";
+    public static final String isAutoRevokeExempted = "isAutoRevokeExempted";
+    public static final String isUidNetworkingBlocked = "isUidNetworkingBlocked";
+    public static final String isSessionRunning = "isSessionRunning";
+    public static final String getActivityClientController = "getActivityClientController";
+    public static final String getModuleProperties = "getModuleProperties";
+    public static final String triggerNetworkRegistration = "triggerNetworkRegistration";
+    public static final String getUidOps = "getUidOps";
 
     /**
      * Contains a mapping from the descriptor to a Map of transact names to their IDs on the device
@@ -1216,6 +1384,442 @@ public class Transacts {
     }
 
     /**
+     * Initializes the mapping of transact names to their expected IDs for a device running Android
+     * 12 / API level 31.
+     */
+    private static class STransacts extends Transacts {
+        public STransacts() {
+            super();
+            mDeviceApiLevel = Build.VERSION_CODES.S;
+
+            Map<String, Integer> transactIds;
+            transactIds = new HashMap<>();
+            transactIds.put(updateState, 33);
+            transactIds.put(getActiveServiceComponentName, 18);
+            transactIds.put(updateKeyphraseSoundModel, 14);
+            transactIds.put(isSessionRunning, 22);
+            mDescriptorTransacts.put(VOICE_INTERACTION_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(bootFinished, 1);
+            transactIds.put(showCpu, 1000);
+            mDescriptorTransacts.put(SURFACE_FLINGER_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(resetLockout, 28);
+            transactIds.put(cancelAuthenticationFromService, 11);
+            transactIds.put(cancelEnrollment, 13);
+            mDescriptorTransacts.put(FINGERPRINT_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(retainSubscriptionsForFactoryReset, 13);
+            mDescriptorTransacts.put(EUICC_CONTROLLER_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(takePersistableUriPermission, 1);
+            transactIds.put(getGrantedUriPermissions, 4);
+            mDescriptorTransacts.put(URI_GRANTS_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(verifyCredential, 10);
+            mDescriptorTransacts.put(LOCK_SETTINGS_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getAvailableGameModes, 3);
+            mDescriptorTransacts.put(GAME_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(reportChangeByUid, 3);
+            transactIds.put(removeOverridesOnReleaseBuilds, 12);
+            transactIds.put(clearOverridesForTest, 16);
+            mDescriptorTransacts.put(PLATFORM_COMPAT_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(beginRecognition, 1);
+            mDescriptorTransacts.put(MUSIC_RECOGNITION_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(reboot, 30);
+            transactIds.put(isAmbientDisplaySuppressedForTokenByApp, 48);
+            transactIds.put(setDynamicPowerSaveHint, 21);
+            transactIds.put(setBatteryDischargePrediction, 25);
+            mDescriptorTransacts.put(POWER_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(notifySystemEvent, 17);
+            transactIds.put(injectCamera, 15);
+            mDescriptorTransacts.put(CAMERA_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(attachAsOriginator, 1);
+            transactIds.put(attachAsMiddleman, 2);
+            mDescriptorTransacts.put(SOUND_TRIGGER_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(grantPermissionFromUser, 11);
+            mDescriptorTransacts.put(SLICE_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getUiPackage, 3);
+            mDescriptorTransacts.put(AUTH_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(isControllerAlwaysOnSupported, 30);
+            mDescriptorTransacts.put(NFC_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(setRingtonePlayer, 68);
+            transactIds.put(getRingtonePlayer, 69);
+            transactIds.put(isAudioServerRunning, 105);
+            transactIds.put(getDeviceVolumeBehavior, 122);
+            mDescriptorTransacts.put(AUDIO_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(noteStartAudio, 5);
+            transactIds.put(getAwakeTimeBattery, 76);
+            mDescriptorTransacts.put(BATTERY_STATS_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(onApplicationActive, 16);
+            mDescriptorTransacts.put(SHORTCUT_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(unregisterObserver, 2);
+            mDescriptorTransacts.put(RESOURCE_OBSERVER_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(setWallpaper, 1);
+            mDescriptorTransacts.put(WALLPAPER_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(enableLocationUpdates, 23);
+            mDescriptorTransacts.put(TELEPHONY_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(destroySmartspaceSession, 6);
+            mDescriptorTransacts.put(SMART_SPACE_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getPrimaryClipSource, 10);
+            mDescriptorTransacts.put(CLIPBOARD_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(requestEmbeddedSubscriptionInfoListRefresh, 11);
+            mDescriptorTransacts.put(ISUB_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            mDescriptorTransacts.put(VIBRATOR_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(clearInteractAcrossProfilesAppOps, 10);
+            mDescriptorTransacts.put(CROSS_PROFILE_APPS_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(isConversation, 5);
+            mDescriptorTransacts.put(PEOPLE_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getActiveNotifications, 62);
+            transactIds.put(getZenRules, 125);
+            transactIds.put(isNotificationPolicyAccessGrantedForPackage, 121);
+            transactIds.put(getEnabledNotificationListeners, 107);
+            transactIds.put(setToastRateLimitingEnabled, 144);
+            mDescriptorTransacts.put(NOTIFICATION_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(movePackage, 114);
+            transactIds.put(installExistingPackageAsUser, 118);
+            transactIds.put(setKeepUninstalledPackages, 204);
+            transactIds.put(getRuntimePermissionsVersion, 182);
+            transactIds.put(getHarmfulAppWarning, 165);
+            transactIds.put(isPackageDeviceAdminOnAnyUser, 153);
+            transactIds.put(isPackageStateProtected, 178);
+            transactIds.put(getMoveStatus, 111);
+            transactIds.put(resetApplicationPreferences, 53);
+            mDescriptorTransacts.put(PACKAGE_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getSubscriptionPlans, 18);
+            transactIds.put(isUidNetworkingBlocked, 23);
+            transactIds.put(getUidPolicy, 4);
+            transactIds.put(registerListener, 6);
+            mDescriptorTransacts.put(NET_POLICY_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(set, 1);
+            transactIds.put(setTimeZone, 3);
+            transactIds.put(setTime, 2);
+            mDescriptorTransacts.put(ALARM_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getActiveProjectionInfo, 4);
+            mDescriptorTransacts.put(MEDIA_PROJECTION_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(dismissKeyguard, 49);
+            mDescriptorTransacts.put(ACTIVITY_CLIENT_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getFrontActivityScreenCompatMode, 17);
+            transactIds.put(getTaskDescription, 26);
+            transactIds.put(getAssistContextExtras, 57);
+            transactIds.put(setFrontActivityScreenCompatMode, 18);
+            transactIds.put(getWindowOrganizerController, 64);
+            transactIds.put(startActivityAsCaller, 13);
+            transactIds.put(getActivityClientController, 16);
+            mDescriptorTransacts.put(ACTIVITY_TASK_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(setPersistentVrModeEnabled, 7);
+            transactIds.put(getVrModeState, 5);
+            transactIds.put(setStandbyEnabled, 11);
+            mDescriptorTransacts.put(VR_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(overridePid, 6);
+            mDescriptorTransacts.put(RESOURCE_MANAGER_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(createAssociation, 12);
+            mDescriptorTransacts.put(COMPANION_DEVICE_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getCacheSizeBytes, 77);
+            transactIds.put(getEncryptionState, 32);
+            transactIds.put(benchmark, 60);
+            mDescriptorTransacts.put(MOUNT_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(suggestExternalTime, 3);
+            transactIds.put(getCapabilitiesAndConfig, 1);
+            mDescriptorTransacts.put(TIME_DETECTOR_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(removeRequestRebootReadinessStatusListener, 5);
+            mDescriptorTransacts.put(REBOOT_READINESS_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(cancelRequest, 4);
+            mDescriptorTransacts.put(DEVICE_STATE_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(setDataSaverModeEnabled, 41);
+            mDescriptorTransacts.put(NETWORK_MANAGEMENT_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(resetAppErrors, 211);
+            transactIds.put(bindBackupAgent, 82);
+            transactIds.put(performIdleMaintenance, 153);
+            transactIds.put(setDumpHeapDebugLimit, 170);
+            transactIds.put(updateLockTaskPackages, 172);
+            transactIds.put(setHasTopUi, 191);
+            transactIds.put(resumeAppSwitches, 81);
+            transactIds.put(getContentProviderExternal, 115);
+            transactIds.put(getIntentForIntentSender, 143);
+            transactIds.put(unhandledBack, 10);
+            transactIds.put(setAlwaysFinish, 36);
+            transactIds.put(startActivityFromRecents, 160);
+            transactIds.put(requestBugReport, 133);
+            transactIds.put(setProcessLimit, 44);
+            transactIds.put(signalPersistentProcesses, 52);
+            transactIds.put(updateConfiguration, 41);
+            transactIds.put(appNotRespondingViaProvider, 154);
+            transactIds.put(shutdown, 79);
+            mDescriptorTransacts.put(ACTIVITY_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(generateChallenge, 19);
+            mDescriptorTransacts.put(FACE_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(awaken, 2);
+            transactIds.put(isDreaming, 7);
+            mDescriptorTransacts.put(DREAMS_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(setRefreshRateSwitchingType, 41);
+            transactIds.put(setTemporaryAutoBrightnessAdjustment, 35);
+            transactIds.put(startWifiDisplayScan, 6);
+            transactIds.put(shouldAlwaysRespectAppRequestedMode, 40);
+            transactIds.put(requestColorMode, 19);
+            mDescriptorTransacts.put(DISPLAY_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(requestProjection, 15);
+            transactIds.put(getActiveProjectionTypes, 20);
+            mDescriptorTransacts.put(UI_MODE_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(createInputConsumer, 81);
+            transactIds.put(setAnimationScale, 37);
+            transactIds.put(removeWindowToken, 18);
+            transactIds.put(thawRotation, 50);
+            transactIds.put(registerShortcutKey, 80);
+            transactIds.put(clearWindowContentFrameStats, 72);
+            transactIds.put(overridePendingAppTransitionRemote, 23);
+            transactIds.put(setRecentsVisibility, 64);
+            transactIds.put(stopFreezingScreen, 26);
+            transactIds.put(dismissKeyguard, 32);
+            transactIds.put(screenshotWallpaper, 57);
+            mDescriptorTransacts.put(WINDOW_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(clearHistory, 26);
+            transactIds.put(setUserRestriction, 34);
+            transactIds.put(getUidOps, 28);
+            transactIds.put(noteOperation, 2);
+            mDescriptorTransacts.put(APP_OPS_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(temporaryEnableAccessibilityStateUntilKeyguardRemoved, 12);
+            transactIds.put(registerUiTestAutomationService, 10);
+            transactIds.put(setPictureInPictureActionReplacingConnection, 9);
+            transactIds.put(getWindowToken, 13);
+            mDescriptorTransacts.put(ACCESSIBILITY_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(removeCredentialManagementApp, 25);
+            mDescriptorTransacts.put(KEY_CHAIN_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(updateUiTranslationState, 5);
+            mDescriptorTransacts.put(TRANSLATION_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(setBindAppWidgetPermission, 20);
+            mDescriptorTransacts.put(APPWIDGET_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(setBackupEnabled, 13);
+            mDescriptorTransacts.put(BACKUP_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(reportEnabledTrustAgentsChanged, 3);
+            transactIds.put(unregisterTrustListener, 5);
+            mDescriptorTransacts.put(TRUST_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getFontConfig, 1);
+            mDescriptorTransacts.put(FONT_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getSpecificationInfo, 4);
+            mDescriptorTransacts.put(UWB_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(setSensorPrivacy, 8);
+            transactIds.put(isSensorPrivacyEnabled, 6);
+            mDescriptorTransacts.put(SENSOR_PRIVACY_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getWifiApConfiguration, 65);
+            transactIds.put(stopSoftAp, 59);
+            transactIds.put(setCoexUnsafeChannels, 54);
+            transactIds.put(setOverrideCountryCode, 34);
+            transactIds.put(unregisterCoexCallback, 56);
+            transactIds.put(setWifiEnabled, 31);
+            transactIds.put(restartWifiSubsystem, 127);
+            mDescriptorTransacts.put(WIFI_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getControlFd, 32);
+            mDescriptorTransacts.put(USB_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(setTemporaryComponent, 2);
+            mDescriptorTransacts.put(SPEECH_RECOGNITION_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(isAutoRevokeExempted, 25);
+            transactIds.put(addOnPermissionsChangeListener, 10);
+            mDescriptorTransacts.put(PERMISSION_MANAGER_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getModuleProperties, 13);
+            mDescriptorTransacts.put(SOUND_TRIGGER_SESSION_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(installCaCert, 98);
+            transactIds.put(getNearbyNotificationStreamingPolicy, 57);
+            transactIds.put(markProfileOwnerOnOrganizationOwnedDevice, 300);
+            transactIds.put(forceSecurityLogs, 254);
+            transactIds.put(getDoNotAskCredentialsOnBoot, 214);
+            transactIds.put(clearSystemUpdatePolicyFreezePeriodRecord, 211);
+            transactIds.put(setDeviceOwner, 77);
+            mDescriptorTransacts.put(DEVICE_POLICY_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getCurrentTunedInfos, 35);
+            mDescriptorTransacts.put(TV_INPUT_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getNextEntry, 4);
+            mDescriptorTransacts.put(DROPBOX_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(pendingRequestForNetwork, 41);
+            transactIds.put(getActiveNetworkForUid, 2);
+            transactIds.put(startNattKeepalive, 56);
+            mDescriptorTransacts.put(CONNECTIVITY_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(checkPermission, 1);
+            mDescriptorTransacts.put(PERMISSION_CHECKER_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(getAlwaysOnVpnPackage, 13);
+            mDescriptorTransacts.put(VPN_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(hasEnrolledBiometrics, 6);
+            mDescriptorTransacts.put(BIOMETRIC_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(requestAvailability, 10);
+            transactIds.put(triggerNetworkRegistration, 19);
+            mDescriptorTransacts.put(TELEPHONY_IMS_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(registerNetworkStatsProvider, 14);
+            transactIds.put(forceUpdate, 8);
+            mDescriptorTransacts.put(NETWORK_STATS_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(setOnMediaKeyListener, 22);
+            transactIds.put(setOnVolumeKeyLongPressListener, 21);
+            mDescriptorTransacts.put(MEDIA_SESSION_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(addOnRoleHoldersChangedListenerAsUser, 7);
+            transactIds.put(setBypassingRoleQualification, 10);
+            mDescriptorTransacts.put(ROLE_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(queryValidVerificationPackageNames, 1);
+            transactIds.put(setDomainVerificationLinkHandlingAllowed, 6);
+            mDescriptorTransacts.put(DOMAIN_VERIFICATION_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(setTouchCalibrationForInputDevice, 11);
+            transactIds.put(isInTabletMode, 21);
+            transactIds.put(monitorGestureInput, 36);
+            transactIds.put(addKeyboardLayoutForInputDevice, 18);
+            transactIds.put(enableInputDevice, 4);
+            transactIds.put(tryPointerSpeed, 7);
+            transactIds.put(removePortAssociation, 38);
+            mDescriptorTransacts.put(INPUT_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(reloadPersistedData, 5);
+            mDescriptorTransacts.put(ROLLBACK_DESCRIPTOR, transactIds);
+
+            transactIds = new HashMap<>();
+            transactIds.put(onBiometricHelp, 47);
+            mDescriptorTransacts.put(STATUS_BAR_DESCRIPTOR, transactIds);
+        }
+    }
+
+    /**
      * Returns a new instance containing the appropriate transact ID mappings for the specified
      * {@code apiLevel} that can be used to invoke direct binder transacts.
      */
@@ -1230,6 +1834,8 @@ public class Transacts {
                 return new QTransacts();
             case Build.VERSION_CODES.R:
                 return new RTransacts();
+            case Build.VERSION_CODES.S:
+                return new STransacts();
             default:
                 throw new IllegalArgumentException(
                         "The provided API level, " + apiLevel + ", is not supported");
@@ -1274,6 +1880,52 @@ public class Transacts {
     }
 
     /**
+     * Invokes a direct binder transact using the specified {@code intent} to bind to the service
+     * within the provided {@code context}; the service's {@code transactName} method is invoked
+     * with the provided {@code parameters} using the {@code descriptor} to look up the transact ID.
+     *
+     * <p>To facilitate invoking direct transacts for permission tests this method will check if
+     * the {@link RemoteException} caught as a result of running the transact is a {@link
+     * SecurityException}; if so the {@code SecurityException} is rethrown as is, otherwise an
+     * {@link BasePermissionTester.UnexpectedPermissionTestFailureException} is thrown.
+     *
+     * @return the {@link Parcel} received as a result of invoking the transact
+     */
+    public Parcel invokeTransactWithServiceFromIntent(Context context, Intent intent,
+            String descriptor, String transactName, Object... parameters) {
+        final CountDownLatch latch = new CountDownLatch(1);
+        IBinder[] connectedBinder = new IBinder[1];
+        ServiceConnection serviceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName className, IBinder binder) {
+                mLogger.logDebug("onServiceConnected: className = " + className);
+                connectedBinder[0] = binder;
+                latch.countDown();
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+                mLogger.logDebug("onServiceDisconnected: componentName = " + componentName);
+            }
+        };
+        context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        boolean connectionSuccessful = false;
+        try {
+            connectionSuccessful = latch.await(5000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            mLogger.logError("Caught an InterruptedException waiting for the service from " + intent
+                    + " to connect: ", e);
+        }
+        if (!connectionSuccessful) {
+            throw new BasePermissionTester.UnexpectedPermissionTestFailureException(
+                    "Failed to connect to the service for descriptor " + descriptor);
+        }
+        return invokeTransactWithCharSequence(connectedBinder[0], descriptor, transactName, false,
+                parameters);
+
+    }
+
+    /**
      * Invokes a direct binder transact against the specified {@code service} using the {@code
      * descriptor}; the service's {@code transactName} method is invoked with the provided {@code
      * parameters} treating {@link String}s as {@link CharSequence}s if {@code useCharSequence} is
@@ -1288,6 +1940,37 @@ public class Transacts {
      */
     public Parcel invokeTransactWithCharSequence(String service, String descriptor,
             String transactName, boolean useCharSequence, Object... parameters) {
+        IBinder binder = null;
+        try {
+            // Obtain the IBinder for the specified service.
+            binder = (IBinder) Class.forName("android.os.ServiceManager")
+                    .getMethod("getService", String.class).invoke(null, service);
+            if (binder == null) {
+                throw new BasePermissionTester.BypassTestException("The " + service
+                        + " service guarded by this permission is not available on this device");
+            }
+        } catch (ReflectiveOperationException e) {
+            throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
+        }
+        return invokeTransactWithCharSequence(binder, descriptor, transactName, useCharSequence,
+                parameters);
+    }
+
+    /**
+     * Invokes a direct binder transact against the specified {@code binder} using the {@code
+     * descriptor}; the service's {@code transactName} method is invoked with the provided {@code
+     * parameters} treating {@link String}s as {@link CharSequence}s if {@code useCharSequence} is
+     * {@code true} (this is required for transacts that accept {@link CharSequence} instances).
+     *
+     * <p>To facilitate invoking direct transacts for permission tests this method will check if
+     * the {@link RemoteException} caught as a result of running the transact is a {@link
+     * SecurityException}; if so the {@code SecurityException} is rethrown as is, otherwise an
+     * {@link BasePermissionTester.UnexpectedPermissionTestFailureException} is thrown.
+     *
+     * @return the {@link Parcel} received as a result of invoking the transact
+     */
+    public Parcel invokeTransactWithCharSequence(IBinder binder, String descriptor,
+            String transactName, boolean useCharSequence, Object... parameters) {
         if (!descriptorContainsTransactName(descriptor, transactName)) {
             throw new BasePermissionTester.UnexpectedPermissionTestFailureException(
                     "Transact action " + transactName + " does not have a corresponding ID for SDK "
@@ -1295,13 +1978,6 @@ public class Transacts {
         }
         int transactId = getTransactId(descriptor, transactName);
         try {
-            // Obtain the IBinder for the specified service.
-            IBinder binder = (IBinder) Class.forName("android.os.ServiceManager")
-                    .getMethod("getService", String.class).invoke(null, service);
-            if (binder == null) {
-                throw new BasePermissionTester.BypassTestException("The " + service
-                        + " service guarded by this permission is not available on this device");
-            }
             Parcel reply = Parcel.obtain();
             // Write all of the provided parameters to the data Parcel to be passed to the transact.
             // Each parameter must be written to the Parcel based on its class; if any new classes
@@ -1327,6 +2003,8 @@ public class Transacts {
                     data.writeInt((Boolean) parameter ? 1 : 0);
                 } else if (parameter instanceof int[]) {
                     data.writeIntArray((int[]) parameter);
+                } else if (parameter instanceof byte[]) {
+                    data.writeByteArray((byte[]) parameter);
                 } else if (parameter instanceof IInterface) {
                     data.writeStrongBinder(
                             parameter != null ? ((IInterface) parameter).asBinder() : null);
@@ -1361,13 +2039,14 @@ public class Transacts {
                 } else if (parameter instanceof NetworkCapabilities) {
                     data.writeInt(1);
                     ((NetworkCapabilities) parameter).writeToParcel(data, 0);
+                } else if (parameter instanceof Parcelable) {
+                    data.writeInt(1);
+                    ((Parcelable) parameter).writeToParcel(data, 0);
                 }
             }
             binder.transact(transactId, data, reply, 0);
             reply.readException();
             return reply;
-        } catch (ReflectiveOperationException roe) {
-            throw new BasePermissionTester.UnexpectedPermissionTestFailureException(roe);
         } catch (RemoteException re) {
             Throwable cause = re.getCause();
             if (cause != null && cause instanceof SecurityException) {

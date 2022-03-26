@@ -63,7 +63,7 @@ public class PrivilegedPermissionTester extends SignaturePermissionTester {
                 continue;
             }
             if (mPermissionTasks.containsKey(permission)) {
-                testPassed = runPermissionTest(permission, mPermissionTasks.get(permission));
+                testPassed = runPermissionTest(permission, mPermissionTasks.get(permission), true);
             } else {
                 testPassed = getAndLogTestStatus(permission);
             }

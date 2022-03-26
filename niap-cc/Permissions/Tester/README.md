@@ -17,7 +17,7 @@ run these tests.
 The `BasePermissionTester` class is the base abstract class from which all other
 permission testers derive. This class contains an inner `PermissionTester`
 utility class that is comprised of a `Runnable` that can be used to verify the
-API, resources, etc., guarded by the permission behave as expeced, along with a
+API, resources, etc., guarded by the permission behave as expected, along with a
 minimum and maximum API level. Subclasses only need to override the
 `runPermissionTests` method to iterate through all permissions to be tested,
 utilizing the `BasePermissionTester#runPermissionTest(permission,
@@ -37,6 +37,28 @@ defined a new instance can be instantiated and returned in the `List` in
 `GmsPermissionConfiguration` and `DebugConfiguration`. During development
 the `DebugConfiguration` can be used by returning the new tester / permission
 under test and modifying `Constants.USE_DEBUG_CONFIG` to `true`.
+
+## Internal Permissions
+Android 12 introduced a new `internal` protection level for permissions that are
+only granted to requesting apps that satisfy one of the other protection flags
+declared for the permission (for a full list of protection flags, see
+[protectionLevel]
+(https://developer.android.com/reference/android/R.attr#protectionLevel)). Since
+`internal` permissions are not granted to apps signed with the platform's
+signing key, the granted path cannot be verified using the standard permission
+tester APK. However, a number of these permissions are granted to the `shell`
+user, and instrumentation tests allow a test to run as the `shell` user by
+invoking [`adoptShellPermissionIdentity`]
+(https://developer.android.com/reference/android/app/UiAutomation#adoptShellPermissionIdentity()).
+This app contains an instrumentation test, `InternalPermissionsTest` under
+`androidTest/` that can be used to verify the APIs guarded by the `internal`
+permissions behave as expected when the permission is granted.
+
+The instrumentation test APK can be built by running `gradlew
+connectedAndroidTest` from the command line within the `Tester/` directory;
+this should generate `app-debug-androidTest.apk`. This APK should be signed with
+the same signing key used to sign the permission tester APK to ensure the
+instrumentation tests can be run against this app.
 
 ## Companion Package
 Under the `Companion/` directory exists the project for the tester companion

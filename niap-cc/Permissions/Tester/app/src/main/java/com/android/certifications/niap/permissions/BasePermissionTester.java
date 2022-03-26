@@ -91,7 +91,8 @@ public abstract class BasePermissionTester {
                 mAppSignature.toByteArray(), PackageManager.CERT_INPUT_RAW_X509);
         mLogger.logDebug(
                 "Device API: " + mDeviceApiLevel + ", build fingerprint: " + Build.FINGERPRINT
-                        + ", matches platform signature: " + mPlatformSignatureMatch);
+                        + ", matches platform signature: " + mPlatformSignatureMatch + ", uid: "
+                        + mUid);
 
         // Obtain all platform declared permissions to ensure tests are only attempted against
         // those declared on the device.
@@ -121,8 +122,17 @@ public abstract class BasePermissionTester {
     public abstract boolean runPermissionTests();
 
     /**
+     * @see #runPermissionTest(String, PermissionTest, boolean)
+     */
+    public boolean runPermissionTest(String permission, PermissionTest test) {
+        return runPermissionTest(permission, test, false);
+    }
+
+    /**
      * Runs the provided {@code test} for the specified {@code permission}, and returns whether the
-     * test completed successfully.
+     * test completed successfully; if {@code exceptionAllowed} is set to true then the API will
+     * be considered successful even if an {@code Exception} other than a {@code SecurityException}
+     * is caught (this can be used for permissions that are typically not exposed to external apps).
      *
      * <p>This method provides a basic framework for running permission tests using the {@link
      * PermissionTest} class by performing the following:
@@ -150,7 +160,8 @@ public abstract class BasePermissionTester {
      *
      * @return true if the test is skipped, if the test is a custom test, or if the test is passed
      */
-    public boolean runPermissionTest(String permission, PermissionTest test) {
+    public boolean runPermissionTest(String permission, PermissionTest test,
+            boolean exceptionAllowed) {
         boolean testPassed = true;
         // if the permission does not exist then skp the test and return immediately.
         if (!mPlatformPermissions.contains(permission)) {
@@ -178,26 +189,51 @@ public abstract class BasePermissionTester {
                 test.runTest();
                 // If the permission was granted then a SecurityException should not have been
                 // thrown so the result of the test should match whether the permission was granted.
-                testPassed = permissionGranted;
-                StatusLogger.logTestStatus(permission, permissionGranted, true);
+                testPassed = getAndLogTestStatus(permission, permissionGranted, true);
             } catch (BypassTestException bte) {
                 StatusLogger.logTestSkipped(permission, permissionGranted, bte.getMessage());
             } catch (SecurityException e) {
                 // Similar to above if the permission was not granted then a SecurityException
                 // should have been thrown so the result of the test should be the opposite of
                 // whether the permission was granted.
-                testPassed = !permissionGranted;
                 mLogger.logDebug("Caught a SecurityException for permission " + permission + ": ",
                         e);
                 if (e.getCause() != null) {
                     mLogger.logDebug("SecuritionException cause: ", e.getCause());
                 }
-                StatusLogger.logTestStatus(permission, permissionGranted, false);
-            } catch (Throwable t) {
+                testPassed = getAndLogTestStatus(permission, permissionGranted, false);
+            } catch (UnexpectedPermissionTestFailureException e) {
                 testPassed = false;
-                StatusLogger.logTestError(permission, t);
+                StatusLogger.logTestError(permission, e);
+            } catch (Throwable t) {
+                // Any other Throwable indicates the test did not fail due to a SecurityException;
+                // treat the API as successful if the caller specified exceptions are allowed.
+                if (exceptionAllowed) {
+                    mLogger.logDebug("Caught a Throwable for permission " + permission + ": ", t);
+                    testPassed = getAndLogTestStatus(permission, permissionGranted, true);
+                } else {
+                    // else an Exception was not expected; treat the test as failed and log the
+                    // error status.
+                    testPassed = false;
+                    StatusLogger.logTestError(permission, t);
+                }
             }
         }
+        return testPassed;
+    }
+
+    /**
+     * Logs and returns the status of the test for the provided {@code permission} given whether
+     * {@code permissionGranted} and {@code apiSuccessful}.
+     *
+     * <p>This method should be overridden by subclasses that test permissions that have additional
+     * requirements to be granted.
+     */
+    protected boolean getAndLogTestStatus(String permission, boolean permissionGranted,
+            boolean apiSuccessful) {
+        // If the permission was granted then the API should have been successful.
+        boolean testPassed = permissionGranted == apiSuccessful;
+        StatusLogger.logTestStatus(permission, permissionGranted, apiSuccessful);
         return testPassed;
     }
 

@@ -21,11 +21,15 @@ import static com.android.certifications.niap.permissions.utils.SignaturePermiss
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+import android.os.Build;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.R;
+import com.android.certifications.niap.permissions.RuntimePermissionTester;
 import com.android.certifications.niap.permissions.SignaturePermissionTester;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +45,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
     private static final String[] DEPENDENT_PERMISSIONS = new String[]{
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.UWB_RANGING,
     };
 
     public SignatureDependentPermissionConfiguration(Activity activity) {
@@ -71,16 +76,36 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
 
     @Override
     public List<BasePermissionTester> getPermissionTesters(Activity activity) {
-        return Collections.singletonList(new SignaturePermissionTester(this, activity));
+        List<BasePermissionTester> permissionTesters = new ArrayList<>();
+        permissionTesters.add(new RuntimePermissionTester(this, activity));
+        permissionTesters.add(new SignaturePermissionTester(this, activity));
+        return permissionTesters;
+    }
+
+    @Override
+    public Optional<List<String>> getRuntimePermissions() {
+        // The API guarded by UWB_RANGING is also guarded by UWB_PRIVILEGED which is checked first.
+        // In this configuration UWB_PRIVILEGED should be granted while UWB_RANGING is not, so this
+        // allows verification that this permission is checked and the API fails as expected when
+        // it is not granted.
+        return Optional.of(Collections.singletonList(Manifest.permission.UWB_RANGING));
     }
 
     @Override
     public Optional<List<String>> getSignaturePermissions() {
-        return Optional.of(Collections.singletonList(permission.RADIO_SCAN_WITHOUT_LOCATION));
+        List<String> permissions = new ArrayList<>();
+        permissions.add(permission.RADIO_SCAN_WITHOUT_LOCATION);
+        // Starting in Android 12 the NETWORK_SCAN permission behaves similar to
+        // RADIO_SCAN_WITHOUT_LOCATION in that it allows a network scan without a location
+        // permission.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissions.add(permission.NETWORK_SCAN);
+        }
+        return Optional.of(permissions);
     }
 
     @Override
     public int getButtonTextId() {
-        return R.string.run_radio_scan_without_location_test;
+        return R.string.run_permission_dependent_tests;
     }
 }
