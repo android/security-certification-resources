@@ -18,13 +18,21 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 30
-
+    signingConfigs {
+        companion {
+            storeFile file("../security/product/ec-p256.jks")
+            storePassword "android"
+            keyPassword "android"
+            keyAlias "platform"
+        }
+    }
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions.companion"
         minSdkVersion 28
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+        signingConfig signingConfigs.companion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
