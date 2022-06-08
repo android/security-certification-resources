@@ -19,26 +19,14 @@ def homePath = System.properties['user.home']
 
 android {
     signingConfigs {
-        debug {
-            storeFile file("../security/debug/rsa-2048.jks")
-            storePassword "android"
-            keyPassword "android"
-            keyAlias "platform"
-        }
         bundle{
             storeFile file("../security/debug/rsa-2048.jks")
             storePassword "android"
             keyPassword "android"
             keyAlias "platform"
         }
-        devkey {
-            storeFile file("../security/product_devkey/platform.keystore")
-            storePassword "android"
-            keyPassword "android"
-            keyAlias "platform"
-        }
         platform {
-            storeFile file("../security/product_t/platform.jks")
+            storeFile file('/Users/wkouki/AndroidStudioProjects/security-certification-resources/niap-cc/Permissions/Tester/security/product_t/platform.jks')
             storePassword "android"
             keyPassword "android"
             keyAlias "platform"
@@ -58,23 +46,30 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        signingConfig signingConfigs.debug
     }
+
     buildTypes {
         release {
+            signingConfig null
+            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+        }
+        debug {
+            signingConfig null
+            debuggable true
         }
     }
     flavorDimensions "settings"
     productFlavors {
         normal {
             dimension "settings"
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.bundle
         }
         noperm {
             dimension "settings"
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.bundle
         }
         platform {
             dimension "settings"
