@@ -26,7 +26,7 @@ android {
             keyAlias "platform"
         }
         platform {
-            storeFile file('/Users/wkouki/AndroidStudioProjects/security-certification-resources/niap-cc/Permissions/Tester/security/product_t/platform.jks')
+            storeFile file('../security/product_t/platform.jks')
             storePassword "android"
             keyPassword "android"
             keyAlias "platform"
