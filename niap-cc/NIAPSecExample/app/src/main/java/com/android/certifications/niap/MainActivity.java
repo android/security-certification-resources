@@ -23,6 +23,8 @@ import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -40,17 +42,33 @@ import com.android.certifications.niap.niapsec.SecureConfig;
 import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
 import com.android.certifications.niap.niapsec.crypto.SecureCipher;
 import com.android.certifications.niap.niapsec.net.SecureURL;
+
 import com.android.certifications.niap.niapsecexample.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.android.certifications.niap.tests.SDPAuthFailureTestWorker;
 import com.android.certifications.niap.tests.SDPTestWorker;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLConnection;
+import java.security.Security;
+
+import java.util.PropertyPermission;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static com.android.certifications.niap.EncryptedDataService.START_FOREGROUND_ACTION;
 import static com.android.certifications.niap.EncryptedDataService.STOP_FOREGROUND_ACTION;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 
 /**
  * Sample Tool for OEMs to run Sensitive Data Protection tests using the NIAPSEC library.
@@ -137,23 +155,50 @@ public class MainActivity extends FragmentActivity {
         OneTimeWorkRequest sdpFailureTestWorker =
                 new OneTimeWorkRequest.Builder(SDPAuthFailureTestWorker.class)
                         .build();
+
         WorkManager.getInstance()
                 .beginWith(sdpTestWorker)
                 .then(sdpFailureTestWorker)
                 .enqueue();
 
+
+        //Async task for network connection
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    SecureConfig secureConfig = SecureConfig.getStrongConfig();
+                    SecureURL secureURL = new SecureURL("https://www.google.com", null);
+                    URLConnection conn = secureURL.openConnection();
+                    conn.connect();
+                } catch (MalformedURLException ex) {
+                    Log.e(TAG, "SecureURL Failure: " + ex.getMessage());
+                    Log.e(TAG, ex.toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+       /*
         try {
             new AsyncTask<Void, Void, Void>() {
                 protected Void doInBackground(Void... unused) {
                     try {
-                        SecureConfig secureConfig = SecureConfig.getStrongConfig();
-                        SecureURL secureURL = new SecureURL("google.com", null);
-                        URLConnection conn = secureURL.openConnection();
-                        conn.connect();
 
+                        URLConnection connection = (HttpsURLConnection) (new URL("https://www.google.com"))
+                                .openConnection();
+                        SSLContext context = SSLContext.getInstance("TLS");
+                        TrustManager tm[] = {};
+                        context.init(null, tm, null);
+                        SSLSocketFactory preferredCipherSuiteSSLSocketFactory = new PreferredCipherSuiteSSLSocketFactory(context.getSocketFactory());
+                        ((HttpsURLConnection) connection).setSSLSocketFactory(preferredCipherSuiteSSLSocketFactory);
+                        connection.connect();
                     } catch(Exception ex) {
                         Log.e(TAG, "SecureURL Failure: " + ex.getMessage());
-                        Log.e(TAG, ex.getStackTrace().toString());
+                        Log.e(TAG, ex.toString());
                     }
                     return null;
                 }
@@ -163,7 +208,7 @@ public class MainActivity extends FragmentActivity {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
+*/
     }
 
     private void showMessage(String message) {
@@ -180,7 +225,7 @@ public class MainActivity extends FragmentActivity {
 
         Log.i(TAG, "Encrypting " + new String(clearText));
 
-        SecureCipher secureCipher = SecureCipher.getDefault(biometricSupport);
+        SecureCipher secureCipher = SecureCipher.getDefault(SecureConfig.getDefault(biometricSupport));
         secureCipher.encryptSensitiveDataAsymmetric(
                 "OAEP_TESTING_RSA",
                 clearText,

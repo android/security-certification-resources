@@ -46,7 +46,7 @@ import androidx.work.WorkerParameters;
 public class SDPAuthFailureTestWorker extends Worker {
 
     private static final String FILE_NAME = "test_file_fail";
-    private static final String KEY_PAIR_ALIAS = "key_pair_alias";
+    private static final String KEY_PAIR_ALIAS = "default_encryption_key";
 
     public SDPAuthFailureTestWorker(Context context, WorkerParameters parameters) {
         super(context, parameters);
@@ -74,7 +74,7 @@ public class SDPAuthFailureTestWorker extends Worker {
             TestUtil.logSuccess(getClass(), "Writing Data: " + TestUtil.DATA,
                     FileOutputStream.class);
             FileOutputStream outputStream = secureContext.openEncryptedFileOutput(FILE_NAME,
-                    Context.MODE_PRIVATE, KEY_PAIR_ALIAS);
+                    Context.MODE_PRIVATE, true);//KEY_PAIR_ALIAS);
             TestUtil.logSuccess(getClass(), "Writing SDP file encrypted contents to " +
                     FILE_NAME, Cipher.class);
             outputStream.write(TestUtil.DATA.getBytes(StandardCharsets.UTF_8));
@@ -94,6 +94,7 @@ public class SDPAuthFailureTestWorker extends Worker {
             secureContext.openEncryptedFileInput(
                     FILE_NAME,
                     Executors.newSingleThreadExecutor(),
+                    true,
                     inputStream -> {
                 try {
                     byte[] encodedData = new byte[inputStream.available()];

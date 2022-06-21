@@ -22,6 +22,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 
+import com.android.certifications.niap.niapsec.SecureConfig;
 import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
 import com.android.certifications.niap.niapsec.context.SecureContextCompat;
 import com.android.certifications.niap.niapsec.crypto.EphemeralSecretKey;
@@ -51,9 +52,9 @@ public class EncryptionManager {
 
     public void createSensitiveDataSymmetricKey(final String keyAlias) {
         Log.i(TAG, "Generating Key...");
-        SecureKeyGenerator keyGenerator = SecureKeyGenerator.getDefault();
+        SecureKeyGenerator keyGenerator = SecureKeyGenerator.getInstance(SecureConfig.getDefault());
         boolean created = keyGenerator.generateKey(keyAlias);
-        SecureKeyStore secureKeyStore = SecureKeyStore.getDefault();
+        SecureKeyStore secureKeyStore = SecureKeyStore.getDefault(SecureConfig.getDefault());
         final boolean keyInHardware = secureKeyStore.checkKeyInsideSecureHardware(keyAlias);
         if (UpdateViewModel.updateStatus != null) {
             UpdateViewModel.updateStatus.postValue("Generated Key Stored in Hardware: " +
@@ -63,10 +64,10 @@ public class EncryptionManager {
 
     public void createSensitiveDataAsymmetricKeyPair(final String keyPairAlias) {
         Log.i(TAG, "Generating KeyPair (RSA)...");
-        SecureKeyGenerator keyGenerator = SecureKeyGenerator.getDefault();
+        SecureKeyGenerator keyGenerator = SecureKeyGenerator.getInstance(SecureConfig.getDefault());
         boolean createdAsym = keyGenerator.generateAsymmetricKeyPair(keyPairAlias);
         Log.i(TAG, "KeyPair Generated: " + createdAsym);
-        SecureKeyStore secureKeyStore = SecureKeyStore.getDefault();
+        SecureKeyStore secureKeyStore = SecureKeyStore.getDefault(SecureConfig.getDefault());
         final boolean keyInHardwareAsym =
                 secureKeyStore.checkKeyInsideSecureHardwareAsymmetric(keyPairAlias);
         if (UpdateViewModel.updateStatus != null) {
@@ -76,7 +77,7 @@ public class EncryptionManager {
     }
 
     public EphemeralSecretKey createEphemeralKey() {
-        SecureKeyGenerator secureKeyGenerator = SecureKeyGenerator.getDefault();
+        SecureKeyGenerator secureKeyGenerator = SecureKeyGenerator.getInstance(SecureConfig.getDefault());
         EphemeralSecretKey secretKey = secureKeyGenerator.generateEphemeralDataKey();
         Log.i("SDPTestWorker", "Ephemeral AES Key Base64:\n" +
                 Base64.encodeToString(secretKey.getEncoded(), Base64.DEFAULT));
@@ -87,7 +88,7 @@ public class EncryptionManager {
             EphemeralSecretKey secretKey,
             String keyPairAlias,
             SecureCipher.SecureAsymmetricEncryptionCallback callback) {
-        SecureCipher secureCipher = SecureCipher.getDefault(biometricSupport);
+        SecureCipher secureCipher = SecureCipher.getDefault(SecureConfig.getDefault(biometricSupport));
         secureCipher.encryptSensitiveDataAsymmetric(keyPairAlias, secretKey.getEncoded(), callback);
     }
 
@@ -117,8 +118,8 @@ public class EncryptionManager {
             // Asymmetric Sensitive Data Protection
             Log.i(TAG, "Device Locked: Encrypted Data using Asymmetric Key");
             EphemeralSecretKey secretKey = createEphemeralKey();
-            SecureCipher secureCipher = SecureCipher.getDefault(biometricSupport);
-            Pair<byte[], byte[]> encryptedData = secureCipher.encryptEphemeralData(secretKey, data);
+            SecureCipher secureCipher = SecureCipher.getDefault(SecureConfig.getDefault(biometricSupport));
+            Pair<byte[], byte[]> encryptedData = secureCipher.encryptEphemeralData(secretKey, data,"default_encryption_key");
             encryptEphemeralKeyAsymmetric(secretKey, asymKeyPairAlias,
                     (byte[] encryptedEphemeralKey) -> {
                 byte[] encodedData = secureCipher.encodeEphemeralData(
@@ -130,7 +131,7 @@ public class EncryptionManager {
                 asymmetricEncryptionCallback.encryptionComplete(encodedData);
             });
         } else {
-            SecureCipher secureCipher = SecureCipher.getDefault(biometricSupport);
+            SecureCipher secureCipher = SecureCipher.getDefault(SecureConfig.getDefault(biometricSupport));
             secureCipher.encryptSensitiveData(
                     symKeyAlias,
                     data,
@@ -152,12 +153,12 @@ public class EncryptionManager {
         final AtomicBoolean saved = new AtomicBoolean(false);
         encryptData(symKeyAlias, asymKeyPairAlias, data, (byte[] encryptedData) -> {
             try {
-                SecureContextCompat secureContext = new SecureContextCompat(context);
+                SecureContextCompat secureContext = new SecureContextCompat(context,SecureConfig.getDefault());
                 Log.i(TAG, "Keyname " + fileName.substring(0, fileName.indexOf(".")));
                 FileOutputStream outputStream = secureContext.openEncryptedFileOutput(
                         fileName,
                         Context.MODE_PRIVATE,
-                        fileName.substring(0, fileName.indexOf(".")));
+                        fileName.substring(0, fileName.indexOf(".")),true);
                 outputStream.write(encryptedData);
                 UpdateViewModel.updateStatus.postValue(
                         "Saving " + encryptedData.length + " bytes to file " + fileName);
@@ -177,7 +178,7 @@ public class EncryptionManager {
             byte[] encodedCipherText,
             SecureCipher.SecureAsymmetricEncryptionCallback callback) {
         if (!deviceLocked()) {
-            SecureCipher secureCipher = SecureCipher.getDefault(biometricSupport);
+            SecureCipher secureCipher = SecureCipher.getDefault(SecureConfig.getDefault(biometricSupport));
             secureCipher.decryptEncodedData(
                     encodedCipherText,
                     (byte[] decryptedData) -> {
@@ -198,12 +199,14 @@ public class EncryptionManager {
     public boolean convertEphemeralEncodedData(String fileName, String keyPairAlias) {
         AtomicBoolean converted = new AtomicBoolean(false);
         try {
-            SecureContextCompat secureContext = new SecureContextCompat(context);
+            SecureContextCompat secureContext = new SecureContextCompat(context,SecureConfig.getDefault());
             secureContext.openEncryptedFileInput(
                     fileName,
                     Executors.newSingleThreadExecutor(),
-                    inputStream -> {
+                    true,
+                    inputStream-> {
                 try {
+
                     byte[] fileData = new byte[inputStream.available()];
                     inputStream.read(fileData);
                     UpdateViewModel.updateStatus.postValue(
@@ -216,7 +219,7 @@ public class EncryptionManager {
                                         .openEncryptedFileOutput(
                                                 fileName,
                                                 Context.MODE_PRIVATE,
-                                                fileName.substring(0, fileName.indexOf(".")));
+                                                fileName.substring(0, fileName.indexOf(".")),true);
                                 outputStream.write(convertedData);
                                 outputStream.flush();
                                 outputStream.close();
@@ -240,17 +243,18 @@ public class EncryptionManager {
 
     public void decryptData(String fileName, SecureCipher.SecureDecryptionCallback callback) {
         try {
-            SecureContextCompat secureContext = new SecureContextCompat(context);
+            SecureContextCompat secureContext = new SecureContextCompat(context,SecureConfig.getDefault());
             secureContext.openEncryptedFileInput(
                     fileName,
                     Executors.newSingleThreadExecutor(),
+                    true,
                     inputStream -> {
                 try {
 
                     byte[] encodedData = new byte[inputStream.available()];
                     inputStream.read(encodedData);
                     inputStream.close();
-                    SecureCipher secureCipher = SecureCipher.getDefault(biometricSupport);
+                    SecureCipher secureCipher = SecureCipher.getDefault(SecureConfig.getDefault(biometricSupport));
                     secureCipher.decryptEncodedData(encodedData, callback);
                 } catch (IOException ex) {
                     Log.e(TAG, "There was a problem writing to file... " + ex.getMessage());
