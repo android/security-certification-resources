@@ -16,19 +16,20 @@
 
 package com.android.certifications.niap;
 
+import static com.android.certifications.niap.EncryptedDataService.START_FOREGROUND_ACTION;
+import static com.android.certifications.niap.EncryptedDataService.STOP_FOREGROUND_ACTION;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -42,33 +43,47 @@ import com.android.certifications.niap.niapsec.SecureConfig;
 import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
 import com.android.certifications.niap.niapsec.crypto.SecureCipher;
 import com.android.certifications.niap.niapsec.net.SecureURL;
-
 import com.android.certifications.niap.niapsecexample.R;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.android.certifications.niap.tests.SDPAuthFailureTestWorker;
 import com.android.certifications.niap.tests.SDPTestWorker;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.AlgorithmConstraints;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Security;
-
-import java.util.PropertyPermission;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static com.android.certifications.niap.EncryptedDataService.START_FOREGROUND_ACTION;
-import static com.android.certifications.niap.EncryptedDataService.STOP_FOREGROUND_ACTION;
-
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+
+import info.guardianproject.netcipher.NetCipher;
+import info.guardianproject.netcipher.client.TlsOnlySocketFactory;
 
 /**
  * Sample Tool for OEMs to run Sensitive Data Protection tests using the NIAPSEC library.
@@ -95,6 +110,12 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.i(TAG, "?>" +  Security.getProperty("jdk.tls.disabledAlgorithms"));
+        Security.setProperty("jdk.tls.disabledAlgorithms","SSLv3, RC4, DES, MD5withRSA," +
+                "DH keySize < 1024, EC keySize < 224, 3DES_EDE_CBC, anon, NULL," +
+                "include jdk.disabled.namedCurves");
+        Log.i(TAG, "?>" +  Security.getProperty("jdk.tls.disabledAlgorithms"));
+
         setContentView(R.layout.activity_main);
         thisActivity = this;
         textView = (TextView) findViewById(R.id.output_textview);
@@ -120,6 +141,8 @@ public class MainActivity extends FragmentActivity {
                 });
             }
         });
+
+
     }
 
     @Override
@@ -163,6 +186,7 @@ public class MainActivity extends FragmentActivity {
 
 
         //Async task for network connection
+        Log.i(TAG, "Secure URL Test One Start...");
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(new Runnable() {
             @Override
@@ -182,33 +206,6 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
-       /*
-        try {
-            new AsyncTask<Void, Void, Void>() {
-                protected Void doInBackground(Void... unused) {
-                    try {
-
-                        URLConnection connection = (HttpsURLConnection) (new URL("https://www.google.com"))
-                                .openConnection();
-                        SSLContext context = SSLContext.getInstance("TLS");
-                        TrustManager tm[] = {};
-                        context.init(null, tm, null);
-                        SSLSocketFactory preferredCipherSuiteSSLSocketFactory = new PreferredCipherSuiteSSLSocketFactory(context.getSocketFactory());
-                        ((HttpsURLConnection) connection).setSSLSocketFactory(preferredCipherSuiteSSLSocketFactory);
-                        connection.connect();
-                    } catch(Exception ex) {
-                        Log.e(TAG, "SecureURL Failure: " + ex.getMessage());
-                        Log.e(TAG, ex.toString());
-                    }
-                    return null;
-                }
-            }.execute();
-
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-*/
     }
 
     private void showMessage(String message) {
