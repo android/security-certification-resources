@@ -16,20 +16,20 @@
 
 package com.android.certifications.niap;
 
-import static com.android.certifications.niap.EncryptedDataService.START_FOREGROUND_ACTION;
-import static com.android.certifications.niap.EncryptedDataService.STOP_FOREGROUND_ACTION;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -43,47 +43,40 @@ import com.android.certifications.niap.niapsec.SecureConfig;
 import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
 import com.android.certifications.niap.niapsec.crypto.SecureCipher;
 import com.android.certifications.niap.niapsec.net.SecureURL;
+
 import com.android.certifications.niap.niapsecexample.R;
-import com.android.certifications.niap.tests.SDPAuthFailureTestWorker;
-import com.android.certifications.niap.tests.SDPTestWorker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.android.certifications.niap.tests.SDPAuthFailureTestWorker;
+import com.android.certifications.niap.tests.SDPTestWorker;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.AlgorithmConstraints;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Security;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
+
+import java.util.PropertyPermission;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
+import static com.android.certifications.niap.EncryptedDataService.START_FOREGROUND_ACTION;
+import static com.android.certifications.niap.EncryptedDataService.STOP_FOREGROUND_ACTION;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.TrustManager;
 
 import info.guardianproject.netcipher.NetCipher;
-import info.guardianproject.netcipher.client.TlsOnlySocketFactory;
 
 /**
  * Sample Tool for OEMs to run Sensitive Data Protection tests using the NIAPSEC library.
@@ -110,12 +103,6 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.i(TAG, "?>" +  Security.getProperty("jdk.tls.disabledAlgorithms"));
-        Security.setProperty("jdk.tls.disabledAlgorithms","SSLv3, RC4, DES, MD5withRSA," +
-                "DH keySize < 1024, EC keySize < 224, 3DES_EDE_CBC, anon, NULL," +
-                "include jdk.disabled.namedCurves");
-        Log.i(TAG, "?>" +  Security.getProperty("jdk.tls.disabledAlgorithms"));
-
         setContentView(R.layout.activity_main);
         thisActivity = this;
         textView = (TextView) findViewById(R.id.output_textview);
@@ -141,8 +128,6 @@ public class MainActivity extends FragmentActivity {
                 });
             }
         });
-
-
     }
 
     @Override
@@ -166,6 +151,7 @@ public class MainActivity extends FragmentActivity {
             This provides an additional test to check and ensure that data cannot be decrypted.
             The key should not be available for decryption while the device is locked.
         */
+        Log.i(TAG,"Security>"+Security.getProperty(MyApplication.DISABLED_ALGOR_TAG));
         int initialDelay = 1;
         if(runInBackgroundCheckBox.isChecked()) {
             Log.i(TAG, "LOCK DEVICE NOW...");
@@ -186,9 +172,8 @@ public class MainActivity extends FragmentActivity {
 
 
         //Async task for network connection
-        Log.i(TAG, "Secure URL Test One Start...");
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(new Runnable() {
+        /*executor.submit(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -204,7 +189,52 @@ public class MainActivity extends FragmentActivity {
                 }
 
             }
+        });*/
+        ExecutorService executor2 = Executors.newCachedThreadPool();
+        Future<?> future = executor2.submit(new Runnable() {
+            @Override
+            public void run() {
+                String result = null;
+                HttpURLConnection connection = null;
+                try {
+                    URL url = new URL("https://www.google.com");
+                    connection = (HttpsURLConnection) url.openConnection();
+                    connection = (HttpsURLConnection) NetCipher.getHttpsURLConnection(url);
+
+                    connection.setRequestProperty("accept", "*/*");
+                    connection.setRequestProperty("connection", "Keep-Alive");
+                    connection.setRequestProperty("user-agent", "Mozilla/5.0 (compatible; MSIE 6.0; WIndows NT 5.1; SV1)");
+
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(
+                            connection.getInputStream()));
+                    String body;
+
+                    while ((body = reader.readLine()) != null) {
+                        //
+                    }
+                    reader.close();
+                    connection.getResponseCode(); // this actually makes it go
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (connection != null)
+                        connection.disconnect();
+                }
+
+            }
         });
+
+        executor.shutdown();
+        try {
+            future.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
