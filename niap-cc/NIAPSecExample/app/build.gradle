@@ -61,5 +61,6 @@ dependencies {
     implementation('androidx.work:work-runtime:2.7.0') {
         because 'previous versions have a bug impacting this application'
     }
+    implementation 'info.guardianproject.netcipher:netcipher:2.1.0'
 
 }

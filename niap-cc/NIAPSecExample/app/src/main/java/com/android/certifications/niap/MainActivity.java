@@ -25,6 +25,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -49,7 +50,10 @@ import com.google.android.material.snackbar.Snackbar;
 import com.android.certifications.niap.tests.SDPAuthFailureTestWorker;
 import com.android.certifications.niap.tests.SDPTestWorker;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -57,9 +61,11 @@ import java.security.Security;
 
 import java.util.PropertyPermission;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static com.android.certifications.niap.EncryptedDataService.START_FOREGROUND_ACTION;
@@ -69,6 +75,8 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
+
+import info.guardianproject.netcipher.NetCipher;
 
 /**
  * Sample Tool for OEMs to run Sensitive Data Protection tests using the NIAPSEC library.
@@ -143,6 +151,7 @@ public class MainActivity extends FragmentActivity {
             This provides an additional test to check and ensure that data cannot be decrypted.
             The key should not be available for decryption while the device is locked.
         */
+        Log.i(TAG,"Security>"+Security.getProperty(MyApplication.DISABLED_ALGOR_TAG));
         int initialDelay = 1;
         if(runInBackgroundCheckBox.isChecked()) {
             Log.i(TAG, "LOCK DEVICE NOW...");
@@ -164,7 +173,7 @@ public class MainActivity extends FragmentActivity {
 
         //Async task for network connection
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(new Runnable() {
+        /*executor.submit(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -180,35 +189,53 @@ public class MainActivity extends FragmentActivity {
                 }
 
             }
+        });*/
+        ExecutorService executor2 = Executors.newCachedThreadPool();
+        Future<?> future = executor2.submit(new Runnable() {
+            @Override
+            public void run() {
+                String result = null;
+                HttpURLConnection connection = null;
+                try {
+                    URL url = new URL("https://www.google.com");
+                    connection = (HttpsURLConnection) url.openConnection();
+                    connection = (HttpsURLConnection) NetCipher.getHttpsURLConnection(url);
+
+                    connection.setRequestProperty("accept", "*/*");
+                    connection.setRequestProperty("connection", "Keep-Alive");
+                    connection.setRequestProperty("user-agent", "Mozilla/5.0 (compatible; MSIE 6.0; WIndows NT 5.1; SV1)");
+
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(
+                            connection.getInputStream()));
+                    String body;
+
+                    while ((body = reader.readLine()) != null) {
+                        //
+                    }
+                    reader.close();
+                    connection.getResponseCode(); // this actually makes it go
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (connection != null)
+                        connection.disconnect();
+                }
+
+            }
         });
 
-       /*
+        executor.shutdown();
         try {
-            new AsyncTask<Void, Void, Void>() {
-                protected Void doInBackground(Void... unused) {
-                    try {
-
-                        URLConnection connection = (HttpsURLConnection) (new URL("https://www.google.com"))
-                                .openConnection();
-                        SSLContext context = SSLContext.getInstance("TLS");
-                        TrustManager tm[] = {};
-                        context.init(null, tm, null);
-                        SSLSocketFactory preferredCipherSuiteSSLSocketFactory = new PreferredCipherSuiteSSLSocketFactory(context.getSocketFactory());
-                        ((HttpsURLConnection) connection).setSSLSocketFactory(preferredCipherSuiteSSLSocketFactory);
-                        connection.connect();
-                    } catch(Exception ex) {
-                        Log.e(TAG, "SecureURL Failure: " + ex.getMessage());
-                        Log.e(TAG, ex.toString());
-                    }
-                    return null;
-                }
-            }.execute();
-
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            future.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
-*/
+
+
     }
 
     private void showMessage(String message) {
