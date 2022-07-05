@@ -759,6 +759,12 @@
     <uses-permission android:name="android.permission.PERFORM_IMS_SINGLE_REGISTRATION" />
     <uses-permission android:name="android.permission.RECORD_BACKGROUND_AUDIO" />
 
+    <!-- New permissions for Android 12 sv2 -->
+    <uses-permission android:name="android.permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD" />
+    <uses-permission android:name="android.permission.ALLOW_PLACE_IN_MULTI_PANE_SETTINGS" />
+    <uses-permission android:name="android.permission.LAUNCH_MULTI_PANE_SETTINGS_DEEP_LINK" />
+    <uses-permission android:name="android.permission.ALLOW_SLIPPERY_TOUCHES" />
+
     <!-- The following permissions are added to verify only apps signed by the signing key used to
          sign GMS or the platform are assigned these permissions. -->
     <uses-permission android:name="com.google.android.gms.auth.api.phone.permission.SEND" />
