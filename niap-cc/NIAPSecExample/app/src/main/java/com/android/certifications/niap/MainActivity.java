@@ -57,6 +57,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 
 import java.util.PropertyPermission;
@@ -197,9 +199,18 @@ public class MainActivity extends FragmentActivity {
                 String result = null;
                 HttpURLConnection connection = null;
                 try {
+
+                    SSLContext sslcontext = SSLContext.getInstance("TLS");
+                    sslcontext.init(null,
+                            null,
+                            null);
+                    SSLSocketFactory customSSLFactory = new CustomSocketFactory(sslcontext.getSocketFactory());
+
                     URL url = new URL("https://www.google.com");
+                    //
+                    HttpsURLConnection.setDefaultSSLSocketFactory(customSSLFactory);
                     connection = (HttpsURLConnection) url.openConnection();
-                    connection = (HttpsURLConnection) NetCipher.getHttpsURLConnection(url);
+                    //connection = (HttpsURLConnection) NetCipher.getHttpsURLConnection(url);
 
                     connection.setRequestProperty("accept", "*/*");
                     connection.setRequestProperty("connection", "Keep-Alive");
@@ -216,7 +227,7 @@ public class MainActivity extends FragmentActivity {
                     reader.close();
                     connection.getResponseCode(); // this actually makes it go
 
-                } catch (IOException e) {
+                } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
                     e.printStackTrace();
                 } finally {
                     if (connection != null)
