@@ -975,6 +975,15 @@ public class SignaturePermissions {
         public static final String USE_SYSTEM_DATA_LOADERS =
                 "com.android.permission.USE_SYSTEM_DATA_LOADERS";
 
+        public static final String TRIGGER_SHELL_PROFCOLLECT_UPLOAD =
+                "android.permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD";
+        public static final String ALLOW_PLACE_IN_MULTI_PANE_SETTINGS =
+                "android.permission.ALLOW_PLACE_IN_MULTI_PANE_SETTINGS";
+        public static final String LAUNCH_MULTI_PANE_SETTINGS_DEEP_LINK =
+                "android.permission.LAUNCH_MULTI_PANE_SETTINGS_DEEP_LINK";
+        public static final String ALLOW_SLIPPERY_TOUCHES =
+                "android.permission.ALLOW_SLIPPERY_TOUCHES";
+
     }
 
     /**
