@@ -2288,7 +2288,7 @@ public class Transacts {
                 return new RTransacts();
             case Build.VERSION_CODES.S:
                 return new STransacts();
-            case 32:
+            case Build.VERSION_CODES.S_V2:
                 return new S2Transacts();
             default:
                 throw new IllegalArgumentException(

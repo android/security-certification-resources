@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Build;
+import android.util.Log;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.R;
@@ -76,6 +77,8 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
 
     @Override
     public List<BasePermissionTester> getPermissionTesters(Activity activity) {
+
+
         List<BasePermissionTester> permissionTesters = new ArrayList<>();
         permissionTesters.add(new RuntimePermissionTester(this, activity));
         permissionTesters.add(new SignaturePermissionTester(this, activity));

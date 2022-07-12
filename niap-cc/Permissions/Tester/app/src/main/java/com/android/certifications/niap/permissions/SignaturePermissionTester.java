@@ -123,6 +123,7 @@ import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.telephony.TelephonyScanManager;
 import android.util.Log;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 
 import androidx.annotation.NonNull;
@@ -3554,6 +3555,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // the instance there is no way to invoke the method since it is guarded by the reflection
         // deny-list.
 
+        //Added as of Android 12 SV2
+
+        mPermissionTasks.put(permission.ALLOW_SLIPPERY_TOUCHES,
+                new PermissionTest(false, Build.VERSION_CODES.S_V2, () -> {
+                    final int FLAG_SLIPPERY = 0x20000000;//The flag is disabled by annotation
+                    WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+                    activity.getWindow().addFlags(FLAG_SLIPPERY);
+                }));
+
         mPermissionTasks.put(permission.SUGGEST_EXTERNAL_TIME,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
                     mTransacts.invokeTransact(Transacts.TIME_DETECTOR_SERVICE,
@@ -3655,6 +3665,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     mTransacts.invokeTransact(Transacts.WIFI_SERVICE, Transacts.WIFI_DESCRIPTOR,
                             Transacts.setCoexUnsafeChannels, null, 0);
                 }));
+
+
+
 
         // All of the BIND_* signature permissions are intended to be required by various services
         // to ensure only the platform can bind to them. The companion package defines a service

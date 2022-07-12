@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.Button;
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         mContext = this;
         LinearLayout layout = findViewById(R.id.mainLayout);
         mStatusTextView = new TextView(this);
@@ -73,7 +75,11 @@ public class MainActivity extends AppCompatActivity {
         mStatusTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18f);
         layout.addView(mStatusTextView);
 
-        // Obtain the list of configurations from the ConfigurationFactory and create a separate
+        /*int targetSdkVersion = getApplicationContext().getApplicationInfo().targetSdkVersion;
+        ((TextView)layout.findViewById(R.id.sdkVersionText))
+                .setText("Target:"+targetSdkVersion+"/");*/
+
+                // Obtain the list of configurations from the ConfigurationFactory and create a separate
         // button to allow the user to invoke each.
         List<TestConfiguration> configurations = ConfigurationFactory.getConfigurations(this);
         for (TestConfiguration configuration : configurations) {
