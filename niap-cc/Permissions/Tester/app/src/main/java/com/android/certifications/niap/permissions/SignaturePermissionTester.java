@@ -3556,13 +3556,18 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // deny-list.
 
         //Added as of Android 12 SV2
-
         mPermissionTasks.put(permission.ALLOW_SLIPPERY_TOUCHES,
                 new PermissionTest(false, Build.VERSION_CODES.S_V2, () -> {
                     final int FLAG_SLIPPERY = 0x20000000;//The flag is disabled by annotation
                     WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
                     activity.getWindow().addFlags(FLAG_SLIPPERY);
                 }));
+        mPermissionTasks.put(permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD,
+                new PermissionTest(false, Build.VERSION_CODES.S_V2, () -> {
+
+                }));
+
+
 
         mPermissionTasks.put(permission.SUGGEST_EXTERNAL_TIME,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
