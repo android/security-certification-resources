@@ -3562,12 +3562,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
                     activity.getWindow().addFlags(FLAG_SLIPPERY);
                 }));
+
         mPermissionTasks.put(permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD,
                 new PermissionTest(false, Build.VERSION_CODES.S_V2, () -> {
-
+                    runShellCommandTest(
+                            "am broadcast --allow-background-activity-starts -a com.android.shell.action.PROFCOLLECT_UPLOAD");
                 }));
-
-
 
         mPermissionTasks.put(permission.SUGGEST_EXTERNAL_TIME,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
