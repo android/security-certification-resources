@@ -53,6 +53,9 @@ import static android.Manifest.permission.USE_FULL_SCREEN_INTENT;
 import static android.Manifest.permission.VIBRATE;
 import static android.Manifest.permission.WAKE_LOCK;
 import static android.Manifest.permission.WRITE_SYNC_SETTINGS;
+import static android.Manifest.permission.READ_BASIC_PHONE_STATE;
+import static android.Manifest.permission.USE_EXACT_ALARM;
+
 
 import static com.android.certifications.niap.permissions.Constants.EXTRA_PERMISSION_GRANTED;
 import static com.android.certifications.niap.permissions.Constants.EXTRA_PERMISSION_NAME;
@@ -633,6 +636,20 @@ public class InstallPermissionTester extends BasePermissionTester {
                             pendingIntent);
                     alarmManager.cancel(pendingIntent);
                 }));
+
+        //New Install Permissions for T
+        mPermissionTasks.put(READ_BASIC_PHONE_STATE,
+                new PermissionTest(false, Build.VERSION_CODES.T, () -> {
+
+
+                }));
+
+        mPermissionTasks.put(USE_EXACT_ALARM,
+                new PermissionTest(false, Build.VERSION_CODES.T, () -> {
+
+
+                }));
+
     }
 
     /**

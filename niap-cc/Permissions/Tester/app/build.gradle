@@ -38,11 +38,11 @@ android {
             keyPassword 'android'
         }
     }
-    compileSdkVersion 32
+    compileSdkVersion 33
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions"
-        minSdkVersion 28
-        targetSdkVersion 32
+        minSdkVersion 32
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
