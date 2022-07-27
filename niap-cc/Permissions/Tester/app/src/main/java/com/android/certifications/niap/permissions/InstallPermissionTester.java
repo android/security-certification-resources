@@ -639,13 +639,13 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         //New Install Permissions for T
         mPermissionTasks.put(READ_BASIC_PHONE_STATE,
-                new PermissionTest(false, Build.VERSION_CODES.T, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
 
 
                 }));
 
         mPermissionTasks.put(USE_EXACT_ALARM,
-                new PermissionTest(false, Build.VERSION_CODES.T, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
 
 
                 }));

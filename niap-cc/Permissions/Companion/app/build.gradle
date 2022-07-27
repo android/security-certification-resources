@@ -20,7 +20,7 @@ android {
     compileSdkVersion 30
     signingConfigs {
         companion {
-            storeFile file("../security/product/ec-p256.jks")
+            storeFile file("../security/ec-p256.jks")
             storePassword "android"
             keyPassword "android"
             keyAlias "platform"
@@ -38,9 +38,17 @@ android {
     }
 
     buildTypes {
+        debug {
+            signingConfig null
+            debuggable true
+            signingConfig signingConfigs.companion
+        }
         release {
+            signingConfig null
+            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.companion
         }
     }
     compileOptions {
