@@ -23,17 +23,25 @@ import static android.Manifest.permission.ANSWER_PHONE_CALLS;
 import static android.Manifest.permission.BLUETOOTH_ADMIN;
 import static android.Manifest.permission.BLUETOOTH_CONNECT;
 import static android.Manifest.permission.BODY_SENSORS;
+import static android.Manifest.permission.BODY_SENSORS_BACKGROUND;
 import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.NEARBY_WIFI_DEVICES;
+import static android.Manifest.permission.POST_NOTIFICATIONS;
+import static android.Manifest.permission.READ_BASIC_PHONE_STATE;
 import static android.Manifest.permission.READ_CALENDAR;
 import static android.Manifest.permission.READ_CALL_LOG;
 import static android.Manifest.permission.READ_CONTACTS;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.READ_MEDIA_AUDIO;
+import static android.Manifest.permission.READ_MEDIA_IMAGES;
+import static android.Manifest.permission.READ_MEDIA_VIDEO;
 import static android.Manifest.permission.READ_PHONE_NUMBERS;
 import static android.Manifest.permission.READ_PHONE_STATE;
 import static android.Manifest.permission.READ_SMS;
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.SEND_SMS;
+import static android.Manifest.permission.USE_EXACT_ALARM;
 import static android.Manifest.permission.WRITE_CALENDAR;
 import static android.Manifest.permission.WRITE_CALL_LOG;
 import static android.Manifest.permission.WRITE_CONTACTS;
@@ -43,6 +51,8 @@ import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.AdvertiseCallback;
@@ -50,9 +60,11 @@ import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.AdvertisingSetCallback;
 import android.bluetooth.le.BluetoothLeAdvertiser;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.hardware.Sensor;
@@ -68,6 +80,7 @@ import android.media.MediaRecorder;
 import android.media.MediaRecorder.AudioEncoder;
 import android.media.MediaRecorder.OutputFormat;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -87,6 +100,7 @@ import android.telecom.TelecomManager;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 
+import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -120,8 +134,11 @@ public class RuntimePermissionTester extends BasePermissionTester {
     protected final AccountManager mAccountManager;
     protected final LocationManager mLocationManager;
     protected final CameraManager mCameraManager;
+    protected final WifiManager mWifiManager;
 
     private final Map<String, PermissionTest> mPermissionTasks;
+
+    private Object mLOHSLock = new Object();//Test for Local only hotspot
 
     public RuntimePermissionTester(TestConfiguration configuration, Activity activity) {
         super(configuration, activity);
@@ -133,6 +150,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
         mAccountManager = (AccountManager) mContext.getSystemService(Context.ACCOUNT_SERVICE);
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
+        mWifiManager =(WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
 
         mPermissionTasks = new HashMap<>();
 
@@ -520,8 +538,83 @@ public class RuntimePermissionTester extends BasePermissionTester {
                     mTransacts.invokeTransact(Transacts.UWB_SERVICE, Transacts.UWB_DESCRIPTOR,
                             Transacts.getSpecificationInfo);
                 }));
-    }
 
+
+        //New Runtime Permissions for T
+        mPermissionTasks.put(READ_MEDIA_AUDIO, new PermissionTest(false, () -> {
+            ContentResolver contentResolver = mContext.getContentResolver();
+            Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            Cursor cursor = contentResolver.query(uri, null, null, null, null);
+            cursor.moveToFirst();
+        }));
+        mPermissionTasks.put(READ_MEDIA_IMAGES, new PermissionTest(false, () -> {
+            ContentResolver contentResolver = mContext.getContentResolver();
+            Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            Cursor cursor = contentResolver.query(uri, null, null, null, null);
+            cursor.moveToFirst();
+        }));
+        mPermissionTasks.put(READ_MEDIA_VIDEO, new PermissionTest(false, () -> {
+            ContentResolver contentResolver = mContext.getContentResolver();
+            Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+            Cursor cursor = contentResolver.query(uri, null, null, null, null);
+            cursor.moveToFirst();
+        }));
+        mPermissionTasks.put(BODY_SENSORS_BACKGROUND, new PermissionTest(false, () -> {
+
+        }));
+        mPermissionTasks.put(POST_NOTIFICATIONS, new PermissionTest(false, () -> {
+
+        }));
+
+        mPermissionTasks.put(NEARBY_WIFI_DEVICES, new PermissionTest(false, () -> {
+            TestLocalOnlyHotspotCallback callback = new TestLocalOnlyHotspotCallback(mLOHSLock);
+            synchronized (mLOHSLock) {
+                try {
+                    //WifiManager.startLocalOnlyHotSpot requires NEARBY_WIFI_DEVICES from android T,
+                    //and also it's a public api
+                    mWifiManager.startLocalOnlyHotspot(callback, null);
+                    mLOHSLock.wait(60);
+                } catch (InterruptedException e) {
+                }
+            }
+
+        }));
+
+    }
+    public class TestLocalOnlyHotspotCallback extends WifiManager.LocalOnlyHotspotCallback {
+        Object hotspotLock;
+        WifiManager.LocalOnlyHotspotReservation reservation = null;
+        boolean onStartedCalled = false;
+        boolean onStoppedCalled = false;
+        boolean onFailedCalled = false;
+        int failureReason = -1;
+        TestLocalOnlyHotspotCallback(Object lock) {
+            hotspotLock = lock;
+        }
+        @Override
+        public void onStarted(WifiManager.LocalOnlyHotspotReservation r) {
+            synchronized (hotspotLock) {
+                reservation = r;
+                onStartedCalled = true;
+                hotspotLock.notify();
+            }
+        }
+        @Override
+        public void onStopped() {
+            synchronized (hotspotLock) {
+                onStoppedCalled = true;
+                hotspotLock.notify();
+            }
+        }
+        @Override
+        public void onFailed(int reason) {
+            synchronized (hotspotLock) {
+                onFailedCalled = true;
+                failureReason = reason;
+                hotspotLock.notify();
+            }
+        }
+    }
     @Override
     public boolean runPermissionTests() {
         boolean allTestsPassed = true;

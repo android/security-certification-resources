@@ -113,6 +113,7 @@ import android.service.notification.StatusBarNotification;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
+import android.telephony.TelephonyManager;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.activities.TestActivity;
@@ -638,15 +639,25 @@ public class InstallPermissionTester extends BasePermissionTester {
                 }));
 
         //New Install Permissions for T
+
+        //Allows read only access to phone state with a non dangerous permission,
+        //including the information like cellular network type, software version.
         mPermissionTasks.put(READ_BASIC_PHONE_STATE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-
-
+                    //Get Cellular network type
+                    TelephonyManager tm = mContext.getSystemService(TelephonyManager.class);
+                    tm.getNetworkType();
                 }));
 
         mPermissionTasks.put(USE_EXACT_ALARM,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-
+                    Intent intent = new Intent(mContext, MainActivity.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent,
+                            PendingIntent.FLAG_IMMUTABLE);
+                    AlarmManager alarmManager = mContext.getSystemService(AlarmManager.class);
+                    alarmManager.setExact(AlarmManager.RTC, System.currentTimeMillis() + 60 * 1000,
+                            pendingIntent);
+                    alarmManager.cancel(pendingIntent);
 
                 }));
 

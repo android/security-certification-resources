@@ -41,7 +41,7 @@ android {
     compileSdkVersion 33
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions"
-        minSdkVersion 32
+        minSdkVersion 28
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"
