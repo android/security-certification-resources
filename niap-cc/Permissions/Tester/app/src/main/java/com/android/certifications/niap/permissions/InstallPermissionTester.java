@@ -646,7 +646,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     //Get Cellular network type
                     TelephonyManager tm = mContext.getSystemService(TelephonyManager.class);
-                    tm.getNetworkType();
+                    tm.getDataNetworkType();
                 }));
 
         mPermissionTasks.put(USE_EXACT_ALARM,
@@ -660,7 +660,6 @@ public class InstallPermissionTester extends BasePermissionTester {
                     alarmManager.cancel(pendingIntent);
 
                 }));
-
     }
 
     /**

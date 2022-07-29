@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         ((TextView)layout.findViewById(R.id.sdkVersionText))
                 .setText("Target:"+targetSdkVersion+"/");*/
 
-                // Obtain the list of configurations from the ConfigurationFactory and create a separate
+        // Obtain the list of configurations from the ConfigurationFactory and create a separate
         // button to allow the user to invoke each.
         List<TestConfiguration> configurations = ConfigurationFactory.getConfigurations(this);
         for (TestConfiguration configuration : configurations) {

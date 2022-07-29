@@ -2290,6 +2290,8 @@ public class Transacts {
                 return new STransacts();
             case Build.VERSION_CODES.S_V2:
                 return new S2Transacts();
+            case Build.VERSION_CODES.TIRAMISU:
+                return new BarbetApiLevel33Transacts();
             default:
                 throw new IllegalArgumentException(
                         "The provided API level, " + apiLevel + ", is not supported");
