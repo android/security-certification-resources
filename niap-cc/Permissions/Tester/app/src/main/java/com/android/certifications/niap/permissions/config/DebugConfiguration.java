@@ -19,6 +19,7 @@ package com.android.certifications.niap.permissions.config;
 import android.app.Activity;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
+import com.android.certifications.niap.permissions.InstallPermissionTester;
 import com.android.certifications.niap.permissions.R;
 import com.android.certifications.niap.permissions.SignaturePermissionTester;
 
@@ -44,7 +45,9 @@ class DebugConfiguration implements TestConfiguration {
         // getSignaturePermissions could be overridden to return one or more permissions to be
         // tested.
         List<BasePermissionTester> permissionTesters = new ArrayList<>();
-        permissionTesters.add(new SignaturePermissionTester(this, activity));
+        //permissionTesters.add(new SignaturePermissionTester(this, activity));
+        permissionTesters.add(new InstallPermissionTester(this, activity));
+
         return permissionTesters;
     }
 

@@ -52,6 +52,9 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.bluetooth.BluetoothAdapter;
@@ -66,6 +69,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -563,7 +567,29 @@ public class RuntimePermissionTester extends BasePermissionTester {
 
         }));
         mPermissionTasks.put(POST_NOTIFICATIONS, new PermissionTest(false, () -> {
+            Intent notificationIntent = new Intent(mContext, MainActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
+                    notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
+            Resources resources = mContext.getResources();
+            CharSequence channelName = resources.getString(R.string.tester_channel_name);
+            NotificationChannel channel = new NotificationChannel(TAG, channelName,
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager notificationManager = mContext.getSystemService(
+                    NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+
+            Notification notification =
+                    new Notification.Builder(mContext, TAG)
+                            .setContentTitle(resources.getText(
+                                    R.string.full_screen_intent_notification_title))
+                            .setContentText(resources.getText(
+                                    R.string.full_screen_intent_notification_message))
+                            .setSmallIcon(R.drawable.ic_launcher_foreground)
+                            .setContentIntent(pendingIntent)
+                            .setFullScreenIntent(pendingIntent, false)
+                            .build();
+            notificationManager.notify(0, notification);
         }));
 
         mPermissionTasks.put(NEARBY_WIFI_DEVICES, new PermissionTest(false, () -> {
