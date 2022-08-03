@@ -172,6 +172,7 @@ public class InternalPermissionTester extends BasePermissionTester {
                 }));
         mPermissionTasks.put(permission.ACCESS_AMBIENT_CONTEXT_EVENT,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    //AmbientContextEventService
                 }));
 
 
