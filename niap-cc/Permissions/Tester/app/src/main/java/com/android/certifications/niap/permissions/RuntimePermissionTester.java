@@ -564,7 +564,16 @@ public class RuntimePermissionTester extends BasePermissionTester {
             cursor.moveToFirst();
         }));
         mPermissionTasks.put(BODY_SENSORS_BACKGROUND, new PermissionTest(false, () -> {
-
+            if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE)) {
+                throw new BypassTestException(
+                        "A heard rate monitor is not available to run this test");
+            }
+            Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
+            if (sensor == null) {
+                throw new SecurityException(
+                        "The heart rate sensor feature is available, but a null sensor was "
+                                + "returned");
+            }
         }));
         mPermissionTasks.put(POST_NOTIFICATIONS, new PermissionTest(false, () -> {
             Intent notificationIntent = new Intent(mContext, MainActivity.class);

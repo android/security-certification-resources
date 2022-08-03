@@ -16,6 +16,12 @@
 
 package com.android.certifications.niap.permissions.config;
 
+import static android.Manifest.permission.NEARBY_WIFI_DEVICES;
+import static android.Manifest.permission.POST_NOTIFICATIONS;
+import static android.Manifest.permission.READ_MEDIA_AUDIO;
+import static android.Manifest.permission.READ_MEDIA_IMAGES;
+import static android.Manifest.permission.READ_MEDIA_VIDEO;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
@@ -49,13 +55,25 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
     private CountDownLatch mCountDownLatch;
 
     private static final String[] REQUIRED_PERMISSIONS = new String[]{
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.READ_PHONE_NUMBERS,
+            //Manifest.permission.READ_EXTERNAL_STORAGE,
+            //Manifest.permission.READ_PHONE_NUMBERS,
+            //POST_NOTIFICATIONS,
+            //NEARBY_WIFI_DEVICES
+            READ_MEDIA_AUDIO,
+            READ_MEDIA_IMAGES,
+            READ_MEDIA_VIDEO
+
     };
 
     private static final String[] PERMISSIONS_UNDER_TEST = new String[]{
-            Manifest.permission.ACCESS_MEDIA_LOCATION,
-            Manifest.permission.SEND_SMS,
+           // Manifest.permission.ACCESS_MEDIA_LOCATION,
+           // Manifest.permission.SEND_SMS,
+            //POST_NOTIFICATIONS,
+            //NEARBY_WIFI_DEVICES,
+            READ_MEDIA_AUDIO,
+            READ_MEDIA_IMAGES,
+            READ_MEDIA_VIDEO
+
     };
 
     RuntimeDependentPermissionConfiguration(Activity activity) {
