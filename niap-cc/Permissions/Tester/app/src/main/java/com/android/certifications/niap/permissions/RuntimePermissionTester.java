@@ -589,6 +589,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
                             .setContentIntent(pendingIntent)
                             .setFullScreenIntent(pendingIntent, false)
                             .build();
+
             notificationManager.notify(0, notification);
         }));
 

@@ -137,6 +137,44 @@ public class InternalPermissionTester extends BasePermissionTester {
                             Transacts.TELEPHONY_IMS_DESCRIPTOR,
                             Transacts.triggerNetworkRegistration, 0, null, 0, "test-sip-reason");
                 }));
+
+
+        //Internal Permissions As of Android 13
+        //SET_DEFAULT_ACCOUNT_FOR_CONTACTS
+        //REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION
+        //BIND_TRACE_REPORT_SERVICE
+        //SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE
+        //READ_ASSISTANT_APP_SEARCH_DATA
+        //READ_HOME_APP_SEARCH_DATA
+        //CREATE_VIRTUAL_DEVICE
+        //ACCESS_AMBIENT_CONTEXT_EVENT
+        mPermissionTasks.put(permission.SET_DEFAULT_ACCOUNT_FOR_CONTACTS,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+
+                }));
+        mPermissionTasks.put(permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                }));
+        mPermissionTasks.put(permission.BIND_TRACE_REPORT_SERVICE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                }));
+        mPermissionTasks.put(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                }));
+        mPermissionTasks.put(permission.READ_ASSISTANT_APP_SEARCH_DATA,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                }));
+        mPermissionTasks.put(permission.READ_HOME_APP_SEARCH_DATA,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                }));
+        mPermissionTasks.put(permission.CREATE_VIRTUAL_DEVICE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                }));
+        mPermissionTasks.put(permission.ACCESS_AMBIENT_CONTEXT_EVENT,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                }));
+
+
     }
 
     @Override
