@@ -534,6 +534,9 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.CONNECTIVITY_DESCRIPTOR, Transacts.pendingRequestForNetwork,
                     descriptorTransacts);
             queryTransactId(Transacts.APP_OPS_DESCRIPTOR, Transacts.getUidOps, descriptorTransacts);
+            //For Android T
+            queryTransactId(Transacts.AMBIENT_CONTEXT_MANAGER_DESCRIPTOR, Transacts.queryServiceStatus,
+                    descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
         }

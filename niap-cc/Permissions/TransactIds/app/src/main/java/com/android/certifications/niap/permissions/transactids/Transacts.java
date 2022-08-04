@@ -292,6 +292,30 @@ public class Transacts {
     public static final String WINDOW_SERVICE = Context.WINDOW_SERVICE;
     public static final String WINDOW_DESCRIPTOR = "android.view.IWindowManager";
 
+    //For Android T
+    public static final String AMBIENT_CONTEXT_MANAGER_SERVICE =
+            "ambient_context";
+    public static final String AMBIENT_CONTEXT_MANAGER_DESCRIPTOR =
+            "android.app.ambientcontext.IAmbientContextManager";
+    public static final String queryServiceStatus="queryServiceStatus";
+
+    public static final String SAFETY_CENTER_MANAGER_SERVICE =
+            "safety_center";
+    public static final String SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR =
+            "android.safetycenter.ISafetyCenterManager";
+    public static final String isSafetyCenterEnabled="isSafetyCenterEnabled";
+    public static final String getSafetyCenterConfig="getSafetyCenterConfig";
+    public static final String getSafetySourceData="getSafetySourceData";
+
+    public static final String VIRTUAL_DEVICE_MANAGER_SERVICE = "virtualdevice";
+    public static final String VIRTUAL_DEVICE_MANAGER_DESCRIPTOR =
+            "android.companion.virtual.IVirtualDeviceManager";
+    public static final String createVirtualDevice="createVirtualDevice";
+
+
+
+
+
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";
     public static final String getNextEntry = "getNextEntry";
