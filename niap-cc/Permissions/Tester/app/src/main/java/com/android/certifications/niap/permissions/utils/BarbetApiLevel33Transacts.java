@@ -168,6 +168,10 @@ public class BarbetApiLevel33Transacts extends Transacts {
         mDescriptorTransacts.put(NET_POLICY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(queryServiceStatus, 3);
+        mDescriptorTransacts.put(AMBIENT_CONTEXT_MANAGER_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(set, 1);
         transactIds.put(setTimeZone, 3);
         transactIds.put(setTime, 2);
@@ -263,6 +267,10 @@ public class BarbetApiLevel33Transacts extends Transacts {
         mDescriptorTransacts.put(FACE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(createVirtualDevice, 1);
+        mDescriptorTransacts.put(VIRTUAL_DEVICE_MANAGER_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(awaken, 2);
         transactIds.put(isDreaming, 7);
         mDescriptorTransacts.put(DREAMS_DESCRIPTOR, transactIds);
@@ -301,6 +309,12 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(getUidOps, 28);
         transactIds.put(noteOperation, 2);
         mDescriptorTransacts.put(APP_OPS_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
+        transactIds.put(getSafetyCenterConfig, 6);
+        transactIds.put(getSafetySourceData, 3);
+        transactIds.put(isSafetyCenterEnabled, 1);
+        mDescriptorTransacts.put(SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(temporaryEnableAccessibilityStateUntilKeyguardRemoved, 12);
@@ -443,6 +457,10 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(tryPointerSpeed, 8);
         transactIds.put(removePortAssociation, 40);
         mDescriptorTransacts.put(INPUT_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
+        // Failed to obtain transactId of addKeyguardLockedStateListener under window: window$Stub
+        mDescriptorTransacts.put(null, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(reloadPersistedData, 5);

@@ -311,9 +311,9 @@ public class Transacts {
     public static final String VIRTUAL_DEVICE_MANAGER_DESCRIPTOR =
             "android.companion.virtual.IVirtualDeviceManager";
     public static final String createVirtualDevice="createVirtualDevice";
-
-
-
+    //For SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE permission of IWindowManger
+    public static final String addKeyguardLockedStateListener
+            ="addKeyguardLockedStateListener";
 
 
     // Following are constants for transact methods that are invoked as part of permission tests.

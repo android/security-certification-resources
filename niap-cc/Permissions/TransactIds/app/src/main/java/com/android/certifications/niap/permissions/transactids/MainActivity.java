@@ -535,8 +535,21 @@ public class MainActivity extends AppCompatActivity {
                     descriptorTransacts);
             queryTransactId(Transacts.APP_OPS_DESCRIPTOR, Transacts.getUidOps, descriptorTransacts);
             //For Android T
+            //   Internal Permissions
             queryTransactId(Transacts.AMBIENT_CONTEXT_MANAGER_DESCRIPTOR, Transacts.queryServiceStatus,
                     descriptorTransacts);
+            queryTransactId(Transacts.SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR, Transacts.isSafetyCenterEnabled,
+                    descriptorTransacts);
+            queryTransactId(Transacts.SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR, Transacts.getSafetyCenterConfig,
+                    descriptorTransacts);
+            queryTransactId(Transacts.SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR, Transacts.getSafetySourceData,
+                    descriptorTransacts);
+            queryTransactId(Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR, Transacts.createVirtualDevice,
+                    descriptorTransacts);
+            queryTransactId(Transacts.WINDOW_SERVICE, Transacts.addKeyguardLockedStateListener,
+                    descriptorTransacts);
+            //   Signature Permissions
+
 
             return writeTransactsSourceFile(descriptorTransacts);
         }
