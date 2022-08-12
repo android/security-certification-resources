@@ -410,6 +410,9 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.thawRotation,
                     descriptorTransacts);
 
+            queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.addKeyguardLockedStateListener,
+                    descriptorTransacts);
+
             // The following are the transacts required for new permissions in Android 12.
             queryTransactId(Transacts.CAMERA_DESCRIPTOR, Transacts.injectCamera,
                     descriptorTransacts);
@@ -546,8 +549,7 @@ public class MainActivity extends AppCompatActivity {
                     descriptorTransacts);
             queryTransactId(Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR, Transacts.createVirtualDevice,
                     descriptorTransacts);
-            queryTransactId(Transacts.WINDOW_SERVICE, Transacts.addKeyguardLockedStateListener,
-                    descriptorTransacts);
+
             //   Signature Permissions
 
 

@@ -61,6 +61,13 @@ public class InternalPermissionsTest {
         mPermissions.add(permission.ACCESS_RCS_USER_CAPABILITY_EXCHANGE);
         mPermissions.add(permission.BYPASS_ROLE_QUALIFICATION);
         mPermissions.add(permission.PERFORM_IMS_SINGLE_REGISTRATION);
+
+        mPermissions.add(permission.SET_DEFAULT_ACCOUNT_FOR_CONTACTS);
+        mPermissions.add(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE);
+        mPermissions.add(permission.CREATE_VIRTUAL_DEVICE);
+        mPermissions.add(permission.ACCESS_AMBIENT_CONTEXT_EVENT);
+        //mPermissions.add(permission.PERFORM_IMS_SINGLE_REGISTRATION);
+
     }
 
     private UiAutomation mUiAutomation;

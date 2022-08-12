@@ -19,9 +19,17 @@ package com.android.certifications.niap.permissions;
 import static com.android.certifications.niap.permissions.utils.InternalPermissions.permission;
 
 import android.app.Activity;
+import android.app.KeyguardManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.UserHandle;
+import android.util.ArraySet;
 
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
@@ -30,12 +38,20 @@ import com.android.certifications.niap.permissions.log.StatusLogger;
 import com.android.certifications.niap.permissions.utils.SignatureUtils;
 import com.android.certifications.niap.permissions.utils.Transacts;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 
 /**
  * Permission tester to verify all platform declared internal permissions properly guard their API,
@@ -147,27 +163,141 @@ public class InternalPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.SET_DEFAULT_ACCOUNT_FOR_CONTACTS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        /*
+                        try {
+                            //Because it's a internal class of the Conatcts application, couldn't take from reflection
+                            Class cpClazz = Class.forName("com.android.contacts.preference.ContactsPreferences");
+                            Constructor cpConstructor = cpClazz.getConstructor(Context.class);
+                            Object cpObject = cpConstructor.newInstance(mContext);
+                            Method testMethod = cpClazz.getMethod("clearDefaultAccount");
+                            testMethod.invoke(cpObject);
+                        } catch (ClassNotFoundException | NoSuchMethodException e) {
+                            e.printStackTrace();
+                        } catch (InvocationTargetException e) {
+                            e.printStackTrace();
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        } catch (InstantiationException e) {
+                            e.printStackTrace();
+                        }*/
+                    }
                 }));
         mPermissionTasks.put(permission.BIND_TRACE_REPORT_SERVICE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+
                 }));
         mPermissionTasks.put(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    //WindowManagerService#addKeyguardLockedStateListener.
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        KeyguardManager.KeyguardLockedStateListener listener =
+                                new KeyguardManager.KeyguardLockedStateListener() {
+                            @Override
+                            public void onKeyguardLockedStateChanged(boolean b) {
+                            }
+                        };
+                        mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
+                                Transacts.addKeyguardLockedStateListener, listener);
+                    }
+
                 }));
 
         mPermissionTasks.put(permission.CREATE_VIRTUAL_DEVICE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    try {
+                        //VirtualDeviceParams originalParams = new VirtualDeviceParams.Builder()
+                        //        .setLockState(VirtualDeviceParams.LOCK_STATE_ALWAYS_UNLOCKED)
+                        //        .setUsersWithMatchingAccounts(Set.of(UserHandle.of(123), UserHandle.of(456)))
+                        //        .build();
+                        Parcelable vdpParams = new Parcelable() {
+                            @Override
+                            public int describeContents() {
+                                return 0;
+                            }
+                            @Override
+                            public void writeToParcel(Parcel dest, int i) {
+
+                                ArraySet<UserHandle> mUsersWithMatchingAccounts = new ArraySet<>();
+                                ArraySet<ComponentName> mAllowedCrossTaskNavigations =  new ArraySet<>();
+                                ArraySet<ComponentName> mBlockedCrossTaskNavigations =  new ArraySet<>();
+                                ArraySet<ComponentName> mBlockedActivities =  new ArraySet<>();
+                                ArraySet<ComponentName> mAllowedActivities =  new ArraySet<>();
+
+                                dest.writeInt(0);//LOCK_STATE_DEFAULT
+                                writeArraySet(dest,mUsersWithMatchingAccounts);
+                                writeArraySet(dest,mAllowedCrossTaskNavigations);
+                                writeArraySet(dest,mBlockedCrossTaskNavigations);
+                                dest.writeInt(0);//mDefaultNavigationPolicy
+                                writeArraySet(dest,mAllowedActivities);
+                                writeArraySet(dest,mBlockedActivities);
+                                dest.writeInt(0);//mDefaultActivityPolicy
+                            }
+                        };
+
+                        mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
+                                Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
+                                Transacts.createVirtualDevice, 0, vdpParams);
+
+                    } finally {
+
+                    }
                 }));
         mPermissionTasks.put(permission.ACCESS_AMBIENT_CONTEXT_EVENT,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //AmbientContextEventService
-                    //mTransacts.invokeTransact();
+                    try {
+                        //Prepare RemoteCallback Object
+                        Class onResultListenerClass = Class.forName(
+                                "android.os.RemoteCallback$OnResultListener");
+                        Object onResultListener = Proxy.newProxyInstance(
+                                onResultListenerClass.getClassLoader(),
+                                new Class[]{onResultListenerClass}, new InvocationHandler() {
+                                    @Override
+                                    public Object invoke(Object o, Method method, Object[] objects)
+                                            throws Throwable {
+                                        mLogger.logDebug("invoke: " + method);
+                                        return null;
+                                    }
+                                });
+                        Class remoteCallbackClass = Class.forName("android.os.RemoteCallback");
+                        Constructor remoteCallbackConstructor = remoteCallbackClass.getConstructor(
+                                onResultListenerClass);
+                        Object remoteCallback = remoteCallbackConstructor.newInstance(
+                                (Object) onResultListener);
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("_user", 0);
+                        bundle.putParcelable("_remote_callback_key", (Parcelable) remoteCallback);
+
+
+
+                        mTransacts.invokeTransact(Transacts.AMBIENT_CONTEXT_MANAGER_SERVICE,
+                                Transacts.AMBIENT_CONTEXT_MANAGER_DESCRIPTOR,
+                                Transacts.queryServiceStatus, 0,
+                                "dummy-package-name", new int[]{0}, bundle);
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    }
+
                 }));
 
 
     }
-
+    //Emulate hidden Parcel API
+    public void writeArraySet(Parcel p,ArraySet<? extends Object> val) {
+        final int size = (val != null) ? val.size() : -1;
+        p.writeInt(size);
+        for (int i = 0; i < size; i++) {
+            p.writeValue(val.valueAt(i));
+        }
+    }
     @Override
     public boolean runPermissionTests() {
         boolean allTestsPassed = true;

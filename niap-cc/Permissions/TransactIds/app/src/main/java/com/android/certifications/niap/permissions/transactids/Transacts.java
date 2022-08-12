@@ -314,6 +314,8 @@ public class Transacts {
     //For SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE permission of IWindowManger
     public static final String addKeyguardLockedStateListener
             ="addKeyguardLockedStateListener";
+    public static final String removeKeyguardLockedStateListener
+            ="removeKeyguardLockedStateListener";
 
 
     // Following are constants for transact methods that are invoked as part of permission tests.

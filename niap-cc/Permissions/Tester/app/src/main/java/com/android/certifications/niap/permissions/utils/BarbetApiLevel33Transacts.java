@@ -290,17 +290,18 @@ public class BarbetApiLevel33Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(createInputConsumer, 83);
-        transactIds.put(setAnimationScale, 39);
         // Failed to obtain transactId of requestUserActivityNotification under android.view.IWindowManager: No field TRANSACTION_requestUserActivityNotification in class Landroid/view/IWindowManager$Stub; (declaration of 'android.view.IWindowManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
-        transactIds.put(removeWindowToken, 18);
-        transactIds.put(thawRotation, 52);
-        transactIds.put(registerShortcutKey, 82);
         transactIds.put(clearWindowContentFrameStats, 75);
-        transactIds.put(overridePendingAppTransitionRemote, 23);
+        transactIds.put(addKeyguardLockedStateListener, 33);
         transactIds.put(setRecentsVisibility, 67);
         transactIds.put(stopFreezingScreen, 26);
         transactIds.put(dismissKeyguard, 32);
         transactIds.put(screenshotWallpaper, 59);
+        transactIds.put(setAnimationScale, 39);
+        transactIds.put(removeWindowToken, 18);
+        transactIds.put(thawRotation, 52);
+        transactIds.put(registerShortcutKey, 82);
+        transactIds.put(overridePendingAppTransitionRemote, 23);
         mDescriptorTransacts.put(WINDOW_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -457,10 +458,6 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(tryPointerSpeed, 8);
         transactIds.put(removePortAssociation, 40);
         mDescriptorTransacts.put(INPUT_DESCRIPTOR, transactIds);
-
-        transactIds = new HashMap<>();
-        // Failed to obtain transactId of addKeyguardLockedStateListener under window: window$Stub
-        mDescriptorTransacts.put(null, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(reloadPersistedData, 5);
