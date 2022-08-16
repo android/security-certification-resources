@@ -413,6 +413,36 @@
             android:permission="android.permission.BIND_TRANSLATION_SERVICE"
             android:enabled="true"
             android:exported="true" />
+        <!-- Services for android T -->
+        <service android:name=".services.TestBindAmbientContextDetectionService"
+            android:permission="android.permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindTvInteractiveApp"
+            android:permission="android.permission.BIND_TV_INTERACTIVE_APP"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindWallpaperEffectsGenerationService"
+            android:permission="android.permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindSelectionToolbarRenderService"
+            android:permission="android.permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindGameService"
+            android:permission="android.permission.BIND_GAME_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindTraceReportService"
+            android:permission="android.permission.BIND_TRACE_REPORT_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindAttestationVerificationService"
+            android:permission="android.permission.BIND_ATTESTATION_VERIFICATION_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+
 
     </application>
 

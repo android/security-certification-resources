@@ -61,8 +61,9 @@ class Android13BindPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.task('a13permissions') {
             doLast {
-                for(item in PERMISSIONS){
-                    def className =  "Test"+item.caseFormat( UPPER_UNDERSCORE, UPPER_CAMEL )
+                def manifestTags = [];
+                for(pm in PERMISSIONS){
+                    def className =  "Test"+pm.caseFormat( UPPER_UNDERSCORE, UPPER_CAMEL )
                     def filePath = "${project.projectDir}/app/src/main/java/com/android/certifications/niap/permissions/companion/services/"
                     new File(filePath+className+".java").
                             text =
@@ -89,9 +90,9 @@ class Android13BindPlugin implements Plugin<Project> {
                             "import android.util.Log;\n" +
                             "\n" +
                             "/**\n" +
-                            " * Exported service used to test the "+item+" permission.\n" +
+                            " * Exported service used to test the "+pm+" permission.\n" +
                             " *\n" +
-                            " * This service requires clients are granted the "+item+"\n" +
+                            " * This service requires clients are granted the "+pm+"\n" +
                             " * permission to bind to it. The Permission Test Tool can attempt to bind to this service\n" +
                             " * and invoke the {@link "+className+"Impl#testMethod()} method\n" +
                             " * to verify that the platform properly enforces this permission requirement.\n" +
@@ -119,7 +120,14 @@ class Android13BindPlugin implements Plugin<Project> {
                             "    }\n" +
                             "}"
 
+                    def tag = "<service android:name=\".services."+className+"\"\n" +
+                            "            android:permission=\"android.permission."+pm+"\"\n" +
+                            "            android:enabled=\"true\"\n" +
+                            "            android:exported=\"true\" />"
+                    manifestTags.push(tag);
                 }
+
+                println manifestTags.join("\n");
             }
         }
     }
