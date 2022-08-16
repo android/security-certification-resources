@@ -47,6 +47,7 @@ class BaselinePackages:
       29: "data/Q-GSI.json",
       30: "data/R-GSI.json",
       31: "data/S-GSI.json",
+      33: "data/T-GSI.json",  # per https://developer.android.com/reference/android/os/Build.VERSION_CODES#TIRAMISU
   }
 
   @staticmethod
