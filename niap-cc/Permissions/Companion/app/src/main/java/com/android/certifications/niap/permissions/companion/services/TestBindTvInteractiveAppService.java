@@ -21,21 +21,21 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * Exported service used to test the BIND_TRACE_REPORT_SERVICE permission.
+ * Exported service used to test the BIND_TV_INTERACTIVE_APP permission.
  *
- * This service requires clients are granted the BIND_TRACE_REPORT_SERVICE
+ * This service requires clients are granted the BIND_TV_INTERACTIVE_APP
  * permission to bind to it. The Permission Test Tool can attempt to bind to this service
- * and invoke the {@link TestBindTraceReportServiceImpl#testMethod()} method
+ * and invoke the {@link TestBindTvInteractiveAppServiceImpl#testMethod()} method
  * to verify that the platform properly enforces this permission requirement.
  */
-public class TestBindTraceReportService extends Service {
-    private static final String TAG = "TestBindTraceReportService";
-    private TestBindTraceReportServiceImpl bindService;
+public class TestBindTvInteractiveAppService extends Service {
+    private static final String TAG = "TestBindTvInteractiveAppService";
+    private TestBindTvInteractiveAppServiceImpl bindService;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        bindService = new TestBindTraceReportServiceImpl();
+        bindService = new TestBindTvInteractiveAppServiceImpl();
     }
 
     @Override
@@ -43,10 +43,10 @@ public class TestBindTraceReportService extends Service {
         return bindService;
     }
 
-    static class TestBindTraceReportServiceImpl extends TestBindService.Stub {
+    static class TestBindTvInteractiveAppServiceImpl extends TestBindService.Stub {
         public void testMethod() {
             Log.d(TAG, "The caller successfully invoked the test method on service "
-                    + "TestBindTraceReportService");
+                    + "TestBindTvInteractiveAppService");
         }
     }
 }

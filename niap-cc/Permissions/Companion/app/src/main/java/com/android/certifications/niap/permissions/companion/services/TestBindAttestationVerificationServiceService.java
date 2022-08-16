@@ -21,21 +21,21 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * Exported service used to test the BIND_AMBIENT_CONTEXT_DETECTION_SERVICE permission.
+ * Exported service used to test the BIND_ATTESTATION_VERIFICATION_SERVICE permission.
  *
- * This service requires clients are granted the BIND_AMBIENT_CONTEXT_DETECTION_SERVICE
+ * This service requires clients are granted the BIND_ATTESTATION_VERIFICATION_SERVICE
  * permission to bind to it. The Permission Test Tool can attempt to bind to this service
- * and invoke the {@link TestBindAmbientContextDetectionServiceImpl#testMethod()} method
+ * and invoke the {@link TestBindAttestationVerificationServiceServiceImpl#testMethod()} method
  * to verify that the platform properly enforces this permission requirement.
  */
-public class TestBindAmbientContextDetectionService extends Service {
-    private static final String TAG = "TestBindAmbientContextDetectionService";
-    private TestBindAmbientContextDetectionServiceImpl bindService;
+public class TestBindAttestationVerificationServiceService extends Service {
+    private static final String TAG = "TestBindAttestationVerificationServiceService";
+    private TestBindAttestationVerificationServiceServiceImpl bindService;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        bindService = new TestBindAmbientContextDetectionServiceImpl();
+        bindService = new TestBindAttestationVerificationServiceServiceImpl();
     }
 
     @Override
@@ -43,10 +43,10 @@ public class TestBindAmbientContextDetectionService extends Service {
         return bindService;
     }
 
-    static class TestBindAmbientContextDetectionServiceImpl extends TestBindService.Stub {
+    static class TestBindAttestationVerificationServiceServiceImpl extends TestBindService.Stub {
         public void testMethod() {
             Log.d(TAG, "The caller successfully invoked the test method on service "
-                    + "TestBindAmbientContextDetectionService");
+                    + "TestBindAttestationVerificationServiceService");
         }
     }
 }

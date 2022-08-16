@@ -21,21 +21,21 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * Exported service used to test the BIND_GAME_SERVICE permission.
+ * Exported service used to test the BIND_AMBIENT_CONTEXT_DETECTION_SERVICE permission.
  *
- * This service requires clients are granted the BIND_GAME_SERVICE
+ * This service requires clients are granted the BIND_AMBIENT_CONTEXT_DETECTION_SERVICE
  * permission to bind to it. The Permission Test Tool can attempt to bind to this service
- * and invoke the {@link TestBindGameServiceImpl#testMethod()} method
+ * and invoke the {@link TestBindAmbientContextDetectionServiceServiceImpl#testMethod()} method
  * to verify that the platform properly enforces this permission requirement.
  */
-public class TestBindGameService extends Service {
-    private static final String TAG = "TestBindGameService";
-    private TestBindGameServiceImpl bindService;
+public class TestBindAmbientContextDetectionServiceService extends Service {
+    private static final String TAG = "TestBindAmbientContextDetectionServiceService";
+    private TestBindAmbientContextDetectionServiceServiceImpl bindService;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        bindService = new TestBindGameServiceImpl();
+        bindService = new TestBindAmbientContextDetectionServiceServiceImpl();
     }
 
     @Override
@@ -43,10 +43,10 @@ public class TestBindGameService extends Service {
         return bindService;
     }
 
-    static class TestBindGameServiceImpl extends TestBindService.Stub {
+    static class TestBindAmbientContextDetectionServiceServiceImpl extends TestBindService.Stub {
         public void testMethod() {
             Log.d(TAG, "The caller successfully invoked the test method on service "
-                    + "TestBindGameService");
+                    + "TestBindAmbientContextDetectionServiceService");
         }
     }
 }

@@ -16,6 +16,9 @@
 
 package com.android.certifications.niap.permissions.companion;
 
+import static android.app.PendingIntent.FLAG_IMMUTABLE;
+import static android.app.PendingIntent.FLAG_MUTABLE;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -255,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
 
         registerReceiver(receiver, new IntentFilter(ACCESS_LOCATION_ACTION));
         Intent intent = new Intent(ACCESS_LOCATION_ACTION);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, FLAG_MUTABLE);
         FusedLocationProviderClient locationClient =
                 LocationServices.getFusedLocationProviderClient(this);
         try {

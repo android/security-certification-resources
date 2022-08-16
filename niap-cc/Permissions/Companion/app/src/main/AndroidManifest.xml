@@ -30,7 +30,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name="com.android.certifications.niap.permissions.companion.MainActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -414,31 +415,32 @@
             android:enabled="true"
             android:exported="true" />
         <!-- Services for android T -->
-        <service android:name=".services.TestBindAmbientContextDetectionService"
+
+        <service android:name=".services.TestBindAmbientContextDetectionServiceService"
             android:permission="android.permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindTvInteractiveApp"
+        <service android:name=".services.TestBindTvInteractiveAppService"
             android:permission="android.permission.BIND_TV_INTERACTIVE_APP"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindWallpaperEffectsGenerationService"
+        <service android:name=".services.TestBindWallpaperEffectsGenerationServiceService"
             android:permission="android.permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindSelectionToolbarRenderService"
+        <service android:name=".services.TestBindSelectionToolbarRenderServiceService"
             android:permission="android.permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindGameService"
+        <service android:name=".services.TestBindGameServiceService"
             android:permission="android.permission.BIND_GAME_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindTraceReportService"
+        <service android:name=".services.TestBindTraceReportServiceService"
             android:permission="android.permission.BIND_TRACE_REPORT_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindAttestationVerificationService"
+        <service android:name=".services.TestBindAttestationVerificationServiceService"
             android:permission="android.permission.BIND_ATTESTATION_VERIFICATION_SERVICE"
             android:enabled="true"
             android:exported="true" />

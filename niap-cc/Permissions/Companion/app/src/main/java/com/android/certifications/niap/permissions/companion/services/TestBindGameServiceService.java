@@ -21,21 +21,21 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * Exported service used to test the BIND_ATTESTATION_VERIFICATION_SERVICE permission.
+ * Exported service used to test the BIND_GAME_SERVICE permission.
  *
- * This service requires clients are granted the BIND_ATTESTATION_VERIFICATION_SERVICE
+ * This service requires clients are granted the BIND_GAME_SERVICE
  * permission to bind to it. The Permission Test Tool can attempt to bind to this service
- * and invoke the {@link TestBindAttestationVerificationServiceImpl#testMethod()} method
+ * and invoke the {@link TestBindGameServiceServiceImpl#testMethod()} method
  * to verify that the platform properly enforces this permission requirement.
  */
-public class TestBindAttestationVerificationService extends Service {
-    private static final String TAG = "TestBindAttestationVerificationService";
-    private TestBindAttestationVerificationServiceImpl bindService;
+public class TestBindGameServiceService extends Service {
+    private static final String TAG = "TestBindGameServiceService";
+    private TestBindGameServiceServiceImpl bindService;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        bindService = new TestBindAttestationVerificationServiceImpl();
+        bindService = new TestBindGameServiceServiceImpl();
     }
 
     @Override
@@ -43,10 +43,10 @@ public class TestBindAttestationVerificationService extends Service {
         return bindService;
     }
 
-    static class TestBindAttestationVerificationServiceImpl extends TestBindService.Stub {
+    static class TestBindGameServiceServiceImpl extends TestBindService.Stub {
         public void testMethod() {
             Log.d(TAG, "The caller successfully invoked the test method on service "
-                    + "TestBindAttestationVerificationService");
+                    + "TestBindGameServiceService");
         }
     }
 }

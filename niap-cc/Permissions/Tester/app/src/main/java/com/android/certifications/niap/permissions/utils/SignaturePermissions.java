@@ -974,7 +974,8 @@ public class SignaturePermissions {
                 "android.permission.WIFI_UPDATE_COEX_UNSAFE_CHANNELS";
         public static final String USE_SYSTEM_DATA_LOADERS =
                 "com.android.permission.USE_SYSTEM_DATA_LOADERS";
-
+        // The following are the new signature permissions for Android 13.
+        // Priviledged
         public static final String TRIGGER_SHELL_PROFCOLLECT_UPLOAD =
                 "android.permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD";
         public static final String ALLOW_PLACE_IN_MULTI_PANE_SETTINGS =
@@ -983,6 +984,22 @@ public class SignaturePermissions {
                 "android.permission.LAUNCH_MULTI_PANE_SETTINGS_DEEP_LINK";
         public static final String ALLOW_SLIPPERY_TOUCHES =
                 "android.permission.ALLOW_SLIPPERY_TOUCHES";
+        // BIND_*
+        public static final String BIND_ATTESTATION_VERIFICATION_SERVICE =
+                "android.permission.BIND_ATTESTATION_VERIFICATION_SERVICE";
+        public static final String BIND_TRACE_REPORT_SERVICE =
+                "android.permission.BIND_TRACE_REPORT_SERVICE";
+        public static final String BIND_GAME_SERVICE =
+                "android.permission.BIND_GAME_SERVICE";
+        public static final String BIND_SELECTION_TOOLBAR_RENDER_SERVICE =
+                "android.permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE";
+        public static final String BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE =
+                "android.permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE";
+        public static final String BIND_TV_INTERACTIVE_APP =
+                "android.permission.BIND_TV_INTERACTIVE_APP";
+        public static final String BIND_AMBIENT_CONTEXT_DETECTION_SERVICE =
+                "android.permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE";
+
 
     }
 

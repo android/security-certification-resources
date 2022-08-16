@@ -63,7 +63,7 @@ class Android13BindPlugin implements Plugin<Project> {
             doLast {
                 def manifestTags = [];
                 for(pm in PERMISSIONS){
-                    def className =  "Test"+pm.caseFormat( UPPER_UNDERSCORE, UPPER_CAMEL )
+                    def className =  "Test"+pm.caseFormat( UPPER_UNDERSCORE, UPPER_CAMEL )+"Service"
                     def filePath = "${project.projectDir}/app/src/main/java/com/android/certifications/niap/permissions/companion/services/"
                     new File(filePath+className+".java").
                             text =

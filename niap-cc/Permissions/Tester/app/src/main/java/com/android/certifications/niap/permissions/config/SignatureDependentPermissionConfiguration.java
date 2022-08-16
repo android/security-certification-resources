@@ -29,6 +29,7 @@ import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.R;
 import com.android.certifications.niap.permissions.RuntimePermissionTester;
 import com.android.certifications.niap.permissions.SignaturePermissionTester;
+import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +48,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.UWB_RANGING,
+
     };
 
     public SignatureDependentPermissionConfiguration(Activity activity) {
@@ -104,6 +106,19 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             permissions.add(permission.NETWORK_SCAN);
         }
+        permissions.add(permission.BIND_TRANSLATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            //BIND_*
+            permissions.add(permission.BIND_ATTESTATION_VERIFICATION_SERVICE);
+            permissions.add(permission.BIND_TRACE_REPORT_SERVICE);
+            permissions.add(permission.BIND_GAME_SERVICE);
+            permissions.add(permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE);
+            permissions.add(permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE);
+            permissions.add(permission.BIND_TV_INTERACTIVE_APP);
+            permissions.add(permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE);
+        }
+        Log.d("aaa",permissions.toString());
         return Optional.of(permissions);
     }
 

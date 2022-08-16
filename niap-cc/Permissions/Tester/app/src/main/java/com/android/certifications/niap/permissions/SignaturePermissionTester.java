@@ -3873,6 +3873,29 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.BIND_TRANSLATION_SERVICE,
                 new PermissionTest(false, Build.VERSION_CODES.S,
                         getBindRunnable(permission.BIND_TRANSLATION_SERVICE)));
+
+        //New BIND_* permissions for Android T
+        mPermissionTasks.put(permission.BIND_ATTESTATION_VERIFICATION_SERVICE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,
+                        getBindRunnable(permission.BIND_ATTESTATION_VERIFICATION_SERVICE)));
+        mPermissionTasks.put(permission.BIND_TRACE_REPORT_SERVICE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,
+                        getBindRunnable(permission.BIND_TRACE_REPORT_SERVICE)));
+        mPermissionTasks.put(permission.BIND_GAME_SERVICE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,
+                        getBindRunnable(permission.BIND_GAME_SERVICE)));
+        mPermissionTasks.put(permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,
+                        getBindRunnable(permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE)));
+        mPermissionTasks.put(permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,
+                        getBindRunnable(permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE)));
+        mPermissionTasks.put(permission.BIND_TV_INTERACTIVE_APP,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,
+                        getBindRunnable(permission.BIND_TV_INTERACTIVE_APP)));
+        mPermissionTasks.put(permission. BIND_AMBIENT_CONTEXT_DETECTION_SERVICE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,
+                        getBindRunnable(permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE)));
     }
 
     /**

@@ -17,7 +17,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     signingConfigs {
         companion {
             storeFile file("../security/ec-p256.jks")
@@ -29,7 +29,7 @@ android {
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions.companion"
         minSdkVersion 28
-        targetSdkVersion 32
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         signingConfig signingConfigs.companion

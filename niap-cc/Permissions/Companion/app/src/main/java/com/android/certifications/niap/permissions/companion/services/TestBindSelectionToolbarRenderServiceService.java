@@ -21,21 +21,21 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * Exported service used to test the BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE permission.
+ * Exported service used to test the BIND_SELECTION_TOOLBAR_RENDER_SERVICE permission.
  *
- * This service requires clients are granted the BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE
+ * This service requires clients are granted the BIND_SELECTION_TOOLBAR_RENDER_SERVICE
  * permission to bind to it. The Permission Test Tool can attempt to bind to this service
- * and invoke the {@link TestBindWallpaperEffectsGenerationServiceImpl#testMethod()} method
+ * and invoke the {@link TestBindSelectionToolbarRenderServiceServiceImpl#testMethod()} method
  * to verify that the platform properly enforces this permission requirement.
  */
-public class TestBindWallpaperEffectsGenerationService extends Service {
-    private static final String TAG = "TestBindWallpaperEffectsGenerationService";
-    private TestBindWallpaperEffectsGenerationServiceImpl bindService;
+public class TestBindSelectionToolbarRenderServiceService extends Service {
+    private static final String TAG = "TestBindSelectionToolbarRenderServiceService";
+    private TestBindSelectionToolbarRenderServiceServiceImpl bindService;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        bindService = new TestBindWallpaperEffectsGenerationServiceImpl();
+        bindService = new TestBindSelectionToolbarRenderServiceServiceImpl();
     }
 
     @Override
@@ -43,10 +43,10 @@ public class TestBindWallpaperEffectsGenerationService extends Service {
         return bindService;
     }
 
-    static class TestBindWallpaperEffectsGenerationServiceImpl extends TestBindService.Stub {
+    static class TestBindSelectionToolbarRenderServiceServiceImpl extends TestBindService.Stub {
         public void testMethod() {
             Log.d(TAG, "The caller successfully invoked the test method on service "
-                    + "TestBindWallpaperEffectsGenerationService");
+                    + "TestBindSelectionToolbarRenderServiceService");
         }
     }
 }

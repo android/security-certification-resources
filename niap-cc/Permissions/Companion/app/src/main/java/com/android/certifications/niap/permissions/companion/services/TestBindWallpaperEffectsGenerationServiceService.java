@@ -21,21 +21,21 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * Exported service used to test the BIND_SELECTION_TOOLBAR_RENDER_SERVICE permission.
+ * Exported service used to test the BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE permission.
  *
- * This service requires clients are granted the BIND_SELECTION_TOOLBAR_RENDER_SERVICE
+ * This service requires clients are granted the BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE
  * permission to bind to it. The Permission Test Tool can attempt to bind to this service
- * and invoke the {@link TestBindSelectionToolbarRenderServiceImpl#testMethod()} method
+ * and invoke the {@link TestBindWallpaperEffectsGenerationServiceServiceImpl#testMethod()} method
  * to verify that the platform properly enforces this permission requirement.
  */
-public class TestBindSelectionToolbarRenderService extends Service {
-    private static final String TAG = "TestBindSelectionToolbarRenderService";
-    private TestBindSelectionToolbarRenderServiceImpl bindService;
+public class TestBindWallpaperEffectsGenerationServiceService extends Service {
+    private static final String TAG = "TestBindWallpaperEffectsGenerationServiceService";
+    private TestBindWallpaperEffectsGenerationServiceServiceImpl bindService;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        bindService = new TestBindSelectionToolbarRenderServiceImpl();
+        bindService = new TestBindWallpaperEffectsGenerationServiceServiceImpl();
     }
 
     @Override
@@ -43,10 +43,10 @@ public class TestBindSelectionToolbarRenderService extends Service {
         return bindService;
     }
 
-    static class TestBindSelectionToolbarRenderServiceImpl extends TestBindService.Stub {
+    static class TestBindWallpaperEffectsGenerationServiceServiceImpl extends TestBindService.Stub {
         public void testMethod() {
             Log.d(TAG, "The caller successfully invoked the test method on service "
-                    + "TestBindSelectionToolbarRenderService");
+                    + "TestBindWallpaperEffectsGenerationServiceService");
         }
     }
 }
