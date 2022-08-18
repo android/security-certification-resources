@@ -1,0 +1,41 @@
+import groovy.json.JsonSlurper
+ext {
+
+
+    String.metaClass.caseFormat = { from, to ->
+        from.to( to, delegate )
+    }
+
+    manifestTags = { json,version ->
+        json.each{ category, list ->
+            println "<!-- New $category permissions as of Android $version -->"
+            list.each{ item ->
+                println "<uses-permission android:name=\"android.permission.$item\" />  "
+            }
+        }
+    }
+
+    task genManifestTags()  { doLast {
+        def src = new File("permissions.json").text;
+        def json = new JsonSlurper().parseText(src)
+        manifestPermissions(json.T,"13")
+    }}
+    signatureConstants = { json,version ->
+        json.each{ category, list ->
+            if(category.equals("Signature")||category.equals("Internal")) {
+                println "// New $category permissions as of Android $version"
+                list.each { item ->
+                    println " public static final String $item =\n" +
+                            "                \"android.permission.$item\";"
+                }
+            }
+        }
+    }
+    task genSignatureConstants()  { doLast {
+        def src = new File("permissions.json").text;
+        def json = new JsonSlurper().parseText(src)
+        signatureConstants(json.T,"13")
+    }}
+
+
+}

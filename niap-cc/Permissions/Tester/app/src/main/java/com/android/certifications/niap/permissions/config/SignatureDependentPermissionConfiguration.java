@@ -106,10 +106,8 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             permissions.add(permission.NETWORK_SCAN);
         }
-        permissions.add(permission.BIND_TRANSLATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            //BIND_*
             permissions.add(permission.BIND_ATTESTATION_VERIFICATION_SERVICE);
             permissions.add(permission.BIND_TRACE_REPORT_SERVICE);
             permissions.add(permission.BIND_GAME_SERVICE);
@@ -118,7 +116,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
             permissions.add(permission.BIND_TV_INTERACTIVE_APP);
             permissions.add(permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE);
         }
-        Log.d("aaa",permissions.toString());
+
         return Optional.of(permissions);
     }
 
