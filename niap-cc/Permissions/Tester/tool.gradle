@@ -37,5 +37,27 @@ ext {
         signatureConstants(json.T,"13")
     }}
 
+    testPlaceHodlers = { json,version,target ->
+        json.each{ category, list ->
+            if(category.equals(target)) {
+                println "// New $category permissions as of Android $version"
+                list.each { item ->
+                    println "mPermissionTasks.put(permission.$item,\n" +
+                            "                new PermissionTest(false, Build.VERSION_CODES.$version, () -> {\n" +
+                            "                    mLogger.logDebug(\"Test case for $item not implemented yet\");\n"+
+                            "                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,\n" +
+                            "                    //       Transacts.unregisterCoexCallback, (Object) null);\n" +
+                            "                }));"
+                }
+            }
+        }
+    }
+
+    task genTestPlaceHolders()  { doLast {
+        def src = new File("permissions.json").text;
+        def json = new JsonSlurper().parseText(src)
+        testPlaceHodlers(json.T,"TIRAMISU","Signature")
+    }}
+
 
 }

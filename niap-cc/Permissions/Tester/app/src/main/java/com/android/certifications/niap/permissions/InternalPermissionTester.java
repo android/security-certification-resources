@@ -183,10 +183,7 @@ public class InternalPermissionTester extends BasePermissionTester {
                         }*/
                     }
                 }));
-        mPermissionTasks.put(permission.BIND_TRACE_REPORT_SERVICE,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
 
-                }));
         mPermissionTasks.put(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     //WindowManagerService#addKeyguardLockedStateListener.

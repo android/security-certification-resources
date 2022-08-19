@@ -40,6 +40,7 @@ import android.app.usage.UsageEvents;
 import android.app.usage.UsageStatsManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -137,9 +138,11 @@ import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
 import com.android.certifications.niap.permissions.services.TestService;
+import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.Transacts;
 import com.android.internal.policy.IKeyguardDismissCallback;
+import com.google.android.gms.location.LocationRequest;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -150,12 +153,14 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -165,11 +170,14 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Permission tester to verify all platform declared signature permissions properly guard their API,
@@ -3673,6 +3681,387 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
 
 
+        // New Signature permissions as of Android TIRAMISU
+        mPermissionTasks.put(permission.LOCATION_BYPASS,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    //LocationSettings.setLocationEnabled(mContext, false, LocationSettingsRestricted.ALLOWED);
+                    mLogger.logDebug("[BLOCK]API setBypass is hidden");
+                    //mLogger.logDebug(
+                    //        ReflectionUtils.checkDeclaredMethod(LocationRequest.create()).toString()
+                    //);
+                }));
+        mPermissionTasks.put(permission.CONTROL_AUTOMOTIVE_GNSS,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("[BLOCK] isAutomotiveGnssSuspended only allowed on automotive devices");
+                    //ReflectionUtils.invokeReflectionCall(mLocationManager.getClass(),
+                    //        "isAutomotiveGnssSuspended",mLocationManager,null);
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_WIFI_NETWORK_SELECTION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    ReflectionUtils.invokeReflectionCall(mWifiManager.getClass(),
+                                   "getSsidsAllowlist",mWifiManager,null);
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_WIFI_INTERFACES,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        mWifiManager.reportCreateInterfaceImpact(WifiManager.WIFI_INTERFACE_TYPE_STA,
+                                true, new Executor() {
+                                    @Override
+                                    public void execute(Runnable runnable) {}
+                                }, new BiConsumer<Boolean, Set<WifiManager.InterfaceCreationImpact>>() {
+                                    @Override
+                                    public void accept(Boolean aBoolean, Set<WifiManager.InterfaceCreationImpact> interfaceCreationImpacts) {}
+                                });
+                    }
+                }));
+
+
+        mPermissionTasks.put(permission.TRIGGER_LOST_MODE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("[BLOCK] Lost mode location updates can only be sent on an organization-owned device.");
+                    /*ReflectionUtils.invokeReflectionCall(mDevicePolicyManager.getClass(),
+                            "sendLostModeLocationUpdate", mDevicePolicyManager,
+                            new Class<?>[]{Executor.class, Consumer.class}, new Executor() {
+                                @Override
+                                public void execute(Runnable runnable) {
+                                }
+                            }, new Consumer<Boolean>() {
+                                @Override
+                                public void accept(Boolean aBoolean) {
+
+                                }
+                                @Override
+                                public Consumer<Boolean> andThen(Consumer<? super Boolean> after) {
+                                    return Consumer.super.andThen(after);
+                                }
+                            });*/
+                }));
+        mPermissionTasks.put(permission.START_CROSS_PROFILE_ACTIVITIES,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for START_CROSS_PROFILE_ACTIVITIES not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.QUERY_USERS,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    //Ensure android.Manifest.permission.MANAGE_USERS is not permitted.
+                    //permission.QUERY_USERS//#isSameProfileGroup
+                    ReflectionUtils.invokeReflectionCall(mUserManager.getClass(),
+                            "isSameProfileGroup", mUserManager,
+                            new Class<?>[]{int.class, int.class}, 0,0);
+                }));
+        mPermissionTasks.put(permission.QUERY_ADMIN_POLICY,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    //@SystemApi
+                    ReflectionUtils.invokeReflectionCall(mDevicePolicyManager.getClass(),
+                            "getPermittedInputMethodsForCurrentUser", mDevicePolicyManager,
+                            new Class<?>[]{},null);
+                }));
+        mPermissionTasks.put(permission.PROVISION_DEMO_DEVICE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    Class fmdpBuilderClazz = null;
+                    Class fmdpClazz = null;
+                    try {
+                        fmdpBuilderClazz = Class.forName("android.app.admin.FullyManagedDeviceProvisioningParams$Builder");
+                        fmdpClazz = Class.forName("android.app.admin.FullyManagedDeviceProvisioningParams");
+
+                        Constructor constructor = fmdpBuilderClazz.getConstructor(ComponentName.class,String.class);
+                        Object fmdpBuilderObj =
+                            constructor.newInstance(new ComponentName(mContext,MainActivity.class),"");
+                        Object fmdpObj = ReflectionUtils.invokeReflectionCall(fmdpBuilderClazz,
+                                "build", fmdpBuilderObj,
+                                new Class<?>[]{},null);
+                        ReflectionUtils.invokeReflectionCall(mDevicePolicyManager.getClass(),
+                                "provisionFullyManagedDevice", mDevicePolicyManager,
+                                new Class<?>[]{fmdpClazz},fmdpObj);
+                    } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                        throw new UnexpectedPermissionTestFailureException(e);
+                    } catch (BasePermissionTester.UnexpectedPermissionTestFailureException e){
+                        mLogger.logDebug("Please check stack trace. " +
+                                "If the stacktrace contains 'Provisioning preconditions failed' messages," +
+                                "This exception is intended");
+                    }
+                }));
+
+        //REQUEST_COMPANION_PROFILE_* methods
+        mPermissionTasks.put(permission.REQUEST_COMPANION_PROFILE_APP_STREAMING,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for REQUEST_COMPANION_PROFILE_APP_STREAMING not implemented yet");
+                    if (!mPackageManager.hasSystemFeature(
+                            PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
+                        throw new BypassTestException(
+                                "Device does not have the "
+                                        + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
+                                        + "for this test");
+                    }
+                    AssociationRequest request = new AssociationRequest.Builder().setDeviceProfile(
+                            AssociationRequest.DEVICE_PROFILE_APP_STREAMING).build();
+                    CompanionDeviceManager.Callback callback =
+                            new CompanionDeviceManager.Callback() {
+                                @Override
+                                public void onDeviceFound(IntentSender intentSender) {
+                                    mLogger.logDebug(
+                                            "onDeviceFound: intentSender = " + intentSender);
+                                }
+                                @Override
+                                public void onFailure(CharSequence charSequence) {
+                                    mLogger.logDebug("onFailure: charSequence = " + charSequence);
+                                }
+                            };
+                    CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
+                            CompanionDeviceManager.class);
+                    companionDeviceManager.associate(request, callback, null);
+                }));
+
+        mPermissionTasks.put(permission.REQUEST_COMPANION_PROFILE_COMPUTER,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for REQUEST_COMPANION_PROFILE_COMPUTER not implemented yet");
+                    if (!mPackageManager.hasSystemFeature(
+                            PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
+                        throw new BypassTestException(
+                                "Device does not have the "
+                                        + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
+                                        + "for this test");
+                    }
+                    AssociationRequest request = new AssociationRequest.Builder().setDeviceProfile(
+                            AssociationRequest.DEVICE_PROFILE_COMPUTER).build();
+                    CompanionDeviceManager.Callback callback =
+                            new CompanionDeviceManager.Callback() {
+                                @Override
+                                public void onDeviceFound(IntentSender intentSender) {
+                                    mLogger.logDebug(
+                                            "onDeviceFound: intentSender = " + intentSender);
+                                }
+                                @Override
+                                public void onFailure(CharSequence charSequence) {
+                                    mLogger.logDebug("onFailure: charSequence = " + charSequence);
+                                }
+                            };
+                    CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
+                            CompanionDeviceManager.class);
+                    companionDeviceManager.associate(request, callback, null);
+                }));
+
+        mPermissionTasks.put(permission.REQUEST_COMPANION_SELF_MANAGED,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for REQUEST_COMPANION_SELF_MANAGED not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.READ_APP_SPECIFIC_LOCALES,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for READ_APP_SPECIFIC_LOCALES not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.USE_ATTESTATION_VERIFICATION_SERVICE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for USE_ATTESTATION_VERIFICATION_SERVICE not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.VERIFY_ATTESTATION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for VERIFY_ATTESTATION not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.REQUEST_UNIQUE_ID_ATTESTATION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for REQUEST_UNIQUE_ID_ATTESTATION not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.GET_HISTORICAL_APP_OPS_STATS,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for GET_HISTORICAL_APP_OPS_STATS not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.SET_SYSTEM_AUDIO_CAPTION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for SET_SYSTEM_AUDIO_CAPTION not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.INSTALL_DPC_PACKAGES,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for INSTALL_DPC_PACKAGES not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.DELIVER_COMPANION_MESSAGES,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for DELIVER_COMPANION_MESSAGES not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.MODIFY_TOUCH_MODE_STATE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for MODIFY_TOUCH_MODE_STATE not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.MODIFY_USER_PREFERRED_DISPLAY_MODE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for MODIFY_USER_PREFERRED_DISPLAY_MODE not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.ACCESS_ULTRASOUND,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for ACCESS_ULTRASOUND not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.CALL_AUDIO_INTERCEPTION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for CALL_AUDIO_INTERCEPTION not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.MANAGE_LOW_POWER_STANDBY,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for MANAGE_LOW_POWER_STANDBY not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.ACCESS_BROADCAST_RESPONSE_STATS,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for ACCESS_BROADCAST_RESPONSE_STATS not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.CHANGE_APP_LAUNCH_TIME_ESTIMATE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for CHANGE_APP_LAUNCH_TIME_ESTIMATE not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.SET_WALLPAPER_DIM_AMOUNT,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for SET_WALLPAPER_DIM_AMOUNT not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.MANAGE_WEAK_ESCROW_TOKEN,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for MANAGE_WEAK_ESCROW_TOKEN not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.START_REVIEW_PERMISSION_DECISIONS,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for START_REVIEW_PERMISSION_DECISIONS not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.START_VIEW_APP_FEATURES,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for START_VIEW_APP_FEATURES not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.MANAGE_CLOUDSEARCH,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for MANAGE_CLOUDSEARCH not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.MANAGE_WALLPAPER_EFFECTS_GENERATION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for MANAGE_WALLPAPER_EFFECTS_GENERATION not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.SUPPRESS_CLIPBOARD_ACCESS_NOTIFICATION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for SUPPRESS_CLIPBOARD_ACCESS_NOTIFICATION not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.ACCESS_TV_SHARED_FILTER,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for ACCESS_TV_SHARED_FILTER not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.ADD_ALWAYS_UNLOCKED_DISPLAY,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for ADD_ALWAYS_UNLOCKED_DISPLAY not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.SET_GAME_SERVICE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for SET_GAME_SERVICE not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.ACCESS_FPS_COUNTER,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for ACCESS_FPS_COUNTER not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.MANAGE_GAME_ACTIVITY,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for MANAGE_GAME_ACTIVITY not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.LAUNCH_DEVICE_MANAGER_SETUP,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for LAUNCH_DEVICE_MANAGER_SETUP not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for UPDATE_DEVICE_MANAGEMENT_RESOURCES not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.READ_SAFETY_CENTER_STATUS,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for READ_SAFETY_CENTER_STATUS not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+
+        mPermissionTasks.put(permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for SET_UNRESTRICTED_KEEP_CLEAR_AREAS not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.TIS_EXTENSION_INTERFACE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for TIS_EXTENSION_INTERFACE not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.WRITE_SECURITY_LOG,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for WRITE_SECURITY_LOG not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+        mPermissionTasks.put(permission.MAKE_UID_VISIBLE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for MAKE_UID_VISIBLE not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                }));
+
 
         // All of the BIND_* signature permissions are intended to be required by various services
         // to ensure only the platform can bind to them. The companion package defines a service
@@ -3874,7 +4263,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.S,
                         getBindRunnable(permission.BIND_TRANSLATION_SERVICE)));
 
-        //New BIND_* permissions for Android T
+        //The following are the new BIND_ permissions in Android T
         mPermissionTasks.put(permission.BIND_ATTESTATION_VERIFICATION_SERVICE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,
                         getBindRunnable(permission.BIND_ATTESTATION_VERIFICATION_SERVICE)));

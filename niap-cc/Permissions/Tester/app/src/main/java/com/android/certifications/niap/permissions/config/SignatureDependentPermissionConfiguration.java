@@ -108,13 +108,24 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissions.add(permission.BIND_ATTESTATION_VERIFICATION_SERVICE);
-            permissions.add(permission.BIND_TRACE_REPORT_SERVICE);
-            permissions.add(permission.BIND_GAME_SERVICE);
-            permissions.add(permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE);
-            permissions.add(permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE);
-            permissions.add(permission.BIND_TV_INTERACTIVE_APP);
-            permissions.add(permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE);
+//            permissions.add(permission.BIND_ATTESTATION_VERIFICATION_SERVICE);
+//            permissions.add(permission.BIND_TRACE_REPORT_SERVICE);
+//            permissions.add(permission.BIND_GAME_SERVICE);
+//            permissions.add(permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE);
+//            permissions.add(permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE);
+//            permissions.add(permission.BIND_TV_INTERACTIVE_APP);
+//            permissions.add(permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE);
+            permissions.add(permission.LOCATION_BYPASS);
+            permissions.add(permission.CONTROL_AUTOMOTIVE_GNSS);
+            permissions.add(permission.MANAGE_WIFI_NETWORK_SELECTION);
+            permissions.add(permission.MANAGE_WIFI_INTERFACES);
+            permissions.add(permission.TRIGGER_LOST_MODE);
+            permissions.add(permission.QUERY_USERS);
+            permissions.add(permission.QUERY_ADMIN_POLICY);
+            permissions.add(permission.PROVISION_DEMO_DEVICE);
+            permissions.add(permission.REQUEST_COMPANION_PROFILE_APP_STREAMING);
+            permissions.add(permission.REQUEST_COMPANION_PROFILE_COMPUTER);
+            //permissions.add(permission.REQUEST_COMPANION_PROFILE_SELF);
         }
 
         return Optional.of(permissions);
