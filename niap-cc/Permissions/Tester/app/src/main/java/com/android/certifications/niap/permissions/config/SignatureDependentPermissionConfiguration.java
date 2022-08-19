@@ -125,7 +125,9 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
             permissions.add(permission.PROVISION_DEMO_DEVICE);
             permissions.add(permission.REQUEST_COMPANION_PROFILE_APP_STREAMING);
             permissions.add(permission.REQUEST_COMPANION_PROFILE_COMPUTER);
-            //permissions.add(permission.REQUEST_COMPANION_PROFILE_SELF);
+            permissions.add(permission.REQUEST_COMPANION_SELF_MANAGED);
+            permissions.add(permission.READ_APP_SPECIFIC_LOCALES);
+            permissions.add(permission.USE_ATTESTATION_VERIFICATION_SERVICE);
         }
 
         return Optional.of(permissions);

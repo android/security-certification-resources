@@ -551,6 +551,10 @@ public class MainActivity extends AppCompatActivity {
                     descriptorTransacts);
 
             //   Signature Permissions
+            queryTransactId(Transacts.ATTESTATION_VERIFICATION_DESCRIPTOR, Transacts.verifyToken,
+                    descriptorTransacts);
+            queryTransactId(Transacts.ATTESTATION_VERIFICATION_DESCRIPTOR, Transacts.verifyAttestation,
+                    descriptorTransacts);
 
 
             return writeTransactsSourceFile(descriptorTransacts);

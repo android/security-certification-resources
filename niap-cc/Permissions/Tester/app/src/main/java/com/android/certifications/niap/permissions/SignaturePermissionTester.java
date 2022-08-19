@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AppOpsManager;
 import android.app.KeyguardManager;
+import android.app.LocaleManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -204,7 +205,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
     protected final PowerManager mPowerManager;
     protected final TelephonyManager mTelephonyManager;
     protected final TelecomManager mTelecomManager;
-
     protected final LocationManager mLocationManager;
     protected final CameraManager mCameraManager;
     protected final DisplayManager mDisplayManager;
@@ -216,6 +216,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
     protected final AppOpsManager mAppOpsManager;
     protected final PrintManager mPrintManager;
     protected final AccessibilityManager mAccessibilityManager;
+    protected final LocaleManager mLocaleManager;
+
 
     protected final List<String> mSignaturePermissions;
     protected final Set<String> mPrivilegedPermissions;
@@ -259,6 +261,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPrintManager = (PrintManager) mContext.getSystemService(Context.PRINT_SERVICE);
         mAccessibilityManager = (AccessibilityManager) mContext.getSystemService(
                 Context.ACCESSIBILITY_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mLocaleManager = (LocaleManager)mContext.getSystemService(Context.LOCALE_SERVICE);
+        } else {
+            mLocaleManager = null;
+        }
 
         mPermissionTasks = new HashMap<>();
 
@@ -2956,7 +2964,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     PackageInstaller packageInstaller = mPackageManager.getPackageInstaller();
                     try {
                         int sessionId = packageInstaller.createSession(
-                                new PackageInstaller.SessionParams(
+                                new SessionParams(
                                         SessionParams.MODE_FULL_INSTALL));
                         PackageInstaller.Session session = packageInstaller.openSession(sessionId);
                         invokeReflectionCall(session.getClass(), "getDataLoaderParams", session,
@@ -3699,13 +3707,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.MANAGE_WIFI_NETWORK_SELECTION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    ReflectionUtils.invokeReflectionCall(mWifiManager.getClass(),
+                    invokeReflectionCall(mWifiManager.getClass(),
                                    "getSsidsAllowlist",mWifiManager,null);
                 }));
 
         mPermissionTasks.put(permission.MANAGE_WIFI_INTERFACES,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         mWifiManager.reportCreateInterfaceImpact(WifiManager.WIFI_INTERFACE_TYPE_STA,
                                 true, new Executor() {
                                     @Override
@@ -3748,14 +3756,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     //Ensure android.Manifest.permission.MANAGE_USERS is not permitted.
                     //permission.QUERY_USERS//#isSameProfileGroup
-                    ReflectionUtils.invokeReflectionCall(mUserManager.getClass(),
+                    invokeReflectionCall(mUserManager.getClass(),
                             "isSameProfileGroup", mUserManager,
                             new Class<?>[]{int.class, int.class}, 0,0);
                 }));
         mPermissionTasks.put(permission.QUERY_ADMIN_POLICY,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     //@SystemApi
-                    ReflectionUtils.invokeReflectionCall(mDevicePolicyManager.getClass(),
+                    invokeReflectionCall(mDevicePolicyManager.getClass(),
                             "getPermittedInputMethodsForCurrentUser", mDevicePolicyManager,
                             new Class<?>[]{},null);
                 }));
@@ -3770,15 +3778,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         Constructor constructor = fmdpBuilderClazz.getConstructor(ComponentName.class,String.class);
                         Object fmdpBuilderObj =
                             constructor.newInstance(new ComponentName(mContext,MainActivity.class),"");
-                        Object fmdpObj = ReflectionUtils.invokeReflectionCall(fmdpBuilderClazz,
+                        Object fmdpObj = invokeReflectionCall(fmdpBuilderClazz,
                                 "build", fmdpBuilderObj,
                                 new Class<?>[]{},null);
-                        ReflectionUtils.invokeReflectionCall(mDevicePolicyManager.getClass(),
+                        invokeReflectionCall(mDevicePolicyManager.getClass(),
                                 "provisionFullyManagedDevice", mDevicePolicyManager,
                                 new Class<?>[]{fmdpClazz},fmdpObj);
                     } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
                         throw new UnexpectedPermissionTestFailureException(e);
-                    } catch (BasePermissionTester.UnexpectedPermissionTestFailureException e){
+                    } catch (UnexpectedPermissionTestFailureException e){
                         mLogger.logDebug("Please check stack trace. " +
                                 "If the stacktrace contains 'Provisioning preconditions failed' messages," +
                                 "This exception is intended");
@@ -3846,21 +3854,24 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.REQUEST_COMPANION_SELF_MANAGED,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for REQUEST_COMPANION_SELF_MANAGED not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        new AssociationRequest.Builder().setSelfManaged(true).setForceConfirmation(true);
+                    }
                 }));
+
         mPermissionTasks.put(permission.READ_APP_SPECIFIC_LOCALES,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for READ_APP_SPECIFIC_LOCALES not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        mLocaleManager.getApplicationLocales(mContext.getPackageName());
+                    }
                 }));
+
         mPermissionTasks.put(permission.USE_ATTESTATION_VERIFICATION_SERVICE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for USE_ATTESTATION_VERIFICATION_SERVICE not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    // in VerificationToken token,in ParcelDuration maximumTokenAge,in AndroidFuture resultCallback
+                    // Intended NPE will be raised
+                    mTransacts.invokeTransact(Transacts.ATTESTATION_VERIFICATION_SERVICE, Transacts.ATTESTATION_VERIFICATION_DESCRIPTOR,
+                           Transacts.verifyToken, null,null,null);
                 }));
         mPermissionTasks.put(permission.VERIFY_ATTESTATION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {

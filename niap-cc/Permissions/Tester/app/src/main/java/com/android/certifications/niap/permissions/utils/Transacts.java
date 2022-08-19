@@ -338,6 +338,12 @@ public class Transacts {
     public static final String addKeyguardLockedStateListener
             ="addKeyguardLockedStateListener";
 
+    public static final String ATTESTATION_VERIFICATION_SERVICE = "attestation_verification";
+    public static final String ATTESTATION_VERIFICATION_DESCRIPTOR =
+            "android.security.attestationverification.IAttestationVerificationManagerService";
+    public static final String verifyToken = "verifyToken";
+    public static final String verifyAttestation = "verifyAttestation";
+
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";
     public static final String getNextEntry = "getNextEntry";

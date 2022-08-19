@@ -354,6 +354,11 @@ public class BarbetApiLevel33Transacts extends Transacts {
         mDescriptorTransacts.put(UWB_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(verifyToken, 2);
+        transactIds.put(verifyAttestation, 1);
+        mDescriptorTransacts.put(ATTESTATION_VERIFICATION_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(setSensorPrivacy, 9);
         transactIds.put(isSensorPrivacyEnabled, 6);
         mDescriptorTransacts.put(SENSOR_PRIVACY_DESCRIPTOR, transactIds);
