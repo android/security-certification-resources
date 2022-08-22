@@ -4026,27 +4026,47 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
         mPermissionTasks.put(permission.MANAGE_WEAK_ESCROW_TOKEN,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for MANAGE_WEAK_ESCROW_TOKEN not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    mLogger.logDebug("[BLOCK] Weak escrow token are only for automotive devices.");
+                    /*invokeReflectionCall(mKeyguardManager.getClass(),
+                            "isWeakEscrowTokenActive", mKeyguardManager,
+                            new Class[]{long.class,UserHandle.class},100L,UserHandle.getUserHandleForUid(mUid));*/
                 }));
         mPermissionTasks.put(permission.START_REVIEW_PERMISSION_DECISIONS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for START_REVIEW_PERMISSION_DECISIONS not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    final Intent featuresIntent = new Intent("android.permission.action.REVIEW_PERMISSION_DECISIONS");
                 }));
         mPermissionTasks.put(permission.START_VIEW_APP_FEATURES,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for START_VIEW_APP_FEATURES not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    final Intent featuresIntent = new Intent("android.intent.action.VIEW_APP_FEATURES");
                 }));
+
         mPermissionTasks.put(permission.MANAGE_CLOUDSEARCH,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    //ndroid.app.cloudsearch.CloudSearchManager;
                     mLogger.logDebug("Test case for MANAGE_CLOUDSEARCH not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+
+                    //in SearchRequest request, in ICloudSearchManagerCallback.aidl callBack
+                    Class<?> clazzSearchBuilder = null;
+                    Class<?> clazzSearch = null;
+
+                    Object searchRequest = null;
+                    try {
+                        clazzSearchBuilder = Class.forName("android.app.cloudsearch.SearchRequest$Builder");
+                        clazzSearch = Class.forName("android.app.cloudsearch.SearchRequest");
+                        mLogger.logDebug("Test case for MANAGE_CLOUDSEARCH not implemented yet"+clazzSearch.toString());
+                        Constructor constructor = clazzSearchBuilder.getConstructor(String.class);
+                        Object builderObj = constructor.newInstance("test");
+                        searchRequest = invokeReflectionCall(clazzSearchBuilder,
+                                "build", builderObj,
+                                new Class[]{});
+
+                        mTransacts.invokeTransact(Transacts.CLOUDSEARCH_SERVICE, Transacts.CLOUDSEARCH_DESCRIPTOR,
+                                Transacts.search,searchRequest,null);
+                    } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
+                        e.printStackTrace();
+                    }
+
+
                 }));
         mPermissionTasks.put(permission.MANAGE_WALLPAPER_EFFECTS_GENERATION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {

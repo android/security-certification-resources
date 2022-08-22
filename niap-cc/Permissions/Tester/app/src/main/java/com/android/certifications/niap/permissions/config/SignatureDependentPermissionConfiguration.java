@@ -144,6 +144,13 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
             permissions.add(permission.CHANGE_APP_LAUNCH_TIME_ESTIMATE);
             permissions.add(permission.SET_WALLPAPER_DIM_AMOUNT);
             permissions.add(permission.MANAGE_WEAK_ESCROW_TOKEN);
+            permissions.add(permission.START_REVIEW_PERMISSION_DECISIONS);
+            permissions.add(permission.START_VIEW_APP_FEATURES);
+
+            permissions.add(permission.MANAGE_CLOUDSEARCH);
+            permissions.add(permission.MANAGE_WALLPAPER_EFFECTS_GENERATION);
+            permissions.add(permission.SUPPRESS_CLIPBOARD_ACCESS_NOTIFICATION);
+
 
 
         }

@@ -234,6 +234,10 @@ public class BarbetApiLevel33Transacts extends Transacts {
         mDescriptorTransacts.put(NETWORK_MANAGEMENT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(search, 1);
+        mDescriptorTransacts.put(CLOUDSEARCH_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(resetAppErrors, 217);
         transactIds.put(bindBackupAgent, 84);
         transactIds.put(performIdleMaintenance, 158);
@@ -301,7 +305,6 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(setAnimationScale, 39);
         transactIds.put(removeWindowToken, 18);
         transactIds.put(thawRotation, 52);
-        // Failed to obtain transactId of getInTouchMode under android.view.IWindowManager: No field TRANSACTION_getInTouchMode in class Landroid/view/IWindowManager$Stub; (declaration of 'android.view.IWindowManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
         transactIds.put(registerShortcutKey, 82);
         transactIds.put(overridePendingAppTransitionRemote, 23);
         mDescriptorTransacts.put(WINDOW_DESCRIPTOR, transactIds);

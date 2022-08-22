@@ -556,8 +556,10 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.ATTESTATION_VERIFICATION_DESCRIPTOR, Transacts.verifyAttestation,
                     descriptorTransacts);
 
-
             queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.setInTouchMode,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.CLOUDSEARCH_DESCRIPTOR, Transacts.search,
                     descriptorTransacts);
 
 

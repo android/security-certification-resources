@@ -348,6 +348,12 @@ public class Transacts {
     public static final String setInTouchMode = "setInTouchMode";
     //public static final String getInTouchMode = "getInTouchMode";
 
+    //CloudSearch
+    public static final String CLOUDSEARCH_SERVICE = "cloudsearch";//Context.CLOUD_SEARCH
+    public static final String CLOUDSEARCH_DESCRIPTOR =
+            "android.app.cloudsearch.ICloudSearchManager";
+    public static final String search="search";
+
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";
     public static final String getNextEntry = "getNextEntry";
