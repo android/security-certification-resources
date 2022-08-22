@@ -557,6 +557,10 @@ public class MainActivity extends AppCompatActivity {
                     descriptorTransacts);
 
 
+            queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.setInTouchMode,
+                    descriptorTransacts);
+
+
             return writeTransactsSourceFile(descriptorTransacts);
         }
 

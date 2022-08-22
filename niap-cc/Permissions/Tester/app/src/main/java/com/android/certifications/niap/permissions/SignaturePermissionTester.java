@@ -16,6 +16,10 @@
 
 package com.android.certifications.niap.permissions;
 
+import static android.security.keystore.KeyProperties.DIGEST_NONE;
+import static android.security.keystore.KeyProperties.DIGEST_SHA256;
+import static android.security.keystore.KeyProperties.DIGEST_SHA512;
+import static android.security.keystore.KeyProperties.PURPOSE_SIGN;
 import static com.android.certifications.niap.permissions.utils.ReflectionUtils.invokeReflectionCall;
 import static com.android.certifications.niap.permissions.utils.SignaturePermissions.permission;
 
@@ -32,6 +36,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.UiAutomation;
 import android.app.UiModeManager;
+import android.app.WallpaperManager;
 import android.app.admin.DevicePolicyManager;
 import android.app.blob.BlobHandle;
 import android.app.blob.BlobStoreManager;
@@ -66,6 +71,8 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.display.DisplayManager;
 import android.hardware.usb.UsbManager;
 import android.location.LocationManager;
+import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.AudioEncoder;
 import android.media.MediaRecorder.AudioSource;
@@ -112,6 +119,7 @@ import android.provider.VoicemailContract.Voicemails;
 import android.se.omapi.Reader;
 import android.se.omapi.SEService;
 import android.security.IKeyChainService;
+import android.security.keystore.KeyGenParameterSpec;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
@@ -125,8 +133,10 @@ import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.telephony.TelephonyScanManager;
 import android.util.Log;
+import android.view.Display;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
+import android.view.accessibility.CaptioningManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -158,8 +168,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.spec.ECGenParameterSpec;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
@@ -217,6 +231,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
     protected final PrintManager mPrintManager;
     protected final AccessibilityManager mAccessibilityManager;
     protected final LocaleManager mLocaleManager;
+    protected CaptioningManager mCaptioningManager;
+    protected final AudioManager mAudioManager;
 
 
     protected final List<String> mSignaturePermissions;
@@ -262,11 +278,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mAccessibilityManager = (AccessibilityManager) mContext.getSystemService(
                 Context.ACCESSIBILITY_SERVICE);
 
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             mLocaleManager = (LocaleManager)mContext.getSystemService(Context.LOCALE_SERVICE);
+            mCaptioningManager = (CaptioningManager) mContext.getSystemService(Context.CAPTIONING_SERVICE);
         } else {
             mLocaleManager = null;
         }
+        mAudioManager = (AudioManager)mContext.getSystemService(Context.AUDIO_SERVICE);
 
         mPermissionTasks = new HashMap<>();
 
@@ -3765,7 +3784,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     //@SystemApi
                     invokeReflectionCall(mDevicePolicyManager.getClass(),
                             "getPermittedInputMethodsForCurrentUser", mDevicePolicyManager,
-                            new Class<?>[]{},null);
+                            new Class<?>[]{});
                 }));
         mPermissionTasks.put(permission.PROVISION_DEMO_DEVICE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
@@ -3780,7 +3799,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             constructor.newInstance(new ComponentName(mContext,MainActivity.class),"");
                         Object fmdpObj = invokeReflectionCall(fmdpBuilderClazz,
                                 "build", fmdpBuilderObj,
-                                new Class<?>[]{},null);
+                                new Class<?>[]{});
                         invokeReflectionCall(mDevicePolicyManager.getClass(),
                                 "provisionFullyManagedDevice", mDevicePolicyManager,
                                 new Class<?>[]{fmdpClazz},fmdpObj);
@@ -3881,21 +3900,43 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
         mPermissionTasks.put(permission.REQUEST_UNIQUE_ID_ATTESTATION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for REQUEST_UNIQUE_ID_ATTESTATION not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    String keystoreAlias = "test_key";
+                    KeyGenParameterSpec.Builder builder =
+                    new KeyGenParameterSpec.Builder(keystoreAlias, PURPOSE_SIGN)
+                            .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
+                            .setDigests(DIGEST_NONE, DIGEST_SHA256, DIGEST_SHA512)
+                            .setAttestationChallenge(new byte[128]);
+                    //setUniqueIeIncluded is a hidden api
+                    builder = (KeyGenParameterSpec.Builder)invokeReflectionCall(builder.getClass(),
+                            "setUniqueIdIncluded",builder,
+                            new Class<?>[]{boolean.class}, true);
+
+                    KeyGenParameterSpec spec = builder.build();
+                    KeyStore keyStore = null;
+                    try {
+                        keyStore = KeyStore.getInstance("AndroidKeyStore");
+                        keyStore.load(null);
+
+                    } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+
+
                 }));
         mPermissionTasks.put(permission.GET_HISTORICAL_APP_OPS_STATS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     mLogger.logDebug("Test case for GET_HISTORICAL_APP_OPS_STATS not implemented yet");
+
                     //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
                     //       Transacts.unregisterCoexCallback, (Object) null);
                 }));
         mPermissionTasks.put(permission.SET_SYSTEM_AUDIO_CAPTION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for SET_SYSTEM_AUDIO_CAPTION not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(mCaptioningManager,"set").toString());
+                    invokeReflectionCall(mCaptioningManager.getClass(),
+                            "setSystemAudioCaptioningEnabled",mCaptioningManager,
+                            new Class<?>[]{boolean.class}, true);
+                    //setSystemAudioCaptioningEnabled( boolean)
                 }));
         mPermissionTasks.put(permission.INSTALL_DPC_PACKAGES,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
@@ -3905,63 +3946,83 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
         mPermissionTasks.put(permission.REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    Object permissionManager = mContext.getSystemService("permission");
+                    //revokePostNotificationPermissionWithoutKillForTest( java.lang.String int);
+                     invokeReflectionCall(permissionManager.getClass(),
+                            "revokePostNotificationPermissionWithoutKillForTest",permissionManager,
+                            new Class<?>[]{String.class,int.class}, mContext.getPackageName(),0);
                 }));
         mPermissionTasks.put(permission.DELIVER_COMPANION_MESSAGES,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for DELIVER_COMPANION_MESSAGES not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+
+                    CompanionDeviceManager companionDeviceManager =
+                            (CompanionDeviceManager) mContext.getSystemService(
+                                    Context.COMPANION_DEVICE_SERVICE);
+
+                    //companionDeviceManager.dispatchMessage( int int byte[])
+                    Object result = invokeReflectionCall(companionDeviceManager.getClass(),
+                            "dispatchMessage", companionDeviceManager,
+                            new Class[]{int.class, int.class, byte[].class}, 0,0, new byte[]{0});
                 }));
         mPermissionTasks.put(permission.MODIFY_TOUCH_MODE_STATE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for MODIFY_TOUCH_MODE_STATE not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
+                           Transacts.setInTouchMode, (Object) true);
                 }));
         mPermissionTasks.put(permission.MODIFY_USER_PREFERRED_DISPLAY_MODE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for MODIFY_USER_PREFERRED_DISPLAY_MODE not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(mDisplayManager,"setGlobal").toString());
+                    Display.Mode mode = mDisplayManager.getDisplays()[0].getMode();
+                    invokeReflectionCall(mDisplayManager.getClass(),
+                            "setGlobalUserPreferredDisplayMode", mDisplayManager,
+                            new Class[]{Display.Mode.class},mode);
                 }));
         mPermissionTasks.put(permission.ACCESS_ULTRASOUND,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for ACCESS_ULTRASOUND not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(mAudioManager,"is").toString());
+                    invokeReflectionCall(mAudioManager.getClass(),
+                            "isUltrasoundSupported", mAudioManager,
+                            new Class[]{});
                 }));
         mPermissionTasks.put(permission.CALL_AUDIO_INTERCEPTION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for CALL_AUDIO_INTERCEPTION not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    invokeReflectionCall(mAudioManager.getClass(),
+                            "isPstnCallAudioInterceptable", mAudioManager,
+                            new Class[]{});
                 }));
         mPermissionTasks.put(permission.MANAGE_LOW_POWER_STANDBY,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for MANAGE_LOW_POWER_STANDBY not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                     //isLowPowerStandbySupported
+                    invokeReflectionCall(mPowerManager.getClass(),
+                            "isLowPowerStandbySupported", mPowerManager,
+                            new Class[]{});
                 }));
         mPermissionTasks.put(permission.ACCESS_BROADCAST_RESPONSE_STATS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for ACCESS_BROADCAST_RESPONSE_STATS not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(mUsageStatsManager,"query").toString());
+                    //queryBroadcastResponseStats( java.lang.String long)
+                    invokeReflectionCall(mUsageStatsManager.getClass(),
+                            "queryBroadcastResponseStats", mUsageStatsManager,
+                            new Class[]{String.class,long.class},mContext.getPackageName(),0);
                 }));
         mPermissionTasks.put(permission.CHANGE_APP_LAUNCH_TIME_ESTIMATE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for CHANGE_APP_LAUNCH_TIME_ESTIMATE not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    //setEstimatedLaunchTimeMillis( java.lang.String long)
+                    //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(mUsageStatsManager,"setE").toString());
+                    invokeReflectionCall(mUsageStatsManager.getClass(),
+                            "setEstimatedLaunchTimeMillis", mUsageStatsManager,
+                            new Class[]{String.class,long.class},mContext.getPackageName(),1000L);
                 }));
         mPermissionTasks.put(permission.SET_WALLPAPER_DIM_AMOUNT,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     mLogger.logDebug("Test case for SET_WALLPAPER_DIM_AMOUNT not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    WallpaperManager wallpaperManager =
+                            (WallpaperManager) mContext.getSystemService(
+                                    Context.WALLPAPER_SERVICE);
+                    //getWallpaperDimAmount()
+                    invokeReflectionCall(wallpaperManager.getClass(),
+                            "getWallpaperDimAmount", wallpaperManager,
+                            new Class[]{});
                 }));
         mPermissionTasks.put(permission.MANAGE_WEAK_ESCROW_TOKEN,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {

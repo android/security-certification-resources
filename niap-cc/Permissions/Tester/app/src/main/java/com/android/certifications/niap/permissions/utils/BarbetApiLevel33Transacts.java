@@ -295,11 +295,13 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(addKeyguardLockedStateListener, 33);
         transactIds.put(setRecentsVisibility, 67);
         transactIds.put(stopFreezingScreen, 26);
+        transactIds.put(setInTouchMode, 42);
         transactIds.put(dismissKeyguard, 32);
         transactIds.put(screenshotWallpaper, 59);
         transactIds.put(setAnimationScale, 39);
         transactIds.put(removeWindowToken, 18);
         transactIds.put(thawRotation, 52);
+        // Failed to obtain transactId of getInTouchMode under android.view.IWindowManager: No field TRANSACTION_getInTouchMode in class Landroid/view/IWindowManager$Stub; (declaration of 'android.view.IWindowManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
         transactIds.put(registerShortcutKey, 82);
         transactIds.put(overridePendingAppTransitionRemote, 23);
         mDescriptorTransacts.put(WINDOW_DESCRIPTOR, transactIds);

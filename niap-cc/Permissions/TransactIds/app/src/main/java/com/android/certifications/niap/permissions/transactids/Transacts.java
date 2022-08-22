@@ -323,6 +323,10 @@ public class Transacts {
     public static final String verifyToken = "verifyToken";
     public static final String verifyAttestation = "verifyAttestation";
 
+    //WindowManager
+    public static final String setInTouchMode = "setInTouchMode";
+    //public static final String getInTouchMode = "getInTouchMode";
+
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";
     public static final String getNextEntry = "getNextEntry";

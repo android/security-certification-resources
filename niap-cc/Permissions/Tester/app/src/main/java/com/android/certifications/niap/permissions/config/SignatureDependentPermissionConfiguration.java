@@ -128,6 +128,24 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
             permissions.add(permission.REQUEST_COMPANION_SELF_MANAGED);
             permissions.add(permission.READ_APP_SPECIFIC_LOCALES);
             permissions.add(permission.USE_ATTESTATION_VERIFICATION_SERVICE);
+
+            permissions.add(permission.REQUEST_UNIQUE_ID_ATTESTATION);
+
+            permissions.add(permission.SET_SYSTEM_AUDIO_CAPTION);
+            permissions.add(permission.REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL);
+            permissions.add(permission.DELIVER_COMPANION_MESSAGES);
+            permissions.add(permission.MODIFY_TOUCH_MODE_STATE);
+
+            permissions.add(permission.MODIFY_USER_PREFERRED_DISPLAY_MODE);
+            permissions.add(permission.ACCESS_ULTRASOUND);
+            permissions.add(permission.CALL_AUDIO_INTERCEPTION);
+            permissions.add(permission.MANAGE_LOW_POWER_STANDBY);
+            permissions.add(permission.ACCESS_BROADCAST_RESPONSE_STATS);
+            permissions.add(permission.CHANGE_APP_LAUNCH_TIME_ESTIMATE);
+            permissions.add(permission.SET_WALLPAPER_DIM_AMOUNT);
+            permissions.add(permission.MANAGE_WEAK_ESCROW_TOKEN);
+
+
         }
 
         return Optional.of(permissions);
