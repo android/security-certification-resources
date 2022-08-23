@@ -333,6 +333,29 @@ public class Transacts {
     public static final String CLOUDSEARCH_DESCRIPTOR =
             "android.app.cloudsearch.ICloudSearchManager";
     public static final String search="search";
+    //WallPaperEffectsGenerationManager
+    public static final String WALLPAPER_EFFECTS_GENERATION_SERVICE =
+            "wallpaper_effects_generation";;
+    public static final String WALLPAPER_EFFECTS_GENERATION_DESCRIPTOR
+            = "android.app.wallpapereffectsgeneration.IWallpaperEffectsGenerationManager";
+    //generateCinematicEffect(in CinematicEffectRequest request,in ICinematicEffectListener listener);
+    public static final String generateCinematicEffect="generateCinematicEffect";
+    //ClibboardService#showAccessNotificationLocked(String callingPackage, int uid, @UserIdInt int userId,
+    //            PerUserClipboard clipboard) {
+    public static final String showAccessNotificationLocked="showAccessNotificationLocked";
+    //GameManagerService#setGameServiceProvider(@Nullable String packageName)
+    public static final String setGameServiceProvider="setGameServiceProvider";
+    public static final String createGameSession="createGameSession";
+    //WindowManagerService#registerTaskFpsCallback(@IntRange(from = 0) int taskId,ITaskFpsCallback callback)
+    public static final String registerTaskFpsCallback="registerTaskFpsCallback";
+
+    //public static final String GAME_CONTROLLER_SERVICE =""
+    //public static final String GAME_CONTROLLER_DESCRIPTOR = "android.service.games. IGameServiceController";
+    //TVManager
+    public static final String getAvailableExtensionInterfaceNames="getAvailableExtensionInterfaceNames";
+    //PackageManagerService#makeUidVisible
+    public static final String makeUidVisible="makeUidVisible";
+
 
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";

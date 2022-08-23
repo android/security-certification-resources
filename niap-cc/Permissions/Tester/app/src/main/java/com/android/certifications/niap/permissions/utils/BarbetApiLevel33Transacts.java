@@ -41,7 +41,9 @@ public class BarbetApiLevel33Transacts extends Transacts {
         mDescriptorTransacts.put(LOCK_SETTINGS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        // Failed to obtain transactId of createGameSession under android.app.IGameManagerService: No field TRANSACTION_createGameSession in class Landroid/app/IGameManagerService$Stub; (declaration of 'android.app.IGameManagerService$Stub' appears in /system/framework/framework.jar)
         transactIds.put(getAvailableGameModes, 3);
+        transactIds.put(setGameServiceProvider, 8);
         mDescriptorTransacts.put(GAME_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -106,6 +108,10 @@ public class BarbetApiLevel33Transacts extends Transacts {
         mDescriptorTransacts.put(RESOURCE_OBSERVER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(generateCinematicEffect, 1);
+        mDescriptorTransacts.put(WALLPAPER_EFFECTS_GENERATION_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(setWallpaper, 1);
         mDescriptorTransacts.put(WALLPAPER_DESCRIPTOR, transactIds);
 
@@ -120,6 +126,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(getPrimaryClipSource, 10);
+        // Failed to obtain transactId of showAccessNotificationLocked under android.content.IClipboard: No field TRANSACTION_showAccessNotificationLocked in class Landroid/content/IClipboard$Stub; (declaration of 'android.content.IClipboard$Stub' appears in /system/framework/framework.jar)
         mDescriptorTransacts.put(CLIPBOARD_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -150,6 +157,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds = new HashMap<>();
         transactIds.put(movePackage, 111);
         transactIds.put(installExistingPackageAsUser, 115);
+        transactIds.put(makeUidVisible, 199);
         transactIds.put(setKeepUninstalledPackages, 204);
         transactIds.put(getRuntimePermissionsVersion, 180);
         // Failed to obtain transactId of addOnPermissionsChangeListener under android.content.pm.IPackageManager: No field TRANSACTION_addOnPermissionsChangeListener in class Landroid/content/pm/IPackageManager$Stub; (declaration of 'android.content.pm.IPackageManager$Stub' appears in /system/framework/framework.jar)
@@ -294,6 +302,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(createInputConsumer, 83);
+        transactIds.put(registerTaskFpsCallback, 130);
         // Failed to obtain transactId of requestUserActivityNotification under android.view.IWindowManager: No field TRANSACTION_requestUserActivityNotification in class Landroid/view/IWindowManager$Stub; (declaration of 'android.view.IWindowManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
         transactIds.put(clearWindowContentFrameStats, 75);
         transactIds.put(addKeyguardLockedStateListener, 33);
@@ -407,6 +416,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
         mDescriptorTransacts.put(DEVICE_POLICY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(getAvailableExtensionInterfaceNames, 5);
         transactIds.put(getCurrentTunedInfos, 39);
         mDescriptorTransacts.put(TV_INPUT_DESCRIPTOR, transactIds);
 

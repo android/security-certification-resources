@@ -561,7 +561,27 @@ public class MainActivity extends AppCompatActivity {
 
             queryTransactId(Transacts.CLOUDSEARCH_DESCRIPTOR, Transacts.search,
                     descriptorTransacts);
+            queryTransactId(Transacts.WALLPAPER_EFFECTS_GENERATION_DESCRIPTOR, Transacts.generateCinematicEffect,
+                    descriptorTransacts);
 
+            queryTransactId(Transacts.CLIPBOARD_DESCRIPTOR, Transacts.showAccessNotificationLocked,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.GAME_DESCRIPTOR, Transacts.setGameServiceProvider,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.registerTaskFpsCallback,
+                    descriptorTransacts);
+            queryTransactId(Transacts.GAME_DESCRIPTOR, Transacts.createGameSession,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.TV_INPUT_DESCRIPTOR,
+                    Transacts.getAvailableExtensionInterfaceNames,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.PACKAGE_DESCRIPTOR,
+                    Transacts.makeUidVisible,
+                    descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
         }

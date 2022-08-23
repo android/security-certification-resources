@@ -354,6 +354,22 @@ public class Transacts {
             "android.app.cloudsearch.ICloudSearchManager";
     public static final String search="search";
 
+    //WallPaperEffectsGenerationManager
+    public static final String WALLPAPER_EFFECTS_GENERATION_SERVICE =
+            "wallpaper_effects_generation";;
+    public static final String WALLPAPER_EFFECTS_GENERATION_DESCRIPTOR
+            = "android.app.wallpapereffectsgeneration.IWallpaperEffectsGenerationManager";
+    //generateCinematicEffect(in CinematicEffectRequest request,in ICinematicEffectListener listener);
+    public static final String generateCinematicEffect="generateCinematicEffect";
+    //GameManagerService#setGameServiceProvider(@Nullable String packageName)
+    public static final String setGameServiceProvider="setGameServiceProvider";
+    //WindowManagerService#registerTaskFpsCallback(@IntRange(from = 0) int taskId,ITaskFpsCallback callback)
+    public static final String registerTaskFpsCallback="registerTaskFpsCallback";
+    //TVManager
+    public static final String getAvailableExtensionInterfaceNames="getAvailableExtensionInterfaceNames";
+    //PackageManagerService#makeUidVisible
+    public static final String makeUidVisible="makeUidVisible";
+
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";
     public static final String getNextEntry = "getNextEntry";

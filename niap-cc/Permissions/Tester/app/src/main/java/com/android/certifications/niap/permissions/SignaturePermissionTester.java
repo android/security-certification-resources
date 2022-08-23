@@ -38,6 +38,7 @@ import android.app.UiAutomation;
 import android.app.UiModeManager;
 import android.app.WallpaperManager;
 import android.app.admin.DevicePolicyManager;
+import android.app.admin.SecurityLog;
 import android.app.blob.BlobHandle;
 import android.app.blob.BlobStoreManager;
 import android.app.role.IOnRoleHoldersChangedListener;
@@ -134,6 +135,7 @@ import android.telephony.TelephonyManager;
 import android.telephony.TelephonyScanManager;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.CaptioningManager;
@@ -175,6 +177,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.spec.ECGenParameterSpec;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -2206,6 +2209,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.Q, Build.VERSION_CODES.R, () -> {
                     // TOOD: May need to skip if the permission is granted as opening the new
                     // activity may interrupt the test app.
+                    //DevicePolicyManager.ACTION_
                     Intent intent = new Intent("com.android.settings.APP_OPEN_BY_DEFAULT_SETTINGS");
                     intent.setData(Uri.parse("package:" + mPackageName));
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -3918,7 +3922,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         keyStore.load(null);
 
                     } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
-                        e.printStackTrace();
+                        throw new UnexpectedPermissionTestFailureException(e);
                     }
 
 
@@ -4042,18 +4046,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.MANAGE_CLOUDSEARCH,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //ndroid.app.cloudsearch.CloudSearchManager;
-                    mLogger.logDebug("Test case for MANAGE_CLOUDSEARCH not implemented yet");
 
                     //in SearchRequest request, in ICloudSearchManagerCallback.aidl callBack
                     Class<?> clazzSearchBuilder = null;
-                    Class<?> clazzSearch = null;
-
                     Object searchRequest = null;
                     try {
                         clazzSearchBuilder = Class.forName("android.app.cloudsearch.SearchRequest$Builder");
-                        clazzSearch = Class.forName("android.app.cloudsearch.SearchRequest");
-                        mLogger.logDebug("Test case for MANAGE_CLOUDSEARCH not implemented yet"+clazzSearch.toString());
+                        //mLogger.logDebug("Test case for MANAGE_CLOUDSEARCH not implemented yet"+clazzSearch.toString());
                         Constructor constructor = clazzSearchBuilder.getConstructor(String.class);
                         Object builderObj = constructor.newInstance("test");
                         searchRequest = invokeReflectionCall(clazzSearchBuilder,
@@ -4063,56 +4062,90 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         mTransacts.invokeTransact(Transacts.CLOUDSEARCH_SERVICE, Transacts.CLOUDSEARCH_DESCRIPTOR,
                                 Transacts.search,searchRequest,null);
                     } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-                        e.printStackTrace();
+                        throw new UnexpectedPermissionTestFailureException(e);
                     }
 
 
                 }));
         mPermissionTasks.put(permission.MANAGE_WALLPAPER_EFFECTS_GENERATION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for MANAGE_WALLPAPER_EFFECTS_GENERATION not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    //Maybe we can put at least first parameter will look back this test suites later....
+                    mTransacts.invokeTransact(Transacts.WALLPAPER_EFFECTS_GENERATION_SERVICE,
+                            Transacts.WALLPAPER_EFFECTS_GENERATION_DESCRIPTOR,
+                            Transacts.generateCinematicEffect,
+                            null,null);
                 }));
         mPermissionTasks.put(permission.SUPPRESS_CLIPBOARD_ACCESS_NOTIFICATION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for SUPPRESS_CLIPBOARD_ACCESS_NOTIFICATION not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    mLogger.logDebug("[BLOCK] Found no proper way to check this permission as of now.");
+                    //ClipboardService#showAccessNotificationLocked
+
                 }));
         mPermissionTasks.put(permission.ACCESS_TV_SHARED_FILTER,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for ACCESS_TV_SHARED_FILTER not implemented yet");
+                    mLogger.logDebug("[BLOCK] Need TV tuner on the device for testing.");
                     //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
                     //       Transacts.unregisterCoexCallback, (Object) null);
+                    /*Class clazzTuner = null;
+                    try {
+                        clazzTuner = Class.forName("android.media.tv.tuner.Tuner");
+                        Constructor constructor = clazzTuner.getConstructor(Context.class,String.class,int.class);
+                        Object tunerObj = constructor.newInstance(mContext,null,100);
+                        mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(tunerObj.getClass(),"openSharedFilter").toString());
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    }*/
                 }));
         mPermissionTasks.put(permission.ADD_ALWAYS_UNLOCKED_DISPLAY,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for ADD_ALWAYS_UNLOCKED_DISPLAY not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+
+                    Class<?> clazzVDPBuilder = null;
+
+                    Object vdpObj = null;
+                    try {
+                        clazzVDPBuilder = Class.forName("android.companion.virtual.VirtualDeviceParams$Builder");
+                        Constructor constructor = clazzVDPBuilder.getConstructor();
+                        Object builderObj = constructor.newInstance();
+                        builderObj = invokeReflectionCall(clazzVDPBuilder, "setLockState", builderObj, new Class[]{int.class},0);
+                        invokeReflectionCall(clazzVDPBuilder, "build", builderObj, new Class[]{});
+                    } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
+                        throw new UnexpectedPermissionTestFailureException(e);
+                    }
                 }));
         mPermissionTasks.put(permission.SET_GAME_SERVICE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for SET_GAME_SERVICE not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    mTransacts.invokeTransact(Transacts.GAME_SERVICE, Transacts.GAME_DESCRIPTOR,
+                           Transacts.setGameServiceProvider, mContext.getPackageName());
                 }));
         mPermissionTasks.put(permission.ACCESS_FPS_COUNTER,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for ACCESS_FPS_COUNTER not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    /*final TaskFpsCallback callback = new TaskFpsCallback() {
+                        @Override
+                        public void onFpsReported(float fps) {
+                            // Ignore
+                        }
+                    };*/
+                    mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
+                           Transacts.registerTaskFpsCallback, 0,null);
                 }));
         mPermissionTasks.put(permission.MANAGE_GAME_ACTIVITY,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     mLogger.logDebug("Test case for MANAGE_GAME_ACTIVITY not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    // mTransacts.invokeTransact(Transacts.GAME_SERVICE, Transacts.GAME_DESCRIPTOR,
+                    //         Transacts.createGameSession, 0);
                 }));
         mPermissionTasks.put(permission.LAUNCH_DEVICE_MANAGER_SETUP,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     mLogger.logDebug("Test case for LAUNCH_DEVICE_MANAGER_SETUP not implemented yet");
+                    //new Intent( "android.app.action.ROLE_HOLDER_PROVISION_FINALIZATION");
                     //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
                     //       Transacts.unregisterCoexCallback, (Object) null);
                 }));
@@ -4121,37 +4154,50 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     mLogger.logDebug("Test case for UPDATE_DEVICE_MANAGEMENT_RESOURCES not implemented yet");
                     //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
                     //       Transacts.unregisterCoexCallback, (Object) null);
+
+                    //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(mDevicePolicyManager,"setS").toString());
                 }));
         mPermissionTasks.put(permission.READ_SAFETY_CENTER_STATUS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for READ_SAFETY_CENTER_STATUS not implemented yet");
+                    mLogger.logDebug("[BLOCK] require internal permission, MANAGE_SAFETY_CENTER permission to eval.");
+//                    Class<?> clazzSaftyCenter = null;
+//                    try {
+//                        clazzSaftyCenter = Class.forName("android.safetycenter.SafetyCenterManager");
+//                        Object saftyCenter = mContext.getSystemService(clazzSaftyCenter);
+//                        invokeReflectionCall(clazzSaftyCenter, "getSafetyCenterConfig", saftyCenter, new Class[]{});
+//                    } catch (ClassNotFoundException e){// | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
+//                        throw new UnexpectedPermissionTestFailureException(e);
+//                    }
+
                     //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
                     //       Transacts.unregisterCoexCallback, (Object) null);
                 }));
 
         mPermissionTasks.put(permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for SET_UNRESTRICTED_KEEP_CLEAR_AREAS not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    View view = new View(mContext);
+                    invokeReflectionCall(View.class, "setUnrestrictedPreferKeepClearRects",
+                            view, new Class[]{List.class},new ArrayList<>());
                 }));
         mPermissionTasks.put(permission.TIS_EXTENSION_INTERFACE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for TIS_EXTENSION_INTERFACE not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    //The tv_input service guarded by this permission is not available on this device
+                    mTransacts.invokeTransact(Transacts.TV_INPUT_SERVICE, Transacts.TV_INPUT_DESCRIPTOR,
+                           Transacts.getAvailableExtensionInterfaceNames);
                 }));
         mPermissionTasks.put(permission.WRITE_SECURITY_LOG,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for WRITE_SECURITY_LOG not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+
+                    SecurityLog log = new SecurityLog();
+                    invokeReflectionCall(SecurityLog.class, "writeEvent",
+                            log, new Class[]{int.class,Object[].class},0,new Object[]{});
+
                 }));
         mPermissionTasks.put(permission.MAKE_UID_VISIBLE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     mLogger.logDebug("Test case for MAKE_UID_VISIBLE not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    mTransacts.invokeTransact(Transacts.PACKAGE_SERVICE, Transacts.PACKAGE_DESCRIPTOR,
+                            Transacts.makeUidVisible,1200000,1300000);
                 }));
 
 
