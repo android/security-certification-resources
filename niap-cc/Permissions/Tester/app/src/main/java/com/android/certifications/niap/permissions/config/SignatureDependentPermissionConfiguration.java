@@ -104,8 +104,8 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         // RADIO_SCAN_WITHOUT_LOCATION in that it allows a network scan without a location
         // permission.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            permissions.add(permission.RADIO_SCAN_WITHOUT_LOCATION);
-            permissions.add(permission.NETWORK_SCAN);
+            //permissions.add(permission.RADIO_SCAN_WITHOUT_LOCATION);
+            //permissions.add(permission.NETWORK_SCAN);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -116,11 +116,12 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
 //            permissions.add(permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE);
 //            permissions.add(permission.BIND_TV_INTERACTIVE_APP);
 //            permissions.add(permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE);
-//            permissions.add(permission.LOCATION_BYPASS);
-//            permissions.add(permission.CONTROL_AUTOMOTIVE_GNSS);
+//              permissions.add(permission.LOCATION_BYPASS);
+//              permissions.add(permission.CONTROL_AUTOMOTIVE_GNSS);
 //            permissions.add(permission.MANAGE_WIFI_NETWORK_SELECTION);
 //            permissions.add(permission.MANAGE_WIFI_INTERFACES);
 //            permissions.add(permission.TRIGGER_LOST_MODE);
+//              permissions.add(permission.START_CROSS_PROFILE_ACTIVITIES);
 //            permissions.add(permission.QUERY_USERS);
 //            permissions.add(permission.QUERY_ADMIN_POLICY);
 //            permissions.add(permission.PROVISION_DEMO_DEVICE);
@@ -130,7 +131,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
 //            permissions.add(permission.READ_APP_SPECIFIC_LOCALES);
 //            permissions.add(permission.USE_ATTESTATION_VERIFICATION_SERVICE);
 //
-//            permissions.add(permission.REQUEST_UNIQUE_ID_ATTESTATION);
+            permissions.add(permission.REQUEST_UNIQUE_ID_ATTESTATION);
 //
 //            permissions.add(permission.SET_SYSTEM_AUDIO_CAPTION);
 //            permissions.add(permission.REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL);
@@ -158,14 +159,14 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
 //            permissions.add(permission.ACCESS_FPS_COUNTER);
 //            permissions.add(permission.MANAGE_GAME_ACTIVITY);
 
-            permissions.add(permission.LAUNCH_DEVICE_MANAGER_SETUP);
-            permissions.add(permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES);
-            permissions.add(permission.READ_SAFETY_CENTER_STATUS);
-
-            permissions.add(permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS);
-            permissions.add(permission.TIS_EXTENSION_INTERFACE);
-            permissions.add(permission.WRITE_SECURITY_LOG);
-            permissions.add(permission.MAKE_UID_VISIBLE);
+//            permissions.add(permission.LAUNCH_DEVICE_MANAGER_SETUP);
+//            permissions.add(permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES);
+//            permissions.add(permission.READ_SAFETY_CENTER_STATUS);
+//
+//            permissions.add(permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS);
+//            permissions.add(permission.TIS_EXTENSION_INTERFACE);
+//            permissions.add(permission.WRITE_SECURITY_LOG);
+//            permissions.add(permission.MAKE_UID_VISIBLE);
 
 
         }
