@@ -187,6 +187,9 @@ class PlatformSignature(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger):
+    if api_level == 33:
+      logger.debug("Returning TPlatformSignature")
+      return TPlatformSignature(logger)
     if api_level == 31:
       logger.debug("Returning SPlatformSignature")
       return SPlatformSignature(logger)
@@ -311,6 +314,11 @@ class SPlatformSignature(PlatformSignature):
   BASE_SCORE = 45
 
 
+class TPlatformSignature(PlatformSignature):
+  API_LEVEL = 33
+  BASE_SCORE = 50
+
+
 class SystemUid(RiskAnalyzer):
   """Analyzer for system uid risks.
   """
@@ -324,6 +332,9 @@ class SystemUid(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger):
+    if api_level == 33:
+      logger.debug("Returning TSystemUid")
+      return TSystemUid(logger)
     if api_level == 31:
       logger.debug("Returning SSystemUid")
       return SSystemUid(logger)
@@ -405,6 +416,11 @@ class RSystemUid(SystemUid):
 class SSystemUid(SystemUid):
   API_LEVEL = 31
   BASE_SCORE = 25
+
+
+class TSystemUid(SystemUid):
+  API_LEVEL = 33
+  BASE_SCORE = 30
 
 
 class RiskyPermissions(RiskAnalyzer):
@@ -505,6 +521,8 @@ class RiskyPermissions(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger, google_discount=False):
+    if api_level == 33:
+      return TRiskyPermissions(logger, google_discount)
     if api_level == 31:
       return SRiskyPermissions(logger, google_discount)
     if api_level == 30:
@@ -728,6 +746,12 @@ class SRiskyPermissions(RiskyPermissions):
   UNGRANTED_SCORE = 175
 
 
+class TRiskyPermissions(RiskyPermissions):
+  API_LEVEL = 33
+  BASE_SCORE = 500
+  UNGRANTED_SCORE = 200
+
+
 class CleartextTraffic(RiskAnalyzer):
   """Cleartext traffic risk analyzer.
 
@@ -739,6 +763,8 @@ class CleartextTraffic(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger, google_discount=False):
+    if api_level == 33:
+      return TCleartextTraffic(logger, google_discount)
     if api_level == 31:
       return SCleartextTraffic(logger, google_discount)
     if api_level == 30:
@@ -856,6 +882,10 @@ class RCleartextTraffic(CleartextTraffic):
 
 class SCleartextTraffic(CleartextTraffic):
   BASE_SCORE = 8
+
+
+class TCleartextTraffic(CleartextTraffic):
+  BASE_SCORE = 9
 
 
 class HostileDownloader(RiskAnalyzer):
