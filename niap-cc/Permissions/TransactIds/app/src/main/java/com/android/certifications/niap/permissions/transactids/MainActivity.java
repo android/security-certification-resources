@@ -558,6 +558,8 @@ public class MainActivity extends AppCompatActivity {
 
             queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.setInTouchMode,
                     descriptorTransacts);
+            queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.getInTouchMode,
+                    descriptorTransacts);
 
             queryTransactId(Transacts.CLOUDSEARCH_DESCRIPTOR, Transacts.search,
                     descriptorTransacts);
@@ -581,6 +583,16 @@ public class MainActivity extends AppCompatActivity {
 
             queryTransactId(Transacts.PACKAGE_DESCRIPTOR,
                     Transacts.makeUidVisible,
+                    descriptorTransacts);
+            queryTransactId(Transacts.APP_OPS_DESCRIPTOR,
+                    Transacts.getHistoricalOps,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
+                    Transacts.setStrings,
+                    descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
+                    Transacts.getString,
                     descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);

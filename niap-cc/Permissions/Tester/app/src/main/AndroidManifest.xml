@@ -30,7 +30,9 @@
         tools:ignore="HardcodedDebugMode">
         <activity
             android:name=".activities.TestActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop" >
+
+        </activity>
         <activity
             android:name=".activities.MainActivity"
             android:launchMode="singleTop"

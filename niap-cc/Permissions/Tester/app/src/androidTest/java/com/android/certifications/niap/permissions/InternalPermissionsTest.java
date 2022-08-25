@@ -26,9 +26,11 @@ import android.app.UiAutomation;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
+import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 
 import org.junit.After;
 import org.junit.Before;
@@ -63,9 +65,10 @@ public class InternalPermissionsTest {
         mPermissions.add(permission.PERFORM_IMS_SINGLE_REGISTRATION);
 
         mPermissions.add(permission.SET_DEFAULT_ACCOUNT_FOR_CONTACTS);
-        mPermissions.add(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE);
-        mPermissions.add(permission.CREATE_VIRTUAL_DEVICE);
-        mPermissions.add(permission.ACCESS_AMBIENT_CONTEXT_EVENT);
+        //mPermissions.add(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE);
+        //mPermissions.add(permission.CREATE_VIRTUAL_DEVICE);
+        //mPermissions.add(permission.ACCESS_AMBIENT_CONTEXT_EVENT);
+        //mPermissions.add(permission.WRITE_SECURITY_LOG);
         //mPermissions.add(permission.PERFORM_IMS_SINGLE_REGISTRATION);
 
     }
@@ -86,11 +89,15 @@ public class InternalPermissionsTest {
         mUiAutomation.dropShellPermissionIdentity();
     }
 
+
     @Test
     public void runPermissionTests_shellIdentity_apisSuccessful() throws Exception {
         InternalPermissionTester permissionTester = new InternalPermissionTester(
                 new InternalTestConfiguration(mPermissions), rule.getActivity());
-        mUiAutomation.adoptShellPermissionIdentity();
+        //mUiAutomation.adoptShellPermissionIdentity();
+        //For query contacts
+        mUiAutomation.grantRuntimePermission(null,"android.permission.QUERY_ALL_PACKAGES");
+        //mUiAutomation.adoptShellPermissionIdentity(permission.WRITE_SECURITY_LOG);
 
         assertTrue(permissionTester.runPermissionTests());
     }

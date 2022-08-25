@@ -326,7 +326,7 @@ public class Transacts {
 
     //WindowManager
     public static final String setInTouchMode = "setInTouchMode";
-    //public static final String getInTouchMode = "getInTouchMode";
+    public static final String getInTouchMode = "getInTouchMode";
 
     //CloudSearchManager
     public static final String CLOUDSEARCH_SERVICE = "cloudsearch";//Context.CLOUD_SEARCH
@@ -355,7 +355,11 @@ public class Transacts {
     public static final String getAvailableExtensionInterfaceNames="getAvailableExtensionInterfaceNames";
     //PackageManagerService#makeUidVisible
     public static final String makeUidVisible="makeUidVisible";
-
+    //AppOpsService
+    public static final String getHistoricalOps="getHistoricalOps";
+    //DevicePolicyManager#
+    public static final String setStrings="setStrings";
+    public static final String getString="getString";
 
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";

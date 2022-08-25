@@ -55,7 +55,7 @@ import static android.Manifest.permission.WAKE_LOCK;
 import static android.Manifest.permission.WRITE_SYNC_SETTINGS;
 import static android.Manifest.permission.READ_BASIC_PHONE_STATE;
 import static android.Manifest.permission.USE_EXACT_ALARM;
-
+import static android.Manifest.permission.READ_NEARBY_STREAMING_POLICY;
 
 import static com.android.certifications.niap.permissions.Constants.EXTRA_PERMISSION_GRANTED;
 import static com.android.certifications.niap.permissions.Constants.EXTRA_PERMISSION_NAME;
@@ -122,6 +122,8 @@ import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
 import com.android.certifications.niap.permissions.services.TestService;
+import com.android.certifications.niap.permissions.utils.SignaturePermissions;
+import com.android.certifications.niap.permissions.utils.Transacts;
 
 import java.net.ServerSocket;
 import java.net.SocketException;
@@ -660,6 +662,22 @@ public class InstallPermissionTester extends BasePermissionTester {
                     alarmManager.cancel(pendingIntent);
 
                 }));
+
+        mPermissionTasks.put(READ_NEARBY_STREAMING_POLICY,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                        //This permission's category has been moved to install after Android T
+
+                        // DevicePolicyManagerService first checks if this feature is available before
+                        // performing the permission check.
+                        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN)) {
+                            throw new BypassTestException("This permission requires feature "
+                                    + PackageManager.FEATURE_DEVICE_ADMIN);
+                        }
+                        mTransacts.invokeTransact(Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.getNearbyNotificationStreamingPolicy, 0);
+                    }
+                ));
     }
 
     /**

@@ -314,6 +314,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(setAnimationScale, 39);
         transactIds.put(removeWindowToken, 18);
         transactIds.put(thawRotation, 52);
+        // Failed to obtain transactId of getInTouchMode under android.view.IWindowManager: No field TRANSACTION_getInTouchMode in class Landroid/view/IWindowManager$Stub; (declaration of 'android.view.IWindowManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
         transactIds.put(registerShortcutKey, 82);
         transactIds.put(overridePendingAppTransitionRemote, 23);
         mDescriptorTransacts.put(WINDOW_DESCRIPTOR, transactIds);
@@ -321,6 +322,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds = new HashMap<>();
         transactIds.put(clearHistory, 26);
         transactIds.put(setUserRestriction, 34);
+        transactIds.put(getHistoricalOps, 19);
         transactIds.put(getUidOps, 28);
         transactIds.put(noteOperation, 2);
         mDescriptorTransacts.put(APP_OPS_DESCRIPTOR, transactIds);
@@ -409,9 +411,11 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(installCaCert, 100);
         transactIds.put(getNearbyNotificationStreamingPolicy, 58);
         // Failed to obtain transactId of markProfileOwnerOnOrganizationOwnedDevice under android.app.admin.IDevicePolicyManager: No field TRANSACTION_markProfileOwnerOnOrganizationOwnedDevice in class Landroid/app/admin/IDevicePolicyManager$Stub; (declaration of 'android.app.admin.IDevicePolicyManager$Stub' appears in /system/framework/framework.jar)
+        transactIds.put(setStrings, 359);
         transactIds.put(forceSecurityLogs, 260);
         transactIds.put(getDoNotAskCredentialsOnBoot, 220);
         transactIds.put(clearSystemUpdatePolicyFreezePeriodRecord, 217);
+        transactIds.put(getString, 361);
         transactIds.put(setDeviceOwner, 78);
         mDescriptorTransacts.put(DEVICE_POLICY_DESCRIPTOR, transactIds);
 
