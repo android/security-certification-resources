@@ -46,7 +46,13 @@ import com.google.android.material.snackbar.Snackbar;
 import com.android.certifications.niap.tests.SDPAuthFailureTestWorker;
 import com.android.certifications.niap.tests.SDPTestWorker;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URLConnection;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static com.android.certifications.niap.EncryptedDataService.START_FOREGROUND_ACTION;
@@ -141,27 +147,31 @@ public class MainActivity extends FragmentActivity {
                 .beginWith(sdpTestWorker)
                 .then(sdpFailureTestWorker)
                 .enqueue();
-
-        try {
-            new AsyncTask<Void, Void, Void>() {
-                protected Void doInBackground(Void... unused) {
-                    try {
-                        SecureConfig secureConfig = SecureConfig.getStrongConfig();
-                        SecureURL secureURL = new SecureURL("google.com", null);
-                        URLConnection conn = secureURL.openConnection();
-                        conn.connect();
-
-                    } catch(Exception ex) {
-                        Log.e(TAG, "SecureURL Failure: " + ex.getMessage());
-                        Log.e(TAG, ex.getStackTrace().toString());
-                    }
-                    return null;
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<?> future = executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    SecureConfig secureConfig = SecureConfig.getStrongConfig();
+                    SecureURL secureURL = new SecureURL("https://www.google.com", null);
+                    URLConnection conn = secureURL.openConnection();
+                    conn.connect();
+                } catch (MalformedURLException ex) {
+                    Log.e(TAG, "SecureURL Failure: " + ex.getMessage());
+                    Log.e(TAG, ex.toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            }.execute();
 
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            }
+        });
+        executor.shutdown();
+        try {
+            future.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
 
     }
@@ -180,7 +190,7 @@ public class MainActivity extends FragmentActivity {
 
         Log.i(TAG, "Encrypting " + new String(clearText));
 
-        SecureCipher secureCipher = SecureCipher.getDefault(biometricSupport);
+        SecureCipher secureCipher = SecureCipher.getDefault(SecureConfig.getDefault(biometricSupport));
         secureCipher.encryptSensitiveDataAsymmetric(
                 "OAEP_TESTING_RSA",
                 clearText,

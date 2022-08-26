@@ -67,7 +67,7 @@ public class SDPTestWorker extends Worker {
             // Write SDP File
             BiometricSupport biometricSupport = new BiometricSupportImpl(
                     MainActivity.thisActivity,
-                    getApplicationContext()) {
+                    getApplicationContext(),false) {
                 @Override
                 public void onAuthenticationSucceeded() {
                     TestUtil.logSuccess(getClass(), "SDP Biometric Unlock Succeeded, " +
@@ -77,12 +77,6 @@ public class SDPTestWorker extends Worker {
                 @Override
                 public void onAuthenticationFailed() {
                     TestUtil.logFailure(getClass(), "SDP Biometric Unlock failed, " +
-                            "file not available for decryption.");
-                }
-
-                @Override
-                public void onAuthenticationCancelled() {
-                    TestUtil.logFailure(getClass(), "SDP Biometric Unlock cancelled, " +
                             "file not available for decryption.");
                 }
 
@@ -114,7 +108,7 @@ public class SDPTestWorker extends Worker {
                     FileOutputStream.class);
             FileOutputStream outputStream = secureContext.openEncryptedFileOutput(
                     FILE_NAME,
-                    Context.MODE_PRIVATE, KEY_PAIR_ALIAS);
+                    Context.MODE_PRIVATE, KEY_PAIR_ALIAS,true);
             TestUtil.logSuccess(
                     getClass(),
                     "Writing SDP file encrypted contents to " + FILE_NAME,
@@ -136,6 +130,7 @@ public class SDPTestWorker extends Worker {
             secureContext.openEncryptedFileInput(
                     FILE_NAME,
                     Executors.newSingleThreadExecutor(),
+                    true,
                     inputStream -> {
                 try {
                     byte[] encodedData = new byte[inputStream.available()];
