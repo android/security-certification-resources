@@ -3904,7 +3904,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.REQUEST_COMPANION_SELF_MANAGED,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-
                     if (!mPackageManager.hasSystemFeature(
                             PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
                         throw new BypassTestException(
@@ -4156,21 +4155,18 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             "getWallpaperDimAmount", wallpaperManager,
                             new Class[]{});
                 }));
+
         mPermissionTasks.put(permission.MANAGE_WEAK_ESCROW_TOKEN,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) {
                         throw new BypassTestException("This permission requires feature "
                                 + PackageManager.FEATURE_AUTOMOTIVE);
                     }
-                    try {
-                        invokeReflectionCall(mKeyguardManager.getClass(),
-                                "isWeakEscrowTokenActive", mKeyguardManager,
-                                new Class[]{long.class, UserHandle.class}, 100L, UserHandle.getUserHandleForUid(mUid));
-                    } catch (IllegalStateException e){
-                        mLogger.logDebug("Intended Exception. Weak escrow token are only for automotive devices.");
-                        e.printStackTrace();
-                    }
+                    invokeReflectionCall(mKeyguardManager.getClass(),
+                            "isWeakEscrowTokenActive", mKeyguardManager,
+                            new Class[]{long.class, UserHandle.class}, 100L, UserHandle.getUserHandleForUid(mUid));
                 }));
+
         mPermissionTasks.put(permission.START_REVIEW_PERMISSION_DECISIONS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) {

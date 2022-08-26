@@ -453,17 +453,8 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         // android.permission.USE_CREDENTIALS has been removed.
 
-        mPermissionTasks.put(USE_FINGERPRINT,
-                new PermissionTest(false, () -> {
-                    FingerprintManager fingerprintManager =
-                            (FingerprintManager) mContext.getSystemService(
-                                    Context.FINGERPRINT_SERVICE);
-                    if (fingerprintManager == null) {
-                        throw new BypassTestException(
-                                "The FingerprintManager is not available on this device");
-                    }
-                    fingerprintManager.hasEnrolledFingerprints();
-                }));
+        // android.permission.USE_FINGERPRINT has been removed (as of SDK level 28)
+
 
         mPermissionTasks.put(VIBRATE, new PermissionTest(false, () -> mVibrator
                 .vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))));
@@ -653,6 +644,8 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(USE_EXACT_ALARM,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    // USE_EXACT_ALARM is the install permission that is the
+                    // differenceies against the SCHEDULE_EXACT_ALRAM
                     Intent intent = new Intent(mContext, MainActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent,
                             PendingIntent.FLAG_IMMUTABLE);
@@ -660,7 +653,6 @@ public class InstallPermissionTester extends BasePermissionTester {
                     alarmManager.setExact(AlarmManager.RTC, System.currentTimeMillis() + 60 * 1000,
                             pendingIntent);
                     alarmManager.cancel(pendingIntent);
-
                 }));
 
         mPermissionTasks.put(READ_NEARBY_STREAMING_POLICY,

@@ -34,7 +34,7 @@ public class Constants {
      * Indicates whether the {@link ConfigurationFactory}
      * should return a debug configuration
      */
-    public static final boolean USE_DEBUG_CONFIG = false;
+    public static final boolean USE_DEBUG_CONFIG = true;
     /**
      * Indicates whether the {@link PrivilegedPermissionTester} should be used to test platform
      * declared signature protection level permissions with the privileged protection flag. This

@@ -47,8 +47,8 @@ class DebugConfiguration implements TestConfiguration {
         // tested.
         List<BasePermissionTester> permissionTesters = new ArrayList<>();
         //permissionTesters.add(new SignaturePermissionTester(this, activity));
-        //permissionTesters.add(new InstallPermissionTester(this, activity));
-        permissionTesters.add(new RuntimePermissionTester(this, activity));
+        permissionTesters.add(new InstallPermissionTester(this, activity));
+        //permissionTesters.add(new RuntimePermissionTester(this, activity));
 
         return permissionTesters;
     }

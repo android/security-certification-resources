@@ -591,12 +591,11 @@ public class RuntimePermissionTester extends BasePermissionTester {
             Notification notification =
                     new Notification.Builder(mContext, TAG)
                             .setContentTitle(resources.getText(
-                                    R.string.full_screen_intent_notification_title))
+                                    R.string.notificaton_title))
                             .setContentText(resources.getText(
-                                    R.string.full_screen_intent_notification_message))
+                                    R.string.intent_notification_message))
                             .setSmallIcon(R.drawable.ic_launcher_foreground)
                             .setContentIntent(pendingIntent)
-                            .setFullScreenIntent(pendingIntent, false)
                             .build();
 
             notificationManager.notify(0, notification);
