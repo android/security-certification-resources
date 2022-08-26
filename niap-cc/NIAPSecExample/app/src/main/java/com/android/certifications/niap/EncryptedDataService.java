@@ -85,12 +85,6 @@ public class EncryptedDataService extends IntentService {
                 onMessage(BIOMETRIC_AUTH + " Failed");
             }
 
-            /*
-            @Override
-            public void onAuthenticationCancelled() {
-                showMessage(BIOMETRIC_AUTH + " Cancelled!");
-            }*/
-
             @Override
             public void onMessage(String message) {
                 showMessage(message);
