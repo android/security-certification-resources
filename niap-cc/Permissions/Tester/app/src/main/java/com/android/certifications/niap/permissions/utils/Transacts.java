@@ -373,6 +373,13 @@ public class Transacts {
     //DevicePolicyManager#
     public static final String setStrings="setStrings";
     public static final String getString="getString";
+    public static final String getPermittedInputMethodsAsUser="getPermittedInputMethodsAsUser";
+
+    public static final String dispatchMessage="dispatchMessage";
+    //int startActivityFromGameSession(IApplicationThread caller, in String callingPackage,
+    //                                in String callingFeatureId, int callingPid, int callingUid, in Intent intent,
+    //                                int taskId, int userId);
+    public static final String startActivityFromGameSession="startActivityFromGameSession";
 
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";
@@ -2492,7 +2499,10 @@ public class Transacts {
                             + mDeviceApiLevel);
         }
         int transactId = getTransactId(descriptor, transactName);
+        Class remoteCallbackClass;
+
         try {
+            remoteCallbackClass = Class.forName("android.os.RemoteCallback");
             Parcel reply = Parcel.obtain();
             // Write all of the provided parameters to the data Parcel to be passed to the transact.
             // Each parameter must be written to the Parcel based on its class; if any new classes
@@ -2554,7 +2564,14 @@ public class Transacts {
                 } else if (parameter instanceof NetworkCapabilities) {
                     data.writeInt(1);
                     ((NetworkCapabilities) parameter).writeToParcel(data, 0);
+                } else if (remoteCallbackClass.isInstance(parameter)) {
+
+                    data.writeInt(0);
+                    ReflectionUtils.invokeReflectionCall(remoteCallbackClass,"writeToParcel",
+                            parameter,new Class[]{Parcel.class,int.class},data,0);
+
                 } else if (parameter instanceof Parcelable) {
+
                     data.writeInt(1);
                     ((Parcelable) parameter).writeToParcel(data, 0);
                 }
@@ -2569,6 +2586,8 @@ public class Transacts {
             } else {
                 throw new BasePermissionTester.UnexpectedPermissionTestFailureException(re);
             }
+        } catch(ClassNotFoundException re) {
+            throw new BasePermissionTester.UnexpectedPermissionTestFailureException(re);
         }
     }
 }

@@ -30,12 +30,18 @@
         tools:ignore="HardcodedDebugMode">
         <activity
             android:name=".activities.TestActivity"
-            android:launchMode="singleTop" >
-
+            android:launchMode="singleTop"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="android.permission.action.ACTION_VIEW_APP_FEATURES" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".activities.MainActivity"
             android:launchMode="singleTop"
+            android:theme="@style/AppTheme.NoActionBar"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,6 +54,20 @@
         <service
             android:name=".services.TestService"
             android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE" />
+
+        <receiver
+            android:name=".receivers.Admin"
+            android:permission="android.permission.BIND_DEVICE_ADMIN"
+            android:exported="true">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/admin"/>
+            <intent-filter>
+                <action
+                    android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+
+            </intent-filter>
+        </receiver>
 
     </application>
 

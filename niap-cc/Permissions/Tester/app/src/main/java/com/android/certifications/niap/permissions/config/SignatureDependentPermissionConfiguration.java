@@ -121,9 +121,9 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
 //            permissions.add(permission.MANAGE_WIFI_NETWORK_SELECTION);
 //            permissions.add(permission.MANAGE_WIFI_INTERFACES);
 //            permissions.add(permission.TRIGGER_LOST_MODE);
-//              permissions.add(permission.START_CROSS_PROFILE_ACTIVITIES);
+              permissions.add(permission.START_CROSS_PROFILE_ACTIVITIES);
 //            permissions.add(permission.QUERY_USERS);
-//            permissions.add(permission.QUERY_ADMIN_POLICY);
+            permissions.add(permission.QUERY_ADMIN_POLICY);
 //            permissions.add(permission.PROVISION_DEMO_DEVICE);
 //            permissions.add(permission.REQUEST_COMPANION_PROFILE_APP_STREAMING);
 //            permissions.add(permission.REQUEST_COMPANION_PROFILE_COMPUTER);
@@ -149,26 +149,26 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
 //            permissions.add(permission.CHANGE_APP_LAUNCH_TIME_ESTIMATE);
 //            permissions.add(permission.SET_WALLPAPER_DIM_AMOUNT);
 //            permissions.add(permission.MANAGE_WEAK_ESCROW_TOKEN);
-            permissions.add(permission.START_REVIEW_PERMISSION_DECISIONS);
-//            permissions.add(permission.START_VIEW_APP_FEATURES);
+ //           permissions.add(permission.START_REVIEW_PERMISSION_DECISIONS);
+ //           permissions.add(permission.START_VIEW_APP_FEATURES);
 //
 //            permissions.add(permission.MANAGE_CLOUDSEARCH);
 //            permissions.add(permission.MANAGE_WALLPAPER_EFFECTS_GENERATION);
 //            permissions.add(permission.SUPPRESS_CLIPBOARD_ACCESS_NOTIFICATION);
 //
             //permissions.add(permission.ACCESS_TV_SHARED_FILTER);
-//            permissions.add(permission.ADD_ALWAYS_UNLOCKED_DISPLAY);
+            permissions.add(permission.ADD_ALWAYS_UNLOCKED_DISPLAY);
             //permissions.add(permission.SET_GAME_SERVICE);
             //permissions.add(permission.ACCESS_FPS_COUNTER);
-//            permissions.add(permission.MANAGE_GAME_ACTIVITY);
+            permissions.add(permission.MANAGE_GAME_ACTIVITY);
 //            permissions.add(permission.LAUNCH_DEVICE_MANAGER_SETUP);
 //            permissions.add(permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES);
 //            permissions.add(permission.READ_SAFETY_CENTER_STATUS);
 //
-            permissions.add(permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS);
-            permissions.add(permission.TIS_EXTENSION_INTERFACE);
-            permissions.add(permission.WRITE_SECURITY_LOG);
-            permissions.add(permission.MAKE_UID_VISIBLE);
+//            permissions.add(permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS);
+//            permissions.add(permission.TIS_EXTENSION_INTERFACE);
+//            permissions.add(permission.WRITE_SECURITY_LOG);
+//            permissions.add(permission.MAKE_UID_VISIBLE);
 
 
         }

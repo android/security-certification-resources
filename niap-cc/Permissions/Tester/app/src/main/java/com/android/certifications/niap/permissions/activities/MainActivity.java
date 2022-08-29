@@ -21,6 +21,8 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -29,11 +31,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.R;
@@ -42,6 +51,7 @@ import com.android.certifications.niap.permissions.config.ConfigurationFactory;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
+import com.android.certifications.niap.permissions.receivers.Admin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,10 +66,14 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "PermissionTesterActivity";
     private static Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
 
+    private static final int ADMIN_INTENT = 1;
+
     private TextView mStatusTextView;
     private List<Button> mTestButtons = new ArrayList<>();
     private Context mContext;
     private TestConfiguration mConfiguration;
+    private DevicePolicyManager mDevicePolicyManager;
+    private ComponentName mComponentName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         mContext = this;
         LinearLayout layout = findViewById(R.id.mainLayout);
+
         mStatusTextView = new TextView(this);
         mStatusTextView.setText(R.string.tap_to_run);
         mStatusTextView.setGravity(Gravity.CENTER);
@@ -84,15 +99,57 @@ public class MainActivity extends AppCompatActivity {
         List<TestConfiguration> configurations = ConfigurationFactory.getConfigurations(this);
         for (TestConfiguration configuration : configurations) {
             Button testButton = new Button(this);
+
             testButton.setText(configuration.getButtonTextId());
+            //testButton.getLayoutParams().width = 640;
             testButton.setOnClickListener((view) -> {
                 new PermissionTesterAsyncTask().execute(configuration);
             });
             layout.addView(testButton);
             mTestButtons.add(testButton);
         }
-    }
 
+        mDevicePolicyManager = (DevicePolicyManager)getSystemService(
+                Context.DEVICE_POLICY_SERVICE);
+        mComponentName = new ComponentName(this, Admin.class);
+
+        //ActionBar actionbar = getSupportActionBar();
+       
+        Toolbar toolBar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolBar);
+
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        //menu.findItem(R.id.action_force_chrome).setChecked(viewModel.isForceChrome.get());
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id){
+            case R.id.action_device_admin_test:
+                if (mDevicePolicyManager.isAdminActive(mComponentName)) {
+                    //mDevicePolicyManager.lockNow();
+                } else {
+                    //Log.d("LockScreen", "admin not active");
+                    Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+                    intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mComponentName);
+                    intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Administrator description");
+                    startActivityForResult(intent, ADMIN_INTENT);
+                }
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
     /**
      * {@link AsyncTask} used to drive the permission test execution using the hooks provided by the
      * {@link TestConfiguration}.
@@ -161,6 +218,18 @@ public class MainActivity extends AppCompatActivity {
 
             for (Button button : mTestButtons) {
                 button.setEnabled(true);
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ADMIN_INTENT) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(getApplicationContext(), "Registered As Admin", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Failed to register as Admin", Toast.LENGTH_SHORT).show();
             }
         }
     }

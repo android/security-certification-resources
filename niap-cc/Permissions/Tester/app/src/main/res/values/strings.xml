@@ -45,4 +45,5 @@
   <string name="exception_permission_consent">Caught an exception waiting for permission consent: %1$s</string>
     <string name="notificaton_title">POST_NOTIFICATIONS test</string>
   <string name="intent_notification_message">POST_NOTIFICATIONS works!</string>
+    <string name="device_admin_test">Device Admin Test</string>
 </resources>

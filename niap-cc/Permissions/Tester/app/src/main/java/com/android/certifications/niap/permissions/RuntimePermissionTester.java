@@ -566,7 +566,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(BODY_SENSORS_BACKGROUND, new PermissionTest(false, () -> {
             if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE)) {
                 throw new BypassTestException(
-                        "A heard rate monitor is not available to run this test");
+                        "A hearr rate monitor is not available to run this test");
             }
             Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
             if (sensor == null) {

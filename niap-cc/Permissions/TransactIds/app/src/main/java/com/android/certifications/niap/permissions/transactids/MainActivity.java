@@ -594,6 +594,17 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
                     Transacts.getString,
                     descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
+                    Transacts.getPermittedInputMethodsAsUser,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.COMPANION_DEVICE_DESCRIPTOR,
+                    Transacts.dispatchMessage,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.ACTIVITY_TASK_DESCRIPTOR,
+                    Transacts.startActivityFromGameSession,
+                    descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
         }

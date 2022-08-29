@@ -349,8 +349,6 @@ public class Transacts {
     //WindowManagerService#registerTaskFpsCallback(@IntRange(from = 0) int taskId,ITaskFpsCallback callback)
     public static final String registerTaskFpsCallback="registerTaskFpsCallback";
 
-    //public static final String GAME_CONTROLLER_SERVICE =""
-    //public static final String GAME_CONTROLLER_DESCRIPTOR = "android.service.games. IGameServiceController";
     //TVManager
     public static final String getAvailableExtensionInterfaceNames="getAvailableExtensionInterfaceNames";
     //PackageManagerService#makeUidVisible
@@ -360,6 +358,15 @@ public class Transacts {
     //DevicePolicyManager#
     public static final String setStrings="setStrings";
     public static final String getString="getString";
+    public static final String getPermittedInputMethodsAsUser="getPermittedInputMethodsAsUser";
+
+    public static final String dispatchMessage="dispatchMessage";
+    //ActivityTaskManagerService
+    //int startActivityFromGameSession(IApplicationThread caller, in String callingPackage,
+    //                                in String callingFeatureId, int callingPid, int callingUid, in Intent intent,
+    //                                int taskId, int userId);
+    public static final String startActivityFromGameSession="startActivityFromGameSession";
+
 
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";

@@ -25,9 +25,12 @@ import android.app.admin.DeviceAdminReceiver;
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.SecurityLog;
 import android.companion.AssociationInfo;
+import android.companion.AssociationRequest;
+import android.companion.CompanionDeviceManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.Signature;
@@ -71,6 +74,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
@@ -184,11 +188,10 @@ public class InternalPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.SET_DEFAULT_ACCOUNT_FOR_CONTACTS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         Intent _intent = new Intent(ContactsContract.Settings.ACTION_SET_DEFAULT_ACCOUNT);
                         PackageManager packageManager = mContext.getPackageManager();
                         List<ResolveInfo> resolveInfoList = packageManager.queryIntentActivities(_intent, 0);
-                        //mLogger.logDebug(""+resolveInfoList.toString());
                         if(resolveInfoList.size()>0){
                             String packageName = resolveInfoList.get(0).activityInfo.packageName;
                             String activityName = resolveInfoList.get(0).activityInfo.name;
@@ -199,33 +202,13 @@ public class InternalPermissionTester extends BasePermissionTester {
                             //mLogger.logDebug("Intent>"+intent.toString());
                             mContext.startActivity(intent);
                         }
-                        /*for (ResolveInfo resolveInfo : resolveInfoList) {
-                            String packageName = resolveInfo.activityInfo.packageName;
-
-                        }*/
-                        /*try {
-                            //Because it's a internal class of the Conatcts application, couldn't take from reflection
-                            Class cpClazz = Class.forName("com.android.contacts.preference.ContactsPreferences");
-                            Constructor cpConstructor = cpClazz.getConstructor(Context.class);
-                            Object cpObject = cpConstructor.newInstance(mContext);
-                            Method testMethod = cpClazz.getMethod("clearDefaultAccount");
-                            testMethod.invoke(cpObject);
-                        } catch (ClassNotFoundException | NoSuchMethodException e) {
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (InstantiationException e) {
-                            e.printStackTrace();
-                        }*/
                     }
                 }));
 
         mPermissionTasks.put(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     //WindowManagerService#addKeyguardLockedStateListener.
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         KeyguardManager.KeyguardLockedStateListener listener =
                                 new KeyguardManager.KeyguardLockedStateListener() {
                             @Override
@@ -237,14 +220,27 @@ public class InternalPermissionTester extends BasePermissionTester {
                     }
 
                 }));
-
+        mPermissionTasks.put(permission.SEND_SAFETY_CENTER_UPDATE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    //SafetyCenterManager#getSafetySourceData requrires this permissons
+                    //Context.SAFETY_CENTER_SERVI
+                    //afetyCentermContext.getSystemService();
+                    Class<?> clazzSaftyCenter = null;
+                    try {
+                        clazzSaftyCenter = Class.forName("android.safetycenter.SafetyCenterManager");
+                        Object saftyCenter = mContext.getSystemService(clazzSaftyCenter);
+                        invokeReflectionCall
+                                (clazzSaftyCenter, "getSafetySourceData",
+                                        saftyCenter, new Class[]{String.class},"GooglePlaySystemUpdate");
+                    } catch (ClassNotFoundException e){// | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
+                        throw new UnexpectedPermissionTestFailureException(e);
+                    }
+                })
+        );
         mPermissionTasks.put(permission.CREATE_VIRTUAL_DEVICE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     try {
-                        //VirtualDeviceParams originalParams = new VirtualDeviceParams.Builder()
-                        //        .setLockState(VirtualDeviceParams.LOCK_STATE_ALWAYS_UNLOCKED)
-                        //        .setUsersWithMatchingAccounts(Set.of(UserHandle.of(123), UserHandle.of(456)))
-                        //        .build();
+
                         Class<?> clazzVDPBuilder = null;
 
                         clazzVDPBuilder = Class.forName("android.companion.virtual.VirtualDeviceParams$Builder");
@@ -254,7 +250,7 @@ public class InternalPermissionTester extends BasePermissionTester {
                         Object vdpParams =
                                 invokeReflectionCall(clazzVDPBuilder, "build", builderObj, new Class[]{});
 
-                        android.os.IBinder binder = new IBinder() {
+                        IBinder binder = new IBinder() {
                             @Nullable
                             @Override
                             public String getInterfaceDescriptor() throws RemoteException {
@@ -302,32 +298,7 @@ public class InternalPermissionTester extends BasePermissionTester {
                                 return false;
                             }
                         };
-//                        public UserHandle getCallingUserHandle() {
-//                            return Binder.getCallingUserHandle();
-//                        }
                         UserHandle uh = Binder.getCallingUserHandle();
-                        //mLogger.logDebug(">>>>"+uh.toString());
-                        //Read Associations from Companion Device Manager
-                        //Context userContext = mContext.createContextAsUser(uh, 0);
-//                        synchronized (mVirtualDeviceManagerLock) {
-//                            final CompanionDeviceManager cdm =
-//                                    userContext.getSystemService(CompanionDeviceManager.class);
-//                            final int userId = user.getUserIdentifier();
-//                            mAllAssociations.put(userId, cdm.getAllAssociations());
-
-                        //final int callingUserId = getCallingUserHandle().getIdentifier();
-                        //            final List<AssociationInfo> associations =
-                        //                    mAllAssociations.get(callingUserId);
-                        //            if (associations != null) {
-                        //                final int associationSize = associations.size();
-                        //                for (int i = 0; i < associationSize; i++) {
-                        //                    AssociationInfo associationInfo = associations.get(i);
-                        //                    if (associationInfo.belongsToPackage(callingUserId, packageName)
-                        //                            && associationId == associationInfo.getId()) {
-                        //                        return associationInfo;
-                        //                    }
-                        //                }
-                        //            }
                         mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
                                 Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
                                 Transacts.createVirtualDevice, binder,mContext.getPackageName(),
@@ -347,6 +318,102 @@ public class InternalPermissionTester extends BasePermissionTester {
 
                     }
                 }));
+
+        mPermissionTasks.put(SignaturePermissions.permission.ADD_ALWAYS_UNLOCKED_DISPLAY,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    Class<?> clazzVDPBuilder = null;
+                    Class<?> clazzVirtualDeviceManager = null;
+                    Object vdpObj = null;
+                    try {
+                        clazzVDPBuilder = Class.forName("android.companion.virtual.VirtualDeviceParams$Builder");
+                        Constructor constructor = clazzVDPBuilder.getConstructor();
+                        Object builderObj = constructor.newInstance();
+                        //VirtualDeviceParams.LOCK_STATE_ALWAYS_UNLOCKED=1
+                        builderObj = invokeReflectionCall(clazzVDPBuilder, "setLockState", builderObj, new Class[]{int.class},
+                                0);
+                        Object vdpParams = invokeReflectionCall(clazzVDPBuilder, "build", builderObj, new Class[]{});
+
+                        clazzVirtualDeviceManager = Class.forName("android.companion.virtual.VirtualDeviceManager");
+                        Object vdpm = mContext.getSystemService(clazzVirtualDeviceManager);
+                        IBinder binder = new IBinder() {
+                            @Nullable
+                            @Override
+                            public String getInterfaceDescriptor() throws RemoteException {
+                                return null;
+                            }
+
+                            @Override
+                            public boolean pingBinder() {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean isBinderAlive() {
+                                return false;
+                            }
+
+                            @Nullable
+                            @Override
+                            public IInterface queryLocalInterface(@NonNull String s) {
+                                return null;
+                            }
+
+                            @Override
+                            public void dump(@NonNull FileDescriptor fileDescriptor, @Nullable String[] strings) throws RemoteException {
+
+                            }
+
+                            @Override
+                            public void dumpAsync(@NonNull FileDescriptor fileDescriptor, @Nullable String[] strings) throws RemoteException {
+
+                            }
+
+                            @Override
+                            public boolean transact(int i, @NonNull Parcel parcel, @Nullable Parcel parcel1, int i1) throws RemoteException {
+                                return false;
+                            }
+
+                            @Override
+                            public void linkToDeath(@NonNull DeathRecipient deathRecipient, int i) throws RemoteException {
+
+                            }
+
+                            @Override
+                            public boolean unlinkToDeath(@NonNull DeathRecipient deathRecipient, int i) {
+                                return false;
+                            }
+                        };
+                        AssociationInfo associationInfo = null;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            for (AssociationInfo ai : mContext.getSystemService(CompanionDeviceManager.class)
+                                    .getMyAssociations()) {
+                                mLogger.logDebug(ai.toString());
+                                //if (packageName.equals(ai.get)) {
+                                    associationInfo = ai;
+                                    break;
+                                //}
+                            }
+                        }
+                        mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
+                                Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
+                                Transacts.createVirtualDevice, binder,mContext.getPackageName(),
+                                associationInfo.getId(), vdpParams,null);
+
+                        //invokeReflectionCall(vdpm.getClass(),
+                        //        "createVirtualDevice", vdpm, new Class[]{int.class,vdpParams.getClass()},
+                        //        1,vdpParams);
+
+                        //mLogger.logDebug(">"+vdpParams.toString()+","+n.toString()+vdpm.toString());
+
+                    } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
+                        throw new UnexpectedPermissionTestFailureException(e);
+                    }
+
+            })
+        );
+
+
+
         mPermissionTasks.put(permission.ACCESS_AMBIENT_CONTEXT_EVENT,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
 
@@ -357,19 +424,59 @@ public class InternalPermissionTester extends BasePermissionTester {
                     int[] eventsArray = new int[] {-1};//AmbientContextEvent.EVENT_COUGH
                     Set<Integer> eventTypes = Arrays.stream(eventsArray).boxed().collect(
                             Collectors.toSet());
-//                         mLogger.logDebug("[BLOCK] Write Security Log."+
-//                            ReflectionUtils.checkDeclaredMethod(ambientContextManager,"query").toString());
 
-                    ReflectionUtils.invokeReflectionCall(ambientContextManager.getClass(),
+                    invokeReflectionCall(ambientContextManager.getClass(),
                             "queryAmbientContextServiceStatus",
-                            ambientContextManager, new Class[]{java.util.Set.class, java.util.concurrent.Executor.class,
-                                    java.util.function.Consumer.class}, eventTypes, new Executor() {
+                            ambientContextManager, new Class[]{Set.class, Executor.class,
+                                    Consumer.class}, eventTypes, new Executor() {
                                 @Override
                                 public void execute(Runnable runnable) {
 
                                 }
                             }, null);
 
+                }));
+
+        mPermissionTasks.put(permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+
+                    if (!mPackageManager.hasSystemFeature(
+                            PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
+                        throw new BypassTestException(
+                                "Device does not have the "
+                                        + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
+                                        + "for this test");
+                    }
+                    AssociationRequest request = new AssociationRequest.Builder().setDeviceProfile(
+                            AssociationRequest.DEVICE_PROFILE_AUTOMOTIVE_PROJECTION).build();
+                    CompanionDeviceManager.Callback callback =
+                            new CompanionDeviceManager.Callback() {
+                                @Override
+                                public void onDeviceFound(IntentSender intentSender) {
+                                    mLogger.logDebug(
+                                            "onDeviceFound: intentSender = " + intentSender);
+                                }
+                                @Override
+                                public void onFailure(CharSequence charSequence) {
+                                    mLogger.logDebug("onFailure: charSequence = " + charSequence);
+                                }
+                            };
+                    CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
+                            CompanionDeviceManager.class);
+                    companionDeviceManager.associate(request, callback, null);
+
+                }));
+
+             mPermissionTasks.put(SignaturePermissions.permission.MODIFY_TOUCH_MODE_STATE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+
+                    //boolean b=(boolean)mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
+                    //        Transacts.getInTouchMode);
+                    //Hasn't raise exception.  need to check property how?
+                    mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
+                            Transacts.setInTouchMode,true);
+                    mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
+                            Transacts.setInTouchMode,false);
                 }));
 
 //        mPermissionTasks.put(permission.WRITE_SECURITY_LOG,

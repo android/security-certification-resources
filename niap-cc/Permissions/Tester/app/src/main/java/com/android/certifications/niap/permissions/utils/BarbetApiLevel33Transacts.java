@@ -199,6 +199,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(getAssistContextExtras, 58);
         transactIds.put(setFrontActivityScreenCompatMode, 20);
         transactIds.put(getWindowOrganizerController, 65);
+        transactIds.put(startActivityFromGameSession, 12);
         transactIds.put(startActivityAsCaller, 15);
         // Failed to obtain transactId of dismissKeyguard under android.app.IActivityTaskManager: No field TRANSACTION_dismissKeyguard in class Landroid/app/IActivityTaskManager$Stub; (declaration of 'android.app.IActivityTaskManager$Stub' appears in /system/framework/framework.jar)
         transactIds.put(getActivityClientController, 18);
@@ -216,6 +217,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(createAssociation, 12);
+        transactIds.put(dispatchMessage, 13);
         mDescriptorTransacts.put(COMPANION_DEVICE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -276,6 +278,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(generateChallenge, 19);
+
         mDescriptorTransacts.put(FACE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -408,6 +411,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
         mDescriptorTransacts.put(SOUND_TRIGGER_SESSION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(getPermittedInputMethodsAsUser, 142);
         transactIds.put(installCaCert, 100);
         transactIds.put(getNearbyNotificationStreamingPolicy, 58);
         // Failed to obtain transactId of markProfileOwnerOnOrganizationOwnedDevice under android.app.admin.IDevicePolicyManager: No field TRANSACTION_markProfileOwnerOnOrganizationOwnedDevice in class Landroid/app/admin/IDevicePolicyManager$Stub; (declaration of 'android.app.admin.IDevicePolicyManager$Stub' appears in /system/framework/framework.jar)

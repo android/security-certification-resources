@@ -16,6 +16,8 @@
 
 package com.android.certifications.niap.permissions.config;
 
+import static android.Manifest.permission.BODY_SENSORS;
+import static android.Manifest.permission.BODY_SENSORS_BACKGROUND;
 import static android.Manifest.permission.NEARBY_WIFI_DEVICES;
 import static android.Manifest.permission.POST_NOTIFICATIONS;
 import static android.Manifest.permission.READ_MEDIA_AUDIO;
@@ -61,8 +63,8 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
             //NEARBY_WIFI_DEVICES
             READ_MEDIA_AUDIO,
             READ_MEDIA_IMAGES,
-            READ_MEDIA_VIDEO
-
+            READ_MEDIA_VIDEO,
+            BODY_SENSORS,
     };
 
     private static final String[] PERMISSIONS_UNDER_TEST = new String[]{
@@ -70,9 +72,12 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
            // Manifest.permission.SEND_SMS,
             //POST_NOTIFICATIONS,
             //NEARBY_WIFI_DEVICES,
+
             READ_MEDIA_AUDIO,
             READ_MEDIA_IMAGES,
-            READ_MEDIA_VIDEO
+            READ_MEDIA_VIDEO,
+            BODY_SENSORS,
+            BODY_SENSORS_BACKGROUND
 
     };
 
