@@ -278,7 +278,6 @@ public class BarbetApiLevel33Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(generateChallenge, 19);
-
         mDescriptorTransacts.put(FACE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -416,6 +415,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(getNearbyNotificationStreamingPolicy, 58);
         // Failed to obtain transactId of markProfileOwnerOnOrganizationOwnedDevice under android.app.admin.IDevicePolicyManager: No field TRANSACTION_markProfileOwnerOnOrganizationOwnedDevice in class Landroid/app/admin/IDevicePolicyManager$Stub; (declaration of 'android.app.admin.IDevicePolicyManager$Stub' appears in /system/framework/framework.jar)
         transactIds.put(setStrings, 359);
+        transactIds.put(getWifiSsidPolicy, 352);
         transactIds.put(forceSecurityLogs, 260);
         transactIds.put(getDoNotAskCredentialsOnBoot, 220);
         transactIds.put(clearSystemUpdatePolicyFreezePeriodRecord, 217);

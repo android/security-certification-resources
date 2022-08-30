@@ -606,6 +606,9 @@ public class MainActivity extends AppCompatActivity {
                     Transacts.startActivityFromGameSession,
                     descriptorTransacts);
 
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
+                    Transacts.getWifiSsidPolicy,descriptorTransacts);
+
             return writeTransactsSourceFile(descriptorTransacts);
         }
 

@@ -3807,41 +3807,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.QUERY_ADMIN_POLICY,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //@SystemApi
-
-                    //DevicePolicyManagerService#getPermittedInputMethodsAsUser
-                    //this method always return null
-                    //List<String> objs = (List<String>)invokeReflectionCall(mDevicePolicyManager.getClass(),
-                    //        "getPermittedInputMethodsForCurrentUser", mDevicePolicyManager,
-                    //        new Class<?>[]{} );
-                    //mLogger.logDebug("not found amin->"+objs);
-                    //getPermittedAccessibilityServices(int);
-                    //    method @Nullable @RequiresPermission(anyOf={android.Manifest.permission.MANAGE_USERS, android.Manifest.permission.QUERY_ADMIN_POLICY}) public java.util.List<java.lang.String> getPermittedInputMethodsForCurrentUser();
-
-                    //Object obj =
-                    //        mTransacts.invokeTransact(Transacts.DEVICE_POLICY_SERVICE,
-                    //        Transacts.DEVICE_POLICY_DESCRIPTOR,Transacts.getPermittedInputMethodsAsUser,
-                    //        UserHandle.readFromParcel(), );
-
-                    mLogger.logDebug("not found amin->");
-                            //       Transacts.unregisterCoexCallback, (Object) null);
-
-                    List<ComponentName> admins = mDevicePolicyManager.getActiveAdmins();
-                    if(admins.size()>=0) {
-                        //mDevicePolicyManager.setSecurityLoggingEnabled(admins.get(0),true);
-                        for(ComponentName cp :admins) {
-                            try {
-                                invokeReflectionCall(mDevicePolicyManager.getClass(),
-                                        "getPermittedInputMethodsForCurrentUser", mDevicePolicyManager,
-                                        new Class<?>[]{});
-                            } catch(Exception ex){
-                                ex.printStackTrace();
-                            }
-                        }
-                     } else {
-                        mLogger.logDebug("not found amin");
-                    }
-
+                    invokeReflectionCall(mDevicePolicyManager.getClass(),
+                            "getWifiSsidPolicy", mDevicePolicyManager,
+                            new Class<?>[]{});
                 }));
 
         mPermissionTasks.put(permission.PROVISION_DEMO_DEVICE,

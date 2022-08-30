@@ -380,6 +380,7 @@ public class Transacts {
     //                                in String callingFeatureId, int callingPid, int callingUid, in Intent intent,
     //                                int taskId, int userId);
     public static final String startActivityFromGameSession="startActivityFromGameSession";
+    public static final String getWifiSsidPolicy="getWifiSsidPolicy";
 
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";
