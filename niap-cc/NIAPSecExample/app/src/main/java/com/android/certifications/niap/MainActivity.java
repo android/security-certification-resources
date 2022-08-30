@@ -156,21 +156,16 @@ public class MainActivity extends FragmentActivity {
                     SecureURL secureURL = new SecureURL("https://www.google.com", null);
                     URLConnection conn = secureURL.openConnection();
                     conn.connect();
-                } catch (MalformedURLException ex) {
+                } catch(Exception ex) {
                     Log.e(TAG, "SecureURL Failure: " + ex.getMessage());
-                    Log.e(TAG, ex.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, ex.getStackTrace().toString());
                 }
-
             }
         });
         executor.shutdown();
         try {
             future.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
