@@ -64,7 +64,7 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
             READ_MEDIA_AUDIO,
             READ_MEDIA_IMAGES,
             READ_MEDIA_VIDEO,
-            BODY_SENSORS,
+            BODY_SENSORS
     };
 
     private static final String[] PERMISSIONS_UNDER_TEST = new String[]{

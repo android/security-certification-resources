@@ -104,6 +104,9 @@ import android.telecom.TelecomManager;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
@@ -111,6 +114,7 @@ import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.Transacts;
+import com.android.certifications.niap.permissions.worker.BackgroundTestWorker;
 
 import java.io.File;
 import java.io.IOException;
@@ -119,6 +123,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Permission tester to verify all runtime permissions properly guard their API, resources, etc.
@@ -566,16 +571,14 @@ public class RuntimePermissionTester extends BasePermissionTester {
         }));
 
         mPermissionTasks.put(BODY_SENSORS_BACKGROUND, new PermissionTest(false, () -> {
-            if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE)) {
-                throw new BypassTestException(
-                        "A hearrt rate monitor is not available to run this test");
-            }
-            Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
-            if (sensor == null) {
-                throw new SecurityException(
-                        "The heart rate sensor feature is available, but a null sensor was "
-                                + "returned");
-            }
+            mLogger.logDebug("Back ground test begin");
+            OneTimeWorkRequest testWorker = new OneTimeWorkRequest.Builder(BackgroundTestWorker.class)
+                    .setInitialDelay(20, TimeUnit.SECONDS)
+                    .build();
+
+            WorkManager.getInstance(mContext)
+                    .beginWith(testWorker)
+                    .enqueue();
         }));
 
         mPermissionTasks.put(POST_NOTIFICATIONS, new PermissionTest(false, () -> {
