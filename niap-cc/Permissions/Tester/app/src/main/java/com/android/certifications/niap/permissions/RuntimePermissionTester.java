@@ -545,6 +545,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
 
 
         //New Runtime Permissions for T
+
         mPermissionTasks.put(READ_MEDIA_AUDIO, new PermissionTest(false, () -> {
             ContentResolver contentResolver = mContext.getContentResolver();
             Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -563,10 +564,11 @@ public class RuntimePermissionTester extends BasePermissionTester {
             Cursor cursor = contentResolver.query(uri, null, null, null, null);
             cursor.moveToFirst();
         }));
+
         mPermissionTasks.put(BODY_SENSORS_BACKGROUND, new PermissionTest(false, () -> {
             if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE)) {
                 throw new BypassTestException(
-                        "A hearr rate monitor is not available to run this test");
+                        "A hearrt rate monitor is not available to run this test");
             }
             Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
             if (sensor == null) {
@@ -575,6 +577,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
                                 + "returned");
             }
         }));
+
         mPermissionTasks.put(POST_NOTIFICATIONS, new PermissionTest(false, () -> {
             Intent notificationIntent = new Intent(mContext, MainActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
@@ -612,7 +615,6 @@ public class RuntimePermissionTester extends BasePermissionTester {
                 } catch (InterruptedException e) {
                 }
             }
-
         }));
 
     }

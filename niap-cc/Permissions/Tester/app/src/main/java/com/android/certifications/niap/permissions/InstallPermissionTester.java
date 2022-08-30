@@ -644,8 +644,8 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(USE_EXACT_ALARM,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    // USE_EXACT_ALARM is the install permission that is the
-                    // differenceies against the SCHEDULE_EXACT_ALRAM
+                    // USE_EXACT_ALARM is an install permission, and that is only
+                    // differenceies against the SCHEDULE_EXACT_ALRAM permission.
                     Intent intent = new Intent(mContext, MainActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent,
                             PendingIntent.FLAG_IMMUTABLE);
@@ -657,10 +657,7 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(READ_NEARBY_STREAMING_POLICY,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                        //This permission's category has been moved to install after Android T
-
-                        // DevicePolicyManagerService first checks if this feature is available before
-                        // performing the permission check.
+                        //This permission's category has been moved to install permission after Android T
                         if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN)) {
                             throw new BypassTestException("This permission requires feature "
                                     + PackageManager.FEATURE_DEVICE_ADMIN);

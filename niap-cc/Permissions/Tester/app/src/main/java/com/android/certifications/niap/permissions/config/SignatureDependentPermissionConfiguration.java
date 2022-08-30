@@ -109,71 +109,69 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            permissions.add(permission.BIND_ATTESTATION_VERIFICATION_SERVICE);
-//            permissions.add(permission.BIND_TRACE_REPORT_SERVICE);
-//            permissions.add(permission.BIND_GAME_SERVICE);
-//            permissions.add(permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE);
-//            permissions.add(permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE);
-//            permissions.add(permission.BIND_TV_INTERACTIVE_APP);
-//            permissions.add(permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE);
-//              permissions.add(permission.LOCATION_BYPASS);
-//              permissions.add(permission.CONTROL_AUTOMOTIVE_GNSS);
-//            permissions.add(permission.MANAGE_WIFI_NETWORK_SELECTION);
-//            permissions.add(permission.MANAGE_WIFI_INTERFACES);
-//            permissions.add(permission.TRIGGER_LOST_MODE);
-              permissions.add(permission.START_CROSS_PROFILE_ACTIVITIES);
-//            permissions.add(permission.QUERY_USERS);
-            permissions.add(permission.QUERY_ADMIN_POLICY);
-//            permissions.add(permission.PROVISION_DEMO_DEVICE);
-//            permissions.add(permission.REQUEST_COMPANION_PROFILE_APP_STREAMING);
-//            permissions.add(permission.REQUEST_COMPANION_PROFILE_COMPUTER);
-//            permissions.add(permission.REQUEST_COMPANION_SELF_MANAGED);
-//            permissions.add(permission.READ_APP_SPECIFIC_LOCALES);
-//            permissions.add(permission.USE_ATTESTATION_VERIFICATION_SERVICE);
-//
-//            permissions.add(permission.REQUEST_UNIQUE_ID_ATTESTATION);
-//            permissions.add(permission.GET_HISTORICAL_APP_OPS_STATS);
-//
-//            permissions.add(permission.SET_SYSTEM_AUDIO_CAPTION);
-//            permissions.add(permission.INSTALL_DPC_PACKAGES);
-//            permissions.add(permission.REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL);
-//            permissions.add(permission.DELIVER_COMPANION_MESSAGES);
-
-//            permissions.add(permission.MODIFY_TOUCH_MODE_STATE);
-//
-//            permissions.add(permission.MODIFY_USER_PREFERRED_DISPLAY_MODE);
-//            permissions.add(permission.ACCESS_ULTRASOUND);
-//            permissions.add(permission.CALL_AUDIO_INTERCEPTION);
-//            permissions.add(permission.MANAGE_LOW_POWER_STANDBY);
-//            permissions.add(permission.ACCESS_BROADCAST_RESPONSE_STATS);
-//            permissions.add(permission.CHANGE_APP_LAUNCH_TIME_ESTIMATE);
-//            permissions.add(permission.SET_WALLPAPER_DIM_AMOUNT);
-//            permissions.add(permission.MANAGE_WEAK_ESCROW_TOKEN);
- //           permissions.add(permission.START_REVIEW_PERMISSION_DECISIONS);
- //           permissions.add(permission.START_VIEW_APP_FEATURES);
-//
-//            permissions.add(permission.MANAGE_CLOUDSEARCH);
-//            permissions.add(permission.MANAGE_WALLPAPER_EFFECTS_GENERATION);
-//            permissions.add(permission.SUPPRESS_CLIPBOARD_ACCESS_NOTIFICATION);
-//
-            //permissions.add(permission.ACCESS_TV_SHARED_FILTER);
-            permissions.add(permission.ADD_ALWAYS_UNLOCKED_DISPLAY);
-            //permissions.add(permission.SET_GAME_SERVICE);
-            //permissions.add(permission.ACCESS_FPS_COUNTER);
-            permissions.add(permission.MANAGE_GAME_ACTIVITY);
-//            permissions.add(permission.LAUNCH_DEVICE_MANAGER_SETUP);
-//            permissions.add(permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES);
-//            permissions.add(permission.READ_SAFETY_CENTER_STATUS);
-//
-//            permissions.add(permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS);
-//            permissions.add(permission.TIS_EXTENSION_INTERFACE);
-//            permissions.add(permission.WRITE_SECURITY_LOG);
-//            permissions.add(permission.MAKE_UID_VISIBLE);
-
-
+            addPermissionsForT(permissions);
         }
 
         return Optional.of(permissions);
+    }
+
+    public void addPermissionsForT(List<String> permissions)
+    {
+            permissions.add(permission.LOCATION_BYPASS);
+            permissions.add(permission.CONTROL_AUTOMOTIVE_GNSS);
+            permissions.add(permission.MANAGE_WIFI_NETWORK_SELECTION);
+            permissions.add(permission.MANAGE_WIFI_INTERFACES);
+            permissions.add(permission.TRIGGER_LOST_MODE);
+            //Infeasible#permissions.add(permission.START_CROSS_PROFILE_ACTIVITIES);
+            permissions.add(permission.QUERY_USERS);
+            permissions.add(permission.QUERY_ADMIN_POLICY);
+            permissions.add(permission.PROVISION_DEMO_DEVICE);
+            permissions.add(permission.REQUEST_COMPANION_PROFILE_APP_STREAMING);
+            permissions.add(permission.REQUEST_COMPANION_PROFILE_COMPUTER);
+            permissions.add(permission.REQUEST_COMPANION_SELF_MANAGED);
+            permissions.add(permission.READ_APP_SPECIFIC_LOCALES);
+            permissions.add(permission.USE_ATTESTATION_VERIFICATION_SERVICE);
+            //Infeasible#permissions.add(permission.VERIFY_ATTESTATION);
+            permissions.add(permission.REQUEST_UNIQUE_ID_ATTESTATION);
+            //Infeasible#permissions.add(permission.GET_HISTORICAL_APP_OPS_STATS);
+            permissions.add(permission.SET_SYSTEM_AUDIO_CAPTION);
+            //Infeasible#permissions.add(permission.INSTALL_DPC_PACKAGES);
+            permissions.add(permission.REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL);
+            //Infeasible#permissions.add(permission.DELIVER_COMPANION_MESSAGES);
+            //Infeasible#permissions.add(permission.MODIFY_TOUCH_MODE_STATE);
+            permissions.add(permission.MODIFY_USER_PREFERRED_DISPLAY_MODE);
+            permissions.add(permission.ACCESS_ULTRASOUND);
+            permissions.add(permission.CALL_AUDIO_INTERCEPTION);
+            permissions.add(permission.MANAGE_LOW_POWER_STANDBY);
+            permissions.add(permission.ACCESS_BROADCAST_RESPONSE_STATS);
+            permissions.add(permission.CHANGE_APP_LAUNCH_TIME_ESTIMATE);
+            permissions.add(permission.SET_WALLPAPER_DIM_AMOUNT);
+            permissions.add(permission.MANAGE_WEAK_ESCROW_TOKEN);
+            permissions.add(permission.START_REVIEW_PERMISSION_DECISIONS);
+            //Infeasible#permissions.add(permission.START_VIEW_APP_FEATURES);
+            permissions.add(permission.MANAGE_CLOUDSEARCH);
+            permissions.add(permission.MANAGE_WALLPAPER_EFFECTS_GENERATION);
+            //Infeasible#permissions.add(permission.SUPPRESS_CLIPBOARD_ACCESS_NOTIFICATION);
+            //Infeasible#permissions.add(permission.ACCESS_TV_SHARED_FILTER);
+            //Infeasible#permissions.add(permission.ADD_ALWAYS_UNLOCKED_DISPLAY);
+            permissions.add(permission.SET_GAME_SERVICE);
+            permissions.add(permission.ACCESS_FPS_COUNTER);
+            permissions.add(permission.MANAGE_GAME_ACTIVITY);
+            permissions.add(permission.LAUNCH_DEVICE_MANAGER_SETUP);
+            permissions.add(permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES);
+            permissions.add(permission.READ_SAFETY_CENTER_STATUS);
+            //Infeasible#permissions.add(permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS);
+            permissions.add(permission.TIS_EXTENSION_INTERFACE);
+            //Infeasible#permissions.add(permission.WRITE_SECURITY_LOG);
+            permissions.add(permission.MAKE_UID_VISIBLE);
+
+            permissions.add(permission.BIND_ATTESTATION_VERIFICATION_SERVICE);
+            permissions.add(permission.BIND_TRACE_REPORT_SERVICE);
+            permissions.add(permission.BIND_GAME_SERVICE);
+            permissions.add(permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE);
+            permissions.add(permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE);
+            permissions.add(permission.BIND_TV_INTERACTIVE_APP);
+            permissions.add(permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE);
     }
 
     @Override

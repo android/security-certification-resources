@@ -3610,19 +3610,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // the instance there is no way to invoke the method since it is guarded by the reflection
         // deny-list.
 
-        //Added as of Android 12 SV2
-        mPermissionTasks.put(permission.ALLOW_SLIPPERY_TOUCHES,
-                new PermissionTest(false, Build.VERSION_CODES.S_V2, () -> {
-                    final int FLAG_SLIPPERY = 0x20000000;//The flag is disabled by annotation
-                    WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
-                    activity.getWindow().addFlags(FLAG_SLIPPERY);
-                }));
 
-        mPermissionTasks.put(permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD,
-                new PermissionTest(false, Build.VERSION_CODES.S_V2, () -> {
-                    runShellCommandTest(
-                            "am broadcast --allow-background-activity-starts -a com.android.shell.action.PROFCOLLECT_UPLOAD");
-                }));
 
         mPermissionTasks.put(permission.SUGGEST_EXTERNAL_TIME,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
@@ -3726,15 +3714,32 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             Transacts.setCoexUnsafeChannels, null, 0);
                 }));
 
+        ////////////////////////////////////////////////////////////////////////////////
+        //New Signature permissions as of Android 12 SV2
 
+        mPermissionTasks.put(permission.ALLOW_SLIPPERY_TOUCHES,
+                new PermissionTest(false, Build.VERSION_CODES.S_V2, () -> {
+                    final int FLAG_SLIPPERY = 0x20000000;//The flag is disabled by annotation
+                    WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+                    activity.getWindow().addFlags(FLAG_SLIPPERY);
+                }));
 
-        // New Signature permissions as of Android TIRAMISU
+        mPermissionTasks.put(permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD,
+                new PermissionTest(false, Build.VERSION_CODES.S_V2, () -> {
+                    runShellCommandTest(
+                            "am broadcast --allow-background-activity-starts -a com.android.shell.action.PROFCOLLECT_UPLOAD");
+                }));
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // New Signature permissions as of TIRAMISU(13/SDK33)
+
         mPermissionTasks.put(permission.LOCATION_BYPASS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     ReflectionUtils.invokeReflectionCall(mLocationManager.getClass(),
                             "setAdasGnssLocationEnabled",mLocationManager,
                             new Class<?>[]{boolean.class}, true);
                 }));
+
         mPermissionTasks.put(permission.CONTROL_AUTOMOTIVE_GNSS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                      if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) {
@@ -3747,8 +3752,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.MANAGE_WIFI_NETWORK_SELECTION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //android.permission.NETWORK_SETTINGS
-
                     invokeReflectionCall(mWifiManager.getClass(),
                                    "getSsidsAllowlist",mWifiManager,null);
                 }));
@@ -3767,10 +3770,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
 
-
         mPermissionTasks.put(permission.TRIGGER_LOST_MODE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //mLogger.logDebug("[BLOCK] Lost mode location updates can only be sent on an organization-owned device.");
                     try {
                         invokeReflectionCall(mDevicePolicyManager.getClass(),
                                 "sendLostModeLocationUpdate", mDevicePolicyManager,
@@ -3783,31 +3784,19 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                     public void accept(Boolean aBoolean) {
 
                                     }
-
                                     @Override
                                     public Consumer<Boolean> andThen(Consumer<? super Boolean> after) {
                                         return Consumer.super.andThen(after);
                                     }
                                 });
                     } catch(UnexpectedPermissionTestFailureException e){
-                        //Below error is intended
+                        //The error is intended
                         //Lost mode location updates can only be sent on an organization-owned device.
                     }
                 }));
-        mPermissionTasks.put(permission.START_CROSS_PROFILE_ACTIVITIES,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    CrossProfileApps crossProfileApps;
-                    crossProfileApps = (CrossProfileApps)mContext.getSystemService(Context.CROSS_PROFILE_APPS_SERVICE);
-                    List<UserHandle> userHandles = (List<UserHandle>)invokeReflectionCall(crossProfileApps.getClass(),
-                            "getTargetUserProfiles", crossProfileApps,
-                            new Class<?>[]{});
 
-                    invokeReflectionCall(crossProfileApps.getClass(),
-                            "startActivity", crossProfileApps,
-                            new Class<?>[]{ComponentName.class,UserHandle.class},
-                            activity.getComponentName(), userHandles.get(0));
-
-                }));
+        // # Skip START_CROSS_PROFILE_ACTIVITIES
+        // Reason : CrossProfileAppService requires Android Enterprise Environment.
 
         mPermissionTasks.put(permission.QUERY_USERS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
@@ -3849,42 +3838,43 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                 ex.printStackTrace();
                             }
                         }
-                        // mLogger.logDebug("[BLOCK] require internal permission, MANAGE_SAFETY_CENTER permission to eval."+nRet);
-                    } else {
+                     } else {
                         mLogger.logDebug("not found amin");
                     }
 
                 }));
-             mPermissionTasks.put(permission.PROVISION_DEMO_DEVICE,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    Class fmdpBuilderClazz = null;
-                    Class fmdpClazz = null;
-                    try {
-                        fmdpBuilderClazz = Class.forName("android.app.admin.FullyManagedDeviceProvisioningParams$Builder");
-                        fmdpClazz = Class.forName("android.app.admin.FullyManagedDeviceProvisioningParams");
 
-                        Constructor constructor = fmdpBuilderClazz.getConstructor(ComponentName.class,String.class);
-                        Object fmdpBuilderObj =
-                            constructor.newInstance(new ComponentName(mContext,MainActivity.class),"");
-                        Object fmdpObj = invokeReflectionCall(fmdpBuilderClazz,
-                                "build", fmdpBuilderObj,
-                                new Class<?>[]{});
-                        invokeReflectionCall(mDevicePolicyManager.getClass(),
-                                "provisionFullyManagedDevice", mDevicePolicyManager,
-                                new Class<?>[]{fmdpClazz},fmdpObj);
-                    } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                        throw new UnexpectedPermissionTestFailureException(e);
-                    } catch (UnexpectedPermissionTestFailureException e){
-                        mLogger.logDebug("Please check stack trace. " +
-                                "If the stacktrace contains 'Provisioning preconditions failed' messages," +
-                                "This exception is intended");
-                    }
-                }));
+        mPermissionTasks.put(permission.PROVISION_DEMO_DEVICE,
+            new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                Class fmdpBuilderClazz = null;
+                Class fmdpClazz = null;
+                try {
+                    fmdpBuilderClazz = Class.forName("android.app.admin.FullyManagedDeviceProvisioningParams$Builder");
+                    fmdpClazz = Class.forName("android.app.admin.FullyManagedDeviceProvisioningParams");
 
+                    Constructor constructor = fmdpBuilderClazz.getConstructor(ComponentName.class,String.class);
+                    Object fmdpBuilderObj =
+                        constructor.newInstance(new ComponentName(mContext,MainActivity.class),"");
+                    Object fmdpObj = invokeReflectionCall(fmdpBuilderClazz,
+                            "build", fmdpBuilderObj,
+                            new Class<?>[]{});
+                    invokeReflectionCall(mDevicePolicyManager.getClass(),
+                            "provisionFullyManagedDevice", mDevicePolicyManager,
+                            new Class<?>[]{fmdpClazz},fmdpObj);
+                } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                    throw new UnexpectedPermissionTestFailureException(e);
+                } catch (UnexpectedPermissionTestFailureException e){
+                    mLogger.logDebug("Please check stack trace. " +
+                            "If the stacktrace contains 'Provisioning preconditions failed' messages," +
+                            "This exception is intended");
+                }
+        }));
+
+        ////////////////////////////////////////////////////////////
         //REQUEST_COMPANION_PROFILE_* methods
+
         mPermissionTasks.put(permission.REQUEST_COMPANION_PROFILE_APP_STREAMING,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                   // mLogger.logDebug("Test case for REQUEST_COMPANION_PROFILE_APP_STREAMING not implemented yet");
                     if (!mPackageManager.hasSystemFeature(
                             PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
                         throw new BypassTestException(
@@ -3949,12 +3939,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                         + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
                                         + "for this test");
                     }
-                    AssociationRequest request =
-                            new AssociationRequest.Builder().setDisplayName("foo")
-                            .setSelfManaged(true).setForceConfirmation(true).build();
+                    AssociationRequest request = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        request = new AssociationRequest.Builder().setDisplayName("foo")
+                        .setSelfManaged(true).setForceConfirmation(true).build();
+                    } else {
+                        throw new BypassTestException("REQUEST_COMPANION_SELF_MANAGED tests requires SDK 33");
+                    }
 
-                            //new AssociationRequest.Builder().setDeviceProfile(
-                            //AssociationRequest.DEVICE_PROFILE_COMPUTER).build();
                     CompanionDeviceManager.Callback callback =
                             new CompanionDeviceManager.Callback() {
                                 @Override
@@ -3970,9 +3962,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
                             CompanionDeviceManager.class);
                     companionDeviceManager.associate(request, callback, null);
-
-
-
                 }));
 
         mPermissionTasks.put(permission.READ_APP_SPECIFIC_LOCALES,
@@ -3984,15 +3973,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     // in VerificationToken token,in ParcelDuration maximumTokenAge,in AndroidFuture resultCallback
                     // Intended NPE will be raised
-                    mTransacts.invokeTransact(Transacts.ATTESTATION_VERIFICATION_SERVICE, Transacts.ATTESTATION_VERIFICATION_DESCRIPTOR,
-                           Transacts.verifyToken, null,null,null);
+                    mTransacts.invokeTransact(Transacts.ATTESTATION_VERIFICATION_SERVICE,
+                            Transacts.ATTESTATION_VERIFICATION_DESCRIPTOR,
+                            Transacts.verifyToken, null,null,null);
                 }));
-        mPermissionTasks.put(permission.VERIFY_ATTESTATION,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for VERIFY_ATTESTATION not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
-                }));
+
+        // # Skip VERIFY_ATTESTATION
+        // Reason : Found No corresponding API or implementation to test.
+
         mPermissionTasks.put(permission.REQUEST_UNIQUE_ID_ATTESTATION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     String keystoreAlias = "test_key";
@@ -4023,83 +4011,20 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
 
-        mPermissionTasks.put(permission.GET_HISTORICAL_APP_OPS_STATS,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for GET_HISTORICAL_APP_OPS_STATS not implemented yet");
-                    Class onResultListenerClass = null;
-                    try {
-                        onResultListenerClass = Class.forName(
-                                "android.os.RemoteCallback$OnResultListener");
-                        Object onResultListener = Proxy.newProxyInstance(
-                                onResultListenerClass.getClassLoader(),
-                                new Class[]{onResultListenerClass}, new InvocationHandler() {
-                                    @Override
-                                    public Object invoke(Object o, Method method, Object[] objects)
-                                            throws Throwable {
-                                        mLogger.logDebug("invoke: " + method);
-                                        return null;
-                                    }
-                                });
-                        Class remoteCallbackClass = Class.forName("android.os.RemoteCallback");
-                        Constructor remoteCallbackConstructor = remoteCallbackClass.getConstructor(
-                                onResultListenerClass);
-                        Object remoteCallback = remoteCallbackConstructor.newInstance(
-                                (Object) onResultListener);
-                        //Bundle bundle = new Bundle();
-                        //bundle.putInt("_user", 0);
-                        //bundle.putParcelable("_remote_callback_key", (Parcelable) remoteCallback);
+        // # Skip GET_HISTORICAL_APP_OPS_STATS
+        // Reason : The orresponding api hasn't raise any exception internally.(AppOpsService#getHistoricalOps)
 
-                        //int uid, String packageName, String attributionTag, in List<String> ops,
-                        //int historyFlags, int filter, long beginTimeMillis, long endTimeMillis, int flags,
-                        //in RemoteCallback callback)
-                        //FILTER_BY_PACKAGE_NAME
-                        final int FILTER_BY_UID = 1<<0;
-                        final int FILTER_BY_PACKAGE_NAME = 1<<1;
-                        final int FILTER_BY_ATTRIBUTION_TAG = 1<<2;
-                        final int FILTER_BY_OP_NAMES = 1<<3;
-
-                        mTransacts.invokeTransact(Transacts.APP_OPS_SERVICE, Transacts.APP_OPS_DESCRIPTOR,
-                                Transacts.getHistoricalOps,Process.SYSTEM_UID,"package_name",
-                                null,null,(FILTER_BY_UID|FILTER_BY_PACKAGE_NAME),0L,Long.MAX_VALUE,0,
-                                remoteCallback
-                        );
-//                        mTransacts.invokeTransact(Transacts.APP_OPS_SERVICE, Transacts.APP_OPS_DESCRIPTOR,
-//                                Transacts.getHistoricalOps,0,"dummy",
-//                                null,null,0,FILTER_BY_PACKAGE_NAME|FILTER_BY_UID,0L,Long.MAX_VALUE,0,null);
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    }
-
-
-                }));
         mPermissionTasks.put(permission.SET_SYSTEM_AUDIO_CAPTION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(mCaptioningManager,"set").toString());
                     invokeReflectionCall(mCaptioningManager.getClass(),
                             "setSystemAudioCaptioningEnabled",mCaptioningManager,
                             new Class<?>[]{boolean.class}, true);
-                    //setSystemAudioCaptioningEnabled( boolean)
                 }));
-        mPermissionTasks.put(permission.INSTALL_DPC_PACKAGES,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for INSTALL_DPC_PACKAGES not implemented yet");
-                    PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(
-                            PackageInstaller.SessionParams.MODE_FULL_INSTALL);
 
 
+        // # Skip INSTALL_DPC_PACKAGES
+        // Reason : Found no way to evaluate this permission without enterprise environment
 
-
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
-                }));
         mPermissionTasks.put(permission.REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     Object permissionManager = mContext.getSystemService("permission");
@@ -4108,89 +4033,54 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             "revokePostNotificationPermissionWithoutKillForTest",permissionManager,
                             new Class<?>[]{String.class,int.class}, mContext.getPackageName(),0);
                 }));
-        //normal permission?
-        mPermissionTasks.put(permission.DELIVER_COMPANION_MESSAGES,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
 
-                    CompanionDeviceManager companionDeviceManager =
-                            (CompanionDeviceManager) mContext.getSystemService(
-                                    Context.COMPANION_DEVICE_SERVICE);
+        // # Skip DELIVER_COMPANION_MESSAGES
+        //Reason : This feature appears to have been punted to U. See b/199427116,
 
-                    //companionDeviceManager.dispatchMessage( int int byte[])
-                    invokeReflectionCall(companionDeviceManager.getClass(),
-                            "dispatchMessage", companionDeviceManager,
-                            new Class[]{int.class, int.class, byte[].class}, 0,0, new byte[]{1,2,3});
+        // # Skip MODIFY_TOUCH_MODE_STATE
+        //Reason : setInTouchMode has not raise any exception. no way to evaluate this permissison.
 
-                    mTransacts.invokeTransact(Transacts.COMPANION_DEVICE_SERVICE,
-                            Transacts.COMPANION_DEVICE_DESCRIPTOR,Transacts.dispatchMessage,
-                            0,0, new byte[]{1,2,3});
-
-                }));
-        mPermissionTasks.put(permission.MODIFY_TOUCH_MODE_STATE,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-
-                    //boolean b=(boolean)mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
-                    //        Transacts.getInTouchMode);
-                    //Hasn't raise exception.  need to check property how?
-                    mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
-                           Transacts.setInTouchMode,true);
-                    mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
-                            Transacts.setInTouchMode,false);
-                }));
         mPermissionTasks.put(permission.MODIFY_USER_PREFERRED_DISPLAY_MODE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(mDisplayManager,"setGlobal").toString());
                     Display.Mode mode = mDisplayManager.getDisplays()[0].getMode();
                     invokeReflectionCall(mDisplayManager.getClass(),
                             "setGlobalUserPreferredDisplayMode", mDisplayManager,
                             new Class[]{Display.Mode.class},mode);
                 }));
+
         mPermissionTasks.put(permission.ACCESS_ULTRASOUND,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(mAudioManager,"is").toString());
                     invokeReflectionCall(mAudioManager.getClass(),
                             "isUltrasoundSupported", mAudioManager,
                             new Class[]{});
                 }));
+
         mPermissionTasks.put(permission.CALL_AUDIO_INTERCEPTION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     invokeReflectionCall(mAudioManager.getClass(),
                             "isPstnCallAudioInterceptable", mAudioManager,
                             new Class[]{});
                 }));
+
         mPermissionTasks.put(permission.MANAGE_LOW_POWER_STANDBY,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                     //isLowPowerStandbySupported
                     invokeReflectionCall(mPowerManager.getClass(),
                             "isLowPowerStandbySupported", mPowerManager,
                             new Class[]{});
                 }));
+
         mPermissionTasks.put(permission.ACCESS_BROADCAST_RESPONSE_STATS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(mUsageStatsManager,"query").toString());
-                    //queryBroadcastResponseStats( java.lang.String long)
                     invokeReflectionCall(mUsageStatsManager.getClass(),
                             "queryBroadcastResponseStats", mUsageStatsManager,
                             new Class[]{String.class,long.class},mContext.getPackageName(),0);
                 }));
+
         mPermissionTasks.put(permission.CHANGE_APP_LAUNCH_TIME_ESTIMATE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //setEstimatedLaunchTimeMillis( java.lang.String long)
-                    //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(mUsageStatsManager,"setE").toString());
-                    invokeReflectionCall(mUsageStatsManager.getClass(),
+                     invokeReflectionCall(mUsageStatsManager.getClass(),
                             "setEstimatedLaunchTimeMillis", mUsageStatsManager,
                             new Class[]{String.class,long.class},mContext.getPackageName(),1000L);
-                }));
-        mPermissionTasks.put(permission.SET_WALLPAPER_DIM_AMOUNT,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for SET_WALLPAPER_DIM_AMOUNT not implemented yet");
-                    WallpaperManager wallpaperManager =
-                            (WallpaperManager) mContext.getSystemService(
-                                    Context.WALLPAPER_SERVICE);
-                    //getWallpaperDimAmount()
-                    invokeReflectionCall(wallpaperManager.getClass(),
-                            "getWallpaperDimAmount", wallpaperManager,
-                            new Class[]{});
                 }));
 
         mPermissionTasks.put(permission.MANAGE_WEAK_ESCROW_TOKEN,
@@ -4201,7 +4091,20 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                     invokeReflectionCall(mKeyguardManager.getClass(),
                             "isWeakEscrowTokenActive", mKeyguardManager,
-                            new Class[]{long.class, UserHandle.class}, 100L, UserHandle.getUserHandleForUid(mUid));
+                            new Class[]{long.class, UserHandle.class},
+                            100L, UserHandle.getUserHandleForUid(mUid));
+                }));
+
+        mPermissionTasks.put(permission.SET_WALLPAPER_DIM_AMOUNT,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mLogger.logDebug("Test case for SET_WALLPAPER_DIM_AMOUNT not implemented yet");
+                    WallpaperManager wallpaperManager =
+                            (WallpaperManager) mContext.getSystemService(
+                                    Context.WALLPAPER_SERVICE);
+
+                    invokeReflectionCall(wallpaperManager.getClass(),
+                            "getWallpaperDimAmount", wallpaperManager,
+                            new Class[]{});
                 }));
 
         mPermissionTasks.put(permission.START_REVIEW_PERMISSION_DECISIONS,
@@ -4217,45 +4120,19 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 
                 }));
-        mPermissionTasks.put(permission.START_VIEW_APP_FEATURES,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    String ACTION_VIEW_APP_FEATURE =
-                            "android.permission.action.ACTION_VIEW_APP_FEATURES";
-                    //final Intent featuresIntent = new Intent(ACTION_VIEW_APP_FEATURE);
-                    String packageName = mContext.getPackageName();
-                    mContext.startActivity(new Intent(ACTION_VIEW_APP_FEATURE)
-                            .setPackage(mContext.getPackageName())
-                            .setComponent(new ComponentName(packageName,
-                                    packageName+".activities.TestActivity"))
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                    //com.google.android.youtube
-                    //featuresIntent
-                     //       .setPackage("com.google.android.gms.permissions.ViewConsumerServicesActivity");//"com.google.android.gms");
-                    //ResolveInfo resolveInfo =mPackageManager.resolveActivity(featuresIntent, 0);
-                    //mLogger.logDebug(">>>>"+resolveInfo+"\n,");
-//                    featuresIntent.setComponent(
-//                            new ComponentName(mPackageName,
-//                                    resolveInfo.activityInfo.name));
-                            //.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    //adb shell am broadcast -a com.package.app.ACTION -es SCAN_RESULT "1021101" com.package.app/.com.package.app.droid.activities.MainActivity
-                    //mContext.startActivity(featuresIntent);
-//                    runShellCommandTest(
-//                            "am broadcast --allow-background-activity-starts " +
-//                                    "-a android.intent.action.VIEW_APP_FEATURES " +
-//                                    "-p com.google.android.gms.permissions.ViewConsumerServicesActivity");
 
-                }));
+        // # Skip START_VIEW_APP_FEATURES
+        //Reason :Found No Corresponding activity for the Intent
+        //android.permission.action.ACTION_VIEW_APP_FEATURES.
 
         mPermissionTasks.put(permission.MANAGE_CLOUDSEARCH,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-
                     //in SearchRequest request, in ICloudSearchManagerCallback.aidl callBack
                     Class<?> clazzSearchBuilder = null;
                     Object searchRequest = null;
                     try {
                         clazzSearchBuilder = Class.forName("android.app.cloudsearch.SearchRequest$Builder");
-                        //mLogger.logDebug("Test case for MANAGE_CLOUDSEARCH not implemented yet"+clazzSearch.toString());
-                        Constructor constructor = clazzSearchBuilder.getConstructor(String.class);
+                         Constructor constructor = clazzSearchBuilder.getConstructor(String.class);
                         Object builderObj = constructor.newInstance("test");
                         searchRequest = invokeReflectionCall(clazzSearchBuilder,
                                 "build", builderObj,
@@ -4266,12 +4143,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
                         throw new UnexpectedPermissionTestFailureException(e);
                     }
-
-
                 }));
+
         mPermissionTasks.put(permission.MANAGE_WALLPAPER_EFFECTS_GENERATION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //Maybe we can put at least first parameter will look back this test suites later....
                     mTransacts.invokeTransact(Transacts.WALLPAPER_EFFECTS_GENERATION_SERVICE,
                             Transacts.WALLPAPER_EFFECTS_GENERATION_DESCRIPTOR,
                             Transacts.generateCinematicEffect,
@@ -4279,139 +4154,17 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
 
-        //SUPPRESS_CLIPBOARD_ACCESS_NOTIFICATION - The permission only suppres the toast.
-        //Found no proper way to check this permission
+        // # Skip SUPPRESS_CLIPBOARD_ACCESS_NOTIFICATION
+        //Reason : Found no proper way to check this permission.
+        //The permission only suppress the toast for clipboard access.
 
-        mPermissionTasks.put(permission.ACCESS_TV_SHARED_FILTER,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("[BLOCK] Need TV tuner on the device for testing.");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
-                    /*Class clazzTuner = null;
-                    try {
-                        clazzTuner = Class.forName("android.media.tv.tuner.Tuner");
-                        Constructor constructor = clazzTuner.getConstructor(Context.class,String.class,int.class);
-                        Object tunerObj = constructor.newInstance(mContext,null,100);
-                        mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(tunerObj.getClass(),"openSharedFilter").toString());
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    }*/
-                }));
-                /*mPermissionTasks.put(permission.ADD_ALWAYS_UNLOCKED_DISPLAY,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+        // # Skip ACCESS_TV_SHARED_FILTER
+        //Reason : Need TV tuner on the device for testing.(Tuner#openSharedFilter)
 
-                    Class<?> clazzVDPBuilder = null;
-                    Class<?> clazzVirtualDeviceManager = null;
-                    Object vdpObj = null;
-                    try {
-                        clazzVDPBuilder = Class.forName("android.companion.virtual.VirtualDeviceParams$Builder");
-                        Constructor constructor = clazzVDPBuilder.getConstructor();
-                        Object builderObj = constructor.newInstance();
-                        //VirtualDeviceParams.LOCK_STATE_ALWAYS_UNLOCKED=1
-                        builderObj = invokeReflectionCall(clazzVDPBuilder, "setLockState", builderObj, new Class[]{int.class},
-                                1);
-                        Object vdpParams = invokeReflectionCall(clazzVDPBuilder, "build", builderObj, new Class[]{});
-                        //Object n = invokeReflectionCall(vdpParams.getClass(),
-                        //        "setLockState", vdpParams, new Class[]{});
-                        //android.companion.virtual.VirtualDeviceManager;
-                        clazzVirtualDeviceManager = Class.forName("android.companion.virtual.VirtualDeviceManager");
-                        Object vdpm = mContext.getSystemService(clazzVirtualDeviceManager);
-                        android.os.IBinder binder = new IBinder() {
-                            @Nullable
-                            @Override
-                            public String getInterfaceDescriptor() throws RemoteException {
-                                return null;
-                            }
+        // # Skip ADD_ALWAYS_UNLOCKED_DISPLAY
+        //Reason : The corresponding api
+        //VirtualDeviceParams.Builder#setLockState hasn't raise an exception.
 
-                            @Override
-                            public boolean pingBinder() {
-                                return false;
-                            }
-
-                            @Override
-                            public boolean isBinderAlive() {
-                                return false;
-                            }
-
-                            @Nullable
-                            @Override
-                            public IInterface queryLocalInterface(@NonNull String s) {
-                                return null;
-                            }
-
-                            @Override
-                            public void dump(@NonNull FileDescriptor fileDescriptor, @Nullable String[] strings) throws RemoteException {
-
-                            }
-
-                            @Override
-                            public void dumpAsync(@NonNull FileDescriptor fileDescriptor, @Nullable String[] strings) throws RemoteException {
-
-                            }
-
-                            @Override
-                            public boolean transact(int i, @NonNull Parcel parcel, @Nullable Parcel parcel1, int i1) throws RemoteException {
-                                return false;
-                            }
-
-                            @Override
-                            public void linkToDeath(@NonNull DeathRecipient deathRecipient, int i) throws RemoteException {
-
-                            }
-
-                            @Override
-                            public boolean unlinkToDeath(@NonNull DeathRecipient deathRecipient, int i) {
-                                return false;
-                            }
-                        };
-//                        public UserHandle getCallingUserHandle() {
-//                            return Binder.getCallingUserHandle();
-//                        }
-                        UserHandle uh = Binder.getCallingUserHandle();
-                        //mLogger.logDebug(">>>>"+uh.toString());
-                        //Read Associations from Companion Device Manager
-                        //Context userContext = mContext.createContextAsUser(uh, 0);
-//                        synchronized (mVirtualDeviceManagerLock) {
-//                            final CompanionDeviceManager cdm =
-//                                    userContext.getSystemService(CompanionDeviceManager.class);
-//                            final int userId = user.getUserIdentifier();
-//                            mAllAssociations.put(userId, cdm.getAllAssociations());
-
-                   //final int callingUserId = getCallingUserHandle().getIdentifier();
-                    //            final List<AssociationInfo> associations =
-                    //                    mAllAssociations.get(callingUserId);
-                    //            if (associations != null) {
-                    //                final int associationSize = associations.size();
-                    //                for (int i = 0; i < associationSize; i++) {
-                    //                    AssociationInfo associationInfo = associations.get(i);
-                    //                    if (associationInfo.belongsToPackage(callingUserId, packageName)
-                    //                            && associationId == associationInfo.getId()) {
-                    //                        return associationInfo;
-                    //                    }
-                    //                }
-                    //            }
-                        mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
-                                Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
-                                Transacts.createVirtualDevice, binder,mContext.getPackageName(),
-                                0, vdpm,null);
-                        //invokeReflectionCall(vdpm.getClass(),
-                        //        "createVirtualDevice", vdpm, new Class[]{int.class,vdpParams.getClass()},
-                        //        1,vdpParams);
-
-                        //mLogger.logDebug(">"+vdpParams.toString()+","+n.toString()+vdpm.toString());
-
-                    } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-                        throw new UnexpectedPermissionTestFailureException(e);
-                    }
-                }));*/
         mPermissionTasks.put(permission.SET_GAME_SERVICE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     mTransacts.invokeTransact(Transacts.GAME_SERVICE, Transacts.GAME_DESCRIPTOR,
@@ -4433,34 +4186,35 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             0,0,new Intent().setClass(mContext, TestActivity.class),0,0);
                 }));
 
-        mPermissionTasks.put(permission.LAUNCH_DEVICE_MANAGER_SETUP,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-
-                    Intent intent = new Intent("android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE")
-                            //.putExtra(TEST_EXTRA_KEY, TEST_EXTRA_VALUE)
-                            .setPackage(mContext.getPackageName()).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            //.putExtra(EXTRA_ROLE_HOLDER_PROVISIONING_INITIATOR_PACKAGE, TEST_CALLING_PACKAGE)
-                            //.putExtra(EXTRA_ROLE_HOLDER_STATE, TEST_ROLE_HOLDER_STATE);
-                    //WizardManagerHelper.copyWizardManagerExtras(MANAGED_PROFILE_INTENT, intent);
-                    mContext.startActivity(intent);
-                    //mLogger.logDebug("Test case for LAUNCH_DEVICE_MANAGER_SETUP not implemented yet");
-                    //final Intent featuresIntent = new Intent("android.intent.action.VIEW_APP_FEATURES");
-                    //com.google.android.youtube
-                    //featuresIntent
-                    //       .setPackage("com.google.android.gms.permissions.ViewConsumerServicesActivity");//"com.google.android.gms");
-                    //ResolveInfo resolveInfo =mPackageManager.resolveActivity(featuresIntent, 0);
-                    //mLogger.logDebug(">>>>"+resolveInfo+"\n,");
+//        mPermissionTasks.put(permission.LAUNCH_DEVICE_MANAGER_SETUP,
+//                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+//
+//                    Intent intent = new Intent("android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE")
+//                            //.putExtra(TEST_EXTRA_KEY, TEST_EXTRA_VALUE)
+//                            .setPackage(mContext.getPackageName()).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            //.putExtra(EXTRA_ROLE_HOLDER_PROVISIONING_INITIATOR_PACKAGE, TEST_CALLING_PACKAGE)
+//                            //.putExtra(EXTRA_ROLE_HOLDER_STATE, TEST_ROLE_HOLDER_STATE);
+//                    //WizardManagerHelper.copyWizardManagerExtras(MANAGED_PROFILE_INTENT, intent);
+//                    mContext.startActivity(intent);
+//                    //mLogger.logDebug("Test case for LAUNCH_DEVICE_MANAGER_SETUP not implemented yet");
+//                    //final Intent featuresIntent = new Intent("android.intent.action.VIEW_APP_FEATURES");
+//                    //com.google.android.youtube
+//                    //featuresIntent
+//                    //       .setPackage("com.google.android.gms.permissions.ViewConsumerServicesActivity");//"com.google.android.gms");
+//                    //ResolveInfo resolveInfo =mPackageManager.resolveActivity(featuresIntent, 0);
+//                    //mLogger.logDebug(">>>>"+resolveInfo+"\n,");
 //                    featuresIntent.setComponent(
 //                            new ComponentName(mPackageName,
 //                                    resolveInfo.activityInfo.name));
-                    //.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    //adb shell am broadcast -a com.package.app.ACTION -es SCAN_RESULT "1021101" com.package.app/.com.package.app.droid.activities.MainActivity
-                    //mContext.startActivity(featuresIntent);
+//                    //.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    //adb shell am broadcast -a com.package.app.ACTION -es SCAN_RESULT "1021101" com.package.app/.com.package.app.droid.activities.MainActivity
+//                    //mContext.startActivity(featuresIntent);
+//
+//                    //new Intent( "android.app.action.ROLE_HOLDER_PROVISION_FINALIZATION");
+//                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+//                    //       Transacts.unregisterCoexCallback, (Object) null);
+//                }));
 
-                    //new Intent( "android.app.action.ROLE_HOLDER_PROVISION_FINALIZATION");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
-                }));
         mPermissionTasks.put(permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     List<Object> array = new ArrayList<Object>();
@@ -4480,31 +4234,29 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     } catch (ClassNotFoundException e){// | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
                         throw new UnexpectedPermissionTestFailureException(e);
                     }
-
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
                 }));
 
-        mPermissionTasks.put(permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    View view = new View(mContext);
-                    view.setBackgroundColor(Color.RED);
-                    List<Rect> a = Collections.singletonList(new Rect(0, 0, 100,100));
-                    //setUnrestrictedPreferKeepClearRects
-                    invokeReflectionCall(View.class, "setUnrestrictedPreferKeepClearRects",
-                            view, new Class[]{List.class},a);
-
-                    activity.runOnUiThread(new Runnable() {
-                           @Override
-                           public void run() {
+//        mPermissionTasks.put(permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS,
+//                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+//                    View view = new View(mContext);
+//                    view.setBackgroundColor(Color.RED);
+//                    List<Rect> a = Collections.singletonList(new Rect(0, 0, 100,100));
+//                    //setUnrestrictedPreferKeepClearRects
+//                    invokeReflectionCall(View.class, "setUnrestrictedPreferKeepClearRects",
+//                            view, new Class[]{List.class},a);
+//
+//                    activity.runOnUiThread(new Runnable() {
+//                           @Override
+//                           public void run() {
 //                               activity.addContentView(view,new ViewGroup.LayoutParams(
 //                                       ViewGroup.LayoutParams.MATCH_PARENT,
 //                                       ViewGroup.LayoutParams.MATCH_PARENT));
-                           }
-                       }
-                    );
-                    //getUIthread().addContentView(view,new WindowManager.LayoutParams());
-                }));
+//                           }
+//                       }
+//                    );
+//                    //getUIthread().addContentView(view,new WindowManager.LayoutParams());
+//                }));
+
         mPermissionTasks.put(permission.TIS_EXTENSION_INTERFACE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     //The tv_input service guarded by this permission is not available on this device
@@ -4512,18 +4264,19 @@ public class SignaturePermissionTester extends BasePermissionTester {
                            Transacts.getAvailableExtensionInterfaceNames);
                 }));
 
-        mPermissionTasks.put(permission.WRITE_SECURITY_LOG,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+//        mPermissionTasks.put(permission.WRITE_SECURITY_LOG,
+//                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+//
+//                    List<ComponentName> admins = mDevicePolicyManager.getActiveAdmins();
+//                    if(admins.size()>=0) {
+//                        mDevicePolicyManager.setSecurityLoggingEnabled(admins.get(0),true);
+//                        int nRet = (int)invokeReflectionCall(SecurityLog.class, "writeEvent",
+//                                null, new Class[]{int.class,Object[].class},10,new Object[]{"dummy"});
+//                       // mLogger.logDebug("[BLOCK] require internal permission, MANAGE_SAFETY_CENTER permission to eval."+nRet);
+//                    }
+//
+//                }));
 
-                    List<ComponentName> admins = mDevicePolicyManager.getActiveAdmins();
-                    if(admins.size()>=0) {
-                        mDevicePolicyManager.setSecurityLoggingEnabled(admins.get(0),true);
-                        int nRet = (int)invokeReflectionCall(SecurityLog.class, "writeEvent",
-                                null, new Class[]{int.class,Object[].class},10,new Object[]{"dummy"});
-                       // mLogger.logDebug("[BLOCK] require internal permission, MANAGE_SAFETY_CENTER permission to eval."+nRet);
-                    }
-
-                }));
         mPermissionTasks.put(permission.MAKE_UID_VISIBLE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     mLogger.logDebug("Test case for MAKE_UID_VISIBLE not implemented yet");
