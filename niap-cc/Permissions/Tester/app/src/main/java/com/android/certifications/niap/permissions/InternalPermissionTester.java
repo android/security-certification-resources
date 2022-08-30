@@ -180,37 +180,24 @@ public class InternalPermissionTester extends BasePermissionTester {
                 }));
 
 
-        //Internal Permissions As of Android 13
-
+        //Internal Permissions as of Android 13
         //permission.READ_ASSISTANT_APP_SEARCH_DATA depends on specific app role
         //permission.READ_HOME_APP_SEARCH_DATA depends on specific app role
-        //permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION is for automotive headset
 
         mPermissionTasks.put(permission.SET_DEFAULT_ACCOUNT_FOR_CONTACTS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        Intent _intent = new Intent(ContactsContract.Settings.ACTION_SET_DEFAULT_ACCOUNT);
-                        PackageManager packageManager = mContext.getPackageManager();
-                        List<ResolveInfo> resolveInfoList = packageManager.queryIntentActivities(_intent, 0);
-                        if(resolveInfoList.size()>0){
-                            String packageName = resolveInfoList.get(0).activityInfo.packageName;
-                            String activityName = resolveInfoList.get(0).activityInfo.name;
-                            Intent intent = new Intent();
-                            intent.setAction(ContactsContract.Settings.ACTION_SET_DEFAULT_ACCOUNT);
-                            intent.setComponent(new ComponentName(packageName, activityName));
-                            intent.setPackage(packageName).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            //mLogger.logDebug("Intent>"+intent.toString());
-                            mContext.startActivity(intent);
+                        Bundle extras = new Bundle();
+                        mContentResolver.call(ContactsContract.AUTHORITY_URI, "setDefaultAccount", null,
+                                extras);
                         }
-                    }
                 }));
 
         mPermissionTasks.put(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     //WindowManagerService#addKeyguardLockedStateListener.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        KeyguardManager.KeyguardLockedStateListener listener =
-                                new KeyguardManager.KeyguardLockedStateListener() {
+                        KeyguardManager.KeyguardLockedStateListener listener = new KeyguardManager.KeyguardLockedStateListener() {
                             @Override
                             public void onKeyguardLockedStateChanged(boolean b) {
                             }
@@ -218,31 +205,13 @@ public class InternalPermissionTester extends BasePermissionTester {
                         mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
                                 Transacts.addKeyguardLockedStateListener, listener);
                     }
-
                 }));
-        mPermissionTasks.put(permission.SEND_SAFETY_CENTER_UPDATE,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //SafetyCenterManager#getSafetySourceData requrires this permissons
-                    //Context.SAFETY_CENTER_SERVI
-                    //afetyCentermContext.getSystemService();
-                    Class<?> clazzSaftyCenter = null;
-                    try {
-                        clazzSaftyCenter = Class.forName("android.safetycenter.SafetyCenterManager");
-                        Object saftyCenter = mContext.getSystemService(clazzSaftyCenter);
-                        invokeReflectionCall
-                                (clazzSaftyCenter, "getSafetySourceData",
-                                        saftyCenter, new Class[]{String.class},"GooglePlaySystemUpdate");
-                    } catch (ClassNotFoundException e){// | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-                        throw new UnexpectedPermissionTestFailureException(e);
-                    }
-                })
-        );
+
         mPermissionTasks.put(permission.CREATE_VIRTUAL_DEVICE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     try {
 
                         Class<?> clazzVDPBuilder = null;
-
                         clazzVDPBuilder = Class.forName("android.companion.virtual.VirtualDeviceParams$Builder");
                         Constructor constructor = clazzVDPBuilder.getConstructor();
                         Object builderObj = constructor.newInstance();
@@ -298,27 +267,65 @@ public class InternalPermissionTester extends BasePermissionTester {
                                 return false;
                             }
                         };
-                        UserHandle uh = Binder.getCallingUserHandle();
+                        //UserHandle uh = Binder.getCallingUserHandle();
                         mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
                                 Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
                                 Transacts.createVirtualDevice, binder,mContext.getPackageName(),
                                 0, vdpParams,null);
 
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    } finally {
-
+                    } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
+                        throw new UnexpectedPermissionTestFailureException(e);
                     }
+
                 }));
 
+        mPermissionTasks.put(permission.SEND_SAFETY_CENTER_UPDATE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    Class<?> clazzSaftyCenter = null;
+                    try {
+                        clazzSaftyCenter = Class.forName("android.safetycenter.SafetyCenterManager");
+                        Object saftyCenter = mContext.getSystemService(clazzSaftyCenter);
+                        invokeReflectionCall
+                                (clazzSaftyCenter, "getSafetySourceData",
+                                        saftyCenter, new Class[]{String.class},"GooglePlaySystemUpdate");
+                    } catch (ClassNotFoundException e){
+                        throw new UnexpectedPermissionTestFailureException(e);
+                    }
+                })
+        );
+
+        mPermissionTasks.put(permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    if (!mPackageManager.hasSystemFeature(
+                            PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
+                        throw new BypassTestException(
+                                "Device does not have the "
+                                        + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
+                                        + "for this test");
+                    }
+                    AssociationRequest request = new AssociationRequest.Builder().setDeviceProfile(
+                            AssociationRequest.DEVICE_PROFILE_AUTOMOTIVE_PROJECTION).build();
+
+                    CompanionDeviceManager.Callback callback =
+                            new CompanionDeviceManager.Callback() {
+                                @Override
+                                public void onDeviceFound(IntentSender intentSender) {
+                                    mLogger.logDebug(
+                                            "onDeviceFound: intentSender = " + intentSender);
+                                }
+                                @Override
+                                public void onFailure(CharSequence charSequence) {
+                                    mLogger.logDebug("onFailure: charSequence = " + charSequence);
+                                }
+                            };
+                    CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
+                            CompanionDeviceManager.class);
+
+                    companionDeviceManager.associate(request, callback, null);
+
+                }));
+
+        //SignaturePermissions.permission.ADD_ALWAYS_UNLOCKED_DISPLAY
         mPermissionTasks.put(SignaturePermissions.permission.ADD_ALWAYS_UNLOCKED_DISPLAY,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     Class<?> clazzVDPBuilder = null;
@@ -399,20 +406,12 @@ public class InternalPermissionTester extends BasePermissionTester {
                                 Transacts.createVirtualDevice, binder,mContext.getPackageName(),
                                 associationInfo.getId(), vdpParams,null);
 
-                        //invokeReflectionCall(vdpm.getClass(),
-                        //        "createVirtualDevice", vdpm, new Class[]{int.class,vdpParams.getClass()},
-                        //        1,vdpParams);
-
-                        //mLogger.logDebug(">"+vdpParams.toString()+","+n.toString()+vdpm.toString());
-
                     } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
                         throw new UnexpectedPermissionTestFailureException(e);
                     }
 
             })
         );
-
-
 
         mPermissionTasks.put(permission.ACCESS_AMBIENT_CONTEXT_EVENT,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
@@ -436,72 +435,8 @@ public class InternalPermissionTester extends BasePermissionTester {
                             }, null);
 
                 }));
-
-        mPermissionTasks.put(permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-
-                    if (!mPackageManager.hasSystemFeature(
-                            PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
-                        throw new BypassTestException(
-                                "Device does not have the "
-                                        + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
-                                        + "for this test");
-                    }
-                    AssociationRequest request = new AssociationRequest.Builder().setDeviceProfile(
-                            AssociationRequest.DEVICE_PROFILE_AUTOMOTIVE_PROJECTION).build();
-                    CompanionDeviceManager.Callback callback =
-                            new CompanionDeviceManager.Callback() {
-                                @Override
-                                public void onDeviceFound(IntentSender intentSender) {
-                                    mLogger.logDebug(
-                                            "onDeviceFound: intentSender = " + intentSender);
-                                }
-                                @Override
-                                public void onFailure(CharSequence charSequence) {
-                                    mLogger.logDebug("onFailure: charSequence = " + charSequence);
-                                }
-                            };
-                    CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
-                            CompanionDeviceManager.class);
-                    companionDeviceManager.associate(request, callback, null);
-
-                }));
-
-             mPermissionTasks.put(SignaturePermissions.permission.MODIFY_TOUCH_MODE_STATE,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-
-                    //boolean b=(boolean)mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
-                    //        Transacts.getInTouchMode);
-                    //Hasn't raise exception.  need to check property how?
-                    mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
-                            Transacts.setInTouchMode,true);
-                    mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
-                            Transacts.setInTouchMode,false);
-                }));
-
-//        mPermissionTasks.put(permission.WRITE_SECURITY_LOG,
-//                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-//                    mLogger.logDebug("[BLOCK] Write Security Log.");
-//
-//                    DevicePolicyManager mDevicePolicyManager = (DevicePolicyManager) mContext.getSystemService(
-//                            Context.DEVICE_POLICY_SERVICE);
-//                    ComponentName component =
-//                            new ComponentName(mContext.getPackageName(), String.valueOf(InternalPermissionTester.class));;
-//                    //mDevicePolicyManager.setSecurityLoggingEnabled(component,true);
-//                    int nRet = (int)invokeReflectionCall(SecurityLog.class, "writeEvent",
-//                            null, new Class[]{int.class,Object[].class},10,new Object[]{"dummy"});
-//
-//                }));
-
     }
-    //Emulate hidden Parcel API
-    public void writeArraySet(Parcel p,ArraySet<? extends Object> val) {
-        final int size = (val != null) ? val.size() : -1;
-        p.writeInt(size);
-        for (int i = 0; i < size; i++) {
-            p.writeValue(val.valueAt(i));
-        }
-    }
+
     @Override
     public boolean runPermissionTests() {
         boolean allTestsPassed = true;
