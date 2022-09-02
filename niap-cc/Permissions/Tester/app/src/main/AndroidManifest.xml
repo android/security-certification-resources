@@ -48,7 +48,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <receiver
+            android:name=".receivers.ChooserReceiver"
+            android:exported="false">
+        </receiver>
         <!-- This service is also used to test REGISTER_SIM_SUBSCRIPTION; the API for this test
            verifies that the specified services requires BIND_TELECOM_CONNECTION_SERVICE. -->
         <service

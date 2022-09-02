@@ -38,6 +38,20 @@
             </intent-filter>
         </activity>
 
+        <!--<activity
+            android:name="com.android.certifications.niap.permissions.companion.PreProvisioningActivity"
+            android:excludeFromRecents="true"
+            android:immersive="true"
+            android:launchMode="singleTop"
+            android:exported="true"
+            android:permission="android.permission.LAUNCH_DEVICE_MANAGER_SETUP"
+            android:theme="@style/AppTheme">
+            <intent-filter android:priority="10">
+                <action android:name="android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>-->
+
         <service
             android:name="com.android.certifications.niap.permissions.companion.services.TestBindIncallServiceService"
             android:enabled="true"

@@ -109,7 +109,8 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            addPermissionsForT(permissions);
+            //addPermissionsForT(permissions);
+            permissions.add(permission.LAUNCH_DEVICE_MANAGER_SETUP);
         }
 
         return Optional.of(permissions);
@@ -157,7 +158,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
             permissions.add(permission.SET_GAME_SERVICE);
             permissions.add(permission.ACCESS_FPS_COUNTER);
             permissions.add(permission.MANAGE_GAME_ACTIVITY);
-            permissions.add(permission.LAUNCH_DEVICE_MANAGER_SETUP);
+            //Infeasible#permissions.add(permission.LAUNCH_DEVICE_MANAGER_SETUP);
             permissions.add(permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES);
             permissions.add(permission.READ_SAFETY_CENTER_STATUS);
             //Infeasible#permissions.add(permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS);

@@ -62,6 +62,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.content.pm.CrossProfileApps;
 import android.content.pm.IOnPermissionsChangeListener;
 import android.content.pm.LauncherApps;
@@ -149,8 +150,13 @@ import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.CaptioningManager;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.activities.TestActivity;
@@ -159,6 +165,7 @@ import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
+import com.android.certifications.niap.permissions.receivers.ChooserReceiver;
 import com.android.certifications.niap.permissions.services.TestService;
 import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
@@ -1689,7 +1696,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.SET_ANIMATION_SCALE,
                 new PermissionTest(false, () -> {
                     mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
-                            Transacts.setAnimationScale, 0, 1L);
+                            Transacts.setAnimationScale, 0, 0.1f);
                 }));
 
         mPermissionTasks.put(permission.SET_DEBUG_APP, new PermissionTest(false, () -> {
@@ -1977,9 +1984,17 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.UPDATE_DEVICE_STATS,
                 new PermissionTest(false, () -> {
-                    mTransacts.invokeTransact(Transacts.BATTERY_STATS_SERVICE,
-                            Transacts.BATTERY_STATS_DESCRIPTOR,
-                            Transacts.noteStartAudio, 0, "test", mUid);
+
+                    if (mDeviceApiLevel == Build.VERSION_CODES.TIRAMISU) {
+                        mTransacts.invokeTransact(Transacts.BATTERY_STATS_SERVICE,
+                                Transacts.BATTERY_STATS_DESCRIPTOR,
+                                Transacts.noteStartAudio,0);
+                    } else {
+                        mTransacts.invokeTransact(Transacts.BATTERY_STATS_SERVICE,
+                                Transacts.BATTERY_STATS_DESCRIPTOR,
+                                Transacts.noteStartAudio, 0, "test", mUid);
+                    }
+
                 }));
 
         // android.permission.UPDATE_LOCK - updatelock service guarded by SELinux policy.
@@ -2826,7 +2841,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     long currTimeMs = System.currentTimeMillis();
                     Parcel result = mTransacts.invokeTransact(Transacts.DROPBOX_SERVICE,
                             Transacts.DROPBOX_DESCRIPTOR,
-                            Transacts.getNextEntry, null, currTimeMs, mPackageName);
+                            Transacts.getNextEntry, "test-tag", currTimeMs, mPackageName);
                     if (result.readInt() == 0) {
                         throw new SecurityException(
                                 "Received DropBoxManager.Entry is null during PEEK_DROPBOX_DATA "
@@ -3871,7 +3886,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.REQUEST_COMPANION_PROFILE_COMPUTER,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //mLogger.logDebug("Test case for REQUEST_COMPANION_PROFILE_COMPUTER not implemented yet");
+
                     if (!mPackageManager.hasSystemFeature(
                             PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
                         throw new BypassTestException(
@@ -4154,34 +4169,30 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             0,0,new Intent().setClass(mContext, TestActivity.class),0,0);
                 }));
 
-//        mPermissionTasks.put(permission.LAUNCH_DEVICE_MANAGER_SETUP,
-//                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-//
-//                    Intent intent = new Intent("android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE")
-//                            //.putExtra(TEST_EXTRA_KEY, TEST_EXTRA_VALUE)
-//                            .setPackage(mContext.getPackageName()).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                            //.putExtra(EXTRA_ROLE_HOLDER_PROVISIONING_INITIATOR_PACKAGE, TEST_CALLING_PACKAGE)
-//                            //.putExtra(EXTRA_ROLE_HOLDER_STATE, TEST_ROLE_HOLDER_STATE);
-//                    //WizardManagerHelper.copyWizardManagerExtras(MANAGED_PROFILE_INTENT, intent);
-//                    mContext.startActivity(intent);
-//                    //mLogger.logDebug("Test case for LAUNCH_DEVICE_MANAGER_SETUP not implemented yet");
-//                    //final Intent featuresIntent = new Intent("android.intent.action.VIEW_APP_FEATURES");
-//                    //com.google.android.youtube
-//                    //featuresIntent
-//                    //       .setPackage("com.google.android.gms.permissions.ViewConsumerServicesActivity");//"com.google.android.gms");
-//                    //ResolveInfo resolveInfo =mPackageManager.resolveActivity(featuresIntent, 0);
-//                    //mLogger.logDebug(">>>>"+resolveInfo+"\n,");
-//                    featuresIntent.setComponent(
-//                            new ComponentName(mPackageName,
-//                                    resolveInfo.activityInfo.name));
-//                    //.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    //adb shell am broadcast -a com.package.app.ACTION -es SCAN_RESULT "1021101" com.package.app/.com.package.app.droid.activities.MainActivity
-//                    //mContext.startActivity(featuresIntent);
-//
-//                    //new Intent( "android.app.action.ROLE_HOLDER_PROVISION_FINALIZATION");
-//                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-//                    //       Transacts.unregisterCoexCallback, (Object) null);
-//                }));
+        mPermissionTasks.put(permission.LAUNCH_DEVICE_MANAGER_SETUP,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+
+                    //DeviceManger#ACTION_ROLE_HOLDER_PROVISION_FINALIZATION
+                    //DeviceManger#ACTION_ROLE_HOLDER_PROVISION_MANAGED_DEVICE_FROM_TRUSTED_SOURCE"
+                    //DeviceManger#ACTION_ROLE_HOLDER_PROVISION_MANAGED_PROFILE
+                    //ROLE_HOLDER_PROVISION_MANAGED_PROFILE
+
+                    Intent intent = new Intent("android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE")
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    //Note :
+                    //This permission restricts displaying list on the chooser.
+                    //(You can take the corresponding activities from resolveActivity/queryIntent regardless
+                    //this permission's status)
+                    //So in this case, if the permission is not granted you'll got a blank chooser.
+                    //Then operation will be canceled by user.
+                    //And if it's granted PreProvisioningActivity will be launched (by default).
+                    //Without AE environment this activity put back RESULT_CANCELED error code.
+
+                    final Intent chooser = Intent.createChooser(intent, "Chooser");
+                    chooser.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    ((MainActivity)activity).launhDeviceManagerTest.launch(chooser);
+                }));
 
         mPermissionTasks.put(permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
@@ -4204,26 +4215,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
 
-//        mPermissionTasks.put(permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS,
-//                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-//                    View view = new View(mContext);
-//                    view.setBackgroundColor(Color.RED);
-//                    List<Rect> a = Collections.singletonList(new Rect(0, 0, 100,100));
-//                    //setUnrestrictedPreferKeepClearRects
-//                    invokeReflectionCall(View.class, "setUnrestrictedPreferKeepClearRects",
-//                            view, new Class[]{List.class},a);
-//
-//                    activity.runOnUiThread(new Runnable() {
-//                           @Override
-//                           public void run() {
-//                               activity.addContentView(view,new ViewGroup.LayoutParams(
-//                                       ViewGroup.LayoutParams.MATCH_PARENT,
-//                                       ViewGroup.LayoutParams.MATCH_PARENT));
-//                           }
-//                       }
-//                    );
-//                    //getUIthread().addContentView(view,new WindowManager.LayoutParams());
-//                }));
+
+        // # Skip SET_UNRESTRICTED_KEEP_CLEAR_AREAS
+        //Reason : The corresponding api
+        //View.setUnrestrictedPreferKeepClearRects hasn't check this restriction.
 
         mPermissionTasks.put(permission.TIS_EXTENSION_INTERFACE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
@@ -4232,18 +4227,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                            Transacts.getAvailableExtensionInterfaceNames);
                 }));
 
-//        mPermissionTasks.put(permission.WRITE_SECURITY_LOG,
-//                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-//
-//                    List<ComponentName> admins = mDevicePolicyManager.getActiveAdmins();
-//                    if(admins.size()>=0) {
-//                        mDevicePolicyManager.setSecurityLoggingEnabled(admins.get(0),true);
-//                        int nRet = (int)invokeReflectionCall(SecurityLog.class, "writeEvent",
-//                                null, new Class[]{int.class,Object[].class},10,new Object[]{"dummy"});
-//                       // mLogger.logDebug("[BLOCK] require internal permission, MANAGE_SAFETY_CENTER permission to eval."+nRet);
-//                    }
-//
-//                }));
+        // # Skip WRITE_SECURITY_LOG
+        //Reason : The corresponding api
+        // SecurityLog.writeEvent hasn't check this restriction/and couldn't execute propery from
+        // User applications.
 
         mPermissionTasks.put(permission.MAKE_UID_VISIBLE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {

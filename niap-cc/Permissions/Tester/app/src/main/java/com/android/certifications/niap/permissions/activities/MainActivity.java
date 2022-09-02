@@ -38,6 +38,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 
@@ -74,6 +78,19 @@ public class MainActivity extends AppCompatActivity {
     private TestConfiguration mConfiguration;
     private DevicePolicyManager mDevicePolicyManager;
     private ComponentName mComponentName;
+
+    public ActivityResultLauncher<Intent> launhDeviceManagerTest = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    sLogger.logDebug(result.toString()+","+result.getResultCode());
+                    sLogger.logDebug(">"+result.describeContents());
+                    sLogger.logDebug(">"+result.getData());
+                    //sLogger.logDebug(">"+result.);
+                    //sLogger.logDebug(">"+result.getData().getPackage());
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
