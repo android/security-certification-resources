@@ -8,23 +8,19 @@ import android.os.Bundle;
 import android.util.Log;
 
 public class ChooserReceiver extends BroadcastReceiver {
+
+    public static final int TEST_LAUNCH_DEVICE_MANAGER_SETUP = 1000;
+
     private static final String TAG = "ChooserReceiver";
     @Override
     public void onReceive(Context context, Intent intent) {
 
         Bundle bundle = intent.getExtras();
-
-        Log.d(TAG, "bundle = null"+bundle+","+intent.getPackage()+""+intent.getType());
-        if(bundle == null) {
-            Log.d(TAG, "bundle = null");
-            return;
-        }
-
-        Object componentName = bundle.get(Intent.EXTRA_CHOSEN_COMPONENT);
-        if (componentName instanceof ComponentName) {
-
-            Log.d(TAG, ((ComponentName)componentName).getPackageName());
-
+        String test = intent.getStringExtra("test");
+        int test_id = intent.getIntExtra("test_id",0);
+        if(test_id == TEST_LAUNCH_DEVICE_MANAGER_SETUP){
+            Object componentName = bundle.get(Intent.EXTRA_CHOSEN_COMPONENT);
+            Log.d(TAG,"*** PASSED "+test+" test case. success.("+componentName+")");
         }
     }
 }

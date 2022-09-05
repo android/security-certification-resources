@@ -84,11 +84,6 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult result) {
-                    sLogger.logDebug(result.toString()+","+result.getResultCode());
-                    sLogger.logDebug(">"+result.describeContents());
-                    sLogger.logDebug(">"+result.getData());
-                    //sLogger.logDebug(">"+result.);
-                    //sLogger.logDebug(">"+result.getData().getPackage());
                 }
             });
 

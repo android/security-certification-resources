@@ -53,6 +53,12 @@
         </activity>-->
 
         <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindPreProvisioningActivityService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.LAUNCH_DEVICE_MANAGER_SETUP" />
+
+        <service
             android:name="com.android.certifications.niap.permissions.companion.services.TestBindIncallServiceService"
             android:enabled="true"
             android:exported="true"

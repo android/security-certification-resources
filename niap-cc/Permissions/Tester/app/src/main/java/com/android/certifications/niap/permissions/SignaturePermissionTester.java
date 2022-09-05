@@ -161,6 +161,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.activities.TestActivity;
 import com.android.certifications.niap.permissions.companion.services.TestBindService;
+import com.android.certifications.niap.permissions.config.BypassConfigException;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -4177,21 +4178,34 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     //DeviceManger#ACTION_ROLE_HOLDER_PROVISION_MANAGED_PROFILE
                     //ROLE_HOLDER_PROVISION_MANAGED_PROFILE
 
-                    Intent intent = new Intent("android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE")
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    Intent featuresIntent = new Intent("android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE");
+                    ResolveInfo resolveInfo =mPackageManager.resolveActivity(featuresIntent, 0);
+                    if(resolveInfo == null){
+                        throw new BypassTestException("the system does not have corresponding activity to" +
+                                " ROLE_HOLDER_PROVISION_MANAGED_PROFILE action. Let's skip it...");
+                    }
 
                     //Note :
-                    //This permission restricts displaying list on the chooser.
-                    //(You can take the corresponding activities from resolveActivity/queryIntent regardless
-                    //this permission's status)
+                    //This permission restricts displaying list on the chooser activity.
                     //So in this case, if the permission is not granted you'll got a blank chooser.
-                    //Then operation will be canceled by user.
-                    //And if it's granted PreProvisioningActivity will be launched (by default).
-                    //Without AE environment this activity put back RESULT_CANCELED error code.
+                    //And if it's granted PreProvisioningActivity will be launched by default.
+                    //If we succeeded to call that activity, We can get an event regarding
+                    //selection of the chooser on BroadCastReciver.
+                    //If the ChooserRecevier does not leave any messages the test is failed.
 
-                    final Intent chooser = Intent.createChooser(intent, "Chooser");
+                    featuresIntent.putExtra("test_id",ChooserReceiver.TEST_LAUNCH_DEVICE_MANAGER_SETUP);
+                    Intent receiver = new Intent(mContext, ChooserReceiver.class);
+                    receiver.putExtra("test_id",ChooserReceiver.TEST_LAUNCH_DEVICE_MANAGER_SETUP);
+                    receiver.putExtra("test","LAUNCH_DEVICE_MANAGER_SETUP");
+                    PendingIntent pendingIntent =
+                            PendingIntent.getBroadcast(mContext,0,receiver,
+                                    PendingIntent.FLAG_MUTABLE|PendingIntent.FLAG_UPDATE_CURRENT);
+                    final Intent chooser =
+                            Intent.createChooser(featuresIntent, "Chooser", pendingIntent.getIntentSender());
                     chooser.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     ((MainActivity)activity).launhDeviceManagerTest.launch(chooser);
+                    mLogger.logInfo("Please check logcat mesage, and confirm TEST_LAUNCH_DEVICE_MANAGER_SETUP test is passed!!");
+
                 }));
 
         mPermissionTasks.put(permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES,
