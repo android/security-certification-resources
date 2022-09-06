@@ -113,6 +113,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(setWallpaper, 1);
+        transactIds.put(setWallpaperComponent, 3);
         mDescriptorTransacts.put(WALLPAPER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();

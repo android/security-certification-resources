@@ -1246,7 +1246,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false, () -> {
                     mTransacts.invokeTransact(Transacts.ACCESSIBILITY_SERVICE,
                             Transacts.ACCESSIBILITY_DESCRIPTOR,
-                            Transacts.setPictureInPictureActionReplacingConnection, 0);
+                            Transacts.setPictureInPictureActionReplacingConnection, getActivityToken());
                 }));
 
         mPermissionTasks.put(permission.MODIFY_APPWIDGET_BIND_PERMISSIONS,
@@ -1806,7 +1806,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false, () -> {
                     ComponentName name = new ComponentName(mContext, MainActivity.class);
                     mTransacts.invokeTransact(Transacts.WALLPAPER_SERVICE, Transacts.WALLPAPER_DESCRIPTOR,
-                            Transacts.setWallpaper, name);
+                            Transacts.setWallpaperComponent, name);
                 }));
 
         mPermissionTasks.put(permission.SHOW_KEYGUARD_MESSAGE,
@@ -2371,6 +2371,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.MANAGE_BIOMETRIC,
                 new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+
+                    //mFinger
+
+
                     try {
                         mTransacts.invokeTransact(Transacts.FACE_SERVICE, Transacts.FACE_DESCRIPTOR,
                                 Transacts.generateChallenge, getActivityToken());
@@ -2378,10 +2382,17 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         // For devices without the face service the fingerprint service can be
                         // used to test this permission. The lock_settings service also uses
                         // this permission, but it is guarded by SELinux policy.
-                        mTransacts.invokeTransact(Transacts.FINGERPRINT_SERVICE,
+                        if (mDeviceApiLevel >= Build.VERSION_CODES.TIRAMISU) {
+                            mTransacts.invokeTransact(Transacts.FINGERPRINT_SERVICE,
+                                    Transacts.FINGERPRINT_DESCRIPTOR,
+                                    Transacts.cancelAuthenticationFromService, 0, getActivityToken(),
+                                    mPackageName, (long) Binder.getCallingPid());
+                        } else {
+                            mTransacts.invokeTransact(Transacts.FINGERPRINT_SERVICE,
                                 Transacts.FINGERPRINT_DESCRIPTOR,
                                 Transacts.cancelAuthenticationFromService, getActivityToken(),
                                 mPackageName, mUid, Binder.getCallingPid(), 0);
+                        }
                     }
                 }));
 
@@ -2429,7 +2440,11 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         mTransacts.invokeTransact(Transacts.STATUS_BAR_SERVICE,
                                 Transacts.STATUS_BAR_DESCRIPTOR,
                                 Transacts.hideBiometricDialog);
-                    } else {
+                    } else if (mDeviceApiLevel == Build.VERSION_CODES.TIRAMISU) {
+                        mTransacts.invokeTransact(Transacts.STATUS_BAR_SERVICE,
+                                Transacts.STATUS_BAR_DESCRIPTOR,
+                                Transacts.onBiometricHelp, 0, "test");
+                    }else {
                         mTransacts.invokeTransact(Transacts.STATUS_BAR_SERVICE,
                                 Transacts.STATUS_BAR_DESCRIPTOR,
                                 Transacts.onBiometricHelp, "test");
@@ -4178,8 +4193,20 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     //DeviceManger#ACTION_ROLE_HOLDER_PROVISION_MANAGED_PROFILE
                     //ROLE_HOLDER_PROVISION_MANAGED_PROFILE
 
+                    Intent ii = new Intent("android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE");
+                    ResolveInfo resolveInfo =mPackageManager.resolveActivity(ii, 0);
+                    mLogger.logInfo(resolveInfo.activityInfo.toString());
+
                     Intent featuresIntent = new Intent("android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE");
-                    ResolveInfo resolveInfo =mPackageManager.resolveActivity(featuresIntent, 0);
+                    featuresIntent.setComponent(new
+                                    ComponentName("com.android.certifications.niap.permissions.companion",
+                                    "com.android.certifications.niap.permissions.companion.PreProvisioningActivity"));
+                    mActivity.startActivity(featuresIntent);
+
+
+//                    Intent ii = new Intent("android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE");
+//                    ResolveInfo resolveInfo =mPackageManager.resolveActivity(ii, 0);
+//                    mLogger.logInfo(resolveInfo.toString());
                     if(resolveInfo == null){
                         throw new BypassTestException("the system does not have corresponding activity to" +
                                 " ROLE_HOLDER_PROVISION_MANAGED_PROFILE action. Let's skip it...");
@@ -4193,6 +4220,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     //selection of the chooser on BroadCastReciver.
                     //If the ChooserRecevier does not leave any messages the test is failed.
 
+                    //Test 1
+                    /*
                     featuresIntent.putExtra("test_id",ChooserReceiver.TEST_LAUNCH_DEVICE_MANAGER_SETUP);
                     Intent receiver = new Intent(mContext, ChooserReceiver.class);
                     receiver.putExtra("test_id",ChooserReceiver.TEST_LAUNCH_DEVICE_MANAGER_SETUP);
@@ -4204,7 +4233,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             Intent.createChooser(featuresIntent, "Chooser", pendingIntent.getIntentSender());
                     chooser.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     ((MainActivity)activity).launhDeviceManagerTest.launch(chooser);
-                    mLogger.logInfo("Please check logcat mesage, and confirm TEST_LAUNCH_DEVICE_MANAGER_SETUP test is passed!!");
+                    mLogger.logInfo("Please check the logcat messages, " +
+                            "and confirm TEST_LAUNCH_DEVICE_MANAGER_SETUP test is passed.");
+
+                     */
 
                 }));
 

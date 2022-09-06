@@ -99,7 +99,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
     @Override
     public Optional<List<String>> getSignaturePermissions() {
         List<String> permissions = new ArrayList<>();
-
+       // permissions.add(permission.START_ANY_ACTIVITY);
         // Starting in Android 12 the NETWORK_SCAN permission behaves similar to
         // RADIO_SCAN_WITHOUT_LOCATION in that it allows a network scan without a location
         // permission.
@@ -107,6 +107,9 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
             //permissions.add(permission.RADIO_SCAN_WITHOUT_LOCATION);
             //permissions.add(permission.NETWORK_SCAN);
         }
+
+
+        //permissions.add(permission.MODIFY_ACCESSIBILITY_DATA);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             //addPermissionsForT(permissions);

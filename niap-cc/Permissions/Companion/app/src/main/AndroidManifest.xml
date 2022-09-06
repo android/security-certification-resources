@@ -22,7 +22,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
+    <uses-permission android:name="android.permission.LAUNCH_DEVICE_MANAGER_SETUP"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -38,7 +38,7 @@
             </intent-filter>
         </activity>
 
-        <!--<activity
+        <activity
             android:name="com.android.certifications.niap.permissions.companion.PreProvisioningActivity"
             android:excludeFromRecents="true"
             android:immersive="true"
@@ -46,11 +46,11 @@
             android:exported="true"
             android:permission="android.permission.LAUNCH_DEVICE_MANAGER_SETUP"
             android:theme="@style/AppTheme">
-            <intent-filter android:priority="10">
+            <intent-filter android:priority="11">
                 <action android:name="android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity>-->
+        </activity>
 
         <service
             android:name="com.android.certifications.niap.permissions.companion.services.TestBindPreProvisioningActivityService"

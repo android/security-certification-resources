@@ -452,6 +452,7 @@ public class Transacts {
     public static final String setAlwaysFinish = "setAlwaysFinish";
     public static final String addKeyboardLayoutForInputDevice = "addKeyboardLayoutForInputDevice";
     public static final String setWallpaper = "setWallpaper";
+    public static final String setWallpaperComponent = "setWallpaperComponent";
     public static final String setStandbyEnabled = "setStandbyEnabled";
     public static final String getCacheSizeBytes = "getCacheSizeBytes";
     public static final String setUserRestriction = "setUserRestriction";

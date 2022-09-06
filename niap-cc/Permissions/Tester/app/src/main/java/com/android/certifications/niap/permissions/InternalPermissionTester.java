@@ -60,6 +60,7 @@ import com.android.certifications.niap.permissions.utils.Transacts;
 
 import java.io.FileDescriptor;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -176,7 +177,8 @@ public class InternalPermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
                     mTransacts.invokeTransact(Transacts.TELEPHONY_IMS_SERVICE,
                             Transacts.TELEPHONY_IMS_DESCRIPTOR,
-                            Transacts.triggerNetworkRegistration, 0, null, 0, "test-sip-reason");
+                            Transacts.triggerNetworkRegistration, 0,
+                            getActivityToken(), 0, "test-sip-reason");
                 }));
 
 
@@ -457,5 +459,21 @@ public class InternalPermissionTester extends BasePermissionTester {
                     "!!! FAILED - one or more internal permission tests failed");
         }
         return allTestsPassed;
+    }
+
+    /**
+     * Returns the {@link IBinder} token for the current activity.
+     *
+     * <p>This token can be used in any binder transaction that requires the activity's token.
+     */
+    public IBinder getActivityToken() {
+        try {
+            Field tokenField = Activity.class.getDeclaredField("mToken");
+            tokenField.setAccessible(true);
+            IBinder token = (IBinder) tokenField.get(mActivity);
+            return token;
+        } catch (ReflectiveOperationException e) {
+            throw new UnexpectedPermissionTestFailureException(e);
+        }
     }
 }

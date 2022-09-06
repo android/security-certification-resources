@@ -58,6 +58,7 @@ public class InternalPermissionsTest {
     private static List<String> mPermissions;
     static {
         mPermissions = new ArrayList<>();
+
         mPermissions.add(permission.MANAGE_HOTWORD_DETECTION);
         mPermissions.add(permission.OBSERVE_SENSOR_PRIVACY);
         mPermissions.add(permission.ACCESS_RCS_USER_CAPABILITY_EXCHANGE);
@@ -94,7 +95,7 @@ public class InternalPermissionsTest {
     public void runPermissionTests_shellIdentity_apisSuccessful() throws Exception {
         InternalPermissionTester permissionTester = new InternalPermissionTester(
                 new InternalTestConfiguration(mPermissions), rule.getActivity());
-        mUiAutomation.adoptShellPermissionIdentity();
+        //mUiAutomation.adoptShellPermissionIdentity();
         //For query contacts
         mUiAutomation.grantRuntimePermission(null,"android.permission.QUERY_ALL_PACKAGES");
 

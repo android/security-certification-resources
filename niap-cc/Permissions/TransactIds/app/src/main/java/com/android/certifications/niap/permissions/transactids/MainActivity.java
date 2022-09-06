@@ -382,6 +382,8 @@ public class MainActivity extends AppCompatActivity {
                     descriptorTransacts);
             queryTransactId(Transacts.WALLPAPER_DESCRIPTOR, Transacts.setWallpaper,
                     descriptorTransacts);
+            queryTransactId(Transacts.WALLPAPER_DESCRIPTOR, Transacts.setWallpaperComponent,
+                    descriptorTransacts);
             queryTransactId(Transacts.WIFI_DESCRIPTOR, Transacts.getWifiApConfiguration,
                     descriptorTransacts);
             queryTransactId(Transacts.WIFI_DESCRIPTOR, Transacts.setWifiEnabled,
