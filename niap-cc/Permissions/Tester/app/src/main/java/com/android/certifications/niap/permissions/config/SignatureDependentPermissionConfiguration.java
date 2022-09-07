@@ -95,6 +95,10 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
 
     @Override
     public Optional<List<String>> getSignaturePermissions() {
+
+
+
+
         List<String> permissions = new ArrayList<>();
        // permissions.add(permission.START_ANY_ACTIVITY);
         // Starting in Android 12 the NETWORK_SCAN permission behaves similar to

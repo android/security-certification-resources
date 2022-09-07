@@ -486,4 +486,8 @@ public class GmsPermissionTester extends BasePermissionTester {
                 .collect(Collectors.toList());
 
     }
+    @Override
+    public Map<String,PermissionTest> getRegisteredPermissions() {
+        return mPermissionTasks;
+    }
 }

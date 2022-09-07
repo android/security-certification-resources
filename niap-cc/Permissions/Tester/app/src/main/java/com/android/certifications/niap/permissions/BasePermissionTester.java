@@ -37,6 +37,8 @@ import com.android.certifications.niap.permissions.utils.Transacts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -120,6 +122,9 @@ public abstract class BasePermissionTester {
      * indicating whether all tests completed successfully.
      */
     public abstract boolean runPermissionTests();
+
+    //public abstract Map<String, PermissionTest> getRegisteredPermissions();
+    public abstract Map<String,PermissionTest> getRegisteredPermissions();
 
     /**
      * @see #runPermissionTest(String, PermissionTest, boolean)
@@ -239,6 +244,8 @@ public abstract class BasePermissionTester {
 
     protected static HashMap<String, ArrayList<String>> mInvokedTransacts = new HashMap<>();
 
+
+
     /**
      * Encapsulates components required for a permission test. The main component is the {@link
      * Runnable} containing a snippet of code to be run to test a permission; in its simplest form
@@ -312,6 +319,16 @@ public abstract class BasePermissionTester {
          */
         public void runTest() {
             mTestRunnable.run();
+        }
+
+        @Override
+        public String toString() {
+            return "PermissionTest{" +
+                    "mIsCustom=" + mIsCustom +
+                    ", mTestRunnable=" + mTestRunnable +
+                    ", mMinApiLevel=" + mMinApiLevel +
+                    ", mMaxApiLevel=" + mMaxApiLevel +
+                    '}';
         }
     }
 

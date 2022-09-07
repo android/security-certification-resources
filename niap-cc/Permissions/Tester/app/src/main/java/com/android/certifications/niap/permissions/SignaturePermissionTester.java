@@ -297,7 +297,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                 "test_access_cache_filesystem.out");
                         if(f.createNewFile()){
                             mLogger.logInfo("test_access_cache_filesystem.out generated.");
-                        };
+                        }
                     } catch (IOException e) {
                         // If an app does not have this permission then an IOException will be
                         // thrown with "Permission denied" in the message.
@@ -393,7 +393,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.ALLOCATE_AGGRESSIVE,
                 new PermissionTest(false, () -> {
-                    UUID storageUUID = null;
+                    UUID storageUUID;
                     try {
                         storageUUID = mStorageManager.getUuidForPath(
                                 Environment.getDataDirectory());
@@ -437,7 +437,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.CAPTURE_AUDIO_OUTPUT,
                 new PermissionTest(false, () -> {
-                    MediaRecorder recorder = null;
+                    MediaRecorder recorder;
                     try {
                         recorder = new MediaRecorder();
                         recorder.setAudioSource(AudioSource.REMOTE_SUBMIX);
@@ -699,7 +699,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
             try {
                 Field idField = userInfo.getClass().getField("id");
                 int userId = (int) idField.get(userInfo);
-                Object result = invokeReflectionCall(mUserManager.getClass(), "removeUser",
+                invokeReflectionCall(mUserManager.getClass(), "removeUser",
                         mUserManager, new Class[]{int.class}, userId);
             } catch (ReflectiveOperationException e) {
                 mLogger.logDebug(
@@ -4192,7 +4192,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     //
 
                     //Obsolated Test Cade
-                    /**
+                    /*
                     featuresIntent.putExtra("test_id",ChooserReceiver.TEST_LAUNCH_DEVICE_MANAGER_SETUP);
                     Intent receiver = new Intent(mContext, ChooserReceiver.class);
                     receiver.putExtra("test_id",ChooserReceiver.TEST_LAUNCH_DEVICE_MANAGER_SETUP);
@@ -4223,7 +4223,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     try {
                         clazzSaftyCenter = Class.forName("android.safetycenter.SafetyCenterManager");
                         Object saftyCenter = mContext.getSystemService(clazzSaftyCenter);
-                        boolean b=(boolean)invokeReflectionCall
+                        invokeReflectionCall
                                 (clazzSaftyCenter, "isSafetyCenterEnabled", saftyCenter, new Class[]{});
                     } catch (ClassNotFoundException e){// | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
                         throw new UnexpectedPermissionTestFailureException(e);
@@ -4658,6 +4658,11 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     "!!! FAILED - one or more signature permission tests failed");
         }
         return allTestsPassed;
+    }
+
+    @Override
+    public Map<String,PermissionTest> getRegisteredPermissions() {
+        return mPermissionTasks;
     }
 
     @Override

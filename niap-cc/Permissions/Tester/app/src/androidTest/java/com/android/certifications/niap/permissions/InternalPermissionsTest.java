@@ -99,6 +99,7 @@ public class InternalPermissionsTest {
         mUiAutomation.grantRuntimePermission(null,"android.permission.QUERY_ALL_PACKAGES");
 
         assertTrue(permissionTester.runPermissionTests());
+
     }
 
     public static class InternalTestConfiguration implements TestConfiguration {

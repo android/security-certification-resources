@@ -717,4 +717,9 @@ public class InstallPermissionTester extends BasePermissionTester {
         }
         return allTestsPassed;
     }
+
+    @Override
+    public Map<String,PermissionTest> getRegisteredPermissions() {
+        return mPermissionTasks;
+    }
 }

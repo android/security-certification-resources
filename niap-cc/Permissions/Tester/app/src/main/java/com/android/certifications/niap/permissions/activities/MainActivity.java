@@ -195,6 +195,11 @@ public class MainActivity extends AppCompatActivity {
 
             for (BasePermissionTester permissionTester : mConfiguration.getPermissionTesters(
                     activity)) {
+                sLogger.logInfo("Test Target: "+permissionTester.getClass().getName());
+                for(BasePermissionTester.PermissionTest pt :permissionTester.getRegisteredPermissions()){
+                    sLogger.logInfo("Test Target: "+pt.toString());
+                }
+
                 if (!permissionTester.runPermissionTests()) {
                     mAllTestsPassed = false;
                 }

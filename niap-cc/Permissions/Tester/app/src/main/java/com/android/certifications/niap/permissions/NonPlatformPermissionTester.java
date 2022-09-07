@@ -110,4 +110,10 @@ public class NonPlatformPermissionTester extends BasePermissionTester {
         }
         return allTestsPassed;
     }
+
+    @Override
+    public Map<String,PermissionTest> getRegisteredPermissions() {
+        mLogger.logInfo("The Tester object handles all declared permissions. Ignored.");
+        return new HashMap<String,PermissionTest>();
+    }
 }

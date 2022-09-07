@@ -340,6 +340,11 @@ public class InternalPermissionTester extends BasePermissionTester {
         return allTestsPassed;
     }
 
+    @Override
+    public Map<String,PermissionTest> getRegisteredPermissions() {
+        return mPermissionTasks;
+    }
+
     /**
      * Returns the {@link IBinder} token for the current activity.
      *
