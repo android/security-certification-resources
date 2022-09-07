@@ -104,9 +104,9 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         //    permissions.add(permission.RADIO_SCAN_WITHOUT_LOCATION);
         //    permissions.add(permission.NETWORK_SCAN);
         //}
-
-        permissions.add(permission.LOCATION_BYPASS);
-        addPermissionsForSV2(permissions);
+        permissions.add(permission.ENTER_CAR_MODE_PRIORITIZED);
+        //permissions.add(permission.LOCATION_BYPASS);
+        //addPermissionsForSV2(permissions);
         //addPermissionsForT(permissions);
 
         return Optional.of(permissions);

@@ -29,7 +29,6 @@ import androidx.test.rule.ActivityTestRule;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
-import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 
 import org.junit.After;
 import org.junit.Before;
@@ -56,7 +55,7 @@ public class InternalPermissionsTest {
     /**
      * A list of permissions that can be granted to the shell identity.
      */
-    private static List<String> mPermissions;
+    private static final List<String> mPermissions;
     static {
         mPermissions = new ArrayList<>();
 
@@ -72,8 +71,6 @@ public class InternalPermissionsTest {
         mPermissions.add(permission.SEND_SAFETY_CENTER_UPDATE);
         mPermissions.add(permission.ACCESS_AMBIENT_CONTEXT_EVENT);
         mPermissions.add(permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION);
-        mPermissions.add(permission.READ_HOME_APP_SEARCH_DATA);
-        //mPermissions.add(SignaturePermissions.permission.ADD_ALWAYS_UNLOCKED_DISPLAY);
 
     }
 

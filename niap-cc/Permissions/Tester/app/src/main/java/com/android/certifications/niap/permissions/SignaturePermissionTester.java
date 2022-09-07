@@ -30,26 +30,15 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AppOpsManager;
-import android.app.GameManager;
-import android.app.Instrumentation;
 import android.app.KeyguardManager;
 import android.app.LocaleManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.UiAutomation;
 import android.app.UiModeManager;
 import android.app.WallpaperManager;
-import android.app.admin.DeviceAdminReceiver;
 import android.app.admin.DevicePolicyManager;
-import android.app.admin.SecurityLog;
-import android.app.appsearch.AppSearchSchema;
-import android.app.appsearch.GetSchemaResponse;
-import android.app.appsearch.PackageIdentifier;
-import android.app.appsearch.SetSchemaRequest;
-import android.app.blob.BlobHandle;
-import android.app.blob.BlobStoreManager;
 import android.app.role.IOnRoleHoldersChangedListener;
 import android.app.role.RoleManager;
 import android.app.usage.UsageEvents;
@@ -67,8 +56,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.ServiceConnection;
-import android.content.pm.ActivityInfo;
-import android.content.pm.CrossProfileApps;
 import android.content.pm.IOnPermissionsChangeListener;
 import android.content.pm.LauncherApps;
 import android.content.pm.LauncherApps.ShortcutQuery;
@@ -78,15 +65,12 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ShortcutManager;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.display.DisplayManager;
 import android.hardware.usb.UsbManager;
 import android.location.LocationManager;
-import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.AudioEncoder;
@@ -114,14 +98,12 @@ import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Looper;
 import android.os.Parcel;
-import android.os.ParcelFileDescriptor;
 import android.os.ParcelUuid;
 import android.os.Parcelable;
 import android.os.PersistableBundle;
 import android.os.PowerManager;
 import android.os.Process;
 import android.os.RemoteException;
-import android.os.SystemClock;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.os.storage.StorageManager;
@@ -133,7 +115,6 @@ import android.provider.Telephony.Carriers;
 import android.provider.VoicemailContract.Voicemails;
 import android.se.omapi.Reader;
 import android.se.omapi.SEService;
-import android.security.IKeyChainService;
 import android.security.keystore.KeyGenParameterSpec;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
@@ -149,68 +130,53 @@ import android.telephony.TelephonyManager;
 import android.telephony.TelephonyScanManager;
 import android.util.Log;
 import android.view.Display;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.CaptioningManager;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.activities.TestActivity;
 import com.android.certifications.niap.permissions.companion.services.TestBindService;
-import com.android.certifications.niap.permissions.config.BypassConfigException;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
-import com.android.certifications.niap.permissions.receivers.ChooserReceiver;
 import com.android.certifications.niap.permissions.services.TestService;
 import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.Transacts;
 import com.android.internal.policy.IKeyguardDismissCallback;
-import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
-import com.google.android.gms.location.LocationRequest;
-import com.google.common.collect.ImmutableSet;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.spec.ECGenParameterSpec;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -218,11 +184,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * Permission tester to verify all platform declared signature permissions properly guard their API,
@@ -275,6 +239,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
      */
     protected final Map<String, PermissionTest> mPermissionTasks;
 
+    @SuppressLint("WrongConstant")
     public SignaturePermissionTester(TestConfiguration configuration, Activity activity) {
         super(configuration, activity);
 
@@ -328,13 +293,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.ACCESS_CACHE_FILESYSTEM,
                 new PermissionTest(false, () -> {
                     try {
-                        new File(Environment.getDownloadCacheDirectory(),
-                                "test_access_cache_filesystem.out")
-                                .createNewFile();
+                        File f = new File(Environment.getDownloadCacheDirectory(),
+                                "test_access_cache_filesystem.out");
+                        if(f.createNewFile()){
+                            mLogger.logInfo("test_access_cache_filesystem.out generated.");
+                        };
                     } catch (IOException e) {
                         // If an app does not have this permission then an IOException will be
                         // thrown with "Permission denied" in the message.
-                        if (e.getMessage().contains("Permission denied")) {
+                        if (Objects.requireNonNull(e.getMessage()).contains("Permission denied")) {
                             throw new SecurityException(e);
                         } else {
                             throw new UnexpectedPermissionTestFailureException(e);
@@ -625,8 +592,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             NetworkCapabilities capabilities =
                                     (NetworkCapabilities) capabilitiesField
                                             .get(networkRequest);
-                            Field capabilitiesValueField = capabilities.getClass().getDeclaredField(
-                                    "mNetworkCapabilities");
+                            //The field access throw exception as of SDK 33.
+                            @SuppressLint("SoonBlockedPrivateApi") Field capabilitiesValueField =
+                                    capabilities.getClass().getDeclaredField("mNetworkCapabilities");
+
                             capabilitiesValueField.setAccessible(true);
                             long capabilitiesValue = (long) capabilitiesValueField.get(
                                     capabilities);
@@ -2625,7 +2594,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     // specified to test this permission.
                     invokeReflectionCall(uiModeManager.getClass(), "enableCarMode", uiModeManager,
                             new Class[]{int.class, int.class}, 1, 0);
-                    uiModeManager.disableCarMode(0);
+                    uiModeManager.disableCarMode(UiModeManager.DISABLE_CAR_MODE_GO_HOME);
                 }));
 
         mPermissionTasks.put(permission.KEYPHRASE_ENROLLMENT_APPLICATION,
@@ -2769,7 +2738,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MONITOR_DEVICE_CONFIG_ACCESS,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
                     try {
-                        Class onResultListenerClass = Class.forName(
+                        Class<?> onResultListenerClass = Class.forName(
                                 "android.os.RemoteCallback$OnResultListener");
                         Object onResultListener = Proxy.newProxyInstance(
                                 onResultListenerClass.getClassLoader(),
@@ -2782,7 +2751,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                     }
                                 });
 
-                        Class remoteCallbackClass = Class.forName("android.os.RemoteCallback");
+                        Class<?> remoteCallbackClass = Class.forName("android.os.RemoteCallback");
                         Constructor remoteCallbackConstructor = remoteCallbackClass.getConstructor(
                                 onResultListenerClass);
                         Object remoteCallback = remoteCallbackConstructor.newInstance(
@@ -2809,7 +2778,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     try {
                         HandlerThread handlerThread = new HandlerThread(TAG);
                         handlerThread.start();
-                        Class networkProviderClass = Class.forName("android.net.NetworkProvider");
+                        Class<?> networkProviderClass = Class.forName("android.net.NetworkProvider");
                         Constructor networkProviderConstructor =
                                 networkProviderClass.getConstructor(Context.class, Looper.class,
                                         String.class);
@@ -2911,7 +2880,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.RESTORE_RUNTIME_PERMISSIONS,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
-                    Object permissionControllerManager = mContext.getSystemService(
+                    @SuppressLint("WrongConstant") Object permissionControllerManager = mContext.getSystemService(
                             "permission_controller");
                     invokeReflectionCall(permissionControllerManager.getClass(),
                             "stageAndApplyRuntimePermissionsBackup", permissionControllerManager,
@@ -3065,7 +3034,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     Object injectionCallback;
                     Object injectionSession;
                     try {
-                        Class injectionCallbackClass = Class.forName(
+                        Class<?> injectionCallbackClass = Class.forName(
                                 "android.hardware.camera2.ICameraInjectionCallback");
                         injectionCallback = Proxy.newProxyInstance(
                                 injectionCallbackClass.getClassLoader(),
@@ -3080,7 +3049,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                         return null;
                                     }
                                 });
-                        Class injectionSessionClass = Class.forName(
+                        Class<?> injectionSessionClass = Class.forName(
                                 "android.hardware.camera2.ICameraInjectionSession");
                         injectionSession = Proxy.newProxyInstance(
                                 injectionSessionClass.getClassLoader(),
@@ -3107,7 +3076,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     } catch (Exception e) {
                         // If the test fails due to this package not holding the required permission
                         // a ServiceSpecificException is thrown with the text "Permission Denial"
-                        if (e.getMessage().contains("Permission Denial")) {
+                        if (Objects.requireNonNull(e.getMessage()).contains("Permission Denial")) {
                             throw new SecurityException(e);
                         }
                     }
@@ -3124,8 +3093,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.CONTROL_DEVICE_STATE,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
-                    Object deviceStateManager = mContext.getSystemService("device_state");
-                    Class deviceStateRequestClass = null;
+                    @SuppressLint("WrongConstant") Object deviceStateManager
+                            = mContext.getSystemService("device_state");
+                    Class<?> deviceStateRequestClass = null;
                     try {
                         deviceStateRequestClass = Class.forName(
                                 "android.hardware.devicestate.DeviceStateRequest");
@@ -3848,8 +3818,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.PROVISION_DEMO_DEVICE,
             new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                Class fmdpBuilderClazz = null;
-                Class fmdpClazz = null;
+                Class<?> fmdpBuilderClazz = null;
+                Class<?> fmdpClazz = null;
                 try {
                     fmdpBuilderClazz = Class.forName("android.app.admin.FullyManagedDeviceProvisioningParams$Builder");
                     fmdpClazz = Class.forName("android.app.admin.FullyManagedDeviceProvisioningParams");
@@ -4029,7 +3999,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    Object permissionManager = mContext.getSystemService("permission");
+                    @SuppressLint("WrongConstant") Object permissionManager = mContext.getSystemService("permission");
                     //revokePostNotificationPermissionWithoutKillForTest( java.lang.String int);
                      invokeReflectionCall(permissionManager.getClass(),
                             "revokePostNotificationPermissionWithoutKillForTest",permissionManager,
@@ -4283,18 +4253,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             Transacts.makeUidVisible,1200000,1300000);
                 }));
 
-
-
-
-
         // All of the BIND_* signature permissions are intended to be required by various services
         // to ensure only the platform can bind to them. The companion package defines a service
         // for each of these permissions, requiring the permission to bind to it. The
         // #getBindRunnable uses the permission name to determine the name of the service in the
         // companion package and returns a Runnable that will attempt to bind to the service
         // for each of the permissions.
-        mPermissionTasks.put(permission.BIND_CONTROLS,
-                new PermissionTest(false, getBindRunnable(permission.BIND_CONTROLS)));
+
         mPermissionTasks.put(permission.BIND_INCALL_SERVICE,
                 new PermissionTest(false, getBindRunnable(permission.BIND_INCALL_SERVICE)));
         mPermissionTasks.put(permission.BIND_ATTENTION_SERVICE,
@@ -4557,7 +4522,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
             serviceName.append("Test");
             for (String element : permission.substring(permission.lastIndexOf('.') + 1).split(
                     "_")) {
-                serviceName.append(element.substring(0, 1)).append(
+                serviceName.append(element.charAt(0)).append(
                         element.substring(1).toLowerCase());
             }
             serviceName.append("Service");
@@ -4594,8 +4559,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
     protected int modifyPermission(String permission,boolean bSwitch) {
         String flag = bSwitch?"grant":"revoke";
         String cmd = "am shell pm "+flag+" "+mContext.getPackageName()+" "+permission;
-        int returnCode = runShellCommand(cmd);
-        return returnCode;
+        return runShellCommand(cmd);
     }
 
     /**
@@ -4650,8 +4614,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         try {
             Field tokenField = Activity.class.getDeclaredField("mToken");
             tokenField.setAccessible(true);
-            IBinder token = (IBinder) tokenField.get(mActivity);
-            return token;
+            return (IBinder) tokenField.get(mActivity);
         } catch (ReflectiveOperationException e) {
             throw new UnexpectedPermissionTestFailureException(e);
         }
@@ -4817,7 +4780,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         return testPassed;
     }
 
-    private IBinder genericIBinder = new IBinder() {
+    private final IBinder genericIBinder = new IBinder() {
         @Nullable
         @Override
         public String getInterfaceDescriptor() throws RemoteException {

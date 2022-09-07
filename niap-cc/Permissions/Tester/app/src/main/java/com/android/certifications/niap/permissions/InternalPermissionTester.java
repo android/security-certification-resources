@@ -228,54 +228,7 @@ public class InternalPermissionTester extends BasePermissionTester {
                         Object vdpParams =
                                 invokeReflectionCall(clazzVDPBuilder, "build", builderObj, new Class[]{});
 
-                        IBinder binder = new IBinder() {
-                            @Nullable
-                            @Override
-                            public String getInterfaceDescriptor() throws RemoteException {
-                                return null;
-                            }
-
-                            @Override
-                            public boolean pingBinder() {
-                                return false;
-                            }
-
-                            @Override
-                            public boolean isBinderAlive() {
-                                return false;
-                            }
-
-                            @Nullable
-                            @Override
-                            public IInterface queryLocalInterface(@NonNull String s) {
-                                return null;
-                            }
-
-                            @Override
-                            public void dump(@NonNull FileDescriptor fileDescriptor, @Nullable String[] strings) throws RemoteException {
-
-                            }
-
-                            @Override
-                            public void dumpAsync(@NonNull FileDescriptor fileDescriptor, @Nullable String[] strings) throws RemoteException {
-
-                            }
-
-                            @Override
-                            public boolean transact(int i, @NonNull Parcel parcel, @Nullable Parcel parcel1, int i1) throws RemoteException {
-                                return false;
-                            }
-
-                            @Override
-                            public void linkToDeath(@NonNull DeathRecipient deathRecipient, int i) throws RemoteException {
-
-                            }
-
-                            @Override
-                            public boolean unlinkToDeath(@NonNull DeathRecipient deathRecipient, int i) {
-                                return false;
-                            }
-                        };
+                        IBinder binder = getActivityToken();
                         //UserHandle uh = Binder.getCallingUserHandle();
                         mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
                                 Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
@@ -334,47 +287,6 @@ public class InternalPermissionTester extends BasePermissionTester {
 
                 }));
 
-        //SignaturePermissions.permission.ADD_ALWAYS_UNLOCKED_DISPLAY
-        mPermissionTasks.put(SignaturePermissions.permission.ADD_ALWAYS_UNLOCKED_DISPLAY,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    Class<?> clazzVDPBuilder = null;
-                    Class<?> clazzVirtualDeviceManager = null;
-                    Object vdpObj = null;
-                    try {
-                        clazzVDPBuilder = Class.forName("android.companion.virtual.VirtualDeviceParams$Builder");
-                        Constructor constructor = clazzVDPBuilder.getConstructor();
-                        Object builderObj = constructor.newInstance();
-                        //VirtualDeviceParams.LOCK_STATE_ALWAYS_UNLOCKED=1
-                        builderObj = invokeReflectionCall(clazzVDPBuilder, "setLockState", builderObj, new Class[]{int.class},
-                                0);
-                        Object vdpParams = invokeReflectionCall(clazzVDPBuilder, "build", builderObj, new Class[]{});
-
-                        clazzVirtualDeviceManager = Class.forName("android.companion.virtual.VirtualDeviceManager");
-                        Object vdpm = mContext.getSystemService(clazzVirtualDeviceManager);
-                        IBinder binder = getActivityToken();
-                        AssociationInfo associationInfo = null;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            for (AssociationInfo ai : mContext.getSystemService(CompanionDeviceManager.class)
-                                    .getMyAssociations()) {
-                                //mLogger.logDebug(ai.toString());
-                                associationInfo = ai;
-                                break;
-                            }
-                            mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
-                                    Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
-                                    Transacts.createVirtualDevice, binder,mContext.getPackageName(),
-                                    associationInfo.getId(), vdpParams,null);
-                        } else {
-                            throw new BypassTestException("Need android T to execute this test suite");
-                        }
-
-                    } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-                        throw new UnexpectedPermissionTestFailureException(e);
-                    }
-
-            })
-        );
-
         mPermissionTasks.put(permission.ACCESS_AMBIENT_CONTEXT_EVENT,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
 
@@ -398,47 +310,12 @@ public class InternalPermissionTester extends BasePermissionTester {
 
                 }));
 
-        mPermissionTasks.put(permission.READ_HOME_APP_SEARCH_DATA,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                        byte[] sha256cert1 = new byte[32];
-                        Arrays.fill(sha256cert1, (byte) 1);
-                        PackageIdentifier packageIdentifier1 = new PackageIdentifier("Email", sha256cert1);
+        // # Skip READ_ASSISTANT_APP_SEARCH_DATA
+        //Reason : Need specific role to test this permission.
 
-                        AppSearchSchema schema1 =
-                                new AppSearchSchema.Builder("Email1")
-                                        .addProperty(
-                                                new AppSearchSchema.StringPropertyConfig.Builder("subject")
-                                                        .setCardinality(
-                                                                AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL)
-                                                        .setIndexingType(
-                                                                AppSearchSchema.StringPropertyConfig
-                                                                        .INDEXING_TYPE_PREFIXES)
-                                                        .setTokenizerType(
-                                                                AppSearchSchema.StringPropertyConfig
-                                                                        .TOKENIZER_TYPE_PLAIN)
-                                                        .build())
-                                        .build();
+        // # Skip READ_HOME_APP_SEARCH_DATA
+        //Reason : Need specific role to test this permission.
 
-                        GetSchemaResponse.Builder builder = null;
-                        builder = new GetSchemaResponse.Builder()
-                                .setVersion(42)
-                                .addSchema(schema1)
-                                .addSchemaTypeNotDisplayedBySystem("Email1")
-                                .setSchemaTypeVisibleToPackages(
-                                        "Email1", ImmutableSet.of(packageIdentifier1))
-                                .setRequiredPermissionsForSchemaTypeVisibility(
-                                        "Email1",
-                                        ImmutableSet.of(
-                                                ImmutableSet.of(
-                                                        SetSchemaRequest.READ_SMS,
-                                                        SetSchemaRequest.READ_CALENDAR),
-                                                ImmutableSet.of(
-                                                        SetSchemaRequest.READ_HOME_APP_SEARCH_DATA)));
-                        builder.build();
-                    }
-
-                }));
     }
 
     @Override
