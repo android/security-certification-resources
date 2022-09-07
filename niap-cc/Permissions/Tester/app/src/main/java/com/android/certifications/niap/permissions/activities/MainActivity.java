@@ -250,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
             int[] grantResults) {
         // Delegate handling of the permission request results to the active configuration.
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         mConfiguration.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

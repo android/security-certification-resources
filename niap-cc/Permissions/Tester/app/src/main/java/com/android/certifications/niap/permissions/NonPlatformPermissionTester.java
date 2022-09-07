@@ -92,7 +92,7 @@ public class NonPlatformPermissionTester extends BasePermissionTester {
                         signatureBytes, PackageManager.CERT_INPUT_RAW_X509);
                 packageSignatureMatch.put(packageName, signatureMatch);
             } else {
-                signatureMatch = packageSignatureMatch.get(packageName);
+                signatureMatch = Boolean.TRUE.equals(packageSignatureMatch.get(packageName));
             }
             if (permissionGranted != (signatureMatch || mPlatformSignatureMatch)) {
                 allTestsPassed = false;

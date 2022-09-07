@@ -56,10 +56,10 @@ public class InternalPermissions {
                 "android.permission.BIND_TRACE_REPORT_SERVICE";
         public static final String SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE =
                 "android.permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE";
-//        public static final String READ_ASSISTANT_APP_SEARCH_DATA =
-//                "android.permission.READ_ASSISTANT_APP_SEARCH_DATA";
-//        public static final String READ_HOME_APP_SEARCH_DATA =
-//                "android.permission.READ_HOME_APP_SEARCH_DATA";
+        public static final String READ_ASSISTANT_APP_SEARCH_DATA =
+                "android.permission.READ_ASSISTANT_APP_SEARCH_DATA";
+        public static final String READ_HOME_APP_SEARCH_DATA =
+                "android.permission.READ_HOME_APP_SEARCH_DATA";
         public static final String SEND_SAFETY_CENTER_UPDATE =
             "android.permission.SEND_SAFETY_CENTER_UPDATE";
         public static final String CREATE_VIRTUAL_DEVICE =

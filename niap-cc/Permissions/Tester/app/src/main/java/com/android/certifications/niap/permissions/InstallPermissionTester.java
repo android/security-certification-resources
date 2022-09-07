@@ -61,6 +61,8 @@ import static com.android.certifications.niap.permissions.Constants.EXTRA_PERMIS
 import static com.android.certifications.niap.permissions.Constants.EXTRA_PERMISSION_NAME;
 import static com.android.certifications.niap.permissions.utils.ReflectionUtils.invokeReflectionCall;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
@@ -114,6 +116,8 @@ import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
 import android.telephony.TelephonyManager;
+
+import androidx.core.app.ActivityCompat;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.activities.TestActivity;
@@ -183,7 +187,18 @@ public class InstallPermissionTester extends BasePermissionTester {
                 new PermissionTest(false, () -> mConnectivityManager.getActiveNetwork()));
 
         mPermissionTasks.put(ACCESS_WIFI_STATE,
-                new PermissionTest(false, () -> mWifiManager.getConfiguredNetworks()));
+                new PermissionTest(false, () -> {
+                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        throw new BypassTestException(
+                                "ACCESS_FINLE_LOCATION permission should be granted to run this test case");
+                    }
+                    if (mDeviceApiLevel >= Build.VERSION_CODES.Q) {
+                        mWifiManager.getCallerConfiguredNetworks();
+                    } else {
+                        mWifiManager.getConfiguredNetworks();
+                    }
+                }));
 
         // android.permission.AUTHENTICATE_ACCOUNTS has been removed.
 
@@ -191,27 +206,32 @@ public class InstallPermissionTester extends BasePermissionTester {
         // been replaced by the new runtime BLUETOOTH permissions.
         mPermissionTasks.put(BLUETOOTH,
                 new PermissionTest(false, Build.VERSION_CODES.P, Build.VERSION_CODES.R, () -> {
-            if (mBluetoothAdapter == null) {
-                throw new BypassTestException(
-                        "A bluetooth adapter is not available to run this test");
-            }
-            mBluetoothAdapter.getAddress();
-        }));
+                    if (mBluetoothAdapter == null) {
+                        throw new BypassTestException(
+                                "A bluetooth adapter is not available to run this test");
+                    }
+                    mBluetoothAdapter.getAddress();
+                }));
 
         // Starting in Android 12 the BLUETOOTH_ADMIN permission is no longer used and has instead
         // been replaced by the new runtime BLUETOOTH permissions.
         mPermissionTasks.put(BLUETOOTH_ADMIN,
                 new PermissionTest(false, Build.VERSION_CODES.P, Build.VERSION_CODES.R, () -> {
-            if (mBluetoothAdapter == null) {
-                throw new BypassTestException(
-                        "A bluetooth adapter is not available to run this test");
-            }
-            if (mBluetoothAdapter.isEnabled()) {
-                mBluetoothAdapter.disable();
-                mBluetoothAdapter.enable();
-            } else {
-                mBluetoothAdapter.enable();
-            }
+                    if (mBluetoothAdapter == null) {
+                        throw new BypassTestException(
+                                "A bluetooth adapter is not available to run this test");
+                    }
+                    if (mBluetoothAdapter.isEnabled()) {
+                        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_CONNECT)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            throw new BypassTestException(
+                                    "BLUETOOTH_CONNECT permission should be granted to run this test case");
+                        }
+                        mBluetoothAdapter.disable();
+                        mBluetoothAdapter.enable();
+                    } else {
+                        mBluetoothAdapter.enable();
+                    }
         }));
 
         mPermissionTasks.put(BROADCAST_STICKY, new PermissionTest(false, () -> {
@@ -247,7 +267,7 @@ public class InstallPermissionTester extends BasePermissionTester {
         }));
 
         mPermissionTasks.put(EXPAND_STATUS_BAR, new PermissionTest(false, () -> {
-            Object statusBarManager = mContext.getSystemService("statusbar");
+            @SuppressLint("WrongConstant") Object statusBarManager = mContext.getSystemService("statusbar");
             invokeReflectionCall(statusBarManager.getClass(), "expandNotificationsPanel",
                     statusBarManager, null);
             // A short sleep is required to allow the notification panel to be expanded before
@@ -463,7 +483,7 @@ public class InstallPermissionTester extends BasePermissionTester {
             PowerManager.WakeLock wakeLock = mPowerManager.newWakeLock(
                     PowerManager.PARTIAL_WAKE_LOCK,
                     InstallPermissionTester.class.getSimpleName() + "::" + TAG);
-            wakeLock.acquire();
+            wakeLock.acquire(10*60*1000L /*10 minutes*/);
             wakeLock.release();
         }));
 
@@ -487,6 +507,11 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(USE_FULL_SCREEN_INTENT,
                 new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
+                        throw new BypassTestException(
+                                "[Bypass] Full screen Intent could not be shown as an inactive notification as of SV2");
+                    }
+
                     Intent notificationIntent = new Intent(mContext, MainActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
                             notificationIntent, PendingIntent.FLAG_IMMUTABLE);
@@ -517,6 +542,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     }
                     StatusBarNotification[] notifications =
                             notificationManager.getActiveNotifications();
+
                     if (notifications.length == 0) {
                         throw new SecurityException(
                                 "fullScreenIntent not displayed as an active notification");

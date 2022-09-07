@@ -29,6 +29,7 @@ import androidx.test.rule.ActivityTestRule;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
+import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 
 import org.junit.After;
 import org.junit.Before;
@@ -71,6 +72,7 @@ public class InternalPermissionsTest {
         mPermissions.add(permission.SEND_SAFETY_CENTER_UPDATE);
         mPermissions.add(permission.ACCESS_AMBIENT_CONTEXT_EVENT);
         mPermissions.add(permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION);
+        mPermissions.add(permission.READ_HOME_APP_SEARCH_DATA);
         //mPermissions.add(SignaturePermissions.permission.ADD_ALWAYS_UNLOCKED_DISPLAY);
 
     }
@@ -95,7 +97,7 @@ public class InternalPermissionsTest {
     public void runPermissionTests_shellIdentity_apisSuccessful() throws Exception {
         InternalPermissionTester permissionTester = new InternalPermissionTester(
                 new InternalTestConfiguration(mPermissions), rule.getActivity());
-        //mUiAutomation.adoptShellPermissionIdentity();
+        mUiAutomation.adoptShellPermissionIdentity();
         //For query contacts
         mUiAutomation.grantRuntimePermission(null,"android.permission.QUERY_ALL_PACKAGES");
 

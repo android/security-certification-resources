@@ -21,8 +21,8 @@ import android.app.Activity;
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.InstallPermissionTester;
 import com.android.certifications.niap.permissions.R;
-import com.android.certifications.niap.permissions.RuntimePermissionTester;
-import com.android.certifications.niap.permissions.SignaturePermissionTester;
+//import com.android.certifications.niap.permissions.RuntimePermissionTester;
+//import com.android.certifications.niap.permissions.SignaturePermissionTester;
 
 import java.util.ArrayList;
 import java.util.List;

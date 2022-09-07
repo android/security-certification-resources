@@ -104,6 +104,7 @@ import android.telecom.TelecomManager;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 
+import androidx.core.app.ActivityCompat;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
@@ -159,7 +160,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
         mAccountManager = (AccountManager) mContext.getSystemService(Context.ACCOUNT_SERVICE);
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
-        mWifiManager =(WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
+        mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
 
         mPermissionTasks = new HashMap<>();
 
@@ -379,6 +380,11 @@ public class RuntimePermissionTester extends BasePermissionTester {
         }));
 
         mPermissionTasks.put(READ_PHONE_NUMBERS, new PermissionTest(false, () -> {
+            if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                throw new BypassTestException(
+                        "READ_SMS & READ_PHONE_STATE permission is required for this test case as prerequisite");
+            }
             mTelephonyManager.getLine1Number();
         }));
 
@@ -483,7 +489,6 @@ public class RuntimePermissionTester extends BasePermissionTester {
                             "Unable to obtain the location data from any image");
                 }));
 
-        // New permissions added to Android 12.
         // The following are the new runtime permissions for Android 12.
         mPermissionTasks.put(Manifest.permission.BLUETOOTH_ADVERTISE,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
@@ -520,6 +525,10 @@ public class RuntimePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(Manifest.permission.BLUETOOTH_CONNECT,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                        throw new BypassTestException(
+                                "BLUETOOTH_SCAN permission is required for this test case");
+                    }
                     BluetoothAdapter.getDefaultAdapter().getName();
                 }));
 
@@ -529,6 +538,10 @@ public class RuntimePermissionTester extends BasePermissionTester {
                     if (!enableBluetoothAdapter(bluetoothAdapter)) {
                         throw new BypassTestException(
                                 "The bluetooth adapter must be enabled for this test");
+                    }
+                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                        throw new BypassTestException(
+                                "BLUETOOTH_SCAN permission is required for this test case");
                     }
                     BluetoothAdapter.getDefaultAdapter().getScanMode();
                 }));
@@ -550,19 +563,20 @@ public class RuntimePermissionTester extends BasePermissionTester {
 
 
         //New Runtime Permissions for T
-
         mPermissionTasks.put(READ_MEDIA_AUDIO, new PermissionTest(false, () -> {
             ContentResolver contentResolver = mContext.getContentResolver();
             Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             Cursor cursor = contentResolver.query(uri, null, null, null, null);
             cursor.moveToFirst();
         }));
+
         mPermissionTasks.put(READ_MEDIA_IMAGES, new PermissionTest(false, () -> {
             ContentResolver contentResolver = mContext.getContentResolver();
             Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
             Cursor cursor = contentResolver.query(uri, null, null, null, null);
             cursor.moveToFirst();
         }));
+
         mPermissionTasks.put(READ_MEDIA_VIDEO, new PermissionTest(false, () -> {
             ContentResolver contentResolver = mContext.getContentResolver();
             Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
@@ -570,16 +584,8 @@ public class RuntimePermissionTester extends BasePermissionTester {
             cursor.moveToFirst();
         }));
 
-        mPermissionTasks.put(BODY_SENSORS_BACKGROUND, new PermissionTest(false, () -> {
-            mLogger.logDebug("Back ground test begin");
-            OneTimeWorkRequest testWorker = new OneTimeWorkRequest.Builder(BackgroundTestWorker.class)
-                    .setInitialDelay(20, TimeUnit.SECONDS)
-                    .build();
-
-            WorkManager.getInstance(mContext)
-                    .beginWith(testWorker)
-                    .enqueue();
-        }));
+        // Skip : BODY_SENSORS_BACKGROUND
+        // Found no practical way to test BODY_SENSORS permission on pixel devices.
 
         mPermissionTasks.put(POST_NOTIFICATIONS, new PermissionTest(false, () -> {
             Intent notificationIntent = new Intent(mContext, MainActivity.class);
@@ -615,7 +621,8 @@ public class RuntimePermissionTester extends BasePermissionTester {
                     //and also it's a public api
                     mWifiManager.startLocalOnlyHotspot(callback, null);
                     mLOHSLock.wait(60);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | IllegalStateException e) {
+                    mLogger.logInfo("Intended exception : "+e.getMessage()+". Ignored.");
                 }
             }
         }));

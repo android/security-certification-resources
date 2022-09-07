@@ -21,9 +21,8 @@ import static com.android.certifications.niap.permissions.utils.SignaturePermiss
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Build;
-import android.util.Log;
+import android.view.WindowManager;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.R;
@@ -42,13 +41,12 @@ import java.util.Optional;
  * radio scan to be performed without a location permission granted.
  */
 public class SignatureDependentPermissionConfiguration implements TestConfiguration {
-    private Activity mActivity;
+    private final Activity mActivity;
 
     private static final String[] DEPENDENT_PERMISSIONS = new String[]{
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.UWB_RANGING,
-
     };
 
     public SignatureDependentPermissionConfiguration(Activity activity) {
@@ -80,7 +78,6 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
     @Override
     public List<BasePermissionTester> getPermissionTesters(Activity activity) {
 
-
         List<BasePermissionTester> permissionTesters = new ArrayList<>();
         permissionTesters.add(new RuntimePermissionTester(this, activity));
         permissionTesters.add(new SignaturePermissionTester(this, activity));
@@ -103,23 +100,25 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         // Starting in Android 12 the NETWORK_SCAN permission behaves similar to
         // RADIO_SCAN_WITHOUT_LOCATION in that it allows a network scan without a location
         // permission.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            //permissions.add(permission.RADIO_SCAN_WITHOUT_LOCATION);
-            //permissions.add(permission.NETWORK_SCAN);
-        }
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        //    permissions.add(permission.RADIO_SCAN_WITHOUT_LOCATION);
+        //    permissions.add(permission.NETWORK_SCAN);
+        //}
 
-
-        //permissions.add(permission.MODIFY_ACCESSIBILITY_DATA);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            //addPermissionsForT(permissions);
-            permissions.add(permission.LAUNCH_DEVICE_MANAGER_SETUP);
-        }
+        permissions.add(permission.LOCATION_BYPASS);
+        addPermissionsForSV2(permissions);
+        //addPermissionsForT(permissions);
 
         return Optional.of(permissions);
     }
 
-    public void addPermissionsForT(List<String> permissions)
+    private void addPermissionsForSV2(List<String> permissions)
+    {
+        permissions.add(permission.ALLOW_SLIPPERY_TOUCHES);
+        permissions.add(permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD);
+    }
+
+    private void addPermissionsForT(List<String> permissions)
     {
             permissions.add(permission.LOCATION_BYPASS);
             permissions.add(permission.CONTROL_AUTOMOTIVE_GNSS);

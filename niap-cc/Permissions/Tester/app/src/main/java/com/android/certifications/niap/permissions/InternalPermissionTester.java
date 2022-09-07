@@ -19,11 +19,16 @@ package com.android.certifications.niap.permissions;
 import static com.android.certifications.niap.permissions.utils.InternalPermissions.permission;
 import static com.android.certifications.niap.permissions.utils.ReflectionUtils.invokeReflectionCall;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.app.admin.DeviceAdminReceiver;
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.SecurityLog;
+import android.app.appsearch.AppSearchSchema;
+import android.app.appsearch.GetSchemaResponse;
+import android.app.appsearch.PackageIdentifier;
+import android.app.appsearch.SetSchemaRequest;
 import android.companion.AssociationInfo;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
@@ -49,6 +54,7 @@ import android.util.ArraySet;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.android.certifications.niap.permissions.config.BypassConfigException;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -57,6 +63,7 @@ import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.SignatureUtils;
 import com.android.certifications.niap.permissions.utils.Transacts;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.FileDescriptor;
 import java.lang.reflect.Constructor;
@@ -344,69 +351,22 @@ public class InternalPermissionTester extends BasePermissionTester {
 
                         clazzVirtualDeviceManager = Class.forName("android.companion.virtual.VirtualDeviceManager");
                         Object vdpm = mContext.getSystemService(clazzVirtualDeviceManager);
-                        IBinder binder = new IBinder() {
-                            @Nullable
-                            @Override
-                            public String getInterfaceDescriptor() throws RemoteException {
-                                return null;
-                            }
-
-                            @Override
-                            public boolean pingBinder() {
-                                return false;
-                            }
-
-                            @Override
-                            public boolean isBinderAlive() {
-                                return false;
-                            }
-
-                            @Nullable
-                            @Override
-                            public IInterface queryLocalInterface(@NonNull String s) {
-                                return null;
-                            }
-
-                            @Override
-                            public void dump(@NonNull FileDescriptor fileDescriptor, @Nullable String[] strings) throws RemoteException {
-
-                            }
-
-                            @Override
-                            public void dumpAsync(@NonNull FileDescriptor fileDescriptor, @Nullable String[] strings) throws RemoteException {
-
-                            }
-
-                            @Override
-                            public boolean transact(int i, @NonNull Parcel parcel, @Nullable Parcel parcel1, int i1) throws RemoteException {
-                                return false;
-                            }
-
-                            @Override
-                            public void linkToDeath(@NonNull DeathRecipient deathRecipient, int i) throws RemoteException {
-
-                            }
-
-                            @Override
-                            public boolean unlinkToDeath(@NonNull DeathRecipient deathRecipient, int i) {
-                                return false;
-                            }
-                        };
+                        IBinder binder = getActivityToken();
                         AssociationInfo associationInfo = null;
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             for (AssociationInfo ai : mContext.getSystemService(CompanionDeviceManager.class)
                                     .getMyAssociations()) {
-                                mLogger.logDebug(ai.toString());
-                                //if (packageName.equals(ai.get)) {
-                                    associationInfo = ai;
-                                    break;
-                                //}
+                                //mLogger.logDebug(ai.toString());
+                                associationInfo = ai;
+                                break;
                             }
+                            mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
+                                    Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
+                                    Transacts.createVirtualDevice, binder,mContext.getPackageName(),
+                                    associationInfo.getId(), vdpParams,null);
+                        } else {
+                            throw new BypassTestException("Need android T to execute this test suite");
                         }
-                        mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
-                                Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
-                                Transacts.createVirtualDevice, binder,mContext.getPackageName(),
-                                associationInfo.getId(), vdpParams,null);
 
                     } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
                         throw new UnexpectedPermissionTestFailureException(e);
@@ -418,7 +378,7 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.ACCESS_AMBIENT_CONTEXT_EVENT,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
 
-                    Object ambientContextManager
+                    @SuppressLint("WrongConstant") Object ambientContextManager
                             = mContext.getSystemService("ambient_context");
                             //Context.AMBIENT_CONTEXT_SERVICE);
 
@@ -435,6 +395,48 @@ public class InternalPermissionTester extends BasePermissionTester {
 
                                 }
                             }, null);
+
+                }));
+
+        mPermissionTasks.put(permission.READ_HOME_APP_SEARCH_DATA,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        byte[] sha256cert1 = new byte[32];
+                        Arrays.fill(sha256cert1, (byte) 1);
+                        PackageIdentifier packageIdentifier1 = new PackageIdentifier("Email", sha256cert1);
+
+                        AppSearchSchema schema1 =
+                                new AppSearchSchema.Builder("Email1")
+                                        .addProperty(
+                                                new AppSearchSchema.StringPropertyConfig.Builder("subject")
+                                                        .setCardinality(
+                                                                AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL)
+                                                        .setIndexingType(
+                                                                AppSearchSchema.StringPropertyConfig
+                                                                        .INDEXING_TYPE_PREFIXES)
+                                                        .setTokenizerType(
+                                                                AppSearchSchema.StringPropertyConfig
+                                                                        .TOKENIZER_TYPE_PLAIN)
+                                                        .build())
+                                        .build();
+
+                        GetSchemaResponse.Builder builder = null;
+                        builder = new GetSchemaResponse.Builder()
+                                .setVersion(42)
+                                .addSchema(schema1)
+                                .addSchemaTypeNotDisplayedBySystem("Email1")
+                                .setSchemaTypeVisibleToPackages(
+                                        "Email1", ImmutableSet.of(packageIdentifier1))
+                                .setRequiredPermissionsForSchemaTypeVisibility(
+                                        "Email1",
+                                        ImmutableSet.of(
+                                                ImmutableSet.of(
+                                                        SetSchemaRequest.READ_SMS,
+                                                        SetSchemaRequest.READ_CALENDAR),
+                                                ImmutableSet.of(
+                                                        SetSchemaRequest.READ_HOME_APP_SEARCH_DATA)));
+                        builder.build();
+                    }
 
                 }));
     }

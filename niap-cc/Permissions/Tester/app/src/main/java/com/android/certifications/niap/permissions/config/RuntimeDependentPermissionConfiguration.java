@@ -23,6 +23,7 @@ import static android.Manifest.permission.POST_NOTIFICATIONS;
 import static android.Manifest.permission.READ_MEDIA_AUDIO;
 import static android.Manifest.permission.READ_MEDIA_IMAGES;
 import static android.Manifest.permission.READ_MEDIA_VIDEO;
+import static android.Manifest.permission.UWB_RANGING;
 
 import android.Manifest;
 import android.app.Activity;
@@ -51,16 +52,16 @@ import java.util.concurrent.CountDownLatch;
  */
 class RuntimeDependentPermissionConfiguration implements TestConfiguration {
     private static final String TAG = "PermissionTester";
-    private static Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
+    private static final Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
 
-    private Activity mActivity;
+    private final Activity mActivity;
     private CountDownLatch mCountDownLatch;
 
     private static final String[] REQUIRED_PERMISSIONS = new String[]{
             //Manifest.permission.READ_EXTERNAL_STORAGE,
             //Manifest.permission.READ_PHONE_NUMBERS,
-            //POST_NOTIFICATIONS,
-            //NEARBY_WIFI_DEVICES
+            POST_NOTIFICATIONS,
+            NEARBY_WIFI_DEVICES,
             READ_MEDIA_AUDIO,
             READ_MEDIA_IMAGES,
             READ_MEDIA_VIDEO,
@@ -70,15 +71,13 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
     private static final String[] PERMISSIONS_UNDER_TEST = new String[]{
            // Manifest.permission.ACCESS_MEDIA_LOCATION,
            // Manifest.permission.SEND_SMS,
-            //POST_NOTIFICATIONS,
-            //NEARBY_WIFI_DEVICES,
-
+            //Android 13
+            POST_NOTIFICATIONS,
+            NEARBY_WIFI_DEVICES,
+            NEARBY_WIFI_DEVICES,
             READ_MEDIA_AUDIO,
             READ_MEDIA_IMAGES,
             READ_MEDIA_VIDEO,
-            BODY_SENSORS,
-            BODY_SENSORS_BACKGROUND
-
     };
 
     RuntimeDependentPermissionConfiguration(Activity activity) {

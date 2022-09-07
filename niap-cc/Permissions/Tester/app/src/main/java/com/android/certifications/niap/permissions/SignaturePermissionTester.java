@@ -26,6 +26,7 @@ import static com.android.certifications.niap.permissions.utils.SignaturePermiss
 
 import android.Manifest;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AppOpsManager;
@@ -43,6 +44,10 @@ import android.app.WallpaperManager;
 import android.app.admin.DeviceAdminReceiver;
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.SecurityLog;
+import android.app.appsearch.AppSearchSchema;
+import android.app.appsearch.GetSchemaResponse;
+import android.app.appsearch.PackageIdentifier;
+import android.app.appsearch.SetSchemaRequest;
 import android.app.blob.BlobHandle;
 import android.app.blob.BlobStoreManager;
 import android.app.role.IOnRoleHoldersChangedListener;
@@ -174,6 +179,7 @@ import com.android.certifications.niap.permissions.utils.Transacts;
 import com.android.internal.policy.IKeyguardDismissCallback;
 import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 import com.google.android.gms.location.LocationRequest;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -2102,7 +2108,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.MANAGE_TEST_NETWORKS,
                 new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
-                    mContext.getSystemService("test_network");
+                    Object test_network = mContext.getSystemService("test_network");
                 }));
 
         // android.permission.CONTROL_DISPLAY_COLOR_TRANSFORMS - color_display service required to
@@ -2111,7 +2117,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // This permission was only used on Android 10; starting with Android 11 profile owners are
         // granted access to device identifiers using the MARK_DEVICE_ORGANIZATION_OWNED permission.
         mPermissionTasks.put(permission.GRANT_PROFILE_OWNER_DEVICE_IDS_ACCESS,
-                new PermissionTest(false, Build.VERSION_CODES.Q, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
                     ComponentName componentName = new ComponentName(mContext, MainActivity.class);
                     // SecurityException message indicates the failure is due to the process not
                     // being run with the system UID, but a check is performed for this permission
@@ -2372,9 +2378,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_BIOMETRIC,
                 new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
 
-                    //mFinger
-
-
                     try {
                         mTransacts.invokeTransact(Transacts.FACE_SERVICE, Transacts.FACE_DESCRIPTOR,
                                 Transacts.generateChallenge, getActivityToken());
@@ -2609,7 +2612,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.CONTROL_DEVICE_LIGHTS,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
-                    Object lightsManager = mContext.getSystemService("lights");
+                    @SuppressLint("WrongConstant") Object lightsManager = mContext.getSystemService("lights");
                     invokeReflectionCall(lightsManager.getClass(), "getLights", lightsManager,
                             null);
                 }));
@@ -2617,7 +2620,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.ENTER_CAR_MODE_PRIORITIZED,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
                     UiModeManager uiModeManager = (UiModeManager) mContext.getSystemService(
-                            mContext.UI_MODE_SERVICE);
+                            Context.UI_MODE_SERVICE);
                     // The reflective call is required since a priority other than 0 must be
                     // specified to test this permission.
                     invokeReflectionCall(uiModeManager.getClass(), "enableCarMode", uiModeManager,
@@ -4096,8 +4099,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.SET_WALLPAPER_DIM_AMOUNT,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for SET_WALLPAPER_DIM_AMOUNT not implemented yet");
-                    WallpaperManager wallpaperManager =
+                     WallpaperManager wallpaperManager =
                             (WallpaperManager) mContext.getSystemService(
                                     Context.WALLPAPER_SERVICE);
 
@@ -4191,37 +4193,36 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     //DeviceManger#ACTION_ROLE_HOLDER_PROVISION_FINALIZATION
                     //DeviceManger#ACTION_ROLE_HOLDER_PROVISION_MANAGED_DEVICE_FROM_TRUSTED_SOURCE"
                     //DeviceManger#ACTION_ROLE_HOLDER_PROVISION_MANAGED_PROFILE
-                    //ROLE_HOLDER_PROVISION_MANAGED_PROFILE
 
                     Intent ii = new Intent("android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE");
                     ResolveInfo resolveInfo =mPackageManager.resolveActivity(ii, 0);
-                    mLogger.logInfo(resolveInfo.activityInfo.toString());
-
+                    if(resolveInfo == null){
+                        throw new BypassTestException("the system does not have corresponding activity to" +
+                                " ROLE_HOLDER_PROVISION_MANAGED_PROFILE action. Let's skip it...");
+                    }
+                    //Simply call the acitivity on Companion app and verify whetehr it is guarded.
                     Intent featuresIntent = new Intent("android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE");
                     featuresIntent.setComponent(new
                                     ComponentName("com.android.certifications.niap.permissions.companion",
                                     "com.android.certifications.niap.permissions.companion.PreProvisioningActivity"));
                     mActivity.startActivity(featuresIntent);
 
+                    // Note :
+                    // The action for cloud dpc manager is guarded by this permission.
+                    // But this type of permissions are not working with platform signatue.
+                    // So you could not find the affect of the permission with the test above.
+                    //
+                    // If you'd like to test it with the platform signature, you can test the codes below.
+                    //
+                    // In this case, if the permission is not granted you'll got a blank chooser.
+                    // And if it's granted PreProvisioningActivity will be launched by default.
+                    // If we succeeded to call that activity, We can get an event regarding
+                    // selection of the chooser on BroadCastReciver.
+                    // We obsolate it because the test requires user interactions.
+                    //
 
-//                    Intent ii = new Intent("android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE");
-//                    ResolveInfo resolveInfo =mPackageManager.resolveActivity(ii, 0);
-//                    mLogger.logInfo(resolveInfo.toString());
-                    if(resolveInfo == null){
-                        throw new BypassTestException("the system does not have corresponding activity to" +
-                                " ROLE_HOLDER_PROVISION_MANAGED_PROFILE action. Let's skip it...");
-                    }
-
-                    //Note :
-                    //This permission restricts displaying list on the chooser activity.
-                    //So in this case, if the permission is not granted you'll got a blank chooser.
-                    //And if it's granted PreProvisioningActivity will be launched by default.
-                    //If we succeeded to call that activity, We can get an event regarding
-                    //selection of the chooser on BroadCastReciver.
-                    //If the ChooserRecevier does not leave any messages the test is failed.
-
-                    //Test 1
-                    /*
+                    //Obsolated Test Cade
+                    /**
                     featuresIntent.putExtra("test_id",ChooserReceiver.TEST_LAUNCH_DEVICE_MANAGER_SETUP);
                     Intent receiver = new Intent(mContext, ChooserReceiver.class);
                     receiver.putExtra("test_id",ChooserReceiver.TEST_LAUNCH_DEVICE_MANAGER_SETUP);
@@ -4235,9 +4236,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     ((MainActivity)activity).launhDeviceManagerTest.launch(chooser);
                     mLogger.logInfo("Please check the logcat messages, " +
                             "and confirm TEST_LAUNCH_DEVICE_MANAGER_SETUP test is passed.");
-
                      */
-
                 }));
 
         mPermissionTasks.put(permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES,
@@ -4249,7 +4248,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.READ_SAFETY_CENTER_STATUS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("[BLOCK] require internal permission, MANAGE_SAFETY_CENTER permission to eval.");
+
                     Class<?> clazzSaftyCenter = null;
                     try {
                         clazzSaftyCenter = Class.forName("android.safetycenter.SafetyCenterManager");
@@ -4280,10 +4279,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.MAKE_UID_VISIBLE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLogger.logDebug("Test case for MAKE_UID_VISIBLE not implemented yet");
                     mTransacts.invokeTransact(Transacts.PACKAGE_SERVICE, Transacts.PACKAGE_DESCRIPTOR,
                             Transacts.makeUidVisible,1200000,1300000);
                 }));
+
+
+
 
 
         // All of the BIND_* signature permissions are intended to be required by various services

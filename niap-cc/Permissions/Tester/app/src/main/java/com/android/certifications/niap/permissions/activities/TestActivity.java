@@ -30,7 +30,7 @@ import com.android.certifications.niap.permissions.log.LoggerFactory;
  */
 public class TestActivity extends AppCompatActivity {
     private static final String TAG = "PermissionTesterTestActivity";
-    private static Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
+    private static final Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -18,7 +18,6 @@ package com.android.certifications.niap.permissions.utils;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,33 +52,30 @@ public class ReflectionUtils {
             }
         }
     }
-    //For survey
-    //   Snippet for investigation
-    //   List<String> a =
-    //                            ReflectionUtils.checkDeclaredMethod(mDevicePolicyManager)
-    //                                    .stream().filter(str->str.startsWith("send"))
-    //                                    .collect(Collectors.toList());
-    public static List<String> checkDeclaredMethod(Object target,final String f){
+    /**
+     * List up declared methods of specified object. it is intended to check the prototype of
+     * transacts api.
+     */
+    public static List<String> checkDeclaredMethod(Object target,final String filter){
         List<String> a = new ArrayList<>();
-        Class clazz = target.getClass();
+        Class<?> clazz = target.getClass();
         Method[] methods = clazz.getDeclaredMethods();
         for(Method m : methods){
-            String method = m.getName()+"(";
-            Class[] types = m.getParameterTypes();
-            for(Class t:types){
-                method = method+" "+t.getTypeName();
-            }
+            StringBuilder method = new StringBuilder(m.getName() + "(");
+            Class<?>[] types = m.getParameterTypes();
+            for(Class<?> t:types) method.append(" ").append(t.getTypeName());
             a.add(method+")");
         }
-        return a.stream().filter(str->str.startsWith(f)).collect(Collectors.toList());
+        return a.stream().filter(str->str.startsWith(filter)).collect(Collectors.toList());
     }
-    public static List<String> checkDeclaredMethod(Class clazz,final String f){
+
+    public static List<String> checkDeclaredMethod(Class<?> clazz,final String f){
         List<String> a = new ArrayList<>();
         Method[] methods = clazz.getDeclaredMethods();
         for(Method m : methods){
             String method = m.getName()+"(";
-            Class[] types = m.getParameterTypes();
-            for(Class t:types){
+            Class<?>[] types = m.getParameterTypes();
+            for(Class<?> t:types){
                 method = method+" "+t.getTypeName();
             }
             a.add(method+")");
