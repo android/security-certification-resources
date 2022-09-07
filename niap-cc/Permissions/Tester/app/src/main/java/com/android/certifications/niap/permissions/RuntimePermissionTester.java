@@ -563,21 +563,21 @@ public class RuntimePermissionTester extends BasePermissionTester {
 
 
         //New Runtime Permissions for T
-        mPermissionTasks.put(READ_MEDIA_AUDIO, new PermissionTest(false, () -> {
+        mPermissionTasks.put(READ_MEDIA_AUDIO, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
             ContentResolver contentResolver = mContext.getContentResolver();
             Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             Cursor cursor = contentResolver.query(uri, null, null, null, null);
             cursor.moveToFirst();
         }));
 
-        mPermissionTasks.put(READ_MEDIA_IMAGES, new PermissionTest(false, () -> {
+        mPermissionTasks.put(READ_MEDIA_IMAGES, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
             ContentResolver contentResolver = mContext.getContentResolver();
             Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
             Cursor cursor = contentResolver.query(uri, null, null, null, null);
             cursor.moveToFirst();
         }));
 
-        mPermissionTasks.put(READ_MEDIA_VIDEO, new PermissionTest(false, () -> {
+        mPermissionTasks.put(READ_MEDIA_VIDEO, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
             ContentResolver contentResolver = mContext.getContentResolver();
             Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
             Cursor cursor = contentResolver.query(uri, null, null, null, null);
@@ -587,7 +587,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
         // Skip : BODY_SENSORS_BACKGROUND
         // Found no practical way to test BODY_SENSORS permission on pixel devices.
 
-        mPermissionTasks.put(POST_NOTIFICATIONS, new PermissionTest(false, () -> {
+        mPermissionTasks.put(POST_NOTIFICATIONS, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
             Intent notificationIntent = new Intent(mContext, MainActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
                     notificationIntent, PendingIntent.FLAG_IMMUTABLE);
@@ -613,7 +613,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
             notificationManager.notify(0, notification);
         }));
 
-        mPermissionTasks.put(NEARBY_WIFI_DEVICES, new PermissionTest(false, () -> {
+        mPermissionTasks.put(NEARBY_WIFI_DEVICES, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
             TestLocalOnlyHotspotCallback callback = new TestLocalOnlyHotspotCallback(mLOHSLock);
             synchronized (mLOHSLock) {
                 try {
@@ -622,12 +622,13 @@ public class RuntimePermissionTester extends BasePermissionTester {
                     mWifiManager.startLocalOnlyHotspot(callback, null);
                     mLOHSLock.wait(60);
                 } catch (InterruptedException | IllegalStateException e) {
-                    mLogger.logInfo("Intended exception : "+e.getMessage()+". Ignored.");
+                    mLogger.logInfo("Intended exception : " + e.getMessage() + ". Ignored.");
                 }
             }
         }));
 
     }
+
     public class TestLocalOnlyHotspotCallback extends WifiManager.LocalOnlyHotspotCallback {
         Object hotspotLock;
         WifiManager.LocalOnlyHotspotReservation reservation = null;
@@ -635,9 +636,11 @@ public class RuntimePermissionTester extends BasePermissionTester {
         boolean onStoppedCalled = false;
         boolean onFailedCalled = false;
         int failureReason = -1;
+
         TestLocalOnlyHotspotCallback(Object lock) {
             hotspotLock = lock;
         }
+
         @Override
         public void onStarted(WifiManager.LocalOnlyHotspotReservation r) {
             synchronized (hotspotLock) {
@@ -646,6 +649,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
                 hotspotLock.notify();
             }
         }
+
         @Override
         public void onStopped() {
             synchronized (hotspotLock) {
@@ -653,6 +657,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
                 hotspotLock.notify();
             }
         }
+
         @Override
         public void onFailed(int reason) {
             synchronized (hotspotLock) {
@@ -662,6 +667,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
             }
         }
     }
+
     @Override
     public boolean runPermissionTests() {
         boolean allTestsPassed = true;
@@ -701,6 +707,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
         mLogger.logDebug(
                 "The bluetooth adapter is not enabled, but the permission required to enable it "
                         + "has been granted; enabling now");
+
         bluetoothAdapter.enable();
         try {
             Thread.sleep(5000);
