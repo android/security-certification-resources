@@ -20,13 +20,13 @@ def homePath = System.properties['user.home']
 android {
     signingConfigs {
         bundle{
-            storeFile file("../security/debug/rsa-2048.jks")
+            storeFile file("../security/rsa2048/rsa-2048.jks")
             storePassword "android"
             keyPassword "android"
             keyAlias "platform"
         }
         platform {
-            storeFile file('../security/product_t/platform.jks')
+            storeFile file('../security/platform/platform.jks')
             storePassword "android"
             keyPassword "android"
             keyAlias "platform"
@@ -47,7 +47,6 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
     buildTypes {
         release {
             signingConfig null
@@ -90,9 +89,9 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.5.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.google.android.gms:play-services-location:19.0.1'
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
     implementation 'com.google.android.gms:play-services-vision:20.1.3'
-    implementation 'com.google.android.gms:play-services-base:18.0.1'
+    implementation 'com.google.android.gms:play-services-base:18.1.0'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.work:work-runtime:2.7.1'
