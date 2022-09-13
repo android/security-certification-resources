@@ -46,4 +46,5 @@
     <string name="notificaton_title">POST_NOTIFICATIONS test</string>
   <string name="intent_notification_message">POST_NOTIFICATIONS works!</string>
     <string name="device_admin_test">Device Admin Test</string>
+    <string name="output_tester_json">Output all tests to json</string>
 </resources>

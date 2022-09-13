@@ -846,7 +846,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // In P this permission only limited the accounts returned from APIs, but starting in Q
         // other APIs under the UserManager were guarded by this permission.
         mPermissionTasks.put(permission.GET_ACCOUNTS_PRIVILEGED,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.P, () -> {
                     mUserManager.getUserName();
                 }));
 
@@ -2042,7 +2042,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.INSTALL_EXISTING_PACKAGES,
-                new PermissionTest(false, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.Q ,() -> {
                     // installExistingPackageAsUser - checks both INSTALL_PACKAGES and
                     // INSTALL_EXISTING_PACKAGES, but SecurityException only reports
                     // INSTALL_PACKAGES.
@@ -2210,7 +2210,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         // This permission was removed starting in Android 12.
         mPermissionTasks.put(permission.OPEN_APP_OPEN_BY_DEFAULT_SETTINGS,
-                new PermissionTest(false, Build.VERSION_CODES.Q, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.Q,
+                        Build.VERSION_CODES.R, () -> {
                     // TOOD: May need to skip if the permission is granted as opening the new
                     // activity may interrupt the test app.
                     //DevicePolicyManager.ACTION_
@@ -2392,8 +2393,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
 
+        //Moved to internal permission as of 31
         mPermissionTasks.put(permission.MANAGE_SENSOR_PRIVACY,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.Q,
+                        Build.VERSION_CODES.R,() -> {
                     // ISensorPrivacyManager#setSensorPrivacy
                     mTransacts.invokeTransact(Transacts.SENSOR_PRIVACY_SERVICE,
                             Transacts.SENSOR_PRIVACY_DESCRIPTOR,
@@ -2534,8 +2537,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             Transacts.isVibrating);
                 }));
 
+        //The permission had been removed as of SDK 31
         mPermissionTasks.put(permission.ASSOCIATE_INPUT_DEVICE_TO_DISPLAY_BY_PORT,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false,
+                        Build.VERSION_CODES.R,Build.VERSION_CODES.R, () -> {
                     mTransacts.invokeTransact(Transacts.INPUT_SERVICE, Transacts.INPUT_DESCRIPTOR,
                             Transacts.removePortAssociation, "testPort");
                 }));
@@ -2648,7 +2653,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.MANAGE_COMPANION_DEVICES,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.P, () -> {
                     // CompanionDeviceManager#isDeviceAssociatedForWifiConnection can be used for
                     // both this permission as well as COMPANION_APPROVE_WIFI_CONNECTION as it first
                     // checks for the MANAGE_COMPANION_DEVICES permission, then it checks if the
@@ -3418,9 +3423,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             mPackageName);
                 }));
 
+        //This permission's category has been moved to install after Android T
+        //The test leave it as is for the previous releases.
         mPermissionTasks.put(permission.READ_NEARBY_STREAMING_POLICY,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
-                    //This permission's category has been moved to install after Android T
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                         // DevicePolicyManagerService first checks if this feature is available before
                         // performing the permission check.
@@ -3624,7 +3630,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.TOGGLE_AUTOMOTIVE_PROJECTION,
-                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.S,
+                        Build.VERSION_CODES.S_V2, () -> {
                     mTransacts.invokeTransact(Transacts.UI_MODE_SERVICE,
                             Transacts.UI_MODE_DESCRIPTOR, Transacts.requestProjection,
                             genericIBinder, 1, mPackageName);
@@ -4263,7 +4270,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.BIND_INCALL_SERVICE,
                 new PermissionTest(false, getBindRunnable(permission.BIND_INCALL_SERVICE)));
         mPermissionTasks.put(permission.BIND_ATTENTION_SERVICE,
-                new PermissionTest(false, getBindRunnable(permission.BIND_ATTENTION_SERVICE)));
+                new PermissionTest(false, Build.VERSION_CODES.Q, getBindRunnable(permission.BIND_ATTENTION_SERVICE)));
         mPermissionTasks.put(permission.BIND_PRINT_RECOMMENDATION_SERVICE,
                 new PermissionTest(false,
                         getBindRunnable(permission.BIND_PRINT_RECOMMENDATION_SERVICE)));
@@ -4296,7 +4303,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false,
                         getBindRunnable(permission.BIND_TELECOM_CONNECTION_SERVICE)));
         mPermissionTasks.put(permission.BIND_CALL_REDIRECTION_SERVICE,
-                new PermissionTest(false,
+                new PermissionTest(false,Build.VERSION_CODES.Q,
                         getBindRunnable(permission.BIND_CALL_REDIRECTION_SERVICE)));
         mPermissionTasks.put(permission.BIND_VOICE_INTERACTION,
                 new PermissionTest(false, getBindRunnable(permission.BIND_VOICE_INTERACTION)));
@@ -4306,12 +4313,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false,
                         getBindRunnable(permission.BIND_RESOLVER_RANKER_SERVICE)));
         mPermissionTasks.put(permission.BIND_CARRIER_MESSAGING_CLIENT_SERVICE,
-                new PermissionTest(false,
+                new PermissionTest(false,Build.VERSION_CODES.Q,
                         getBindRunnable(permission.BIND_CARRIER_MESSAGING_CLIENT_SERVICE)));
         mPermissionTasks.put(permission.BIND_CONNECTION_SERVICE,
                 new PermissionTest(false, getBindRunnable(permission.BIND_CONNECTION_SERVICE)));
         mPermissionTasks.put(permission.BIND_QUICK_ACCESS_WALLET_SERVICE,
-                new PermissionTest(false,
+                new PermissionTest(false,Build.VERSION_CODES.R,
                         getBindRunnable(permission.BIND_QUICK_ACCESS_WALLET_SERVICE)));
         mPermissionTasks.put(permission.BIND_VPN_SERVICE,
                 new PermissionTest(false, getBindRunnable(permission.BIND_VPN_SERVICE)));
@@ -4354,7 +4361,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false,
                         getBindRunnable(permission.BIND_AUTOFILL_FIELD_CLASSIFICATION_SERVICE)));
         mPermissionTasks.put(permission.BIND_CONTENT_SUGGESTIONS_SERVICE,
-                new PermissionTest(false,
+                new PermissionTest(false,Build.VERSION_CODES.Q,
                         getBindRunnable(permission.BIND_CONTENT_SUGGESTIONS_SERVICE)));
         mPermissionTasks.put(permission.BIND_NOTIFICATION_ASSISTANT_SERVICE,
                 new PermissionTest(false,
@@ -4370,7 +4377,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false,
                         getBindRunnable(permission.BIND_TELEPHONY_NETWORK_SERVICE)));
         mPermissionTasks.put(permission.BIND_CONTROLS,
-                new PermissionTest(false, getBindRunnable(permission.BIND_CONTROLS)));
+                new PermissionTest(false, Build.VERSION_CODES.R,getBindRunnable(permission.BIND_CONTROLS)));
         mPermissionTasks.put(permission.BIND_SETTINGS_SUGGESTIONS_SERVICE,
                 new PermissionTest(false,
                         getBindRunnable(permission.BIND_SETTINGS_SUGGESTIONS_SERVICE)));
@@ -4381,27 +4388,28 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.BIND_TELEPHONY_DATA_SERVICE,
                 new PermissionTest(false, getBindRunnable(permission.BIND_TELEPHONY_DATA_SERVICE)));
         mPermissionTasks.put(permission.BIND_CELL_BROADCAST_SERVICE,
-                new PermissionTest(false, getBindRunnable(permission.BIND_CELL_BROADCAST_SERVICE)));
+                new PermissionTest(false, Build.VERSION_CODES.R,
+                        getBindRunnable(permission.BIND_CELL_BROADCAST_SERVICE)));
         mPermissionTasks.put(permission.BIND_ACCESSIBILITY_SERVICE,
                 new PermissionTest(false, getBindRunnable(permission.BIND_ACCESSIBILITY_SERVICE)));
         mPermissionTasks.put(permission.BIND_INPUT_METHOD,
                 new PermissionTest(false, getBindRunnable(permission.BIND_INPUT_METHOD)));
         mPermissionTasks.put(permission.BIND_EXTERNAL_STORAGE_SERVICE,
-                new PermissionTest(false,
+                new PermissionTest(false,Build.VERSION_CODES.R,
                         getBindRunnable(permission.BIND_EXTERNAL_STORAGE_SERVICE)));
         mPermissionTasks.put(permission.BIND_TEXTCLASSIFIER_SERVICE,
                 new PermissionTest(false, getBindRunnable(permission.BIND_TEXTCLASSIFIER_SERVICE)));
         mPermissionTasks.put(permission.BIND_NFC_SERVICE,
                 new PermissionTest(false, getBindRunnable(permission.BIND_NFC_SERVICE)));
         mPermissionTasks.put(permission.BIND_PHONE_ACCOUNT_SUGGESTION_SERVICE,
-                new PermissionTest(false,
+                new PermissionTest(false,Build.VERSION_CODES.Q,
                         getBindRunnable(permission.BIND_PHONE_ACCOUNT_SUGGESTION_SERVICE)));
         mPermissionTasks.put(permission.BIND_IMS_SERVICE,
                 new PermissionTest(false, getBindRunnable(permission.BIND_IMS_SERVICE)));
         mPermissionTasks.put(permission.BIND_TEXT_SERVICE,
                 new PermissionTest(false, getBindRunnable(permission.BIND_TEXT_SERVICE)));
         mPermissionTasks.put(permission.BIND_EXPLICIT_HEALTH_CHECK_SERVICE,
-                new PermissionTest(false,
+                new PermissionTest(false,Build.VERSION_CODES.Q,
                         getBindRunnable(permission.BIND_EXPLICIT_HEALTH_CHECK_SERVICE)));
         mPermissionTasks.put(permission.BIND_NETWORK_RECOMMENDATION_SERVICE,
                 new PermissionTest(false,
@@ -4409,12 +4417,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.BIND_CHOOSER_TARGET_SERVICE,
                 new PermissionTest(false, getBindRunnable(permission.BIND_CHOOSER_TARGET_SERVICE)));
         mPermissionTasks.put(permission.BIND_INLINE_SUGGESTION_RENDER_SERVICE,
-                new PermissionTest(false,
+                new PermissionTest(false,Build.VERSION_CODES.R,
                         getBindRunnable(permission.BIND_INLINE_SUGGESTION_RENDER_SERVICE)));
         mPermissionTasks.put(permission.BIND_CONTENT_CAPTURE_SERVICE,
-                new PermissionTest(false,
+                new PermissionTest(false,Build.VERSION_CODES.Q,
                         getBindRunnable(permission.BIND_CONTENT_CAPTURE_SERVICE)));
-        mPermissionTasks.put(permission.BIND_AUGMENTED_AUTOFILL_SERVICE, new PermissionTest(false,
+        mPermissionTasks.put(permission.BIND_AUGMENTED_AUTOFILL_SERVICE,
+                new PermissionTest(false,Build.VERSION_CODES.Q,
                 getBindRunnable(permission.BIND_AUGMENTED_AUTOFILL_SERVICE)));
 
         // The following are the new BIND_ permissions in Android 12.

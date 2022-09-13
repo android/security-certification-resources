@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -49,16 +50,32 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
+import com.android.certifications.niap.permissions.GmsPermissionTester;
+import com.android.certifications.niap.permissions.InstallPermissionTester;
+import com.android.certifications.niap.permissions.InternalPermissionTester;
 import com.android.certifications.niap.permissions.R;
+import com.android.certifications.niap.permissions.RuntimePermissionTester;
+import com.android.certifications.niap.permissions.SignaturePermissionTester;
 import com.android.certifications.niap.permissions.config.BypassConfigException;
 import com.android.certifications.niap.permissions.config.ConfigurationFactory;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.receivers.Admin;
+import com.android.certifications.niap.permissions.utils.PermissionUtils;
+import com.android.certifications.niap.permissions.utils.gson.Test;
+import com.android.certifications.niap.permissions.utils.gson.TestCategory;
+import com.android.certifications.niap.permissions.utils.gson.TestSuites;
+import com.google.gson.Gson;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Activity to drive permission test configurations. This activity obtains the configuration(s) to
@@ -147,11 +164,11 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         switch (id){
+            case R.id.action_output_tester_json:
+                writeAllTesterDetailsToJson();
+                break;
             case R.id.action_device_admin_test:
-                if (mDevicePolicyManager.isAdminActive(mComponentName)) {
-                    //mDevicePolicyManager.lockNow();
-                } else {
-                    //Log.d("LockScreen", "admin not active");
+                if (!mDevicePolicyManager.isAdminActive(mComponentName)) {
                     Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
                     intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mComponentName);
                     intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Administrator description");
@@ -195,11 +212,8 @@ public class MainActivity extends AppCompatActivity {
 
             for (BasePermissionTester permissionTester : mConfiguration.getPermissionTesters(
                     activity)) {
-                sLogger.logInfo("Test Target: "+permissionTester.getClass().getName());
-                for(BasePermissionTester.PermissionTest pt :permissionTester.getRegisteredPermissions()){
-                    sLogger.logInfo("Test Target: "+pt.toString());
-                }
 
+                PermissionUtils.checkTester(permissionTester);
                 if (!permissionTester.runPermissionTests()) {
                     mAllTestsPassed = false;
                 }
@@ -257,5 +271,72 @@ public class MainActivity extends AppCompatActivity {
         // Delegate handling of the permission request results to the active configuration.
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         mConfiguration.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private void writeAllTesterDetailsToJson() {
+        try {
+            final String fileName = "all-tester.json";
+            OutputStreamWriter writer = new OutputStreamWriter(mContext.openFileOutput(
+                    fileName, Context.MODE_PRIVATE));
+            //Prepare all defined tester
+            List<TestConfiguration> configurations =
+                    ConfigurationFactory.getConfigurations(this);
+            if(configurations.size() == 0){
+                sLogger.logError("[error] configuration not found!");
+                return;
+            }
+            List<BasePermissionTester> sources = new ArrayList<>();
+            TestConfiguration c = configurations.get(0);
+            sources.add(new InternalPermissionTester(c,this));
+            sources.add(new InstallPermissionTester(c,this));
+            sources.add(new RuntimePermissionTester(c,this));
+            sources.add(new SignaturePermissionTester(c,this));
+            sources.add(new GmsPermissionTester(c,this));
+
+            //Note : Output all tests suites into below structure for checking project health
+            //Test Category ... :
+            //    Name: [Name,Category,minVersion,maxVersion] ...
+            //Analysis
+            //  Naming Conflicts:[Name ....]
+            //  Test Counts : [Category:Name ....]
+            Set<String> dupecheck = new HashSet<>();
+            List<String> dupe = new ArrayList<>();
+            Map<String,Integer> testCounter = new HashMap<>();
+            int totalCounter = 0;
+            TestSuites gsonTestSuites = new TestSuites();
+            for(BasePermissionTester s:sources){
+                Integer testCount = 0;
+                Map<String,BasePermissionTester.PermissionTest> tests = s.getRegisteredPermissions();
+                String testCategory = s.getClass().getSimpleName().
+                        replaceAll("PermissionTester$","").toLowerCase();
+                TestCategory gsonCategory = new TestCategory(testCategory);
+                sLogger.logInfo(" >"+testCategory+"");
+
+                for(Map.Entry<String,BasePermissionTester.PermissionTest> entry:tests.entrySet()){
+                    String key = entry.getKey();
+                    //register dupe
+                    if(dupecheck.contains(key)) dupe.add(testCategory+"$"+key); else dupecheck.add(key);
+                    BasePermissionTester.PermissionTest test = entry.getValue();
+                    gsonCategory.tests.add(new Test(key,test.mMinApiLevel,test.mMaxApiLevel));
+                    testCount++;
+                    totalCounter++;
+                }
+                sLogger.logInfo(" >"+testCategory+" contains "+testCount+" test suites.");
+                gsonTestSuites.testCategories.add(gsonCategory);
+                testCounter.put(testCategory,testCount);
+            }
+            sLogger.logInfo(">The applicatin contains "+totalCounter+" test suites.");
+            sLogger.logInfo(">Test Conflicts :"+dupe.toString());
+
+            Gson gson = new Gson();
+            writer.write(gson.toJson(gsonTestSuites));
+
+            writer.close();
+
+            sLogger.logInfo( "Completed to output all tester details to json: " + mContext.getFilesDir() + "/"+fileName);
+
+        } catch (IOException e) {
+            sLogger.logError( "Caught an IOException writing the file: ", e);
+        }
     }
 }

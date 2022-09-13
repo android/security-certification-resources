@@ -71,7 +71,6 @@ public class InternalPermissionsTest {
         mPermissions.add(permission.SEND_SAFETY_CENTER_UPDATE);
         mPermissions.add(permission.ACCESS_AMBIENT_CONTEXT_EVENT);
         mPermissions.add(permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION);
-
     }
 
     private UiAutomation mUiAutomation;

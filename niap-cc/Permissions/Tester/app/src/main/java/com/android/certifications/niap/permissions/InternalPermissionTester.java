@@ -316,6 +316,24 @@ public class InternalPermissionTester extends BasePermissionTester {
         // # Skip READ_HOME_APP_SEARCH_DATA
         //Reason : Need specific role to test this permission.
 
+        //The permission is moved from signature permission (since android s)
+        mPermissionTasks.put(SignaturePermissions.permission.MANAGE_SENSOR_PRIVACY,
+                new PermissionTest(false, Build.VERSION_CODES.S,() -> {
+                    // ISensorPrivacyManager#setSensorPrivacy
+                    mTransacts.invokeTransact(Transacts.SENSOR_PRIVACY_SERVICE,
+                            Transacts.SENSOR_PRIVACY_DESCRIPTOR,
+                            Transacts.setSensorPrivacy, false);
+                }));
+
+        //The permission is moved from signature permission (since android t)
+        mPermissionTasks.put(SignaturePermissions.permission.TOGGLE_AUTOMOTIVE_PROJECTION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,
+                        Build.VERSION_CODES.S_V2, () -> {
+                    mTransacts.invokeTransact(Transacts.UI_MODE_SERVICE,
+                            Transacts.UI_MODE_DESCRIPTOR, Transacts.requestProjection,
+                            getActivityToken(), 1, mPackageName);
+                }));
+
     }
 
     @Override
