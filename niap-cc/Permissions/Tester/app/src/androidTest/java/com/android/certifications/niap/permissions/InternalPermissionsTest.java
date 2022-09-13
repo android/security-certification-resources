@@ -29,6 +29,7 @@ import androidx.test.rule.ActivityTestRule;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
+import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 
 import org.junit.After;
 import org.junit.Before;
@@ -58,19 +59,24 @@ public class InternalPermissionsTest {
     private static final List<String> mPermissions;
     static {
         mPermissions = new ArrayList<>();
-
+        //12
         mPermissions.add(permission.MANAGE_HOTWORD_DETECTION);
         mPermissions.add(permission.OBSERVE_SENSOR_PRIVACY);
+        mPermissions.add(permission.DOMAIN_VERIFICATION_AGENT);
         mPermissions.add(permission.ACCESS_RCS_USER_CAPABILITY_EXCHANGE);
+        mPermissions.add(permission.ASSOCIATE_COMPANION_DEVICES);
         mPermissions.add(permission.BYPASS_ROLE_QUALIFICATION);
         mPermissions.add(permission.PERFORM_IMS_SINGLE_REGISTRATION);
-
+        //13
         mPermissions.add(permission.SET_DEFAULT_ACCOUNT_FOR_CONTACTS);
         mPermissions.add(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE);
         mPermissions.add(permission.CREATE_VIRTUAL_DEVICE);
         mPermissions.add(permission.SEND_SAFETY_CENTER_UPDATE);
         mPermissions.add(permission.ACCESS_AMBIENT_CONTEXT_EVENT);
         mPermissions.add(permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION);
+
+        mPermissions.add(SignaturePermissions.permission.MANAGE_SENSOR_PRIVACY);
+        mPermissions.add(SignaturePermissions.permission.TOGGLE_AUTOMOTIVE_PROJECTION);
     }
 
     private UiAutomation mUiAutomation;
@@ -93,6 +99,7 @@ public class InternalPermissionsTest {
     public void runPermissionTests_shellIdentity_apisSuccessful() throws Exception {
         InternalPermissionTester permissionTester = new InternalPermissionTester(
                 new InternalTestConfiguration(mPermissions), rule.getActivity());
+
         mUiAutomation.adoptShellPermissionIdentity();
         //For query contacts
         mUiAutomation.grantRuntimePermission(null,"android.permission.QUERY_ALL_PACKAGES");

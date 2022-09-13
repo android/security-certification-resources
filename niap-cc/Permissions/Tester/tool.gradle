@@ -25,6 +25,7 @@ ext {
             manifestTags(json.T, "13")
         }
     }
+
     signatureConstants = { json, version ->
         json.each { category, list ->
             if (category.equals("Signature") || category.equals("Internal")) {
@@ -37,6 +38,7 @@ ext {
 
         }
     }
+
     task genSignatureConstants() {
         doLast {
             def src = new File("permissions.json").text;
@@ -68,4 +70,5 @@ ext {
             testPlaceHodlers(json4.T, "TIRAMISU", "Signature")
         }
     }
+
 }

@@ -66,8 +66,5 @@ public class InternalPermissions {
                 "android.permission.CREATE_VIRTUAL_DEVICE";
         public static final String ACCESS_AMBIENT_CONTEXT_EVENT =
                 "android.permission.ACCESS_AMBIENT_CONTEXT_EVENT";
-
-        public static final String WRITE_SECURITY_LOG =
-                "android.permission.WRITE_SECURITY_LOG";
     }
 }

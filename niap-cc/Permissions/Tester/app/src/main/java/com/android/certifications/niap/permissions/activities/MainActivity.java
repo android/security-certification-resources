@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
             for (BasePermissionTester permissionTester : mConfiguration.getPermissionTesters(
                     activity)) {
 
-                PermissionUtils.checkTester(permissionTester);
+                //PermissionUtils.checkTester(permissionTester);
                 if (!permissionTester.runPermissionTests()) {
                     mAllTestsPassed = false;
                 }

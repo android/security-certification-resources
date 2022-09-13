@@ -26,6 +26,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.location.Location;
+import android.os.Build;
 import android.util.SparseArray;
 
 import com.android.certifications.niap.permissions.config.TestConfiguration;
@@ -186,7 +187,7 @@ public class GmsPermissionTester extends BasePermissionTester {
         mPermissionTasks = new HashMap<>();
 
         mPermissionTasks.put(Manifest.permission.ACTIVITY_RECOGNITION,
-                new PermissionTest(false, () -> {
+                new PermissionTest(false,Build.VERSION_CODES.Q, () -> {
                     final String ACTIVITY_RECOGNITION_TEST = "ACTIVITY_RECOGNITION_TEST";
                     CountDownLatch[] latch = new CountDownLatch[1];
                     latch[0] = new CountDownLatch(1);
@@ -293,7 +294,7 @@ public class GmsPermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(Manifest.permission.ACCESS_FINE_LOCATION,
-                new PermissionTest(false, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.Q,() -> {
                     Task<Location> locationTask = LocationServices.getFusedLocationProviderClient(
                             mContext).getLastLocation();
                     try {
