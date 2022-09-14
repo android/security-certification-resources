@@ -149,6 +149,7 @@ import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.Transacts;
 import com.android.internal.policy.IKeyguardDismissCallback;
+import com.google.common.util.concurrent.ServiceManager;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -232,6 +233,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
     protected final List<String> mSignaturePermissions;
     protected final Set<String> mPrivilegedPermissions;
     protected final Set<String> mDevelopmentPermissions;
+
 
     /**
      * Map of permissions that can only be held by platform signed apps to their corresponding
@@ -435,36 +437,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             Transacts.notifySystemEvent, 0, new int[]{});
                 }));
 
-        mPermissionTasks.put(permission.CAPTURE_AUDIO_OUTPUT,
-                new PermissionTest(false, () -> {
-                    MediaRecorder recorder;
-                    try {
-                        recorder = new MediaRecorder();
-                        recorder.setAudioSource(AudioSource.REMOTE_SUBMIX);
-                        String fileName = mContext.getFilesDir() + "/test_capture_audio_output.out";
-                        recorder.setOutputFile(new File(fileName));
-                        recorder.setOutputFormat(OutputFormat.THREE_GPP);
-                        recorder.setAudioEncoder(AudioEncoder.AMR_NB);
-                        recorder.prepare();
-                        recorder.start();
-                    } catch (RuntimeException e) {
-                        // The call to start was observed to fail with a RuntimeException with
-                        // the following:
-                        // ServiceManager: Permission failure:
-                        // android.permission.CAPTURE_AUDIO_OUTPUT from uid=10167 pid=24184
-                        throw new SecurityException(e);
-                    } catch (IOException ioe) {
-                        // An IOException indicates that the permission check was passed and the
-                        // API should be considered as being successfully invoked.
-                        mLogger.logDebug("Caught an IOException: ", ioe);
-                        return;
-                    }
-                    // If the call to start has been passed then the permission check was
-                    // successful and any failures in stop can still be treated as a successful
-                    // API invocation.
-                    recorder.stop();
-                }));
 
+        mPermissionTasks.put(permission.CAPTURE_AUDIO_OUTPUT, new PermissionTest(false, () -> {
+            // void forceRemoteSubmixFullVolume(boolean startForcing, IBinder cb);
+            mTransacts.invokeTransact(Transacts.AUDIO_SERVICE, Transacts.AUDIO_DESCRIPTOR,
+                    Transacts.forceRemoteSubmixFullVolume, true, getActivityToken());
+        }));
 
         mPermissionTasks.put(permission.CAPTURE_SECURE_VIDEO_OUTPUT,
                 new PermissionTest(false, () -> {
@@ -709,7 +687,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
             }
         }));
 
-        mPermissionTasks.put(permission.CRYPT_KEEPER, new PermissionTest(false, () -> {
+        mPermissionTasks.put(permission.CRYPT_KEEPER,
+                new PermissionTest(false,Build.VERSION_CODES.P,Build.VERSION_CODES.S,() -> {
             mTransacts.invokeTransact(Transacts.MOUNT_SERVICE, Transacts.MOUNT_DESCRIPTOR,
                     Transacts.getEncryptionState);
         }));
@@ -2086,7 +2065,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // This permission was only used on Android 10; starting with Android 11 profile owners are
         // granted access to device identifiers using the MARK_DEVICE_ORGANIZATION_OWNED permission.
         mPermissionTasks.put(permission.GRANT_PROFILE_OWNER_DEVICE_IDS_ACCESS,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.Q,Build.VERSION_CODES.Q, () -> {
                     ComponentName componentName = new ComponentName(mContext, MainActivity.class);
                     // SecurityException message indicates the failure is due to the process not
                     // being run with the system UID, but a check is performed for this permission
@@ -2692,20 +2671,28 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MARK_DEVICE_ORGANIZATION_OWNED,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
                     ComponentName componentName = new ComponentName(mContext, MainActivity.class);
-                    mTransacts.invokeTransact(Transacts.DEVICE_POLICY_SERVICE,
-                            Transacts.DEVICE_POLICY_DESCRIPTOR,
-                            Transacts.markProfileOwnerOnOrganizationOwnedDevice, componentName);
-                    // If the permission is granted an active admin must first be granted to
-                    // verify this test; since this is outside the scope of a permission test skip
-                    // the test when the permission is granted.
-                    if (mContext.checkSelfPermission(permission.MARK_DEVICE_ORGANIZATION_OWNED)
-                            == PackageManager.PERMISSION_GRANTED) {
-                        throw new BypassTestException(
-                                "This permission requires an active admin to be set");
+                    //
+                    if (mDeviceApiLevel <= Build.VERSION_CODES.S_V2) {
+                        // If the permission is granted an active admin must first be granted to
+                        // verify this test; since this is outside the scope of a permission test skip
+                        // the test when the permission is granted.
+                        if (mContext.checkSelfPermission(permission.MARK_DEVICE_ORGANIZATION_OWNED)
+                                == PackageManager.PERMISSION_GRANTED) {
+                            throw new BypassTestException(
+                                    "This permission requires an active admin to be set");
+                        }
+                        mTransacts.invokeTransact(Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.markProfileOwnerOnOrganizationOwnedDevice, componentName);
+                    } else {
+                        //Above methods are removed from Android T
+                        //The below api can also be granted to run with MANAGE_PROFILE_AND_DEVICE_OWNERS
+                        //permission. For checking please remove both of the permisssions.
+                        mTransacts.invokeTransact(Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setProfileOwnerOnOrganizationOwnedDevice,
+                                componentName,Process.myUid(),true);
                     }
-                    mTransacts.invokeTransact(Transacts.DEVICE_POLICY_SERVICE,
-                            Transacts.DEVICE_POLICY_DESCRIPTOR,
-                            Transacts.markProfileOwnerOnOrganizationOwnedDevice, componentName);
                 }));
 
         mPermissionTasks.put(permission.MEDIA_RESOURCE_OVERRIDE_PID,
@@ -2831,10 +2818,17 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.PEEK_DROPBOX_DATA,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+
                     long currTimeMs = System.currentTimeMillis();
-                    Parcel result = mTransacts.invokeTransact(Transacts.DROPBOX_SERVICE,
+
+                    final DropBoxManager db = (DropBoxManager) mContext.getSystemService(Context.DROPBOX_SERVICE);
+                    db.addText("test-tag","PEEK_DROPBOX_DATA test at :"+currTimeMs);
+
+                    Parcel result= mTransacts.invokeTransact(Transacts.DROPBOX_SERVICE,
                             Transacts.DROPBOX_DESCRIPTOR,
-                            Transacts.getNextEntry, "test-tag", currTimeMs, mPackageName);
+                            Transacts.getNextEntry, "test-tag", currTimeMs-(1000*60), mPackageName);
+
+
                     if (result.readInt() == 0) {
                         throw new SecurityException(
                                 "Received DropBoxManager.Entry is null during PEEK_DROPBOX_DATA "
@@ -2842,6 +2836,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                     DropBoxManager.Entry entry = DropBoxManager.Entry.CREATOR.createFromParcel(
                             result);
+
                     mLogger.logDebug(
                             "Successfully parsed entry from parcel: " + entry.getText(100));
                 }));
@@ -3107,9 +3102,26 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     } catch (ClassNotFoundException e) {
                         throw new UnexpectedPermissionTestFailureException(e);
                     }
-                    mTransacts.invokeTransact(Transacts.DEVICE_STATE_SERVICE,
-                            Transacts.DEVICE_STATE_DESCRIPTOR, Transacts.cancelRequest,
-                            deviceStateRequestClass.cast(null));
+                    if (mDeviceApiLevel <= Build.VERSION_CODES.S_V2) {
+                        mTransacts.invokeTransact(Transacts.DEVICE_STATE_SERVICE,
+                                Transacts.DEVICE_STATE_DESCRIPTOR, Transacts.cancelRequest,
+                                deviceStateRequestClass.cast(null));
+                    } else {
+                        mLogger.logInfo("Check cancelStateRequest");
+                        //!!!!!!!!Check other tests using handlers!!!!!!!//
+                        /*
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mTransacts.invokeTransact(Transacts.DEVICE_STATE_SERVICE,
+                                        Transacts.DEVICE_STATE_DESCRIPTOR, Transacts.cancelStateRequest);
+                            }
+                        }, 5000);*/
+
+                        // * Checks if the process can control the device state. If the calling process ID is
+                        // * not the top app, then check if this process holds the CONTROL_DEVICE_STATE permission.
+
+                    }
                 }));
 
         // CONTROL_OEM_PAID_NETWORK_PREFERENCE requires a device that supports automotive.

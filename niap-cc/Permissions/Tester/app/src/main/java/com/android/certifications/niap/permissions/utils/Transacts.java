@@ -376,11 +376,11 @@ public class Transacts {
     public static final String getPermittedInputMethodsAsUser="getPermittedInputMethodsAsUser";
 
     public static final String dispatchMessage="dispatchMessage";
-    //int startActivityFromGameSession(IApplicationThread caller, in String callingPackage,
-    //                                in String callingFeatureId, int callingPid, int callingUid, in Intent intent,
-    //                                int taskId, int userId);
     public static final String startActivityFromGameSession="startActivityFromGameSession";
     public static final String getWifiSsidPolicy="getWifiSsidPolicy";
+    public static final String forceRemoteSubmixFullVolume="forceRemoteSubmixFullVolume";
+    public static final String setProfileOwnerOnOrganizationOwnedDevice="setProfileOwnerOnOrganizationOwnedDevice";
+    public static final String cancelStateRequest="cancelStateRequest";
 
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";

@@ -91,6 +91,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(setRingtonePlayer, 69);
         transactIds.put(getRingtonePlayer, 70);
         transactIds.put(isAudioServerRunning, 103);
+        transactIds.put(forceRemoteSubmixFullVolume, 15);
         transactIds.put(getDeviceVolumeBehavior, 121);
         mDescriptorTransacts.put(AUDIO_DESCRIPTOR, transactIds);
 
@@ -225,6 +226,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(getCacheSizeBytes, 77);
         // Failed to obtain transactId of getEncryptionState under android.os.storage.IStorageManager: No field TRANSACTION_getEncryptionState in class Landroid/os/storage/IStorageManager$Stub; (declaration of 'android.os.storage.IStorageManager$Stub' appears in /system/framework/framework.jar!classes2.dex)
         transactIds.put(benchmark, 60);
+        // Failed to obtain transactId of isConvertibleToFBE under android.os.storage.IStorageManager: No field TRANSACTION_isConvertibleToFBE in class Landroid/os/storage/IStorageManager$Stub; (declaration of 'android.os.storage.IStorageManager$Stub' appears in /system/framework/framework.jar!classes2.dex)
         mDescriptorTransacts.put(MOUNT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -238,6 +240,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         // Failed to obtain transactId of cancelRequest under android.hardware.devicestate.IDeviceStateManager: No field TRANSACTION_cancelRequest in class Landroid/hardware/devicestate/IDeviceStateManager$Stub; (declaration of 'android.hardware.devicestate.IDeviceStateManager$Stub' appears in /system/framework/framework.jar)
+        transactIds.put(cancelStateRequest, 4);
         mDescriptorTransacts.put(DEVICE_STATE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -417,6 +420,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
         // Failed to obtain transactId of markProfileOwnerOnOrganizationOwnedDevice under android.app.admin.IDevicePolicyManager: No field TRANSACTION_markProfileOwnerOnOrganizationOwnedDevice in class Landroid/app/admin/IDevicePolicyManager$Stub; (declaration of 'android.app.admin.IDevicePolicyManager$Stub' appears in /system/framework/framework.jar)
         transactIds.put(setStrings, 359);
         transactIds.put(getWifiSsidPolicy, 352);
+        transactIds.put(setProfileOwnerOnOrganizationOwnedDevice, 306);
         transactIds.put(forceSecurityLogs, 260);
         transactIds.put(getDoNotAskCredentialsOnBoot, 220);
         transactIds.put(clearSystemUpdatePolicyFreezePeriodRecord, 217);

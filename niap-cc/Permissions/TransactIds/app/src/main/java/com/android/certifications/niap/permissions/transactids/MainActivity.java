@@ -611,6 +611,19 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
                     Transacts.getWifiSsidPolicy,descriptorTransacts);
 
+            queryTransactId(Transacts.AUDIO_DESCRIPTOR,
+                    Transacts.forceRemoteSubmixFullVolume,descriptorTransacts);
+
+            queryTransactId(Transacts.MOUNT_DESCRIPTOR,
+                    Transacts.isConvertibleToFBE,descriptorTransacts);
+
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
+                    Transacts.setProfileOwnerOnOrganizationOwnedDevice,descriptorTransacts);
+
+            queryTransactId(Transacts.DEVICE_STATE_DESCRIPTOR,
+                    Transacts.cancelStateRequest,descriptorTransacts);
+
+
             return writeTransactsSourceFile(descriptorTransacts);
         }
 
