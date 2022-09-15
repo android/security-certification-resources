@@ -25,6 +25,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -48,8 +49,10 @@ import androidx.appcompat.widget.Toolbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
+import com.android.certifications.niap.permissions.Constants;
 import com.android.certifications.niap.permissions.GmsPermissionTester;
 import com.android.certifications.niap.permissions.InstallPermissionTester;
 import com.android.certifications.niap.permissions.InternalPermissionTester;
@@ -76,6 +79,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Activity to drive permission test configurations. This activity obtains the configuration(s) to
@@ -164,17 +168,23 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         switch (id){
+            /**
+             * Create a json file for checking whole testing items
+             */
             case R.id.action_output_tester_json:
                 writeAllTesterDetailsToJson();
                 break;
-            case R.id.action_device_admin_test:
+            case R.id.action_request_runtime_permissions:
+                requestRuntimePermissionsForSignatureTests();
+                break;
+            /*case R.id.action_device_admin_test:
                 if (!mDevicePolicyManager.isAdminActive(mComponentName)) {
                     Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
                     intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mComponentName);
                     intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Administrator description");
                     startActivityForResult(intent, ADMIN_INTENT);
                 }
-                break;
+                break;*/
         }
 
         return super.onOptionsItemSelected(item);
@@ -270,7 +280,31 @@ public class MainActivity extends AppCompatActivity {
             int[] grantResults) {
         // Delegate handling of the permission request results to the active configuration.
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        mConfiguration.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(mConfiguration != null)
+            mConfiguration.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    final String[] RUNTIME_PERMS_FOR_SIG = new String[]{
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.READ_CALL_LOG",
+        "android.permission.RECEIVE_SMS",
+        "com.android.voicemail.permission.ADD_VOICEMAIL",
+        "android.permission.RECORD_AUDIO"
+    };
+
+    private void requestRuntimePermissionsForSignatureTests()
+    {
+        List<String> not_granted = new ArrayList<String>();
+        for(String p:RUNTIME_PERMS_FOR_SIG){
+            if (checkSelfPermission(p) == PackageManager.PERMISSION_GRANTED) {
+                continue;
+            } else {
+                not_granted.add(p);
+            }
+        }
+        String[] perms = not_granted.toArray(new String[0]);
+        ActivityCompat.requestPermissions(this,perms,
+                Constants.PERMISSION_CODE_RUNTIME_DEPENDENT_PERMISSIONS);
     }
 
     private void writeAllTesterDetailsToJson() {

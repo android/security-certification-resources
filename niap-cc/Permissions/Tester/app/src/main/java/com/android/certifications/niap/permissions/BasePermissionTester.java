@@ -204,7 +204,7 @@ public abstract class BasePermissionTester {
                 mLogger.logDebug("Caught a SecurityException for permission " + permission + ": ",
                         e);
                 if (e.getCause() != null) {
-                    mLogger.logDebug("SecuritionException cause: ", e.getCause());
+                    mLogger.logDebug("SecurityException cause: ", e.getCause());
                 }
                 testPassed = getAndLogTestStatus(permission, permissionGranted, false);
             } catch (UnexpectedPermissionTestFailureException e) {

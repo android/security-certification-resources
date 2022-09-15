@@ -69,8 +69,8 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
     };
 
     private static final String[] PERMISSIONS_UNDER_TEST = new String[]{
-           // Manifest.permission.ACCESS_MEDIA_LOCATION,
-           // Manifest.permission.SEND_SMS,
+            // Manifest.permission.ACCESS_MEDIA_LOCATION,
+            // Manifest.permission.SEND_SMS,
             //Android 13
             POST_NOTIFICATIONS,
             NEARBY_WIFI_DEVICES,

@@ -1249,8 +1249,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.MOUNT_FORMAT_FILESYSTEMS,
                 new PermissionTest(false, () -> {
+                    //
                     mTransacts.invokeTransact(Transacts.MOUNT_SERVICE, Transacts.MOUNT_DESCRIPTOR,
-                            Transacts.benchmark, "test", (IBinder) null);
+                            Transacts.benchmark, "private", (IBinder) null);
                 }));
 
         mPermissionTasks.put(permission.MOUNT_UNMOUNT_FILESYSTEMS,
@@ -2203,17 +2204,30 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // android.permission.SMS_FINANCIAL_TRANSACTIONS - both with and without the permission
         // granted a null value can be sent to the callback.
 
+
         mPermissionTasks.put(permission.RESET_PASSWORD,
                 new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
                     String newPassword = null;
                     // In Android 10 a password had to be specified. Since this test only allows a
                     // password to be set if it has not been previously set this password will need
                     // to be cleared before a subsequent test invocation when the test app is
-                    // platform signed.
+                    // platform signed. ag/9703399
                     if (mDeviceApiLevel == Build.VERSION_CODES.Q) {
                         newPassword = "1234";
                     }
-                    mDevicePolicyManager.resetPassword(newPassword, 0);
+                    KeyguardManager manager = (KeyguardManager)
+                            mContext.getSystemService(Context.KEYGUARD_SERVICE);
+                    if(manager.isDeviceSecure()){
+                        //To avoid untrusted password reset, resetPassword() will either
+                        //throw SecurityException, or fail silently, if once passowrd is specified.
+                        //So we need to reset it before testing.
+                        throw new BypassTestException("Skipped : " +
+                                "To avoid untrusted password reset, resetPassword() will " +
+                                "throw SecurityException, if once screen lock passowrd is specified."+
+                                "Please reset it before testing this permission");
+                    } else {
+                        mDevicePolicyManager.resetPassword(newPassword, 0);
+                    }
                 }));
 
         mPermissionTasks.put(permission.WRITE_DEVICE_CONFIG,
@@ -3092,7 +3106,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.CONTROL_DEVICE_STATE,
-                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.S,
+                        Build.VERSION_CODES.S, () -> {
                     @SuppressLint("WrongConstant") Object deviceStateManager
                             = mContext.getSystemService("device_state");
                     Class<?> deviceStateRequestClass = null;
@@ -3102,24 +3117,17 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     } catch (ClassNotFoundException e) {
                         throw new UnexpectedPermissionTestFailureException(e);
                     }
-                    if (mDeviceApiLevel <= Build.VERSION_CODES.S_V2) {
+                    if (mDeviceApiLevel <= Build.VERSION_CODES.S) {
                         mTransacts.invokeTransact(Transacts.DEVICE_STATE_SERVICE,
                                 Transacts.DEVICE_STATE_DESCRIPTOR, Transacts.cancelRequest,
                                 deviceStateRequestClass.cast(null));
                     } else {
-                        mLogger.logInfo("Check cancelStateRequest");
-                        //!!!!!!!!Check other tests using handlers!!!!!!!//
-                        /*
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                mTransacts.invokeTransact(Transacts.DEVICE_STATE_SERVICE,
-                                        Transacts.DEVICE_STATE_DESCRIPTOR, Transacts.cancelStateRequest);
-                            }
-                        }, 5000);*/
+                        throw new BypassTestException(
+                                "Skip: cancelStateRequest() need to check with background process.\n" +
+                                        "See DeviceStateManagerService#assertCanControlDeviceState");
 
-                        // * Checks if the process can control the device state. If the calling process ID is
-                        // * not the top app, then check if this process holds the CONTROL_DEVICE_STATE permission.
+//                        Transacts.invokeTransact(Transacts.DEVICE_STATE_SERVICE,
+//                                Transacts.DEVICE_STATE_DESCRIPTOR, Transacts.cancelStateRequest);
 
                     }
                 }));
@@ -3529,7 +3537,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         } else {
                             // any other exceptions should be logged for debugging in case other
                             // devices use a different error code for PERMISSION_DENIED.
-                            mLogger.logDebug("Caught an exception invoking the transact: ", e);
+
+                            mLogger.logDebug("Intended Exception : Caught an exception invoking the transact: ", e);
                         }
                     }
                 }));

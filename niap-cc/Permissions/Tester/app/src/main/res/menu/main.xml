@@ -7,8 +7,12 @@
         android:title="@string/output_tester_json"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_request_runtime_permissions"
+        android:title="@string/request_runtime_permissions_for_sig"
+        app:showAsAction="never" />
+    <!--<item
         android:id="@+id/action_device_admin_test"
         android:title="@string/device_admin_test"
-        app:showAsAction="never" />
+        app:showAsAction="never" />-->
 
 </menu>

@@ -118,11 +118,23 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         //permissions.add(permission.MARK_DEVICE_ORGANIZATION_OWNED);
         //permissions.add(permission.PEEK_DROPBOX_DATA);
         //permissions.add(permission.CONTROL_DEVICE_STATE);
-        permissions.add(permission.RESET_PASSWORD);
+        //permissions.add(permission.RESET_PASSWORD);
+        //permissions.add(permission.MOUNT_FORMAT_FILESYSTEMS);
+        addPermissionsNeedPreReq(permissions);
 
         return Optional.of(permissions);
     }
-    
+
+    //Those test suites require some runtime permissions to execute.
+    private void addPermissionsNeedPreReq(List<String> permissions)
+    {
+        permissions.add(permission.LOCAL_MAC_ADDRESS);
+        permissions.add(permission.MANAGE_SOUND_TRIGGER);
+        permissions.add(permission.READ_VOICEMAIL);
+        permissions.add(permission.WRITE_VOICEMAIL);
+        permissions.add(permission.ACCESS_MESSAGES_ON_ICC);
+
+    }
     //Add all signature permission tests for SDK28 
     private void addPermissionsFor28(List<String> permissions)
     {
