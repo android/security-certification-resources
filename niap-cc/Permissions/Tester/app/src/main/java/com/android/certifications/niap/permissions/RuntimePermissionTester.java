@@ -207,7 +207,9 @@ public class RuntimePermissionTester extends BasePermissionTester {
             mContentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
         }));
 
-        mPermissionTasks.put(READ_EXTERNAL_STORAGE, new PermissionTest(false, () -> {
+        mPermissionTasks.put(READ_EXTERNAL_STORAGE, new PermissionTest(false,
+                Build.VERSION_CODES.P, Build.VERSION_CODES.S_V2,
+                () -> {
             mWallpaperManager.getWallpaperFile(WallpaperManager.FLAG_SYSTEM);
         }));
 
