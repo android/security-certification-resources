@@ -629,9 +629,6 @@ public class RuntimePermissionTester extends BasePermissionTester {
                 }
             }));
         }
-
-
-
     }
 
     public static class TestLocalOnlyHotspotCallback extends WifiManager.LocalOnlyHotspotCallback {

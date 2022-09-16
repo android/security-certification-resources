@@ -593,42 +593,35 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     } else {
                         // The following are the default NetworkCapabilities without
                         // NET_CAPABILITY_NOT_RESTRICTED set.
-                        long defaultCapabilities =
-                                (1 << NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-                                        | (1 << NetworkCapabilities.NET_CAPABILITY_NOT_VPN);
-                        Parcelable networkCapabilities = new Parcelable() {
-                            @Override
-                            public int describeContents() {
-                                return 0;
-                            }
+                        Class<?> ncBuilderClazz = null;
+                        try {
+                            ncBuilderClazz = Class.forName("android.net.NetworkCapabilities$Builder");
 
-                            @Override
-                            public void writeToParcel(Parcel parcel, int i) {
-                                parcel.writeLong(defaultCapabilities); // mNetworkCapabilities
-                                parcel.writeLong(0); // mForbiddenNetworkCapabilities
-                                parcel.writeLong(0); // mTransportTypes
-                                parcel.writeInt(0); // mLinkUpBandwidthKbps
-                                parcel.writeInt(0); // mLinkDownBandwidthKbps
-                                parcel.writeParcelable(null, i); // mNetworkSpecifier
-                                parcel.writeParcelable(null, i); // mTransportInfo
-                                parcel.writeInt(-1); // mSignalStrength
-                                parcel.writeInt(-1); // mUids
-                                parcel.writeString(""); // mSSID
-                                parcel.writeBoolean(false); // mPrivateDnsBroken
-                                parcel.writeIntArray(new int[0]); // Administrator Uids
-                                parcel.writeInt(mUid); // mOwnerUid
-                                parcel.writeInt(mUid); // mRequestorUid
-                                parcel.writeString(mPackageName); // mRequestorPackageName
-                                parcel.writeIntArray(new int[0]); // mSubIds
-                            }
-                        };
-                        Intent intent = new Intent(mContext, TestActivity.class);
-                        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent,
-                                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-                        mTransacts.invokeTransact(Transacts.CONNECTIVITY_SERVICE,
-                                Transacts.CONNECTIVITY_DESCRIPTOR,
-                                Transacts.pendingRequestForNetwork, networkCapabilities,
-                                pendingIntent, mPackageName, null);
+                            Object ncBuilderObj = invokeReflectionCall(ncBuilderClazz,
+                                    "withoutDefaultCapabilities", null,
+                                    new Class<?>[]{});
+                            ncBuilderObj = invokeReflectionCall(ncBuilderClazz,
+                                    "addCapability", ncBuilderObj,
+                                    new Class<?>[]{int.class},NetworkCapabilities.NET_CAPABILITY_TRUSTED);
+                            ncBuilderObj = invokeReflectionCall(ncBuilderClazz,
+                                    "addCapability", ncBuilderObj,
+                                    new Class<?>[]{int.class},NetworkCapabilities.NET_CAPABILITY_NOT_VPN);
+
+                            NetworkCapabilities nc  = (NetworkCapabilities) invokeReflectionCall(ncBuilderClazz,
+                                    "build", ncBuilderObj,
+                                    new Class<?>[]{});
+
+                            Intent intent = new Intent(mContext, TestActivity.class);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent,
+                                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                            mTransacts.invokeTransact(Transacts.CONNECTIVITY_SERVICE,
+                                    Transacts.CONNECTIVITY_DESCRIPTOR,
+                                    Transacts.pendingRequestForNetwork,nc,
+                                    pendingIntent, mPackageName, mContext.getAttributionTag());
+
+                        } catch (ClassNotFoundException e) {
+                            throw new UnexpectedPermissionTestFailureException(e);
+                        }
                     }
                 }));
 
@@ -3213,7 +3206,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_WIFI_COUNTRY_CODE,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
                     mTransacts.invokeTransact(Transacts.WIFI_SERVICE, Transacts.WIFI_DESCRIPTOR,
-                            Transacts.setOverrideCountryCode, "test-country-code");
+                            Transacts.setOverrideCountryCode, "ja");
                 }));
 
         mPermissionTasks.put(permission.MODIFY_REFRESH_RATE_SWITCHING_TYPE,
@@ -3604,7 +3597,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
                     mTransacts.invokeTransact(Transacts.REBOOT_READINESS_SERVICE,
                             Transacts.REBOOT_READINESS_DESCRIPTOR,
-                            Transacts.removeRequestRebootReadinessStatusListener, (Object) null);
+                            Transacts.removeRequestRebootReadinessStatusListener, getActivityToken());
                 }));
 
         mPermissionTasks.put(permission.SOUNDTRIGGER_DELEGATE_IDENTITY,
@@ -3632,7 +3625,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
                     mTransacts.invokeTransact(Transacts.SOUND_TRIGGER_SERVICE,
                             Transacts.SOUND_TRIGGER_DESCRIPTOR, Transacts.attachAsMiddleman,
-                            identity, identity, genericIBinder);
+                            identity, identity, getActivityToken());
                 }));
 
         // SOUND_TRIGGER_RUN_IN_BATTERY_SAVER requires an initial transact to obtain an instance
@@ -3645,6 +3638,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.SUGGEST_EXTERNAL_TIME,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    //android.app.time.ExternalTimeSuggestion
                     mTransacts.invokeTransact(Transacts.TIME_DETECTOR_SERVICE,
                             Transacts.TIME_DETECTOR_DESCRIPTOR, Transacts.suggestExternalTime,
                             (Object) null);
@@ -3683,6 +3677,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.MANAGE_MUSIC_RECOGNITION,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    //RecognitionRequest,IBinder
                     mTransacts.invokeTransact(Transacts.MUSIC_RECOGNITION_SERVICE,
                             Transacts.MUSIC_RECOGNITION_DESCRIPTOR, Transacts.beginRecognition,
                             null, null);
@@ -3703,9 +3698,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.GET_PEOPLE_TILE_PREVIEW,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    Bundle param = new Bundle();
                     mContentResolver.call(
                             Uri.parse("content://com.android.systemui.people.PeopleProvider"),
-                            "get_people_tile_preview", null, null);
+                            "get_people_tile_preview", null, param);
                 }));
 
         mPermissionTasks.put(permission.MANAGE_ACTIVITY_TASKS,
@@ -3735,8 +3731,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.WIFI_ACCESS_COEX_UNSAFE_CHANNELS,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    //WifiManager.CoexCallback()
                     mTransacts.invokeTransact(Transacts.WIFI_SERVICE, Transacts.WIFI_DESCRIPTOR,
-                            Transacts.unregisterCoexCallback, (Object) null);
+                            Transacts.unregisterCoexCallback,(Object) null);
 
                 }));
 

@@ -30,7 +30,7 @@ public class BackgroundTestWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        //mLogger.logDebug("***background worker");
+
         if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE)) {
             mLogger.logDebug("Bypass : A hearrt rate monitor is not available to run this test");
             return Result.success();

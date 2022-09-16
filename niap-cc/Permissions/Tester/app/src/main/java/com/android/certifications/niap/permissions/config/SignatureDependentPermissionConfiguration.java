@@ -21,14 +21,11 @@ import static com.android.certifications.niap.permissions.utils.SignaturePermiss
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.os.Build;
-import android.view.WindowManager;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.R;
 import com.android.certifications.niap.permissions.RuntimePermissionTester;
 import com.android.certifications.niap.permissions.SignaturePermissionTester;
-import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -120,7 +117,10 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         //permissions.add(permission.CONTROL_DEVICE_STATE);
         //permissions.add(permission.RESET_PASSWORD);
         //permissions.add(permission.MOUNT_FORMAT_FILESYSTEMS);
-        addPermissionsNeedPreReq(permissions);
+        //addPermissionsNeedPreReq(permissions);
+        //addPermissionsWithError(permissions);
+
+        permissions.add(permission.CONNECTIVITY_USE_RESTRICTED_NETWORKS);
 
         return Optional.of(permissions);
     }
@@ -133,8 +133,37 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         permissions.add(permission.READ_VOICEMAIL);
         permissions.add(permission.WRITE_VOICEMAIL);
         permissions.add(permission.ACCESS_MESSAGES_ON_ICC);
-
     }
+
+    private void addPermissionsWithError(List<String> permissions)
+    {
+        permissions.add(permission.CHANGE_COMPONENT_ENABLED_STATE);
+        permissions.add(permission.CONNECTIVITY_USE_RESTRICTED_NETWORKS);
+        permissions.add(permission.CONTROL_REMOTE_APP_TRANSITION_ANIMATIONS);
+        permissions.add(permission.DELETE_PACKAGES);
+        permissions.add(permission.FORCE_PERSISTABLE_URI_PERMISSIONS);
+        permissions.add(permission.HARDWARE_TEST);
+        permissions.add(permission.MANAGE_DOCUMENTS);
+        permissions.add(permission.MANAGE_PROFILE_AND_DEVICE_OWNERS);
+        permissions.add(permission.OBSERVE_GRANT_REVOKE_PERMISSIONS);
+        permissions.add(permission.PACKET_KEEPALIVE_OFFLOAD);
+        permissions.add(permission.READ_SEARCH_INDEXABLES);
+        permissions.add(permission.SET_INPUT_CALIBRATION);
+        permissions.add(permission.SET_KEYBOARD_LAYOUT);
+        permissions.add(permission.START_TASKS_FROM_RECENTS);
+        permissions.add(permission.KEYPHRASE_ENROLLMENT_APPLICATION);
+        permissions.add(permission.NETWORK_STATS_PROVIDER);
+        permissions.add(permission.FORCE_DEVICE_POLICY_MANAGER_LOGS);
+        permissions.add(permission.GET_PEOPLE_TILE_PREVIEW);
+        permissions.add(permission.MANAGE_MUSIC_RECOGNITION);
+        permissions.add(permission.MANAGE_WIFI_COUNTRY_CODE);
+        permissions.add(permission.SET_AND_VERIFY_LOCKSCREEN_CREDENTIALS);
+        permissions.add(permission.SIGNAL_REBOOT_READINESS);
+        permissions.add(permission.SOUNDTRIGGER_DELEGATE_IDENTITY);
+        permissions.add(permission.SUGGEST_EXTERNAL_TIME);
+        permissions.add(permission.WIFI_ACCESS_COEX_UNSAFE_CHANNELS);
+    }
+    
     //Add all signature permission tests for SDK28 
     private void addPermissionsFor28(List<String> permissions)
     {
