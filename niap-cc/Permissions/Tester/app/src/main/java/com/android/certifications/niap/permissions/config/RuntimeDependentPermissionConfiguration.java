@@ -122,10 +122,10 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
             //WRITE_EXTERNAL_STORAGE,//The permission does not show user consent dialogue
             ADD_VOICEMAIL
     };
-    private static final String[] REQUIRED_PERMISSIONS = RUNTIME_SDK28A;// new String[]{
+    private static final String[] REQUIRED_PERMISSIONS = RUNTIME_SDK29;// new String[]{
 
     //}
-    private static final String[] PERMISSIONS_UNDER_TEST = RUNTIME_SDK28A;//new String[]{
+    private static final String[] PERMISSIONS_UNDER_TEST = RUNTIME_SDK29;//new String[]{
     //};
 
     RuntimeDependentPermissionConfiguration(Activity activity) {
