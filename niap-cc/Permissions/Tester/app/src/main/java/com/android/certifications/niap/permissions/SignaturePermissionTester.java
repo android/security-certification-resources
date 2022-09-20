@@ -142,6 +142,7 @@ import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
 import com.android.certifications.niap.permissions.services.TestService;
+import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.Transacts;
 import com.android.internal.policy.IKeyguardDismissCallback;
@@ -3845,9 +3846,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.QUERY_USERS,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    //mLogger.logInfo(ReflectionUtils.checkDeclaredMethod(mUserManager,"isSame").toString());
+
                     invokeReflectionCall(mUserManager.getClass(),
                             "isSameProfileGroup", mUserManager,
-                            new Class<?>[]{int.class, int.class}, 0,10);
+                            new Class<?>[]{android.os.UserHandle.class, android.os.UserHandle.class},
+                            UserHandle.getUserHandleForUid(0),UserHandle.getUserHandleForUid(10));
                 }));
 
         mPermissionTasks.put(permission.QUERY_ADMIN_POLICY,
@@ -4064,6 +4068,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MODIFY_USER_PREFERRED_DISPLAY_MODE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     Display.Mode mode = mDisplayManager.getDisplays()[0].getMode();
+                    //The method may not find if the app is signing by the platform signing key
+                    //mLogger.logInfo(ReflectionUtils.checkDeclaredMethod(mDisplayManager,"setGlobalUser").toString());
                     invokeReflectionCall(mDisplayManager.getClass(),
                             "setGlobalUserPreferredDisplayMode", mDisplayManager,
                             new Class[]{Display.Mode.class},mode);

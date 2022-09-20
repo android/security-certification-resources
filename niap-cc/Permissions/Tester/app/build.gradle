@@ -67,7 +67,7 @@ android {
         }
         noperm {
             dimension "settings"
-            signingConfig signingConfigs.platform
+            signingConfig signingConfigs.bundle
         }
         platform {
             dimension "settings"

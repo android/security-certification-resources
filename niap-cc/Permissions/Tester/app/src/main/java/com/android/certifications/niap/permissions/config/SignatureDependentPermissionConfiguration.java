@@ -100,7 +100,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         //        addPermissionsFor30(permissions);
         //        addPermissionsFor31(permissions);
         //        addPermissionsFor32(permissions);
-        //        addPermissionsFor33(permissions);
+                addPermissionsFor33(permissions);
 
         permissions.add(permission.CONNECTIVITY_USE_RESTRICTED_NETWORKS);
 
