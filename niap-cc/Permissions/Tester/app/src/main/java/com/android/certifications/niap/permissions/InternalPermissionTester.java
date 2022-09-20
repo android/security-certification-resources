@@ -265,25 +265,27 @@ public class InternalPermissionTester extends BasePermissionTester {
                                         + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
                                         + "for this test");
                     }
-                    AssociationRequest request = new AssociationRequest.Builder().setDeviceProfile(
-                            AssociationRequest.DEVICE_PROFILE_AUTOMOTIVE_PROJECTION).build();
+                    AssociationRequest request = null;
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        request = new AssociationRequest.Builder().setDeviceProfile(
+                                AssociationRequest.DEVICE_PROFILE_AUTOMOTIVE_PROJECTION).build();
+                        CompanionDeviceManager.Callback callback =
+                                new CompanionDeviceManager.Callback() {
+                                    @Override
+                                    public void onDeviceFound(IntentSender intentSender) {
+                                        mLogger.logDebug(
+                                                "onDeviceFound: intentSender = " + intentSender);
+                                    }
+                                    @Override
+                                    public void onFailure(CharSequence charSequence) {
+                                        mLogger.logDebug("onFailure: charSequence = " + charSequence);
+                                    }
+                                };
+                        CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
+                                CompanionDeviceManager.class);
 
-                    CompanionDeviceManager.Callback callback =
-                            new CompanionDeviceManager.Callback() {
-                                @Override
-                                public void onDeviceFound(IntentSender intentSender) {
-                                    mLogger.logDebug(
-                                            "onDeviceFound: intentSender = " + intentSender);
-                                }
-                                @Override
-                                public void onFailure(CharSequence charSequence) {
-                                    mLogger.logDebug("onFailure: charSequence = " + charSequence);
-                                }
-                            };
-                    CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
-                            CompanionDeviceManager.class);
-
-                    companionDeviceManager.associate(request, callback, null);
+                        companionDeviceManager.associate(request, callback, null);
+                    }
 
                 }));
 

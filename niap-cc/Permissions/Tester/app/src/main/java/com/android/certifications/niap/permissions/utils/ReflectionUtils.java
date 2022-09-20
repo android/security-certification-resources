@@ -45,7 +45,7 @@ public class ReflectionUtils {
             return method.invoke(targetObject, parameters);
         } catch (ReflectiveOperationException e) {
             Throwable cause = e.getCause();
-            if (cause != null && cause instanceof SecurityException) {
+            if (cause instanceof SecurityException) {
                 throw (SecurityException) cause;
             } else {
                 throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
@@ -73,10 +73,10 @@ public class ReflectionUtils {
         List<String> a = new ArrayList<>();
         Method[] methods = clazz.getDeclaredMethods();
         for(Method m : methods){
-            String method = m.getName()+"(";
+            StringBuilder method = new StringBuilder(m.getName() + "(");
             Class<?>[] types = m.getParameterTypes();
             for(Class<?> t:types){
-                method = method+" "+t.getTypeName();
+                method.append(" ").append(t.getTypeName());
             }
             a.add(method+")");
         }

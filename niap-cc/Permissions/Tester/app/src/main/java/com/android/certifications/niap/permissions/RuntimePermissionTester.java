@@ -23,12 +23,10 @@ import static android.Manifest.permission.ANSWER_PHONE_CALLS;
 import static android.Manifest.permission.BLUETOOTH_ADMIN;
 import static android.Manifest.permission.BLUETOOTH_CONNECT;
 import static android.Manifest.permission.BODY_SENSORS;
-import static android.Manifest.permission.BODY_SENSORS_BACKGROUND;
 import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.NEARBY_WIFI_DEVICES;
 import static android.Manifest.permission.POST_NOTIFICATIONS;
-import static android.Manifest.permission.READ_BASIC_PHONE_STATE;
 import static android.Manifest.permission.READ_CALENDAR;
 import static android.Manifest.permission.READ_CALL_LOG;
 import static android.Manifest.permission.READ_CONTACTS;
@@ -41,7 +39,6 @@ import static android.Manifest.permission.READ_PHONE_STATE;
 import static android.Manifest.permission.READ_SMS;
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.SEND_SMS;
-import static android.Manifest.permission.USE_EXACT_ALARM;
 import static android.Manifest.permission.WRITE_CALENDAR;
 import static android.Manifest.permission.WRITE_CALL_LOG;
 import static android.Manifest.permission.WRITE_CONTACTS;
@@ -52,7 +49,6 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -62,7 +58,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
-import android.bluetooth.le.AdvertisingSetCallback;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -92,7 +87,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.CalendarContract.CalendarAlerts;
 import android.provider.CalendarContract.Events;
-import android.provider.CallLog;
 import android.provider.CallLog.Calls;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
@@ -105,10 +99,7 @@ import android.telecom.TelecomManager;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
@@ -117,7 +108,6 @@ import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.Transacts;
-import com.android.certifications.niap.permissions.worker.BackgroundTestWorker;
 
 import java.io.File;
 import java.io.IOException;
@@ -126,7 +116,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Permission tester to verify all runtime permissions properly guard their API, resources, etc.
@@ -153,6 +142,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
     private final Object mLOHSLock = new Object();//Test for Local only hotspot
 
 
+    @SuppressLint("MissingPermission")
     public RuntimePermissionTester(TestConfiguration configuration, Activity activity) {
         super(configuration, activity);
 
@@ -697,6 +687,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
      * @param bluetoothAdapter the adapter to be enabled
      * @return {@code true} if the adapter is successfully enabled
      */
+    @SuppressLint("MissingPermission")
     private boolean enableBluetoothAdapter(BluetoothAdapter bluetoothAdapter) {
         // If the bluetooth adapter is enabled then no further work is required.
         if (bluetoothAdapter.isEnabled()) {

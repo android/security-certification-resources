@@ -17,6 +17,7 @@
 package com.android.certifications.niap.permissions;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -182,6 +183,7 @@ public class GmsPermissionTester extends BasePermissionTester {
                 "com.google.android.gms.vehicle.permission.SHARED_AUTO_SENSOR_DATA");
     }
 
+    @SuppressLint("MissingPermission")
     public GmsPermissionTester(TestConfiguration configuration, Activity activity) {
         super(configuration, activity);
         mPermissionTasks = new HashMap<>();
@@ -224,7 +226,8 @@ public class GmsPermissionTester extends BasePermissionTester {
                     // the Task from the #requestActivityUpdates to complete.
                     ActivityRecognitionClient activityClient = ActivityRecognition.getClient(
                             mContext);
-                    Task<Void> activityRecognitionTask = activityClient.requestActivityUpdates(0, pendingIntent);
+                    Task<Void> activityRecognitionTask =
+                            activityClient.requestActivityUpdates(0, pendingIntent);
                     try {
                         Tasks.await(activityRecognitionTask, 10, TimeUnit.SECONDS);
                     } catch (ExecutionException | TimeoutException | InterruptedException e) {

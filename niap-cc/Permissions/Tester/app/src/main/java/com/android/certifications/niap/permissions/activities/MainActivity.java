@@ -16,21 +16,18 @@
 
 package com.android.certifications.niap.permissions.activities;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
@@ -44,11 +41,9 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
@@ -64,8 +59,6 @@ import com.android.certifications.niap.permissions.config.ConfigurationFactory;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
-import com.android.certifications.niap.permissions.receivers.Admin;
-import com.android.certifications.niap.permissions.utils.PermissionUtils;
 import com.android.certifications.niap.permissions.utils.gson.Test;
 import com.android.certifications.niap.permissions.utils.gson.TestCategory;
 import com.android.certifications.niap.permissions.utils.gson.TestSuites;
@@ -79,7 +72,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Activity to drive permission test configurations. This activity obtains the configuration(s) to
@@ -89,16 +81,14 @@ import java.util.concurrent.CountDownLatch;
  */
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "PermissionTesterActivity";
-    private static Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
+    private static final Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
 
     private static final int ADMIN_INTENT = 1;
 
     private TextView mStatusTextView;
-    private List<Button> mTestButtons = new ArrayList<>();
+    private final List<Button> mTestButtons = new ArrayList<>();
     private Context mContext;
     private TestConfiguration mConfiguration;
-    private DevicePolicyManager mDevicePolicyManager;
-    private ComponentName mComponentName;
 
     public ActivityResultLauncher<Intent> launhDeviceManagerTest = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -142,9 +132,9 @@ public class MainActivity extends AppCompatActivity {
             mTestButtons.add(testButton);
         }
 
-        mDevicePolicyManager = (DevicePolicyManager)getSystemService(
-                Context.DEVICE_POLICY_SERVICE);
-        mComponentName = new ComponentName(this, Admin.class);
+        //mDevicePolicyManager = (DevicePolicyManager)getSystemService(
+        //        Context.DEVICE_POLICY_SERVICE);
+        //mComponentName = new ComponentName(this, Admin.class);
 
         //ActionBar actionbar = getSupportActionBar();
        
@@ -153,22 +143,23 @@ public class MainActivity extends AppCompatActivity {
 
     }
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(@NonNull Menu menu) {
         super.onPrepareOptionsMenu(menu);
         //menu.findItem(R.id.action_force_chrome).setChecked(viewModel.isForceChrome.get());
         return true;
     }
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         switch (id){
-            /**
+            /*
              * Create a json file for checking whole testing items
              */
             case R.id.action_output_tester_json:
@@ -184,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Administrator description");
                     startActivityForResult(intent, ADMIN_INTENT);
                 }
-                break;*/
+            break;*/
         }
 
         return super.onOptionsItemSelected(item);
@@ -276,8 +267,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         // Delegate handling of the permission request results to the active configuration.
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(mConfiguration != null)
@@ -296,9 +287,7 @@ public class MainActivity extends AppCompatActivity {
     {
         List<String> not_granted = new ArrayList<String>();
         for(String p:RUNTIME_PERMS_FOR_SIG){
-            if (checkSelfPermission(p) == PackageManager.PERMISSION_GRANTED) {
-                continue;
-            } else {
+            if (checkSelfPermission(p) != PackageManager.PERMISSION_GRANTED) {
                 not_granted.add(p);
             }
         }

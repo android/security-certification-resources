@@ -26,6 +26,8 @@ import android.content.pm.Signature;
 import android.content.res.Resources;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
+
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -37,7 +39,6 @@ import com.android.certifications.niap.permissions.utils.Transacts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -321,6 +322,7 @@ public abstract class BasePermissionTester {
             mTestRunnable.run();
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "PermissionTest{" +

@@ -95,30 +95,12 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
 
         List<String> permissions = new ArrayList<>();
 
-        // Starting in Android 12 the NETWORK_SCAN permission behaves similar to
-        // RADIO_SCAN_WITHOUT_LOCATION in that it allows a network scan without a location
-        // permission.
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        //    permissions.add(permission.RADIO_SCAN_WITHOUT_LOCATION);
-        //    permissions.add(permission.NETWORK_SCAN);
-        //}
-
-//        addPermissionsFor28(permissions);
-//        addPermissionsFor29(permissions);
-//        addPermissionsFor30(permissions);
-//        addPermissionsFor31(permissions);
-//        addPermissionsFor32(permissions);
-//        addPermissionsFor33(permissions);
-
-        //permissions.add(permission.CAPTURE_AUDIO_OUTPUT);
-        //permissions.add(permission.CRYPT_KEEPER);
-        //permissions.add(permission.MARK_DEVICE_ORGANIZATION_OWNED);
-        //permissions.add(permission.PEEK_DROPBOX_DATA);
-        //permissions.add(permission.CONTROL_DEVICE_STATE);
-        //permissions.add(permission.RESET_PASSWORD);
-        //permissions.add(permission.MOUNT_FORMAT_FILESYSTEMS);
-        //addPermissionsNeedPreReq(permissions);
-        //addPermissionsWithError(permissions);
+        //        addPermissionsFor28(permissions);
+        //        addPermissionsFor29(permissions);
+        //        addPermissionsFor30(permissions);
+        //        addPermissionsFor31(permissions);
+        //        addPermissionsFor32(permissions);
+        //        addPermissionsFor33(permissions);
 
         permissions.add(permission.CONNECTIVITY_USE_RESTRICTED_NETWORKS);
 

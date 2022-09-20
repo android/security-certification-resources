@@ -28,7 +28,6 @@ import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +37,7 @@ import java.util.Map;
 public class PermissionUtils {
 
     private static final String TAG = "PermissionUtils";
-    private static Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
+    private static final Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
 
 
     /**
@@ -58,9 +57,9 @@ public class PermissionUtils {
             try {
                 List<PermissionInfo> permissions = packageManager.queryPermissionsByGroup(
                         groupName, 0);
-                for (PermissionInfo permission : permissions) {
-                    declaredPermissions.add(permission);
-                }
+
+                declaredPermissions.addAll(permissions);
+
             } catch (PackageManager.NameNotFoundException e) {
                 StatusLogger.logError("Caught a NameNotFoundException for group " + groupName, e);
             }
@@ -92,4 +91,5 @@ public class PermissionUtils {
             sLogger.logInfo("  >"+entry.getKey()+"(min:"+test.mMinApiLevel+",max:"+test.mMaxApiLevel+")");
         }
     }
+
 }

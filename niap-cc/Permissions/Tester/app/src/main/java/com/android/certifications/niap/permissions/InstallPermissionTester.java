@@ -193,8 +193,10 @@ public class InstallPermissionTester extends BasePermissionTester {
                         throw new BypassTestException(
                                 "ACCESS_FINLE_LOCATION permission should be granted to run this test case");
                     }
-                    if (mDeviceApiLevel >= Build.VERSION_CODES.Q) {
-                        mWifiManager.getCallerConfiguredNetworks();
+                    if (mDeviceApiLevel >= Build.VERSION_CODES.S) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            mWifiManager.getCallerConfiguredNetworks();
+                        }
                     } else {
                         mWifiManager.getConfiguredNetworks();
                     }
@@ -446,7 +448,7 @@ public class InstallPermissionTester extends BasePermissionTester {
         // android.permission.UNINSTALL_SHORTCUT is no longer used.
 
         mPermissionTasks.put(USE_BIOMETRIC, new PermissionTest(false, () -> {
-            if (mDeviceApiLevel == Build.VERSION_CODES.P) {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
                 FingerprintManager fingerprintManager =
                         (FingerprintManager) mContext.getSystemService(
                                 Context.FINGERPRINT_SERVICE);
@@ -460,14 +462,18 @@ public class InstallPermissionTester extends BasePermissionTester {
                 // for this permission. Android 10 introduced the canAuthenticate method while
                 // Android 11 deprecated that in favor of an overloaded version that accepts
                 // an int representing Authenticators.
-                BiometricManager biometricManager = (BiometricManager) mContext.getSystemService(
+                BiometricManager biometricManager = null;
+
+                biometricManager = (BiometricManager) mContext.getSystemService(
                         Context.BIOMETRIC_SERVICE);
+
                 if (mDeviceApiLevel == Build.VERSION_CODES.Q) {
                     biometricManager.canAuthenticate();
-                } else {
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
                     biometricManager.canAuthenticate(
                             BiometricManager.Authenticators.BIOMETRIC_STRONG);
                 }
+
             }
         }));
 
@@ -503,7 +509,11 @@ public class InstallPermissionTester extends BasePermissionTester {
         // new install permissions for Q
         mPermissionTasks.put(REQUEST_PASSWORD_COMPLEXITY,
                 new PermissionTest(false, Build.VERSION_CODES.Q,
-                        () -> mDevicePolicyManager.getPasswordComplexity()));
+                        () -> {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                mDevicePolicyManager.getPasswordComplexity();
+                            }
+                }));
 
         mPermissionTasks.put(USE_FULL_SCREEN_INTENT,
                 new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
@@ -558,13 +568,15 @@ public class InstallPermissionTester extends BasePermissionTester {
         // new install permissions for R
         mPermissionTasks.put(NFC_PREFERRED_PAYMENT_INFO,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
-                    NfcAdapter adapter = NfcAdapter.getDefaultAdapter(mContext);
-                    if (adapter == null) {
-                        throw new BypassTestException(
-                                "An NFC adapter is not available to run this test");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(mContext);
+                        if (adapter == null) {
+                            throw new BypassTestException(
+                                    "An NFC adapter is not available to run this test");
+                        }
+                        CardEmulation cardEmulation = CardEmulation.getInstance(adapter);
+                        cardEmulation.getDescriptionForPreferredPaymentService();
                     }
-                    CardEmulation cardEmulation = CardEmulation.getInstance(adapter);
-                    cardEmulation.getDescriptionForPreferredPaymentService();
                 }));
 
         mPermissionTasks.put(QUERY_ALL_PACKAGES,
@@ -590,11 +602,14 @@ public class InstallPermissionTester extends BasePermissionTester {
                     // run the API here where the SecurityException can be handled, and if the
                     // permission is granted then run it on the UI thread since an exception should
                     // not be thrown in that case.
-                    if (mContext.checkSelfPermission(HIDE_OVERLAY_WINDOWS) != PackageManager.PERMISSION_GRANTED) {
-                        mActivity.getWindow().setHideOverlayWindows(true);
-                    } else {
-                        mActivity.runOnUiThread(
-                                () -> mActivity.getWindow().setHideOverlayWindows(true));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        if (mContext.checkSelfPermission(HIDE_OVERLAY_WINDOWS) != PackageManager.PERMISSION_GRANTED) {
+                            mActivity.getWindow().setHideOverlayWindows(true);
+                        } else {
+                            mActivity.runOnUiThread(
+                                    () -> mActivity.getWindow().setHideOverlayWindows(true));
+
+                        }
                     }
                 }));
 
@@ -610,24 +625,28 @@ public class InstallPermissionTester extends BasePermissionTester {
                                         + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
                                         + "for this test");
                     }
-                    AssociationRequest request = new AssociationRequest.Builder().setDeviceProfile(
-                            AssociationRequest.DEVICE_PROFILE_WATCH).build();
-                    CompanionDeviceManager.Callback callback =
-                            new CompanionDeviceManager.Callback() {
-                                @Override
-                                public void onDeviceFound(IntentSender intentSender) {
-                                    mLogger.logDebug(
-                                            "onDeviceFound: intentSender = " + intentSender);
-                                }
+                    AssociationRequest request = null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        request = new AssociationRequest.Builder().setDeviceProfile(
+                                AssociationRequest.DEVICE_PROFILE_WATCH).build();
+                        CompanionDeviceManager.Callback callback =
+                                new CompanionDeviceManager.Callback() {
+                                    @Override
+                                    public void onDeviceFound(IntentSender intentSender) {
+                                        mLogger.logDebug(
+                                                "onDeviceFound: intentSender = " + intentSender);
+                                    }
 
-                                @Override
-                                public void onFailure(CharSequence charSequence) {
-                                    mLogger.logDebug("onFailure: charSequence = " + charSequence);
-                                }
-                            };
-                    CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
-                            CompanionDeviceManager.class);
-                    companionDeviceManager.associate(request, callback, null);
+                                    @Override
+                                    public void onFailure(CharSequence charSequence) {
+                                        mLogger.logDebug("onFailure: charSequence = " + charSequence);
+                                    }
+                                };
+                        CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
+                                CompanionDeviceManager.class);
+                        companionDeviceManager.associate(request, callback, null);
+                    }
+
                 }));
 
         mPermissionTasks.put(REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE,
@@ -638,9 +657,11 @@ public class InstallPermissionTester extends BasePermissionTester {
                     // Exception was not thrown back to this test. If in a future release this test
                     // fails because the Exception crosses the binder call then this test will need
                     // to differentiate between a SecurityException and the RuntimeException.
-                    CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
-                            CompanionDeviceManager.class);
-                    companionDeviceManager.startObservingDevicePresence("11:22:33:44:55:66");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
+                                CompanionDeviceManager.class);
+                        companionDeviceManager.startObservingDevicePresence("11:22:33:44:55:66");
+                    }
                 }));
 
         // UPDATE_PACKAGES_WITHOUT_USER_ACTION requires a package that can be used for the update
