@@ -368,6 +368,8 @@ public class Transacts {
     public static final String isConvertibleToFBE="isConvertibleToFBE";
     public static final String setProfileOwnerOnOrganizationOwnedDevice="setProfileOwnerOnOrganizationOwnedDevice";
     public static final String cancelStateRequest="cancelStateRequest";
+    public static final String setUserPreferredDisplayMode="setUserPreferredDisplayMode";
+    public static final String stopAppForUser="stopAppForUser";
 
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";

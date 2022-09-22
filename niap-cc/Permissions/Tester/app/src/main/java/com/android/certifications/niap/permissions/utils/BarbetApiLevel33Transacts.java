@@ -257,6 +257,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(performIdleMaintenance, 158);
         transactIds.put(setDumpHeapDebugLimit, 175);
         transactIds.put(updateLockTaskPackages, 177);
+        transactIds.put(stopAppForUser, 73);
         // Failed to obtain transactId of getGrantedUriPermissions under android.app.IActivityManager: No field TRANSACTION_getGrantedUriPermissions in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
         transactIds.put(setHasTopUi, 196);
         // Failed to obtain transactId of dismissKeyguard under android.app.IActivityManager: No field TRANSACTION_dismissKeyguard in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
@@ -297,6 +298,7 @@ public class BarbetApiLevel33Transacts extends Transacts {
         transactIds.put(setRefreshRateSwitchingType, 46);
         transactIds.put(setTemporaryAutoBrightnessAdjustment, 37);
         transactIds.put(startWifiDisplayScan, 6);
+        transactIds.put(setUserPreferredDisplayMode, 41);
         transactIds.put(shouldAlwaysRespectAppRequestedMode, 45);
         transactIds.put(requestColorMode, 19);
         mDescriptorTransacts.put(DISPLAY_DESCRIPTOR, transactIds);

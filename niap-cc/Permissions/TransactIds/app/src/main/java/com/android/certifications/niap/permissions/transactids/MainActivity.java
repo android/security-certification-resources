@@ -623,6 +623,10 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.DEVICE_STATE_DESCRIPTOR,
                     Transacts.cancelStateRequest,descriptorTransacts);
 
+            queryTransactId(Transacts.DISPLAY_DESCRIPTOR,
+                    Transacts.setUserPreferredDisplayMode,descriptorTransacts);
+            queryTransactId(Transacts.ACTIVITY_DESCRIPTOR,
+                    Transacts.stopAppForUser,descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
         }
