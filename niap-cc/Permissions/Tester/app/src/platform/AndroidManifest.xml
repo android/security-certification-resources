@@ -881,4 +881,7 @@
     <!-- TODO: Additional signature permissions that are declared by the packages preinstalled on
          the device under test should be added here. -->
 
+    <uses-permission android:name="com.qualcomm.permission.READPROC" />
+
+
 </manifest>

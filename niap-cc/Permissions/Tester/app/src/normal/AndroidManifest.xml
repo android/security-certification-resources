@@ -875,8 +875,9 @@
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="com.google.android.gms.vehicle.permission.SHARED_AUTO_SENSOR_DATA" />
 
-
     <!-- TODO: Additional signature permissions that are declared by the packages preinstalled on
          the device under test should be added here. -->
+
+    <uses-permission android:name="com.qualcomm.permission.READPROC" />
 
 </manifest>

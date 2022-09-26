@@ -542,7 +542,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
     //Add all signature permission tests for SDK32 
     private void addPermissionsFor32(List<String> permissions)
     {
-        permissions.add(permission.ALLOW_SLIPPERY_TOUCHES);
+        //permissions.add(permission.ALLOW_SLIPPERY_TOUCHES);
         permissions.add(permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD);
     }
 

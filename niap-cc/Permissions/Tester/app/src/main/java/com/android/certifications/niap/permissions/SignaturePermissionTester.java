@@ -2459,19 +2459,21 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         Intent intent = new Intent("android.intent.action.VIEW_PERMISSION_USAGE")
                                 .putExtra("android.intent.extra.PERMISSION_GROUP_NAME",
                                                 "android.permission-group.CAMERA");
-
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            //Corresponding Activity will be missing since S, so try to test an activity on
+                            //the companion app instead.
+                            intent.setComponent(new
+                                    ComponentName("com.android.certifications.niap.permissions.companion",
+                                    "com.android.certifications.niap.permissions.companion.ViewPermissionUsageActivity"));
+                        }
                         //ResolveInfo resolveInfo = mackageManager.resolveActivity(viewUsageIntent,
                         //        PackageManager.MATCH_INSTANT);
 
                         ResolveInfo resolveInfo =mPackageManager.resolveActivity(intent, 0);
-                        if(resolveInfo != null) {
-                            //com.android.internal.app.ResolverActivity handles it.
-                            mLogger.logInfo(resolveInfo.toString());
-                        }
-                        /*if(resolveInfo == null){
+                        if(resolveInfo == null){
                             throw new BypassTestException("the system does not have corresponding activity to" +
                                     " ROLE_HOLDER_PROVISION_MANAGED_PROFILE action. Let's skip it...");
-                        }*/
+                        }
                         //alternative plan but it did not works:android.intent.action.VIEW_PERMISSION_USAGE_FOR_PERIOD
 
 
@@ -3840,15 +3842,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
         ////////////////////////////////////////////////////////////////////////////////
         //New Signature permissions as of Android 12 SV2
 
-        mPermissionTasks.put(permission.ALLOW_SLIPPERY_TOUCHES,
-                new PermissionTest(false, Build.VERSION_CODES.S_V2, () -> {
-                    final int FLAG_SLIPPERY = 0x20000000;//The flag is disabled by annotation
-                    //WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
-                    final Handler mainHandler = new Handler(Looper.getMainLooper());
-                    mainHandler.post(() -> {
-                        activity.getWindow().addFlags(FLAG_SLIPPERY);
-                    });
-                }));
+        // # Skip ALLOW_SLIPPERY_TOUCHES
+        // Reason : The permission is Infeasible to test
 
         mPermissionTasks.put(permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD,
                 new PermissionTest(false, Build.VERSION_CODES.S_V2, () -> {

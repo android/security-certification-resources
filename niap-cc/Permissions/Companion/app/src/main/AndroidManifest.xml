@@ -52,6 +52,20 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.android.certifications.niap.permissions.companion.ViewPermissionUsageActivity"
+            android:excludeFromRecents="true"
+            android:immersive="true"
+            android:launchMode="singleTop"
+            android:exported="true"
+            android:permission="andorid.permission.START_VIEW_PERMISSION_USAGE"
+            android:theme="@style/AppTheme">
+            <intent-filter android:priority="11">
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name="com.android.certifications.niap.permissions.companion.services.TestBindPreProvisioningActivityService"
             android:enabled="true"
