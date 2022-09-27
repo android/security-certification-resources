@@ -36,6 +36,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.DropBoxManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -115,6 +116,10 @@ public class MainActivity extends AppCompatActivity {
                 new SetupTestsAsyncTask().execute();
             }
         });
+
+        long currTimeMs = System.currentTimeMillis();
+        final DropBoxManager db = (DropBoxManager) getApplicationContext().getSystemService(Context.DROPBOX_SERVICE);
+        db.addText("test-companion-tag","Companion:PEEK_DROPBOX_DATA test at :"+currTimeMs);
     }
 
     /**

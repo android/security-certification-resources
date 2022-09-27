@@ -102,14 +102,14 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         //        addPermissionsFor32(permissions);
         //        addPermissionsFor33(permissions);
 
-        //permissions.add(permission.CONNECTIVITY_USE_RESTRICTED_NETWORKS);
+        //permissions.add(permission.READ_APP_SPECIFIC_LOCALES);
 
-        permissions.add(permission.CAPTURE_AUDIO_OUTPUT);
-        permissions.add(permission.ALLOW_SLIPPERY_TOUCHES);
-        permissions.add(permission.START_VIEW_PERMISSION_USAGE);//show view
-        permissions.add(permission.REQUEST_UNIQUE_ID_ATTESTATION);
+//        permissions.add(permission.CAPTURE_AUDIO_OUTPUT);
+//        permissions.add(permission.ALLOW_SLIPPERY_TOUCHES);
+//        permissions.add(permission.START_VIEW_PERMISSION_USAGE);//show view
+//        permissions.add(permission.REQUEST_UNIQUE_ID_ATTESTATION);
         permissions.add(permission.LISTEN_ALWAYS_REPORTED_SIGNAL_STRENGTH);
-        permissions.add(permission.CAMERA_INJECT_EXTERNAL_CAMERA);
+//        permissions.add(permission.CAMERA_INJECT_EXTERNAL_CAMERA);
 
         return Optional.of(permissions);
     }

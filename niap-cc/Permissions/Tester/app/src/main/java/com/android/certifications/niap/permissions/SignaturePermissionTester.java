@@ -121,6 +121,7 @@ import android.telephony.CellInfo;
 import android.telephony.NetworkScanRequest;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
+import android.telephony.SignalStrengthUpdateRequest;
 import android.telephony.SmsManager;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
@@ -2466,8 +2467,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                     ComponentName("com.android.certifications.niap.permissions.companion",
                                     "com.android.certifications.niap.permissions.companion.ViewPermissionUsageActivity"));
                         }
-                        //ResolveInfo resolveInfo = mackageManager.resolveActivity(viewUsageIntent,
-                        //        PackageManager.MATCH_INSTANT);
 
                         ResolveInfo resolveInfo =mPackageManager.resolveActivity(intent, 0);
                         if(resolveInfo == null){
@@ -2475,8 +2474,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                     " ROLE_HOLDER_PROVISION_MANAGED_PROFILE action. Let's skip it...");
                         }
                         //alternative plan but it did not works:android.intent.action.VIEW_PERMISSION_USAGE_FOR_PERIOD
-
-
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mContext.startActivity(intent);
                     } catch (ActivityNotFoundException e) {
@@ -2658,38 +2655,60 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.LISTEN_ALWAYS_REPORTED_SIGNAL_STRENGTH,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
-                    HandlerThread handlerThread = new HandlerThread(TAG);
-                    handlerThread.start();
-                    Handler handler = new Handler(handlerThread.getLooper());
-                    // An Exception array is used since local variables referenced from a lambda
-                    // expression must be effectively final.
-                    //https://source.corp.google.com/tm-dev/cts/tests/tests/telephony/current/src/android/telephony/cts/PhoneStateListenerTest.java;l=333?q=LISTEN_ALWAYS_REPORTED_SIGNAL_STRENGTH&sq=package:tm-dev
-                    Exception[] caughtException = new Exception[1];
-                    CountDownLatch latch = new CountDownLatch(1);
-                    handler.post(() -> {
-                        PhoneStateListener listener = new PhoneStateListener() {
-                            @Override
-                            public void onSignalStrengthsChanged(SignalStrength signalStrength) {
-                                mLogger.logDebug("onSignalStrengthChanged: signalStrength = "
-                                        + signalStrength);
-                            }
-                        };
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        //The way to using the listner was obsolated after android T, so let me choose using this option instead
+                        //https://source.corp.google.com/android-internal/cts/tests/tests/telephony/current/src/android/telephony/cts/TelephonyManagerTest.java;rcl=91e7eeb88fd7c7b2855068487f89af167cc79808;l=4186
+                        //problem : if the signature does not match it always fail,because the method also checks MODIFY_PHONE_STATE permission
+
+                        SignalStrengthUpdateRequest.Builder builder = new SignalStrengthUpdateRequest.Builder()
+                                .setSignalThresholdInfos(Collections.EMPTY_LIST);
+
+                        builder = (SignalStrengthUpdateRequest.Builder)
+                                invokeReflectionCall(SignalStrengthUpdateRequest.Builder.class,
+                                "setSystemThresholdReportingRequestedWhileIdle", builder,
+                                new Class<?>[]{boolean.class},true);
+                        SignalStrengthUpdateRequest request = builder.build();
                         try {
-                            mTelephonyManager.listen(listener, 0x00000200);
-                        } catch (Exception e) {
-                            caughtException[0] = e;
+                            mTelephonyManager.setSignalStrengthUpdateRequest(request);
+                        } catch (IllegalStateException ex){
+                            mLogger.logInfo("Expected:"+ex.getMessage());
+                        }
+
+                    } else {
+                        HandlerThread handlerThread = new HandlerThread(TAG);
+                        handlerThread.start();
+                        Handler handler = new Handler(handlerThread.getLooper());
+                        // An Exception array is used since local variables referenced from a lambda
+                        // expression must be effectively final.
+                        //https://source.corp.google.com/tm-dev/cts/tests/tests/telephony/current/src/android/telephony/cts/PhoneStateListenerTest.java;l=333?q=LISTEN_ALWAYS_REPORTED_SIGNAL_STRENGTH&sq=package:tm-dev
+                        Exception[] caughtException = new Exception[1];
+                        CountDownLatch latch = new CountDownLatch(1);
+                        handler.post(() -> {
+                            PhoneStateListener listener = new PhoneStateListener() {
+                                @Override
+                                public void onSignalStrengthsChanged(SignalStrength signalStrength) {
+                                    mLogger.logDebug("onSignalStrengthChanged: signalStrength = "
+                                            + signalStrength);
+                                }
+                            };
+                            try {
+                                mTelephonyManager.listen(listener, 0x00000200);
+                            } catch (Exception e) {
+                                caughtException[0] = e;
+                                e.printStackTrace();
+                            }
+                            latch.countDown();
+                        });
+                        try {
+                            latch.await(2000, TimeUnit.MILLISECONDS);
+                        } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        latch.countDown();
-                    });
-                    try {
-                        latch.await(2000, TimeUnit.MILLISECONDS);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        if (caughtException[0] instanceof SecurityException) {
+                            throw (SecurityException) caughtException[0];
+                        }
                     }
-                    if (caughtException[0] instanceof SecurityException) {
-                        throw (SecurityException) caughtException[0];
-                    }
+
                 }));
 
         // android.permission.LOADER_USAGE_STATS - incremental service is guarded by SELinux
@@ -2897,12 +2916,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
                     long currTimeMs = System.currentTimeMillis();
 
-                    final DropBoxManager db = (DropBoxManager) mContext.getSystemService(Context.DROPBOX_SERVICE);
-                    db.addText("test-tag","PEEK_DROPBOX_DATA test at :"+currTimeMs);
+                    //#add a line from companion app.=>need to run the companion app before testing
+                    //final DropBoxManager db = (DropBoxManager) mContext.getSystemService(Context.DROPBOX_SERVICE);
+                    //db.addText("test-tag","PEEK_DROPBOX_DATA test at :"+currTimeMs);
 
                     Parcel result= mTransacts.invokeTransact(Transacts.DROPBOX_SERVICE,
                             Transacts.DROPBOX_DESCRIPTOR,
-                            Transacts.getNextEntry, "test-tag", currTimeMs-(1000*60), mPackageName);
+                            Transacts.getNextEntry, "test-companion-tag", currTimeMs-(1000*60*60), mPackageName);
 
 
                     if (result.readInt() == 0) {
@@ -4066,7 +4086,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.READ_APP_SPECIFIC_LOCALES,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    mLocaleManager.getApplicationLocales("com.google.android.youtube");
+                    //if the caller is not an owner of the application, the api raise a secuirty exception.
+                    mLocaleManager.getApplicationLocales("com.android.certifications.niap.permissions.companion");
                 }));
 
         mPermissionTasks.put(permission.USE_ATTESTATION_VERIFICATION_SERVICE,
