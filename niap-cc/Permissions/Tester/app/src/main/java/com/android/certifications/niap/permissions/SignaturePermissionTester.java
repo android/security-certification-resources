@@ -129,7 +129,6 @@ import android.telephony.TelephonyManager;
 import android.telephony.TelephonyScanManager;
 import android.util.Log;
 import android.view.Display;
-import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.CaptioningManager;
 
@@ -144,7 +143,6 @@ import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
 import com.android.certifications.niap.permissions.services.TestService;
-import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.Transacts;
 import com.android.internal.policy.IKeyguardDismissCallback;
@@ -438,7 +436,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.CAPTURE_AUDIO_OUTPUT, new PermissionTest(false, () -> {
 
-            MediaRecorder recorder = null;
+            MediaRecorder recorder;
             try {
                 recorder = new MediaRecorder();
                 recorder.setAudioSource(MediaRecorder.AudioSource.REMOTE_SUBMIX);
@@ -519,7 +517,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.CLEAR_APP_USER_DATA,
                 new PermissionTest(false, () -> {
-                    Class<?> packageDataObserverClass = null;
+                    Class<?> packageDataObserverClass;
                     try {
                         packageDataObserverClass = Class
                                 .forName("android.content.pm.IPackageDataObserver");
@@ -4087,7 +4085,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.READ_APP_SPECIFIC_LOCALES,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     //if the caller is not an owner of the application, the api raise a secuirty exception.
-                    mLocaleManager.getApplicationLocales("com.android.certifications.niap.permissions.companion");
+                    try {
+                        mLocaleManager.getApplicationLocales(
+                                "com.android.certifications.niap.permissions.companion");
+                    } catch (IllegalArgumentException ex){
+                        //if signed signature is not a platform one, the api may not find the package.
+                        throw new SecurityException(ex);
+                    }
                 }));
 
         mPermissionTasks.put(permission.USE_ATTESTATION_VERIFICATION_SERVICE,

@@ -22,61 +22,31 @@ import static com.android.certifications.niap.permissions.utils.ReflectionUtils.
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.KeyguardManager;
-import android.app.admin.DeviceAdminReceiver;
-import android.app.admin.DevicePolicyManager;
-import android.app.admin.SecurityLog;
-import android.app.appsearch.AppSearchSchema;
-import android.app.appsearch.GetSchemaResponse;
-import android.app.appsearch.PackageIdentifier;
-import android.app.appsearch.SetSchemaRequest;
-import android.companion.AssociationInfo;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.pm.Signature;
-import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.IInterface;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.os.RemoteException;
-import android.os.UserHandle;
 import android.provider.ContactsContract;
-import android.util.ArraySet;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.android.certifications.niap.permissions.config.BypassConfigException;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
-import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.SignatureUtils;
 import com.android.certifications.niap.permissions.utils.Transacts;
-import com.google.common.collect.ImmutableSet;
 
-import java.io.FileDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -243,7 +213,7 @@ public class InternalPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.SEND_SAFETY_CENTER_UPDATE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    Class<?> clazzSaftyCenter = null;
+                    Class<?> clazzSaftyCenter;
                     try {
                         clazzSaftyCenter = Class.forName("android.safetycenter.SafetyCenterManager");
                         Object saftyCenter = mContext.getSystemService(clazzSaftyCenter);
@@ -265,7 +235,7 @@ public class InternalPermissionTester extends BasePermissionTester {
                                         + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
                                         + "for this test");
                     }
-                    AssociationRequest request = null;
+                    AssociationRequest request;
                     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         request = new AssociationRequest.Builder().setDeviceProfile(
                                 AssociationRequest.DEVICE_PROFILE_AUTOMOTIVE_PROJECTION).build();
@@ -374,8 +344,7 @@ public class InternalPermissionTester extends BasePermissionTester {
         try {
             Field tokenField = Activity.class.getDeclaredField("mToken");
             tokenField.setAccessible(true);
-            IBinder token = (IBinder) tokenField.get(mActivity);
-            return token;
+            return (IBinder) tokenField.get(mActivity);
         } catch (ReflectiveOperationException e) {
             throw new UnexpectedPermissionTestFailureException(e);
         }

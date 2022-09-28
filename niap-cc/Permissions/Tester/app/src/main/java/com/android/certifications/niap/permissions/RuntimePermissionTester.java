@@ -301,7 +301,6 @@ public class RuntimePermissionTester extends BasePermissionTester {
                                     "Could not create the temporary file "
                                             + file.getAbsolutePath());
                         }
-                        ;
                         file.delete();
                     } catch (IOException e) {
                         // If the permission is not granted then this could fail with a
@@ -471,9 +470,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
                             exif.getLatLong(latLong);
                             // Not all images will have location data, ensure all images are
                             // tested before reporting an error.
-                            if (latLong[0] == 0.0f && latLong[1] == 0.0f) {
-                                continue;
-                            } else {
+                            if (!(latLong[0] == 0.0f && latLong[1] == 0.0f)) {
                                 return;
                             }
                         } catch (IOException e) {

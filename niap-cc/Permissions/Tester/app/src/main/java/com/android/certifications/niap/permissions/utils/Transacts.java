@@ -315,7 +315,7 @@ public class Transacts {
     public static final String WINDOW_SERVICE = Context.WINDOW_SERVICE;
     public static final String WINDOW_DESCRIPTOR = "android.view.IWindowManager";
 
-    //For Android T
+    //Below are settings for Android T
     public static final String AMBIENT_CONTEXT_MANAGER_SERVICE =
             "ambient_context";
     public static final String AMBIENT_CONTEXT_MANAGER_DESCRIPTOR =
@@ -346,7 +346,6 @@ public class Transacts {
 
     //WindowManager
     public static final String setInTouchMode = "setInTouchMode";
-    //public static final String getInTouchMode = "getInTouchMode";
 
     //CloudSearch
     public static final String CLOUDSEARCH_SERVICE = "cloudsearch";//Context.CLOUD_SEARCH

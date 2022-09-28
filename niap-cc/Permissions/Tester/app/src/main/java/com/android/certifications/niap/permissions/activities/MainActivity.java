@@ -113,10 +113,6 @@ public class MainActivity extends AppCompatActivity {
         mStatusTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18f);
         layout.addView(mStatusTextView);
 
-        /*int targetSdkVersion = getApplicationContext().getApplicationInfo().targetSdkVersion;
-        ((TextView)layout.findViewById(R.id.sdkVersionText))
-                .setText("Target:"+targetSdkVersion+"/");*/
-
         // Obtain the list of configurations from the ConfigurationFactory and create a separate
         // button to allow the user to invoke each.
         List<TestConfiguration> configurations = ConfigurationFactory.getConfigurations(this);
@@ -124,19 +120,12 @@ public class MainActivity extends AppCompatActivity {
             Button testButton = new Button(this);
 
             testButton.setText(configuration.getButtonTextId());
-            //testButton.getLayoutParams().width = 640;
             testButton.setOnClickListener((view) -> {
                 new PermissionTesterAsyncTask().execute(configuration);
             });
             layout.addView(testButton);
             mTestButtons.add(testButton);
         }
-
-        //mDevicePolicyManager = (DevicePolicyManager)getSystemService(
-        //        Context.DEVICE_POLICY_SERVICE);
-        //mComponentName = new ComponentName(this, Admin.class);
-
-        //ActionBar actionbar = getSupportActionBar();
        
         Toolbar toolBar = findViewById(R.id.toolbar);
         setSupportActionBar(toolBar);

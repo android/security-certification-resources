@@ -102,15 +102,6 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         //        addPermissionsFor32(permissions);
         //        addPermissionsFor33(permissions);
 
-        //permissions.add(permission.READ_APP_SPECIFIC_LOCALES);
-
-//        permissions.add(permission.CAPTURE_AUDIO_OUTPUT);
-//        permissions.add(permission.ALLOW_SLIPPERY_TOUCHES);
-//        permissions.add(permission.START_VIEW_PERMISSION_USAGE);//show view
-//        permissions.add(permission.REQUEST_UNIQUE_ID_ATTESTATION);
-        permissions.add(permission.LISTEN_ALWAYS_REPORTED_SIGNAL_STRENGTH);
-//        permissions.add(permission.CAMERA_INJECT_EXTERNAL_CAMERA);
-
         return Optional.of(permissions);
     }
 
@@ -356,7 +347,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         permissions.add(permission.SHOW_KEYGUARD_MESSAGE);
         permissions.add(permission.SHUTDOWN);
         permissions.add(permission.SIGNAL_PERSISTENT_PROCESSES);
-//        permissions.add(permission.START_ANY_ACTIVITY);//The test shows bottom sheet dialogue
+        permissions.add(permission.START_ANY_ACTIVITY);//The test shows bottom sheet dialogue
         permissions.add(permission.START_TASKS_FROM_RECENTS);//Illegal Argument Exception
         permissions.add(permission.STATUS_BAR);
         permissions.add(permission.STATUS_BAR_SERVICE);
@@ -397,7 +388,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         permissions.add(permission.CONTROL_KEYGUARD_SECURE_NOTIFICATIONS);
         permissions.add(permission.GET_RUNTIME_PERMISSIONS);
         permissions.add(permission.GRANT_PROFILE_OWNER_DEVICE_IDS_ACCESS);//Test Faiure:Reflection
-        //permissions.add(permission.LOCK_DEVICE);//The test locks screen
+        permissions.add(permission.LOCK_DEVICE);//The test locks screen
         permissions.add(permission.MANAGE_ACCESSIBILITY);
         permissions.add(permission.MANAGE_APP_PREDICTIONS);
         permissions.add(permission.MANAGE_APPOPS);
@@ -416,9 +407,9 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         permissions.add(permission.POWER_SAVER);
         permissions.add(permission.READ_DEVICE_CONFIG);
         permissions.add(permission.RESET_PASSWORD);//Failed to RESET_PASSWORD
-        //permissions.add(permission.REVIEW_ACCESSIBILITY_SERVICES);//The test displays alertbox
+        permissions.add(permission.REVIEW_ACCESSIBILITY_SERVICES);//The test displays alertbox
         permissions.add(permission.SEND_DEVICE_CUSTOMIZATION_READY);
-        //permissions.add(permission.START_VIEW_PERMISSION_USAGE);//The test displays help page
+        permissions.add(permission.START_VIEW_PERMISSION_USAGE);//The test displays help page
         permissions.add(permission.TEST_MANAGE_ROLLBACKS);
         permissions.add(permission.USE_BIOMETRIC_INTERNAL);
         permissions.add(permission.WHITELIST_RESTRICTED_PERMISSIONS);
