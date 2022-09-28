@@ -15,7 +15,7 @@
  */
 
 apply plugin: 'com.android.application'
-
+def applicationName = 'Companion'
 android {
     compileSdkVersion 33
     signingConfigs {
@@ -35,6 +35,11 @@ android {
         signingConfig signingConfigs.companion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "${applicationName}-${variant.buildType.name}.apk"
+        }
     }
 
     buildTypes {

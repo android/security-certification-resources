@@ -54,6 +54,7 @@ import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentat
 @RunWith(AndroidJUnit4.class)
 public class InternalPermissionsTest {
     /**
+     *
      * A list of permissions that can be granted to the shell identity.
      */
     private static final List<String> mPermissions;

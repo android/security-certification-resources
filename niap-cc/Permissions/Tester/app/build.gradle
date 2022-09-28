@@ -16,7 +16,7 @@
 
 apply plugin: 'com.android.application'
 def homePath = System.properties['user.home']
-
+def applicationName = 'Tester'
 android {
     signingConfigs {
         bundle{
@@ -38,6 +38,13 @@ android {
             keyPassword 'android'
         }
     }
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            def flavor = variant.productFlavors.name[0]
+            outputFileName = "${applicationName}-${flavor}-${variant.buildType.name}.apk"
+        }
+    }
+
     compileSdkVersion 33
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions"
