@@ -1280,4 +1280,14 @@
     <uses-permission android:name="com.google.android.calendar.permission.READ_OOBE" />
     <uses-permission android:name="com.google.android.gms.chromesync.permission.METADATA_UPDATED" />
 
+    <uses-permission android:name="android.permission.DEBUG_VIRTUAL_MACHINE" />
+    <uses-permission android:name="com.android.frameworks.core.batterystatsviewer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.android.remoteprovisioner.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.customermobile.preload.StartOnBoot.PERMISSION" />
+    <uses-permission android:name="com.google.android.apps.dreamliner.permission.WRITE_DREAMLINER_INFO" />
+    <uses-permission android:name="com.google.android.sample.rcsclient.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.shannon.permission.IWLAN_CONFIGURATION" />
+    <uses-permission android:name="com.shannon.qualifiednetworksservice.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.shannon.rcsservice.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.verizon.permission.STORE_DEMO_MODE" />
 </manifest>
