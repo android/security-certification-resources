@@ -288,6 +288,13 @@ public class InternalPermissionTester extends BasePermissionTester {
         // # Skip READ_HOME_APP_SEARCH_DATA
         //Reason : Need specific role to test this permission.
 
+        mPermissionTasks.put(permission.MANAGE_SAFETY_CENTER,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,() -> {
+                    mTransacts.invokeTransact(Transacts.SAFETY_CENTER_MANAGER_SERVICE,
+                            Transacts.SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR,
+                            Transacts.getSafetyCenterConfig);
+                }));
+
         //The permission is moved from signature permission (since android s)
         mPermissionTasks.put(SignaturePermissions.permission.MANAGE_SENSOR_PRIVACY,
                 new PermissionTest(false, Build.VERSION_CODES.S,() -> {

@@ -77,6 +77,7 @@ import android.media.MediaRecorder;
 import android.media.session.MediaSessionManager;
 import android.net.ConnectivityManager;
 import android.net.ConnectivityManager.NetworkCallback;
+import android.net.IpConfiguration;
 import android.net.MacAddress;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -95,6 +96,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Looper;
+import android.os.OutcomeReceiver;
 import android.os.Parcel;
 import android.os.ParcelUuid;
 import android.os.Parcelable;
@@ -143,6 +145,7 @@ import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
 import com.android.certifications.niap.permissions.services.TestService;
+import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.Transacts;
 import com.android.internal.policy.IKeyguardDismissCallback;
@@ -4137,7 +4140,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         // # Skip GET_HISTORICAL_APP_OPS_STATS
-        // Reason : The orresponding api hasn't raise any exception internally.(AppOpsService#getHistoricalOps)
+        // Reason : The corresponding api hasn't raise any exception internally.(AppOpsService#getHistoricalOps)
 
         mPermissionTasks.put(permission.SET_SYSTEM_AUDIO_CAPTION,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
@@ -4412,6 +4415,57 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     mTransacts.invokeTransact(Transacts.PACKAGE_SERVICE, Transacts.PACKAGE_DESCRIPTOR,
                             Transacts.makeUidVisible,1200000,1300000);
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_ETHERNET_NETWORKS,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    //disableInterface,enableInterface,updateConfiguration
+                    //Those apis always raise UnsupportedOperationException
+                    //if the system doesn't have automotive feature
+                    if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) {
+                        throw new BypassTestException("This permission requires the feature "
+                                + PackageManager.FEATURE_AUTOMOTIVE);
+                    }
+
+                    Object ethernetManager =
+                            mContext.getSystemService("ethernet");
+                    Class<?> eurClazz = null;
+                    Class<?> eurBuilderClazz = null;
+                    try {
+                        //To construct NetworkCapabilities as a parameter of EthernetNetworkUpdateRequest
+                        Class<?> ncBuilderClazz = null;
+                        ncBuilderClazz = Class.forName("android.net.NetworkCapabilities$Builder");
+                        Object ncBuilderObj = invokeReflectionCall(ncBuilderClazz,
+                            "withoutDefaultCapabilities", null,
+                            new Class<?>[]{});
+                        NetworkCapabilities nc  = (NetworkCapabilities) invokeReflectionCall(ncBuilderClazz,
+                                "build", ncBuilderObj,
+                                new Class<?>[]{});
+                        //set up EthernetNetworkUpdateRequest
+                        eurClazz = Class.forName("android.net.EthernetNetworkUpdateRequest");
+                        eurBuilderClazz = Class.forName("android.net.EthernetNetworkUpdateRequest$Builder");
+                        Constructor eurBuilderConstructor = eurBuilderClazz.getConstructor();
+                        Object eurBuilderObj = eurBuilderConstructor.newInstance();
+                        eurBuilderObj = invokeReflectionCall(eurBuilderClazz,
+                                "setIpConfiguration", eurBuilderObj,
+                                new Class<?>[]{IpConfiguration.class}, new IpConfiguration.Builder().build());
+
+                        eurBuilderObj = invokeReflectionCall(eurBuilderClazz,
+                                "setNetworkCapabilities", eurBuilderObj,
+                                new Class<?>[]{NetworkCapabilities.class}, nc);
+
+                        Object eurObj =  invokeReflectionCall(eurBuilderClazz,
+                                "build", eurBuilderObj,
+                                new Class<?>[]{});
+
+                        invokeReflectionCall(ethernetManager.getClass(),
+                                "updateConfiguration", ethernetManager,
+                                new Class[]{String.class,eurClazz,Executor.class, OutcomeReceiver.class},
+                                "test123abc789", eurObj, null, null
+                        );
+                    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
                 }));
 
         // All of the BIND_* signature permissions are intended to be required by various services

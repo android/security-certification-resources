@@ -1102,12 +1102,10 @@ public class SignaturePermissions {
                 "android.permission.CREATE_VIRTUAL_DEVICE";
         public static final String SEND_SAFETY_CENTER_UPDATE =
                 "android.permission.SEND_SAFETY_CENTER_UPDATE";
-        public static final String MANAGE_SAFETY_CENTER =
-                "android.permission.MANAGE_SAFETY_CENTER";
         public static final String ACCESS_AMBIENT_CONTEXT_EVENT =
                 "android.permission.ACCESS_AMBIENT_CONTEXT_EVENT";
-
-
+        public static final String MANAGE_ETHERNET_NETWORKS =
+                "android.permission.MANAGE_ETHERNET_NETWORKS";
     }
 
     /**

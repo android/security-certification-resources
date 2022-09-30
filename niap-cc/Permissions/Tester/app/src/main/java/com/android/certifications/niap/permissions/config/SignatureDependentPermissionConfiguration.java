@@ -94,7 +94,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
     public Optional<List<String>> getSignaturePermissions() {
 
         List<String> permissions = new ArrayList<>();
-
+        permissions.add(permission.MANAGE_ETHERNET_NETWORKS);
         //        addPermissionsFor28(permissions);
         //        addPermissionsFor29(permissions);
         //        addPermissionsFor30(permissions);
