@@ -2823,6 +2823,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MONITOR_DEVICE_CONFIG_ACCESS,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
                     try {
+
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                             Class<?> onResultListenerClass = Class.forName(
                                     "android.os.RemoteCallback$OnResultListener");
@@ -2915,6 +2916,21 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.PEEK_DROPBOX_DATA,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
 
+                    //Just to be safe, if the PEEK_DROPBOX_DATA permission is not granted
+                    //but READ_LOGS and PACKAGE_USAGE_STATS are granted,
+                    //I think we should skip the test since it looks like these development permissions
+                    //that are granted with the -g flag will always allow the normal variant to access dropbox data.
+
+                    if (mContext.checkSelfPermission(Manifest.permission.READ_LOGS)
+                            == PackageManager.PERMISSION_GRANTED &&
+                            mContext.checkSelfPermission(Manifest.permission.PACKAGE_USAGE_STATS)
+                                    == PackageManager.PERMISSION_GRANTED) {
+                        if(mContext.checkSelfPermission(permission.PEEK_DROPBOX_DATA)
+                                != PackageManager.PERMISSION_GRANTED)
+                        throw new BypassTestException(
+                                "Bypass the check due to avoid unexpected behaviour. ");
+                    }
+
                     long currTimeMs = System.currentTimeMillis();
 
                     //#add a line from companion app.=>need to run the companion app before testing
@@ -2923,13 +2939,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
                     Parcel result= mTransacts.invokeTransact(Transacts.DROPBOX_SERVICE,
                             Transacts.DROPBOX_DESCRIPTOR,
-                            Transacts.getNextEntry, "test-companion-tag", currTimeMs-(1000*60*60), mPackageName);
-
+                            Transacts.getNextEntry, "test-companion-tag", currTimeMs-(1000*60*60*8), mPackageName);
 
                     if (result.readInt() == 0) {
                         throw new SecurityException(
                                 "Received DropBoxManager.Entry is null during PEEK_DROPBOX_DATA "
-                                        + "test");
+                                        + "test. Please check you surely executed companion app before testing.");
                     }
                     DropBoxManager.Entry entry = DropBoxManager.Entry.CREATOR.createFromParcel(
                             result);

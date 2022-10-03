@@ -50,13 +50,13 @@ public interface TestConfiguration {
      */
     default List<BasePermissionTester> getPermissionTesters(Activity activity) {
         List<BasePermissionTester> permissionTesters = new ArrayList<>();
-        //permissionTesters.add(new RuntimePermissionTester(this, activity));
+        permissionTesters.add(new RuntimePermissionTester(this, activity));
         permissionTesters.add(new SignaturePermissionTester(this, activity));
         if (Constants.USE_PRIVILEGED_PERMISSION_TESTER) {
             permissionTesters.add(new PrivilegedPermissionTester(this, activity));
         }
-        //permissionTesters.add(new InternalPermissionTester(this, activity));
-        //permissionTesters.add(new InstallPermissionTester(this, activity));
+        permissionTesters.add(new InternalPermissionTester(this, activity));
+        permissionTesters.add(new InstallPermissionTester(this, activity));
         return permissionTesters;
     }
 
