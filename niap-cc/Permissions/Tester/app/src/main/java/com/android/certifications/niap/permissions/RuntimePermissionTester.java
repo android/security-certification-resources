@@ -59,6 +59,7 @@ import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -85,6 +86,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.BaseColumns;
 import android.provider.CalendarContract.CalendarAlerts;
 import android.provider.CalendarContract.Events;
 import android.provider.CallLog.Calls;
@@ -95,11 +97,13 @@ import android.provider.ContactsContract.RawContacts;
 import android.provider.MediaStore;
 import android.provider.Telephony;
 import android.provider.VoicemailContract.Voicemails;
+import android.service.notification.StatusBarNotification;
 import android.telecom.TelecomManager;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
@@ -555,33 +559,55 @@ public class RuntimePermissionTester extends BasePermissionTester {
 
         //New Runtime Permissions for T
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+
             mPermissionTasks.put(READ_MEDIA_AUDIO, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                 ContentResolver contentResolver = mContext.getContentResolver();
-                Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                @SuppressLint("Recycle") Cursor cursor = contentResolver.query(uri, null, null, null, null);
-                cursor.moveToFirst();
+                @SuppressLint("Recycle") Cursor cursor = contentResolver.query(
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        null, null, null, null);
+                if (cursor == null) {
+                    throw new UnexpectedPermissionTestFailureException(
+                            "Unable to obtain an image to test READ_MEDIA_AUDIO");
+                } else if (!cursor.moveToFirst()) {
+                    throw new SecurityException("Failed to load media files:READ_MEDIA_AUDIO." +
+                            "Pleaes ensure to execute the companion app before testing.");
+                }
             }));
-            mPermissionTasks.put(READ_MEDIA_IMAGES, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+
+            mPermissionTasks.put(READ_MEDIA_IMAGES, new PermissionTest(
+                    false, Build.VERSION_CODES.TIRAMISU, () -> {
                 ContentResolver contentResolver = mContext.getContentResolver();
-                Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                @SuppressLint("Recycle") Cursor cursor = contentResolver.query(uri, null, null, null, null);
-                cursor.moveToFirst();
+                @SuppressLint("Recycle") Cursor cursor = contentResolver.query(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        null, null, null, null);
+                if (cursor == null) {
+                    throw new UnexpectedPermissionTestFailureException(
+                            "Unable to obtain an image to test READ_MEDIA_IMAGES");
+                } else if (!cursor.moveToFirst()) {
+                    throw new SecurityException("Failed to load media files:READ_MEDIA_IMAGES." +
+                            "Pleaes ensure to execute the companion app before testing.");
+                }
             }));
 
             mPermissionTasks.put(READ_MEDIA_VIDEO, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                 ContentResolver contentResolver = mContext.getContentResolver();
-                Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                @SuppressLint("Recycle") Cursor cursor = contentResolver.query(uri, null, null, null, null);
-                cursor.moveToFirst();
+                @SuppressLint("Recycle") Cursor cursor = contentResolver.query(
+                        MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                        null, null, null, null);
+                if (cursor == null) {
+                    throw new UnexpectedPermissionTestFailureException(
+                            "Unable to obtain an image to test READ_MEDIA_VIDEO");
+                } else if (!cursor.moveToFirst()) {
+                    throw new SecurityException("Failed to load media files:READ_MEDIA_VIDEO." +
+                            "Pleaes ensure to execute the companion app before testing.");
+                }
             }));
 
             // Skip : BODY_SENSORS_BACKGROUND
             // Found no practical way to test BODY_SENSORS permission on pixel devices.
 
             mPermissionTasks.put(POST_NOTIFICATIONS, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                Intent notificationIntent = new Intent(mContext, MainActivity.class);
-                PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
-                        notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+
 
                 Resources resources = mContext.getResources();
                 CharSequence channelName = resources.getString(R.string.tester_channel_name);
@@ -591,17 +617,39 @@ public class RuntimePermissionTester extends BasePermissionTester {
                         NotificationManager.class);
                 notificationManager.createNotificationChannel(channel);
 
+                Intent notificationIntent = new Intent(mContext, MainActivity.class);
+                PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
+                        notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+
                 Notification notification =
-                        new Notification.Builder(mContext, TAG)
+                        new NotificationCompat.Builder(mContext, TAG)
                                 .setContentTitle(resources.getText(
                                         R.string.notificaton_title))
                                 .setContentText(resources.getText(
                                         R.string.intent_notification_message))
                                 .setSmallIcon(R.drawable.ic_launcher_foreground)
+                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                                 .setContentIntent(pendingIntent)
                                 .build();
 
-                notificationManager.notify(0, notification);
+                notificationManager.notify(1000, notification);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
+                boolean found = false;
+                for (StatusBarNotification nn : notifications) {
+                    if (nn.getId() == 1000) {
+                        mLogger.logInfo("notification found");
+                        found = true;
+                    }
+                }
+                if(!found){
+                    throw new SecurityException("Expected notification is not shown");
+                }
+
             }));
 
             mPermissionTasks.put(NEARBY_WIFI_DEVICES, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {

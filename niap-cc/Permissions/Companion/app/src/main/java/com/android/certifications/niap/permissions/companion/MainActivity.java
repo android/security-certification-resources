@@ -320,6 +320,54 @@ public class MainActivity extends AppCompatActivity {
             }
             photoContentValues.put(MediaStore.Images.Media.IS_PENDING, 0);
             contentResolver.update(photoUri, photoContentValues, null, null);
+
+            //Audio
+            ContentValues audioContentValues = new ContentValues();
+            audioContentValues.put(MediaStore.Audio.Media.DISPLAY_NAME, "TestAudio");
+            audioContentValues.put(MediaStore.Audio.Media.MIME_TYPE, "audio/mpeg");
+            audioContentValues.put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/");
+            audioContentValues.put(MediaStore.Audio.Media.IS_PENDING, 1);
+            collectionUri = MediaStore.Audio.Media.getContentUri(
+                    MediaStore.VOLUME_EXTERNAL_PRIMARY);
+            Uri audioUri = contentResolver.insert(collectionUri, audioContentValues);
+
+            try (InputStream inputStream = getResources().openRawResource(R.raw.test_audio);
+                 OutputStream outputStream = contentResolver.openOutputStream(audioUri)) {
+                byte[] bytes = new byte[2048];
+                while (inputStream.read(bytes) != -1) {
+                    outputStream.write(bytes);
+                }
+                Log.d(TAG, "Successfully wrote file to Music directory");
+            } catch (IOException e) {
+                Log.e(TAG, "Caught an exception copying file:", e);
+                result = false;
+            }
+            audioContentValues.put(MediaStore.Audio.Media.IS_PENDING, 0);
+            contentResolver.update(audioUri, audioContentValues, null, null);
+            //Video
+            ContentValues videoContentValues = new ContentValues();
+            videoContentValues.put(MediaStore.Video.Media.DISPLAY_NAME, "TestVideo");
+            videoContentValues.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
+            videoContentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/");
+            videoContentValues.put(MediaStore.Video.Media.IS_PENDING, 1);
+            collectionUri = MediaStore.Video.Media.getContentUri(
+                    MediaStore.VOLUME_EXTERNAL_PRIMARY);
+            Uri videoUri = contentResolver.insert(collectionUri, videoContentValues);
+
+            try (InputStream inputStream = getResources().openRawResource(R.raw.test_video);
+                 OutputStream outputStream = contentResolver.openOutputStream(videoUri)) {
+                byte[] bytes = new byte[2048];
+                while (inputStream.read(bytes) != -1) {
+                    outputStream.write(bytes);
+                }
+                Log.d(TAG, "Successfully wrote file to Music directory");
+            } catch (IOException e) {
+                Log.e(TAG, "Caught an exception copying file:", e);
+                result = false;
+            }
+            videoContentValues.put(MediaStore.Video.Media.IS_PENDING, 0);
+            contentResolver.update(videoUri, videoContentValues, null, null);
+
         }
         return result;
     }
