@@ -287,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void writeAllTesterDetailsToJson() {
         try {
+
             final String fileName = "all-tester.json";
             OutputStreamWriter writer = new OutputStreamWriter(mContext.openFileOutput(
                     fileName, Context.MODE_PRIVATE));

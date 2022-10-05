@@ -106,7 +106,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
     }
 
     //Those test suites require some runtime permissions to execute.
-    private void addPermissionsNeedPreReq(List<String> permissions)
+    public static void addPermissionsNeedPreReq(List<String> permissions)
     {
         permissions.add(permission.LOCAL_MAC_ADDRESS);
         permissions.add(permission.MANAGE_SOUND_TRIGGER);
@@ -115,7 +115,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         permissions.add(permission.ACCESS_MESSAGES_ON_ICC);
     }
 
-    private void addPermissionsWithError(List<String> permissions)
+    public static void addPermissionsWithError(List<String> permissions)
     {
         permissions.add(permission.CHANGE_COMPONENT_ENABLED_STATE);
         permissions.add(permission.CONNECTIVITY_USE_RESTRICTED_NETWORKS);
@@ -145,7 +145,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
     }
     
     //Add all signature permission tests for SDK28 
-    private void addPermissionsFor28(List<String> permissions)
+    public static void addPermissionsFor28(List<String> permissions)
     {
         permissions.add(permission.ACCESS_AMBIENT_LIGHT_STATS);
         permissions.add(permission.ACCESS_CACHE_FILESYSTEM);
@@ -372,7 +372,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
     }
 
     //Add all signature permission tests for SDK29 
-    private void addPermissionsFor29(List<String> permissions)
+    public static void addPermissionsFor29(List<String> permissions)
     {
         permissions.add(permission.ACCESS_SHARED_LIBRARIES);
         permissions.add(permission.ADJUST_RUNTIME_PERMISSIONS_POLICY);
@@ -421,7 +421,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
     }
 
     //Add all signature permission tests for SDK30 
-    private void addPermissionsFor30(List<String> permissions)
+    public static void addPermissionsFor30(List<String> permissions)
     {
         permissions.add(permission.ACCESS_CONTEXT_HUB);
         permissions.add(permission.ACCESS_LOCUS_ID_USAGE_STATS);
@@ -465,7 +465,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
     }
 
     //Add all signature permission tests for SDK31 
-    private void addPermissionsFor31(List<String> permissions)
+    public static void addPermissionsFor31(List<String> permissions)
     {
         permissions.add(permission.ACCESS_TUNED_INFO);
         permissions.add(permission.ASSOCIATE_INPUT_DEVICE_TO_DISPLAY);
@@ -500,6 +500,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         permissions.add(permission.MANAGE_TIME_AND_ZONE_DETECTION);
         permissions.add(permission.MANAGE_TOAST_RATE_LIMITING);
         permissions.add(permission.MANAGE_UI_TRANSLATION);
+
         permissions.add(permission.MANAGE_WIFI_COUNTRY_CODE);//Illegal argument exception
         permissions.add(permission.MODIFY_REFRESH_RATE_SWITCHING_TYPE);
         permissions.add(permission.NFC_SET_CONTROLLER_ALWAYS_ON);
@@ -512,7 +513,9 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         permissions.add(permission.READ_PROJECTION_STATE);
         permissions.add(permission.REGISTER_MEDIA_RESOURCE_OBSERVER);//Binder Transaction error(-22)
         permissions.add(permission.RESET_APP_ERRORS);
-        permissions.add(permission.RESTART_WIFI_SUBSYSTEM);
+        //The test crashes the system with TP1A.221105.002 9080065 dev-keys
+        //  permissions.add(permission.RESTART_WIFI_SUBSYSTEM);
+
         permissions.add(permission.SCHEDULE_PRIORITIZED_ALARM);
         permissions.add(permission.SEND_CATEGORY_CAR_NOTIFICATIONS);
         permissions.add(permission.SET_AND_VERIFY_LOCKSCREEN_CREDENTIALS);//Illegal arg
@@ -531,14 +534,13 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
     }
 
     //Add all signature permission tests for SDK32 
-    private void addPermissionsFor32(List<String> permissions)
+    public static void addPermissionsFor32(List<String> permissions)
     {
-        //permissions.add(permission.ALLOW_SLIPPERY_TOUCHES);
         permissions.add(permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD);
     }
 
     //Add all signature permission tests for SDK33 
-    private void addPermissionsFor33(List<String> permissions)
+    public static void addPermissionsFor33(List<String> permissions)
     {
         permissions.add(permission.ACCESS_BROADCAST_RESPONSE_STATS);
         permissions.add(permission.ACCESS_FPS_COUNTER);

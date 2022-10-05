@@ -360,7 +360,7 @@ public class MainActivity extends AppCompatActivity {
                 while (inputStream.read(bytes) != -1) {
                     outputStream.write(bytes);
                 }
-                Log.d(TAG, "Successfully wrote file to Music directory");
+                Log.d(TAG, "Successfully wrote file to Movies directory");
             } catch (IOException e) {
                 Log.e(TAG, "Caught an exception copying file:", e);
                 result = false;
