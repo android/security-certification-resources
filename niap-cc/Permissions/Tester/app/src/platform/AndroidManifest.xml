@@ -1291,4 +1291,6 @@
     <uses-permission android:name="com.google.android.apps.gsa.nga.engine.stash.BROADCAST" />
     <uses-permission android:name="com.google.android.gms.smartdevice.permission.NOTIFY_QUICK_START_STATUS" />
 
+    <uses-permission android:name="com.google.android.settings.future.biometrics.faceenroll.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+
 </manifest>

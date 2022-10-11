@@ -240,7 +240,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
      */
     protected final Map<String, PermissionTest> mPermissionTasks;
 
-    @SuppressLint("WrongConstant")
+    @SuppressLint({"WrongConstant", "SuspiciousIndentation"})
     public SignaturePermissionTester(TestConfiguration configuration, Activity activity) {
         super(configuration, activity);
 
@@ -4370,7 +4370,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     // We obsolate it because the test requires user interactions.
                     //
 
-                    //Obsolated Test Cade
+                    //Obsoleted Test Cade
                     /*
                     featuresIntent.putExtra("test_id",ChooserReceiver.TEST_LAUNCH_DEVICE_MANAGER_SETUP);
                     Intent receiver = new Intent(mContext, ChooserReceiver.class);

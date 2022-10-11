@@ -514,7 +514,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
         permissions.add(permission.REGISTER_MEDIA_RESOURCE_OBSERVER);//Binder Transaction error(-22)
         permissions.add(permission.RESET_APP_ERRORS);
         //The test crashes the system with TP1A.221105.002 9080065 dev-keys
-        //  permissions.add(permission.RESTART_WIFI_SUBSYSTEM);
+        permissions.add(permission.RESTART_WIFI_SUBSYSTEM);
 
         permissions.add(permission.SCHEDULE_PRIORITIZED_ALARM);
         permissions.add(permission.SEND_CATEGORY_CAR_NOTIFICATIONS);
