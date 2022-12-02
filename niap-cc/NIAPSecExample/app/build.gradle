@@ -18,13 +18,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
+
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.android.certifications.niap.sdp"
         minSdkVersion 28
-        targetSdkVersion 32
+        targetSdkVersion 33
+
         versionCode 1
         versionName "1.0"
 
@@ -39,8 +41,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
+        sourceCompatibility = "1.8"
+        targetCompatibility = "1.8"
     }
 }
 
@@ -62,7 +64,4 @@ dependencies {
     implementation('androidx.work:work-runtime:2.7.0') {
         because 'previous versions have a bug impacting this application'
     }
-    implementation 'info.guardianproject.netcipher:netcipher:2.2.0-alpha'
-
-
 }
