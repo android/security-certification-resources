@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,7 +143,6 @@ public class MainActivity extends FragmentActivity {
             This provides an additional test to check and ensure that data cannot be decrypted.
             The key should not be available for decryption while the device is locked.
         */
-        Log.i(TAG,"Security>"+Security.getProperty(MyApplication.DISABLED_ALGOR_TAG));
         int initialDelay = 1;
         if(runInBackgroundCheckBox.isChecked()) {
             Log.i(TAG, "LOCK DEVICE NOW...");
