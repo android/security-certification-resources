@@ -80,12 +80,6 @@ public class SDPTestWorker extends Worker {
                             "file not available for decryption.");
                 }
 
-                //@Override
-                public void onAuthenticationCancelled() {
-                    TestUtil.logFailure(getClass(), "SDP Biometric Unlock cancelled, " +
-                            "file not available for decryption.");
-                }
-
                 @Override
                 public void onMessage(String message) {
                     TestUtil.logSuccess(getClass(), message);
