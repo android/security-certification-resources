@@ -23,7 +23,7 @@ android {
             storeFile file("../security/ec-p256.jks")
             storePassword "android"
             keyPassword "android"
-            keyAlias "platform"
+            keyAlias "ecp256"
         }
     }
     defaultConfig {
