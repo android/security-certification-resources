@@ -25,7 +25,7 @@ android {
     defaultConfig {
         applicationId "com.android.certifications.niap.sdp"
         minSdkVersion 28
-        targetSdkVersion 33
+        targetSdkVersion 31
 
         versionCode 1
         versionName "1.0"
@@ -41,8 +41,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
     }
 }
 

@@ -16,7 +16,6 @@
 
 package com.android.certifications.niap.permissions.companion;
 
-import static android.app.PendingIntent.FLAG_IMMUTABLE;
 import static android.app.PendingIntent.FLAG_MUTABLE;
 
 import android.Manifest;

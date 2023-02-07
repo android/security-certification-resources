@@ -63,13 +63,6 @@ import java.util.concurrent.TimeUnit;
 import static com.android.certifications.niap.EncryptedDataService.START_FOREGROUND_ACTION;
 import static com.android.certifications.niap.EncryptedDataService.STOP_FOREGROUND_ACTION;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-
-import info.guardianproject.netcipher.NetCipher;
-
 /**
  * Sample Tool for OEMs to run Sensitive Data Protection tests using the NIAPSEC library.
  *
