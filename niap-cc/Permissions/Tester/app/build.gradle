@@ -19,11 +19,14 @@ def homePath = System.properties['user.home']
 def applicationName = 'Tester'
 android {
     signingConfigs {
-        bundle{
-            storeFile file("../security/rsa2048/rsa-2048.jks")
+        // TODO :
+        // Prepare your own normal.jks and platform.jks as settings and put these into
+        // assigned path. It helps to build
+        norm{
+            storeFile file("../security/normal/normal.jks")
             storePassword "android"
             keyPassword "android"
-            keyAlias "rsa2048"
+            keyAlias "normal"
         }
         platform {
             storeFile file('../security/platform/platform.jks')
@@ -71,11 +74,11 @@ android {
     productFlavors {
         normal {
             dimension "settings"
-            signingConfig signingConfigs.bundle
+            signingConfig signingConfigs.norm
         }
         noperm {
             dimension "settings"
-            signingConfig signingConfigs.bundle
+            signingConfig signingConfigs.norm
         }
         platform {
             dimension "settings"

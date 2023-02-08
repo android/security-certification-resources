@@ -32,7 +32,6 @@
 
     <application
         android:debuggable="true"
-        android:sharedUserId="android.uid.system"
         android:extractNativeLibs="false" >
         <uses-library android:name="android.test.runner" />
 

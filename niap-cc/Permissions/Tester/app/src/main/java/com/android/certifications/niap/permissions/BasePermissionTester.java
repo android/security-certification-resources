@@ -124,7 +124,6 @@ public abstract class BasePermissionTester {
      */
     public abstract boolean runPermissionTests();
 
-    //public abstract Map<String, PermissionTest> getRegisteredPermissions();
     public abstract Map<String,PermissionTest> getRegisteredPermissions();
 
     /**

@@ -184,8 +184,8 @@ public class InstallPermissionTester extends BasePermissionTester {
                                 "ACCESS_FINLE_LOCATION permission should be granted to run this test case");
                     }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        //mWifiManager.getCallerConfiguredNetworks();
-                        mWifiManager.getConfiguredNetworks();
+                        mWifiManager.getCallerConfiguredNetworks();
+                        //mWifiManager.getConfiguredNetworks();
                     } else {
                         mWifiManager.getConfiguredNetworks();
                     }
@@ -213,11 +213,6 @@ public class InstallPermissionTester extends BasePermissionTester {
                                 "A bluetooth adapter is not available to run this test");
                     }
                     if (mBluetoothAdapter.isEnabled()) {
-                        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_CONNECT)
-                                != PackageManager.PERMISSION_GRANTED) {
-                            throw new BypassTestException(
-                                    "BLUETOOTH_CONNECT permission should be granted to run this test case");
-                        }
                         mBluetoothAdapter.disable();
                         mBluetoothAdapter.enable();
                     } else {
@@ -505,11 +500,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(USE_FULL_SCREEN_INTENT,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
-                        throw new BypassTestException(
-                                "[Bypass] Full screen Intent could not be shown as an inactive notification as of SV2");
-                    }
+                new PermissionTest(false, Build.VERSION_CODES.Q,Build.VERSION_CODES.S, () -> {
 
                     Intent notificationIntent = new Intent(mContext, MainActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,

@@ -587,7 +587,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
                     // Prior to Android 12 the NetworkRequest could be modified via reflection to
                     // request restricted networks.
-                    if (mDeviceApiLevel < Build.VERSION_CODES.S) {
+                    if (mDeviceApiLevel < Build.VERSION_CODES.R) {
                         try {
                             NetworkRequest.Builder networkRequestBuilder =
                                     new NetworkRequest.Builder()

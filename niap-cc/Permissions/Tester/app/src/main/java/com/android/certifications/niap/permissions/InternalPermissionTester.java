@@ -306,8 +306,7 @@ public class InternalPermissionTester extends BasePermissionTester {
 
         //The permission is moved from signature permission (since android t)
         mPermissionTasks.put(SignaturePermissions.permission.TOGGLE_AUTOMOTIVE_PROJECTION,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,
-                        Build.VERSION_CODES.S_V2, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     mTransacts.invokeTransact(Transacts.UI_MODE_SERVICE,
                             Transacts.UI_MODE_DESCRIPTOR, Transacts.requestProjection,
                             getActivityToken(), 1, mPackageName);

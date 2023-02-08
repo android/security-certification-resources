@@ -535,10 +535,6 @@ public class RuntimePermissionTester extends BasePermissionTester {
                         throw new BypassTestException(
                                 "The bluetooth adapter must be enabled for this test");
                     }
-                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                        throw new BypassTestException(
-                                "BLUETOOTH_SCAN permission is required for this test case");
-                    }
                     BluetoothAdapter.getDefaultAdapter().getScanMode();
                 }));
 
@@ -567,7 +563,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
                         null, null, null, null);
                 if (cursor == null) {
                     throw new UnexpectedPermissionTestFailureException(
-                            "Unable to obtain an image to test READ_MEDIA_AUDIO");
+                            "Unable to obtain an sound to test READ_MEDIA_AUDIO");
                 } else if (!cursor.moveToFirst()) {
                     throw new SecurityException("Failed to load media files:READ_MEDIA_AUDIO." +
                             "Pleaes ensure to execute the companion app before testing.");
