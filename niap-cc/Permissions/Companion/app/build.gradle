@@ -19,11 +19,14 @@ def applicationName = 'Companion'
 android {
     compileSdkVersion 33
     signingConfigs {
+        // TODO :
+        // Prepare your own companion.jks and put it into
+        // assigned path.
         companion {
-            storeFile file("../security/ec-p256.jks")
+            storeFile file("../security/companion.jks")
             storePassword "android"
             keyPassword "android"
-            keyAlias "ecp256"
+            keyAlias "companion"
         }
     }
     defaultConfig {

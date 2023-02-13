@@ -19,6 +19,7 @@
 
     <!-- The app does not use this permission, but it is requested so that it can be revoked during
          the REVOKE_RUNTIME_PERMISSIONS test. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

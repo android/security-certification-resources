@@ -21,7 +21,7 @@ android {
     signingConfigs {
         // TODO :
         // Prepare your own normal.jks and platform.jks as settings and put these into
-        // assigned path. It helps to build
+        // assigned path. It helps to build the application variants automatically.
         norm{
             storeFile file("../security/normal/normal.jks")
             storePassword "android"
