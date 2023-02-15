@@ -22,6 +22,7 @@ android {
         // TODO :
         // Prepare your own companion.jks and put it into
         // assigned path.
+        // For details see the instructions on the SIGNING.md
         companion {
             storeFile file("../security/companion.jks")
             storePassword "android"
