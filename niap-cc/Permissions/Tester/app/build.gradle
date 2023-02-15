@@ -22,6 +22,7 @@ android {
         // TODO :
         // Prepare your own normal.jks and platform.jks as settings and put these into
         // assigned path. It helps to build the application variants automatically.
+        // For details see the instructions on the SIGNING.md
         norm{
             storeFile file("../security/normal/normal.jks")
             storePassword "android"

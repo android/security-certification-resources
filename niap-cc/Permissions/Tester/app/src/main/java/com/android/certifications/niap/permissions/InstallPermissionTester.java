@@ -183,12 +183,8 @@ public class InstallPermissionTester extends BasePermissionTester {
                         throw new BypassTestException(
                                 "ACCESS_FINLE_LOCATION permission should be granted to run this test case");
                     }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        mWifiManager.getCallerConfiguredNetworks();
-                        //mWifiManager.getConfiguredNetworks();
-                    } else {
-                        mWifiManager.getConfiguredNetworks();
-                    }
+                    mWifiManager.getConfiguredNetworks();
+
                 }));
 
         // android.permission.AUTHENTICATE_ACCOUNTS has been removed.
