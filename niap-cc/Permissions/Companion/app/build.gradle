@@ -23,6 +23,7 @@ android {
         // Prepare your own companion.jks and put it into
         // assigned path.
         // For details see the instructions on the SIGNING.md
+        // (This key should not be identical to normal.jks file for the Tester app)
         companion {
             storeFile file("../security/companion.jks")
             storePassword "android"
