@@ -16,6 +16,7 @@
 
 package com.android.certifications.niap.permissions.utils;
 
+import android.util.Log;
 import com.android.certifications.niap.permissions.BasePermissionTester;
 
 import java.lang.reflect.Method;
@@ -52,6 +53,26 @@ public class ReflectionUtils {
             }
         }
     }
+
+    //recursive function to search am exception in the nested stack trace
+    public static boolean findCauseInStackTraceElement(Boolean resp,Throwable ex,String nameMatches)
+    {
+        //Log.d("!*!name matches","in:"+resp+">"+ex.getClass().toString());
+        //boolean bRet=false;
+        if(ex.getCause() != null){
+            resp = findCauseInStackTraceElement(resp,ex.getCause(),nameMatches);
+        }
+        if(resp) {
+            return true;
+        } else {
+            if(ex.getClass().toString().indexOf(nameMatches)>-1){
+                //Log.d("!*!name matches", ex.getClass().toString() + "??" + nameMatches);
+                resp = true;
+            }
+            return resp;
+        }
+    }
+
     /**
      * List up declared methods of specified object. it is intended to check the prototype of
      * transacts api.

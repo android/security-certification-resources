@@ -88,6 +88,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.DropBoxManager;
 import android.os.Environment;
@@ -1971,7 +1972,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.UPDATE_DEVICE_STATS,
                 new PermissionTest(false, () -> {
 
-                    if (mDeviceApiLevel == Build.VERSION_CODES.TIRAMISU) {
+                    if (mDeviceApiLevel >= Build.VERSION_CODES.TIRAMISU) {
                         mTransacts.invokeTransact(Transacts.BATTERY_STATS_SERVICE,
                                 Transacts.BATTERY_STATS_DESCRIPTOR,
                                 Transacts.noteStartAudio,0);
@@ -2244,7 +2245,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     // In Android 10 a password had to be specified. Since this test only allows a
                     // password to be set if it has not been previously set this password will need
                     // to be cleared before a subsequent test invocation when the test app is
-                    // platform signed. ag/9703399
+                    // platform signed.
+                    // https://cs.android.com/android/_/android/platform/frameworks/base/+/d952240979aea7d10b5f81dfa9199323c79b4363
                     if (mDeviceApiLevel == Build.VERSION_CODES.Q) {
                         newPassword = "1234";
                     }
@@ -2444,7 +2446,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         mTransacts.invokeTransact(Transacts.STATUS_BAR_SERVICE,
                                 Transacts.STATUS_BAR_DESCRIPTOR,
                                 Transacts.hideBiometricDialog);
-                    } else if (mDeviceApiLevel == Build.VERSION_CODES.TIRAMISU) {
+                    } else if (mDeviceApiLevel >= Build.VERSION_CODES.TIRAMISU) {
                         mTransacts.invokeTransact(Transacts.STATUS_BAR_SERVICE,
                                 Transacts.STATUS_BAR_DESCRIPTOR,
                                 Transacts.onBiometricHelp, 0, "test");
@@ -2658,7 +2660,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         //The way to using the listner was obsolated after android T, so let me choose using this option instead
-                        //https://source.corp.google.com/android-internal/cts/tests/tests/telephony/current/src/android/telephony/cts/TelephonyManagerTest.java;rcl=91e7eeb88fd7c7b2855068487f89af167cc79808;l=4186
+                        //https://cs.android.com/android/platform/superproject/+/master:cts/tests/tests/telephony/current/src/android/telephony/cts/PhoneStateListenerTest.java;l=328;drc=e64188140ba71c7b7424b044119b37af1dde6609?=4186
                         //problem : if the signature does not match it always fail,because the method also checks MODIFY_PHONE_STATE permission
 
                         SignalStrengthUpdateRequest.Builder builder = new SignalStrengthUpdateRequest.Builder()
@@ -3228,19 +3230,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     } catch (ClassNotFoundException e) {
                         throw new UnexpectedPermissionTestFailureException(e);
                     }
-                    if (mDeviceApiLevel <= Build.VERSION_CODES.S) {
-                        mTransacts.invokeTransact(Transacts.DEVICE_STATE_SERVICE,
-                                Transacts.DEVICE_STATE_DESCRIPTOR, Transacts.cancelRequest,
-                                deviceStateRequestClass.cast(null));
-                    } else {
-                        throw new BypassTestException(
-                                "Skip: cancelStateRequest() need to check with background process.\n" +
-                                        "See DeviceStateManagerService#assertCanControlDeviceState");
+                    mTransacts.invokeTransact(Transacts.DEVICE_STATE_SERVICE,
+                      Transacts.DEVICE_STATE_DESCRIPTOR, Transacts.cancelRequest,
+                      deviceStateRequestClass.cast(null));
 
-//                        Transacts.invokeTransact(Transacts.DEVICE_STATE_SERVICE,
-//                                Transacts.DEVICE_STATE_DESCRIPTOR, Transacts.cancelStateRequest);
-
-                    }
                 }));
 
         // CONTROL_OEM_PAID_NETWORK_PREFERENCE requires a device that supports automotive.
@@ -3561,7 +3554,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         //This permission's category has been moved to install after Android T
         //The test leave it as is for the previous releases.
         mPermissionTasks.put(permission.READ_NEARBY_STREAMING_POLICY,
-                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.S, VERSION_CODES.S_V2, () -> {
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                         // DevicePolicyManagerService first checks if this feature is available before
                         // performing the permission check.
@@ -3988,11 +3981,16 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             "provisionFullyManagedDevice", mDevicePolicyManager,
                             new Class<?>[]{fmdpClazz},fmdpObj);
                 } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                    throw new UnexpectedPermissionTestFailureException(e);
+                  throw new UnexpectedPermissionTestFailureException(e);
                 } catch (UnexpectedPermissionTestFailureException e){
-                    mLogger.logDebug("Please check stack trace. " +
-                            "If the stacktrace contains 'Provisioning preconditions failed' messages," +
-                            "This exception is intended");
+                  if(e.getMessage().equals("java.lang.reflect.InvocationTargetException")){
+                    boolean foundExpected = ReflectionUtils.
+                        findCauseInStackTraceElement(false,e,
+                            "android.os.ServiceSpecificException");
+                    if(!foundExpected) throw e;
+                  } else {
+                    throw e;
+                  }
                 }
         }));
 
@@ -4181,7 +4179,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
 
         // # Skip DELIVER_COMPANION_MESSAGES
-        //Reason : This feature appears to have been punted to U. See b/199427116,
+        // Reason : Found No corresponding API or implementation to test.
 
         // # Skip MODIFY_TOUCH_MODE_STATE
         //Reason : setInTouchMode has not raise any exception. no way to evaluate this permissison.
