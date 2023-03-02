@@ -24,7 +24,6 @@
         android:name="androidx.test.runner.AndroidJUnitRunner"
         android:functionalTest="false"
         android:handleProfiling="false"
-        android:sharedUserId="android.uid.system"
         android:label="Tests for com.android.certifications.niap.permissions"
         android:targetPackage="com.android.certifications.niap.permissions" />
 
