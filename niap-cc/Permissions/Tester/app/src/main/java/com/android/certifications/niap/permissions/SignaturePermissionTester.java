@@ -1010,10 +1010,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.MANAGE_ACTIVITY_STACKS,
-                new PermissionTest(false,Build.VERSION_CODES.P,
-                        Build.VERSION_CODES.Q,() -> {
+                new PermissionTest(false,Build.VERSION_CODES.P, () -> {
                     //MANAGE_ACTIVITY_STACKS is a deprecated permission, we should bypass this permisson from s
-
 
                     String service = "activity_task";
                     String descriptor = Transacts.ACTIVITY_TASK_DESCRIPTOR;
