@@ -2683,7 +2683,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         Handler handler = new Handler(handlerThread.getLooper());
                         // An Exception array is used since local variables referenced from a lambda
                         // expression must be effectively final.
-                        //https://source.corp.google.com/tm-dev/cts/tests/tests/telephony/current/src/android/telephony/cts/PhoneStateListenerTest.java;l=333?q=LISTEN_ALWAYS_REPORTED_SIGNAL_STRENGTH&sq=package:tm-dev
+                        //https://cs.android.com/android/platform/superproject/+/master:cts/tests/tests/telephony/current/src/android/telephony/cts/PhoneStateListenerTest.java;l=328;drc=e64188140ba71c7b7424b044119b37af1dde6609?
                         Exception[] caughtException = new Exception[1];
                         CountDownLatch latch = new CountDownLatch(1);
                         handler.post(() -> {

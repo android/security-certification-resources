@@ -95,6 +95,7 @@ public class SignatureDependentPermissionConfiguration implements TestConfigurat
 
         List<String> permissions = new ArrayList<>();
         permissions.add(permission.MANAGE_ETHERNET_NETWORKS);
+        permissions.add(permission.RADIO_SCAN_WITHOUT_LOCATION);
         //        addPermissionsFor28(permissions);
         //        addPermissionsFor29(permissions);
         //        addPermissionsFor30(permissions);

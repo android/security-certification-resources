@@ -16,52 +16,16 @@
 
 package com.android.certifications.niap.permissions.config;
 
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.Manifest.permission.ACCESS_MEDIA_LOCATION;
-import static android.Manifest.permission.ADD_VOICEMAIL;
-import static android.Manifest.permission.ANSWER_PHONE_CALLS;
-import static android.Manifest.permission.BLUETOOTH_ADVERTISE;
-import static android.Manifest.permission.BLUETOOTH_CONNECT;
-import static android.Manifest.permission.BLUETOOTH_SCAN;
-import static android.Manifest.permission.BODY_SENSORS;
-import static android.Manifest.permission.BODY_SENSORS_BACKGROUND;
-import static android.Manifest.permission.CALL_PHONE;
-import static android.Manifest.permission.NEARBY_WIFI_DEVICES;
-import static android.Manifest.permission.POST_NOTIFICATIONS;
-import static android.Manifest.permission.READ_CALENDAR;
-import static android.Manifest.permission.READ_CALL_LOG;
-import static android.Manifest.permission.READ_CONTACTS;
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.READ_MEDIA_AUDIO;
-import static android.Manifest.permission.READ_MEDIA_IMAGES;
-import static android.Manifest.permission.READ_MEDIA_VIDEO;
-import static android.Manifest.permission.READ_PHONE_NUMBERS;
-import static android.Manifest.permission.READ_PHONE_STATE;
-import static android.Manifest.permission.READ_SMS;
-import static android.Manifest.permission.RECORD_AUDIO;
-import static android.Manifest.permission.SEND_SMS;
-import static android.Manifest.permission.UWB_RANGING;
-import static android.Manifest.permission.WRITE_CALENDAR;
-import static android.Manifest.permission.WRITE_CALL_LOG;
-import static android.Manifest.permission.WRITE_CONTACTS;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static android.Manifest.permission.ACTIVITY_RECOGNITION;
-import static android.Manifest.permission.CAMERA;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-
 import androidx.core.app.ActivityCompat;
-
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.Constants;
 import com.android.certifications.niap.permissions.R;
 import com.android.certifications.niap.permissions.RuntimePermissionTester;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
