@@ -382,6 +382,8 @@ public class MainActivity extends AppCompatActivity {
                     descriptorTransacts);
             queryTransactId(Transacts.WALLPAPER_DESCRIPTOR, Transacts.setWallpaper,
                     descriptorTransacts);
+            queryTransactId(Transacts.WALLPAPER_DESCRIPTOR, Transacts.setWallpaperComponent,
+                    descriptorTransacts);
             queryTransactId(Transacts.WIFI_DESCRIPTOR, Transacts.getWifiApConfiguration,
                     descriptorTransacts);
             queryTransactId(Transacts.WIFI_DESCRIPTOR, Transacts.setWifiEnabled,
@@ -408,6 +410,9 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.stopFreezingScreen,
                     descriptorTransacts);
             queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.thawRotation,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.addKeyguardLockedStateListener,
                     descriptorTransacts);
 
             // The following are the transacts required for new permissions in Android 12.
@@ -534,6 +539,94 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.CONNECTIVITY_DESCRIPTOR, Transacts.pendingRequestForNetwork,
                     descriptorTransacts);
             queryTransactId(Transacts.APP_OPS_DESCRIPTOR, Transacts.getUidOps, descriptorTransacts);
+            //For Android T
+            //   Internal Permissions
+            queryTransactId(Transacts.AMBIENT_CONTEXT_MANAGER_DESCRIPTOR, Transacts.queryServiceStatus,
+                    descriptorTransacts);
+            queryTransactId(Transacts.SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR, Transacts.isSafetyCenterEnabled,
+                    descriptorTransacts);
+            queryTransactId(Transacts.SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR, Transacts.getSafetyCenterConfig,
+                    descriptorTransacts);
+            queryTransactId(Transacts.SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR, Transacts.getSafetySourceData,
+                    descriptorTransacts);
+            queryTransactId(Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR, Transacts.createVirtualDevice,
+                    descriptorTransacts);
+
+            //   Signature Permissions
+            queryTransactId(Transacts.ATTESTATION_VERIFICATION_DESCRIPTOR, Transacts.verifyToken,
+                    descriptorTransacts);
+            queryTransactId(Transacts.ATTESTATION_VERIFICATION_DESCRIPTOR, Transacts.verifyAttestation,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.setInTouchMode,
+                    descriptorTransacts);
+            queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.getInTouchMode,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.CLOUDSEARCH_DESCRIPTOR, Transacts.search,
+                    descriptorTransacts);
+            queryTransactId(Transacts.WALLPAPER_EFFECTS_GENERATION_DESCRIPTOR, Transacts.generateCinematicEffect,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.CLIPBOARD_DESCRIPTOR, Transacts.showAccessNotificationLocked,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.GAME_DESCRIPTOR, Transacts.setGameServiceProvider,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.registerTaskFpsCallback,
+                    descriptorTransacts);
+            queryTransactId(Transacts.GAME_DESCRIPTOR, Transacts.createGameSession,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.TV_INPUT_DESCRIPTOR,
+                    Transacts.getAvailableExtensionInterfaceNames,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.PACKAGE_DESCRIPTOR,
+                    Transacts.makeUidVisible,
+                    descriptorTransacts);
+            queryTransactId(Transacts.APP_OPS_DESCRIPTOR,
+                    Transacts.getHistoricalOps,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
+                    Transacts.setStrings,
+                    descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
+                    Transacts.getString,
+                    descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
+                    Transacts.getPermittedInputMethodsAsUser,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.COMPANION_DEVICE_DESCRIPTOR,
+                    Transacts.dispatchMessage,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.ACTIVITY_TASK_DESCRIPTOR,
+                    Transacts.startActivityFromGameSession,
+                    descriptorTransacts);
+
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
+                    Transacts.getWifiSsidPolicy,descriptorTransacts);
+
+            queryTransactId(Transacts.AUDIO_DESCRIPTOR,
+                    Transacts.forceRemoteSubmixFullVolume,descriptorTransacts);
+
+            queryTransactId(Transacts.MOUNT_DESCRIPTOR,
+                    Transacts.isConvertibleToFBE,descriptorTransacts);
+
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
+                    Transacts.setProfileOwnerOnOrganizationOwnedDevice,descriptorTransacts);
+
+            queryTransactId(Transacts.DEVICE_STATE_DESCRIPTOR,
+                    Transacts.cancelStateRequest,descriptorTransacts);
+
+            queryTransactId(Transacts.DISPLAY_DESCRIPTOR,
+                    Transacts.setUserPreferredDisplayMode,descriptorTransacts);
+            queryTransactId(Transacts.ACTIVITY_DESCRIPTOR,
+                    Transacts.stopAppForUser,descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
         }

@@ -1,0 +1,74 @@
+import groovy.json.JsonSlurper
+ext {
+    // # Command Snippets
+    // ./gradlew genManifestTags
+    // ./gradlew genSignatureConstants
+    // ./gradlew genTestPlaceHolders
+
+    String.metaClass.caseFormat = { from, to ->
+        from.to(to, delegate)
+    }
+
+    manifestTags = { json, version ->
+        json.each { category, list ->
+            println "<!-- New $category permissions as of Android $version -->"
+            list.each { item ->
+                println "<uses-permission android:name=\"android.permission.$item\" />  "
+            }
+        }
+    }
+
+    task genManifestTags() {
+        doLast {
+            def src = new File("permissions.json").text;
+            def json = new JsonSlurper().parseText(src)
+            manifestTags(json.T, "13")
+        }
+    }
+
+    signatureConstants = { json, version ->
+        json.each { category, list ->
+            if (category.equals("Signature") || category.equals("Internal")) {
+                println "// New $category permissions as of Android $version"
+                list.each { item ->
+                    println " public static final String $item =\n" +
+                            "                \"android.permission.$item\";"
+                }
+            }
+
+        }
+    }
+
+    task genSignatureConstants() {
+        doLast {
+            def src = new File("permissions.json").text;
+            def json2 = new JsonSlurper().parseText(src)
+            signatureConstants(json2.T, "13")
+        }
+    }
+
+    testPlaceHodlers = { json3, version2, target ->
+        json3.each { category, list ->
+            if (category.equals(target)) {
+                println "// New $category permissions as of Android $version2"
+                list.each { item ->
+                    println "mPermissionTasks.put(permission.$item,\n" +
+                            "                new PermissionTest(false, Build.VERSION_CODES.$version2, () -> {\n" +
+                            "                    mLogger.logDebug(\"Test case for $item not implemented yet\");\n" +
+                            "                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,\n" +
+                            "                    //       Transacts.unregisterCoexCallback, (Object) null);\n" +
+                            "                }));"
+                }
+            }
+        }
+    }
+
+    task genTestPlaceHolders() {
+        doLast {
+            def src = new File("permissions.json").text;
+            def json4 = new JsonSlurper().parseText(src)
+            testPlaceHodlers(json4.T, "TIRAMISU", "Signature")
+        }
+    }
+
+}

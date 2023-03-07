@@ -19,8 +19,12 @@ package com.android.certifications.niap.permissions.config;
 import android.app.Activity;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
+import com.android.certifications.niap.permissions.InstallPermissionTester;
 import com.android.certifications.niap.permissions.R;
+import com.android.certifications.niap.permissions.RuntimePermissionTester;
 import com.android.certifications.niap.permissions.SignaturePermissionTester;
+//import com.android.certifications.niap.permissions.RuntimePermissionTester;
+//import com.android.certifications.niap.permissions.SignaturePermissionTester;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +49,9 @@ class DebugConfiguration implements TestConfiguration {
         // tested.
         List<BasePermissionTester> permissionTesters = new ArrayList<>();
         permissionTesters.add(new SignaturePermissionTester(this, activity));
+        permissionTesters.add(new InstallPermissionTester(this, activity));
+        permissionTesters.add(new RuntimePermissionTester(this, activity));
+
         return permissionTesters;
     }
 

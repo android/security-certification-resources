@@ -43,4 +43,10 @@
   <string name="permissions_must_be_granted">The permissions %1$s must be granted for this test</string>
   <string name="permissions_must_not_be_granted">The permissions %1$s must not be granted for this test</string>
   <string name="exception_permission_consent">Caught an exception waiting for permission consent: %1$s</string>
+    <string name="notificaton_title">POST_NOTIFICATIONS test</string>
+  <string name="intent_notification_message">POST_NOTIFICATIONS works!</string>
+    <string name="device_admin_test">Device Admin Test</string>
+    <string name="output_tester_json">Output all tests to json</string>
+    <string name="request_runtime_permissions">Request Runtime Permissions</string>
+    <string name="request_runtime_permissions_for_sig">Request perms(sig tests)</string>
 </resources>

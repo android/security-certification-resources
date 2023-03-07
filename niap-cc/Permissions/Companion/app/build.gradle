@@ -15,24 +15,50 @@
  */
 
 apply plugin: 'com.android.application'
-
+def applicationName = 'Companion'
 android {
-    compileSdkVersion 30
-
+    compileSdkVersion 33
+    signingConfigs {
+        // TODO :
+        // Prepare your own companion.jks and put it into
+        // assigned path.
+        // For details see the instructions on the SIGNING.md
+        // (This key should not be identical to normal.jks file for the Tester app)
+        companion {
+            storeFile file("../security/companion.jks")
+            storePassword "android"
+            keyPassword "android"
+            keyAlias "companion"
+        }
+    }
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions.companion"
         minSdkVersion 28
-        targetSdkVersion 30
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
+        signingConfig signingConfigs.companion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "${applicationName}-${variant.buildType.name}.apk"
+        }
+    }
 
     buildTypes {
+        debug {
+            signingConfig null
+            debuggable true
+            signingConfig signingConfigs.companion
+        }
         release {
+            signingConfig null
+            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.companion
         }
     }
     compileOptions {
@@ -42,6 +68,7 @@ android {
     lintOptions {
         abortOnError false
     }
+    namespace 'com.android.certifications.niap.permissions.companion'
 }
 
 dependencies {

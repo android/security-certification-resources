@@ -25,10 +25,15 @@ import static android.Manifest.permission.BLUETOOTH_CONNECT;
 import static android.Manifest.permission.BODY_SENSORS;
 import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.NEARBY_WIFI_DEVICES;
+import static android.Manifest.permission.POST_NOTIFICATIONS;
 import static android.Manifest.permission.READ_CALENDAR;
 import static android.Manifest.permission.READ_CALL_LOG;
 import static android.Manifest.permission.READ_CONTACTS;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.READ_MEDIA_AUDIO;
+import static android.Manifest.permission.READ_MEDIA_IMAGES;
+import static android.Manifest.permission.READ_MEDIA_VIDEO;
 import static android.Manifest.permission.READ_PHONE_NUMBERS;
 import static android.Manifest.permission.READ_PHONE_STATE;
 import static android.Manifest.permission.READ_SMS;
@@ -42,18 +47,26 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
-import android.bluetooth.le.AdvertisingSetCallback;
 import android.bluetooth.le.BluetoothLeAdvertiser;
+import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -68,13 +81,14 @@ import android.media.MediaRecorder;
 import android.media.MediaRecorder.AudioEncoder;
 import android.media.MediaRecorder.OutputFormat;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.BaseColumns;
 import android.provider.CalendarContract.CalendarAlerts;
 import android.provider.CalendarContract.Events;
-import android.provider.CallLog;
 import android.provider.CallLog.Calls;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
@@ -83,10 +97,15 @@ import android.provider.ContactsContract.RawContacts;
 import android.provider.MediaStore;
 import android.provider.Telephony;
 import android.provider.VoicemailContract.Voicemails;
+import android.service.notification.StatusBarNotification;
 import android.telecom.TelecomManager;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+
+import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -120,9 +139,14 @@ public class RuntimePermissionTester extends BasePermissionTester {
     protected final AccountManager mAccountManager;
     protected final LocationManager mLocationManager;
     protected final CameraManager mCameraManager;
+    protected final WifiManager mWifiManager;
 
     private final Map<String, PermissionTest> mPermissionTasks;
 
+    private final Object mLOHSLock = new Object();//Test for Local only hotspot
+
+
+    @SuppressLint("MissingPermission")
     public RuntimePermissionTester(TestConfiguration configuration, Activity activity) {
         super(configuration, activity);
 
@@ -133,6 +157,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
         mAccountManager = (AccountManager) mContext.getSystemService(Context.ACCOUNT_SERVICE);
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
+        mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
 
         mPermissionTasks = new HashMap<>();
 
@@ -166,7 +191,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
         }));
 
         mPermissionTasks.put(READ_CALL_LOG, new PermissionTest(false, () -> {
-            CallLog.Calls.getLastOutgoingCall(mContext);
+            Calls.getLastOutgoingCall(mContext);
         }));
 
         // android.permission.READ_CELL_BROADCASTS is a hidden runtime permission, but even with
@@ -176,7 +201,9 @@ public class RuntimePermissionTester extends BasePermissionTester {
             mContentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
         }));
 
-        mPermissionTasks.put(READ_EXTERNAL_STORAGE, new PermissionTest(false, () -> {
+        mPermissionTasks.put(READ_EXTERNAL_STORAGE, new PermissionTest(false,
+                Build.VERSION_CODES.P, Build.VERSION_CODES.S_V2,
+                () -> {
             mWallpaperManager.getWallpaperFile(WallpaperManager.FLAG_SYSTEM);
         }));
 
@@ -232,10 +259,10 @@ public class RuntimePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(WRITE_CALL_LOG, new PermissionTest(false, () -> {
             ContentValues values = new ContentValues();
-            values.put(CallLog.Calls.NUMBER, "520-555-1234");
-            values.put(CallLog.Calls.DATE, System.currentTimeMillis());
-            values.put(CallLog.Calls.DURATION, 0);
-            values.put(CallLog.Calls.TYPE, Calls.OUTGOING_TYPE);
+            values.put(Calls.NUMBER, "520-555-1234");
+            values.put(Calls.DATE, System.currentTimeMillis());
+            values.put(Calls.DURATION, 0);
+            values.put(Calls.TYPE, Calls.OUTGOING_TYPE);
             mContentResolver.insert(Calls.CONTENT_URI, values);
         }));
 
@@ -278,7 +305,6 @@ public class RuntimePermissionTester extends BasePermissionTester {
                                     "Could not create the temporary file "
                                             + file.getAbsolutePath());
                         }
-                        ;
                         file.delete();
                     } catch (IOException e) {
                         // If the permission is not granted then this could fail with a
@@ -352,6 +378,11 @@ public class RuntimePermissionTester extends BasePermissionTester {
         }));
 
         mPermissionTasks.put(READ_PHONE_NUMBERS, new PermissionTest(false, () -> {
+            if (ActivityCompat.checkSelfPermission(mContext, READ_SMS) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(mContext, READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                throw new BypassTestException(
+                        "READ_SMS & READ_PHONE_STATE permission is required for this test case as prerequisite");
+            }
             mTelephonyManager.getLine1Number();
         }));
 
@@ -443,9 +474,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
                             exif.getLatLong(latLong);
                             // Not all images will have location data, ensure all images are
                             // tested before reporting an error.
-                            if (latLong[0] == 0.0f && latLong[1] == 0.0f) {
-                                continue;
-                            } else {
+                            if (!(latLong[0] == 0.0f && latLong[1] == 0.0f)) {
                                 return;
                             }
                         } catch (IOException e) {
@@ -456,7 +485,6 @@ public class RuntimePermissionTester extends BasePermissionTester {
                             "Unable to obtain the location data from any image");
                 }));
 
-        // New permissions added to Android 12.
         // The following are the new runtime permissions for Android 12.
         mPermissionTasks.put(Manifest.permission.BLUETOOTH_ADVERTISE,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
@@ -491,8 +519,12 @@ public class RuntimePermissionTester extends BasePermissionTester {
                     advertiser.stopAdvertising(callback);
                 }));
 
-        mPermissionTasks.put(Manifest.permission.BLUETOOTH_CONNECT,
+        mPermissionTasks.put(BLUETOOTH_CONNECT,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                        throw new BypassTestException(
+                                "BLUETOOTH_SCAN permission is required for this test case");
+                    }
                     BluetoothAdapter.getDefaultAdapter().getName();
                 }));
 
@@ -520,6 +552,155 @@ public class RuntimePermissionTester extends BasePermissionTester {
                     mTransacts.invokeTransact(Transacts.UWB_SERVICE, Transacts.UWB_DESCRIPTOR,
                             Transacts.getSpecificationInfo);
                 }));
+
+        //New Runtime Permissions for T
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+
+            mPermissionTasks.put(READ_MEDIA_AUDIO, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                ContentResolver contentResolver = mContext.getContentResolver();
+                @SuppressLint("Recycle") Cursor cursor = contentResolver.query(
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        null, null, null, null);
+                if (cursor == null) {
+                    throw new UnexpectedPermissionTestFailureException(
+                            "Unable to obtain an sound to test READ_MEDIA_AUDIO");
+                } else if (!cursor.moveToFirst()) {
+                    throw new SecurityException("Failed to load media files:READ_MEDIA_AUDIO." +
+                            "Pleaes ensure to execute the companion app before testing.");
+                }
+            }));
+
+            mPermissionTasks.put(READ_MEDIA_IMAGES, new PermissionTest(
+                    false, Build.VERSION_CODES.TIRAMISU, () -> {
+                ContentResolver contentResolver = mContext.getContentResolver();
+                @SuppressLint("Recycle") Cursor cursor = contentResolver.query(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        null, null, null, null);
+                if (cursor == null) {
+                    throw new UnexpectedPermissionTestFailureException(
+                            "Unable to obtain an image to test READ_MEDIA_IMAGES");
+                } else if (!cursor.moveToFirst()) {
+                    throw new SecurityException("Failed to load media files:READ_MEDIA_IMAGES." +
+                            "Pleaes ensure to execute the companion app before testing.");
+                }
+            }));
+
+            mPermissionTasks.put(READ_MEDIA_VIDEO, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                ContentResolver contentResolver = mContext.getContentResolver();
+                @SuppressLint("Recycle") Cursor cursor = contentResolver.query(
+                        MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                        null, null, null, null);
+                if (cursor == null) {
+                    throw new UnexpectedPermissionTestFailureException(
+                            "Unable to obtain an image to test READ_MEDIA_VIDEO");
+                } else if (!cursor.moveToFirst()) {
+                    throw new SecurityException("Failed to load media files:READ_MEDIA_VIDEO." +
+                            "Pleaes ensure to execute the companion app before testing.");
+                }
+            }));
+
+            // Skip : BODY_SENSORS_BACKGROUND
+            // Found no practical way to test BODY_SENSORS permission on pixel devices.
+
+            mPermissionTasks.put(POST_NOTIFICATIONS, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+
+
+                Resources resources = mContext.getResources();
+                CharSequence channelName = resources.getString(R.string.tester_channel_name);
+                NotificationChannel channel = new NotificationChannel(TAG, channelName,
+                        NotificationManager.IMPORTANCE_DEFAULT);
+                NotificationManager notificationManager = mContext.getSystemService(
+                        NotificationManager.class);
+                notificationManager.createNotificationChannel(channel);
+
+                Intent notificationIntent = new Intent(mContext, MainActivity.class);
+                PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
+                        notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+
+                Notification notification =
+                        new NotificationCompat.Builder(mContext, TAG)
+                                .setContentTitle(resources.getText(
+                                        R.string.notificaton_title))
+                                .setContentText(resources.getText(
+                                        R.string.intent_notification_message))
+                                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                                .setContentIntent(pendingIntent)
+                                .build();
+
+                notificationManager.notify(1000, notification);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
+                boolean found = false;
+                for (StatusBarNotification nn : notifications) {
+                    if (nn.getId() == 1000) {
+                        mLogger.logInfo("notification found");
+                        found = true;
+                    }
+                }
+                if(!found){
+                    throw new SecurityException("Expected notification is not shown");
+                }
+
+            }));
+
+            mPermissionTasks.put(NEARBY_WIFI_DEVICES, new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                TestLocalOnlyHotspotCallback callback = new TestLocalOnlyHotspotCallback(mLOHSLock);
+                synchronized (mLOHSLock) {
+                    try {
+                        //WifiManager.startLocalOnlyHotSpot requires NEARBY_WIFI_DEVICES from android T,
+                        //and also it's a public api
+                        mWifiManager.startLocalOnlyHotspot(callback, null);
+                        mLOHSLock.wait(60);
+                    } catch (InterruptedException | IllegalStateException e) {
+                        mLogger.logInfo("Intended exception : " + e.getMessage() + ". Ignored.");
+                    }
+                }
+            }));
+        }
+    }
+
+    public static class TestLocalOnlyHotspotCallback extends WifiManager.LocalOnlyHotspotCallback {
+        final Object hotspotLock;
+        WifiManager.LocalOnlyHotspotReservation reservation = null;
+        boolean onStartedCalled = false;
+        boolean onStoppedCalled = false;
+        boolean onFailedCalled = false;
+        int failureReason = -1;
+
+        TestLocalOnlyHotspotCallback(Object lock) {
+            hotspotLock = lock;
+        }
+
+        @Override
+        public void onStarted(WifiManager.LocalOnlyHotspotReservation r) {
+            synchronized (hotspotLock) {
+                reservation = r;
+                onStartedCalled = true;
+                hotspotLock.notify();
+            }
+        }
+
+        @Override
+        public void onStopped() {
+            synchronized (hotspotLock) {
+                onStoppedCalled = true;
+                hotspotLock.notify();
+            }
+        }
+
+        @Override
+        public void onFailed(int reason) {
+            synchronized (hotspotLock) {
+                onFailedCalled = true;
+                failureReason = reason;
+                hotspotLock.notify();
+            }
+        }
     }
 
     @Override
@@ -547,6 +728,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
      * @param bluetoothAdapter the adapter to be enabled
      * @return {@code true} if the adapter is successfully enabled
      */
+    @SuppressLint("MissingPermission")
     private boolean enableBluetoothAdapter(BluetoothAdapter bluetoothAdapter) {
         // If the bluetooth adapter is enabled then no further work is required.
         if (bluetoothAdapter.isEnabled()) {
@@ -561,6 +743,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
         mLogger.logDebug(
                 "The bluetooth adapter is not enabled, but the permission required to enable it "
                         + "has been granted; enabling now");
+
         bluetoothAdapter.enable();
         try {
             Thread.sleep(5000);
@@ -569,5 +752,9 @@ public class RuntimePermissionTester extends BasePermissionTester {
                     + " bluetooth adapter to be enabled");
         }
         return bluetoothAdapter.isEnabled();
+    }
+    @Override
+    public Map<String,PermissionTest> getRegisteredPermissions() {
+        return mPermissionTasks;
     }
 }

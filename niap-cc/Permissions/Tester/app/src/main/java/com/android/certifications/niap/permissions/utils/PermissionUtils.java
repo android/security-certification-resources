@@ -21,16 +21,25 @@ import android.content.pm.PackageManager;
 import android.content.pm.PermissionGroupInfo;
 import android.content.pm.PermissionInfo;
 
+import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.Constants;
+import com.android.certifications.niap.permissions.log.Logger;
+import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Provides utility methods to obtain the declared permissions on the device under test.
  */
 public class PermissionUtils {
+
+    private static final String TAG = "PermissionUtils";
+    private static final Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
+
+
     /**
      * Returns a {@link List} of {@link PermissionInfo} instances representing all permissions
      * declared on the device; this result includes permissions declared by the platform as well as
@@ -48,9 +57,9 @@ public class PermissionUtils {
             try {
                 List<PermissionInfo> permissions = packageManager.queryPermissionsByGroup(
                         groupName, 0);
-                for (PermissionInfo permission : permissions) {
-                    declaredPermissions.add(permission);
-                }
+
+                declaredPermissions.addAll(permissions);
+
             } catch (PackageManager.NameNotFoundException e) {
                 StatusLogger.logError("Caught a NameNotFoundException for group " + groupName, e);
             }
@@ -72,4 +81,15 @@ public class PermissionUtils {
         }
         return platformPermissions;
     }
+
+
+    public static void checkTester(BasePermissionTester tester){
+        Map<String, BasePermissionTester.PermissionTest> pt =tester.getRegisteredPermissions();
+        sLogger.logInfo("Tester Name: "+tester.getClass().getName());
+        for(Map.Entry<String,BasePermissionTester.PermissionTest> entry:pt.entrySet()){
+            BasePermissionTester.PermissionTest test = entry.getValue();
+            sLogger.logInfo("  >"+entry.getKey()+"(min:"+test.mMinApiLevel+",max:"+test.mMaxApiLevel+")");
+        }
+    }
+
 }

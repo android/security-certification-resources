@@ -1,6 +1,6 @@
 /*
 
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 33
+
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.android.certifications.niap.sdp"
         minSdkVersion 28
-        targetSdkVersion 33
+        targetSdkVersion 31
+
         versionCode 1
         versionName "1.0"
 
@@ -39,8 +41,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
     }
 }
 

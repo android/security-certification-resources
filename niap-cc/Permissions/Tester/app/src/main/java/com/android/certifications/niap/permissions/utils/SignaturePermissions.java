@@ -974,7 +974,138 @@ public class SignaturePermissions {
                 "android.permission.WIFI_UPDATE_COEX_UNSAFE_CHANNELS";
         public static final String USE_SYSTEM_DATA_LOADERS =
                 "com.android.permission.USE_SYSTEM_DATA_LOADERS";
+        // The following are the new signature permissions for Android SV2
+        public static final String TRIGGER_SHELL_PROFCOLLECT_UPLOAD =
+                "android.permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD";
+        public static final String ALLOW_PLACE_IN_MULTI_PANE_SETTINGS =
+                "android.permission.ALLOW_PLACE_IN_MULTI_PANE_SETTINGS";
+        public static final String LAUNCH_MULTI_PANE_SETTINGS_DEEP_LINK =
+                "android.permission.LAUNCH_MULTI_PANE_SETTINGS_DEEP_LINK";
+        public static final String ALLOW_SLIPPERY_TOUCHES =
+                "android.permission.ALLOW_SLIPPERY_TOUCHES";
 
+        // New Signature permissions as of Android 13
+        public static final String LOCATION_BYPASS =
+                "android.permission.LOCATION_BYPASS";
+        public static final String CONTROL_AUTOMOTIVE_GNSS =
+                "android.permission.CONTROL_AUTOMOTIVE_GNSS";
+        public static final String MANAGE_WIFI_NETWORK_SELECTION =
+                "android.permission.MANAGE_WIFI_NETWORK_SELECTION";
+        public static final String MANAGE_WIFI_INTERFACES =
+                "android.permission.MANAGE_WIFI_INTERFACES";
+        public static final String TRIGGER_LOST_MODE =
+                "android.permission.TRIGGER_LOST_MODE";
+        public static final String START_CROSS_PROFILE_ACTIVITIES =
+                "android.permission.START_CROSS_PROFILE_ACTIVITIES";
+        public static final String QUERY_USERS =
+                "android.permission.QUERY_USERS";
+        public static final String QUERY_ADMIN_POLICY =
+                "android.permission.QUERY_ADMIN_POLICY";
+        public static final String PROVISION_DEMO_DEVICE =
+                "android.permission.PROVISION_DEMO_DEVICE";
+        public static final String REQUEST_COMPANION_PROFILE_APP_STREAMING =
+                "android.permission.REQUEST_COMPANION_PROFILE_APP_STREAMING";
+        public static final String REQUEST_COMPANION_PROFILE_COMPUTER =
+                "android.permission.REQUEST_COMPANION_PROFILE_COMPUTER";
+        public static final String REQUEST_COMPANION_SELF_MANAGED =
+                "android.permission.REQUEST_COMPANION_SELF_MANAGED";
+        public static final String READ_APP_SPECIFIC_LOCALES =
+                "android.permission.READ_APP_SPECIFIC_LOCALES";
+        public static final String USE_ATTESTATION_VERIFICATION_SERVICE =
+                "android.permission.USE_ATTESTATION_VERIFICATION_SERVICE";
+        public static final String VERIFY_ATTESTATION =
+                "android.permission.VERIFY_ATTESTATION";
+        public static final String BIND_ATTESTATION_VERIFICATION_SERVICE =
+                "android.permission.BIND_ATTESTATION_VERIFICATION_SERVICE";
+        public static final String REQUEST_UNIQUE_ID_ATTESTATION =
+                "android.permission.REQUEST_UNIQUE_ID_ATTESTATION";
+        public static final String GET_HISTORICAL_APP_OPS_STATS =
+                "android.permission.GET_HISTORICAL_APP_OPS_STATS";
+        public static final String SET_SYSTEM_AUDIO_CAPTION =
+                "android.permission.SET_SYSTEM_AUDIO_CAPTION";
+        public static final String BIND_GAME_SERVICE =
+                "android.permission.BIND_GAME_SERVICE";
+        public static final String BIND_SELECTION_TOOLBAR_RENDER_SERVICE =
+                "android.permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE";
+        public static final String BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE =
+                "android.permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE";
+        public static final String BIND_TV_INTERACTIVE_APP =
+                "android.permission.BIND_TV_INTERACTIVE_APP";
+        public static final String INSTALL_DPC_PACKAGES =
+                "android.permission.INSTALL_DPC_PACKAGES";
+        public static final String REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL =
+                "android.permission.REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL";
+        public static final String DELIVER_COMPANION_MESSAGES =
+                "android.permission.DELIVER_COMPANION_MESSAGES";
+        public static final String MODIFY_TOUCH_MODE_STATE =
+                "android.permission.MODIFY_TOUCH_MODE_STATE";
+        public static final String MODIFY_USER_PREFERRED_DISPLAY_MODE =
+                "android.permission.MODIFY_USER_PREFERRED_DISPLAY_MODE";
+        public static final String ACCESS_ULTRASOUND =
+                "android.permission.ACCESS_ULTRASOUND";
+        public static final String CALL_AUDIO_INTERCEPTION =
+                "android.permission.CALL_AUDIO_INTERCEPTION";
+        public static final String MANAGE_LOW_POWER_STANDBY =
+                "android.permission.MANAGE_LOW_POWER_STANDBY";
+        public static final String ACCESS_BROADCAST_RESPONSE_STATS =
+                "android.permission.ACCESS_BROADCAST_RESPONSE_STATS";
+        public static final String CHANGE_APP_LAUNCH_TIME_ESTIMATE =
+                "android.permission.CHANGE_APP_LAUNCH_TIME_ESTIMATE";
+        public static final String SET_WALLPAPER_DIM_AMOUNT =
+                "android.permission.SET_WALLPAPER_DIM_AMOUNT";
+        public static final String MANAGE_WEAK_ESCROW_TOKEN =
+                "android.permission.MANAGE_WEAK_ESCROW_TOKEN";
+        public static final String START_REVIEW_PERMISSION_DECISIONS =
+                "android.permission.START_REVIEW_PERMISSION_DECISIONS";
+        public static final String START_VIEW_APP_FEATURES =
+                "android.permission.START_VIEW_APP_FEATURES";
+        public static final String MANAGE_CLOUDSEARCH =
+                "android.permission.MANAGE_CLOUDSEARCH";
+        public static final String MANAGE_WALLPAPER_EFFECTS_GENERATION =
+                "android.permission.MANAGE_WALLPAPER_EFFECTS_GENERATION";
+        public static final String SUPPRESS_CLIPBOARD_ACCESS_NOTIFICATION =
+                "android.permission.SUPPRESS_CLIPBOARD_ACCESS_NOTIFICATION";
+        public static final String ACCESS_TV_SHARED_FILTER =
+                "android.permission.ACCESS_TV_SHARED_FILTER";
+        public static final String ADD_ALWAYS_UNLOCKED_DISPLAY =
+                "android.permission.ADD_ALWAYS_UNLOCKED_DISPLAY";
+        public static final String SET_GAME_SERVICE =
+                "android.permission.SET_GAME_SERVICE";
+        public static final String ACCESS_FPS_COUNTER =
+                "android.permission.ACCESS_FPS_COUNTER";
+        public static final String MANAGE_GAME_ACTIVITY =
+                "android.permission.MANAGE_GAME_ACTIVITY";
+        public static final String LAUNCH_DEVICE_MANAGER_SETUP =
+                "android.permission.LAUNCH_DEVICE_MANAGER_SETUP";
+        public static final String UPDATE_DEVICE_MANAGEMENT_RESOURCES =
+                "android.permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES";
+        public static final String READ_SAFETY_CENTER_STATUS =
+                "android.permission.READ_SAFETY_CENTER_STATUS";
+        public static final String BIND_AMBIENT_CONTEXT_DETECTION_SERVICE =
+                "android.permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE";
+        public static final String SET_UNRESTRICTED_KEEP_CLEAR_AREAS =
+                "android.permission.SET_UNRESTRICTED_KEEP_CLEAR_AREAS";
+        public static final String TIS_EXTENSION_INTERFACE =
+                "android.permission.TIS_EXTENSION_INTERFACE";
+        public static final String WRITE_SECURITY_LOG =
+                "android.permission.WRITE_SECURITY_LOG";
+        public static final String MAKE_UID_VISIBLE =
+                "android.permission.MAKE_UID_VISIBLE";
+        // New Internal permissions as of Android 13
+        public static final String REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION =
+                "android.permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION";
+        public static final String BIND_TRACE_REPORT_SERVICE =
+                "android.permission.BIND_TRACE_REPORT_SERVICE";
+        public static final String SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE =
+                "android.permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE";
+        public static final String CREATE_VIRTUAL_DEVICE =
+                "android.permission.CREATE_VIRTUAL_DEVICE";
+        public static final String SEND_SAFETY_CENTER_UPDATE =
+                "android.permission.SEND_SAFETY_CENTER_UPDATE";
+        public static final String ACCESS_AMBIENT_CONTEXT_EVENT =
+                "android.permission.ACCESS_AMBIENT_CONTEXT_EVENT";
+        public static final String MANAGE_ETHERNET_NETWORKS =
+                "android.permission.MANAGE_ETHERNET_NETWORKS";
     }
 
     /**

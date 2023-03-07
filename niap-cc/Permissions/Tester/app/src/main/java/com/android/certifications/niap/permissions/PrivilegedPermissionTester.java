@@ -36,7 +36,7 @@ public class PrivilegedPermissionTester extends SignaturePermissionTester {
     private static final String TAG = "PrivilegedPermissionTester";
     private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
 
-    private boolean mIsPrivApp;
+    private final boolean mIsPrivApp;
 
     public PrivilegedPermissionTester(TestConfiguration configuration, Activity activity) {
         super(configuration, activity);
@@ -131,7 +131,7 @@ public class PrivilegedPermissionTester extends SignaturePermissionTester {
                 && !mDevelopmentPermissions.contains(permission)) {
             testPassed = false;
         }
-        if (mPlatformSignatureMatch && permissionGranted != true) {
+        if (mPlatformSignatureMatch && !permissionGranted) {
             testPassed = false;
         }
         // the API should only be successful when the permission is granted.

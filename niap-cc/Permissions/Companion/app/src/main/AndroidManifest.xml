@@ -19,10 +19,11 @@
 
     <!-- The app does not use this permission, but it is requested so that it can be revoked during
          the REVOKE_RUNTIME_PERMISSIONS test. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
+    <uses-permission android:name="android.permission.LAUNCH_DEVICE_MANAGER_SETUP"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -30,12 +31,47 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name="com.android.certifications.niap.permissions.companion.MainActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.android.certifications.niap.permissions.companion.PreProvisioningActivity"
+            android:excludeFromRecents="true"
+            android:immersive="true"
+            android:launchMode="singleTop"
+            android:exported="true"
+            android:permission="android.permission.LAUNCH_DEVICE_MANAGER_SETUP"
+            android:theme="@style/AppTheme">
+            <intent-filter android:priority="11">
+                <action android:name="android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.android.certifications.niap.permissions.companion.ViewPermissionUsageActivity"
+            android:excludeFromRecents="true"
+            android:immersive="true"
+            android:launchMode="singleTop"
+            android:exported="true"
+            android:permission="andorid.permission.START_VIEW_PERMISSION_USAGE"
+            android:theme="@style/AppTheme">
+            <intent-filter android:priority="11">
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name="com.android.certifications.niap.permissions.companion.services.TestBindPreProvisioningActivityService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.LAUNCH_DEVICE_MANAGER_SETUP" />
 
         <service
             android:name="com.android.certifications.niap.permissions.companion.services.TestBindIncallServiceService"
@@ -413,6 +449,37 @@
             android:permission="android.permission.BIND_TRANSLATION_SERVICE"
             android:enabled="true"
             android:exported="true" />
+        <!-- Services for android T -->
+
+        <service android:name=".services.TestBindAmbientContextDetectionServiceService"
+            android:permission="android.permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindTvInteractiveAppService"
+            android:permission="android.permission.BIND_TV_INTERACTIVE_APP"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindWallpaperEffectsGenerationServiceService"
+            android:permission="android.permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindSelectionToolbarRenderServiceService"
+            android:permission="android.permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindGameServiceService"
+            android:permission="android.permission.BIND_GAME_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindTraceReportServiceService"
+            android:permission="android.permission.BIND_TRACE_REPORT_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".services.TestBindAttestationVerificationServiceService"
+            android:permission="android.permission.BIND_ATTESTATION_VERIFICATION_SERVICE"
+            android:enabled="true"
+            android:exported="true" />
+
 
     </application>
 

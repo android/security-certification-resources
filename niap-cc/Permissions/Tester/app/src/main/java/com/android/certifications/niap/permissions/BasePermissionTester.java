@@ -26,6 +26,8 @@ import android.content.pm.Signature;
 import android.content.res.Resources;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
+
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -37,6 +39,7 @@ import com.android.certifications.niap.permissions.utils.Transacts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -121,6 +124,8 @@ public abstract class BasePermissionTester {
      */
     public abstract boolean runPermissionTests();
 
+    public abstract Map<String,PermissionTest> getRegisteredPermissions();
+
     /**
      * @see #runPermissionTest(String, PermissionTest, boolean)
      */
@@ -199,7 +204,7 @@ public abstract class BasePermissionTester {
                 mLogger.logDebug("Caught a SecurityException for permission " + permission + ": ",
                         e);
                 if (e.getCause() != null) {
-                    mLogger.logDebug("SecuritionException cause: ", e.getCause());
+                    mLogger.logDebug("SecurityException cause: ", e.getCause());
                 }
                 testPassed = getAndLogTestStatus(permission, permissionGranted, false);
             } catch (UnexpectedPermissionTestFailureException e) {
@@ -238,6 +243,8 @@ public abstract class BasePermissionTester {
     }
 
     protected static HashMap<String, ArrayList<String>> mInvokedTransacts = new HashMap<>();
+
+
 
     /**
      * Encapsulates components required for a permission test. The main component is the {@link
@@ -312,6 +319,17 @@ public abstract class BasePermissionTester {
          */
         public void runTest() {
             mTestRunnable.run();
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "PermissionTest{" +
+                    "mIsCustom=" + mIsCustom +
+                    ", mTestRunnable=" + mTestRunnable +
+                    ", mMinApiLevel=" + mMinApiLevel +
+                    ", mMaxApiLevel=" + mMaxApiLevel +
+                    '}';
         }
     }
 

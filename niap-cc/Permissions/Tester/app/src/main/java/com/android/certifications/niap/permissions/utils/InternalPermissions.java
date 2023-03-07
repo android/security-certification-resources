@@ -46,5 +46,27 @@ public class InternalPermissions {
                 "android.permission.PERFORM_IMS_SINGLE_REGISTRATION";
         public static final String RECORD_BACKGROUND_AUDIO =
                 "android.permission.RECORD_BACKGROUND_AUDIO";
+
+        //Android T(13)
+        public static final String SET_DEFAULT_ACCOUNT_FOR_CONTACTS =
+                "android.permission.SET_DEFAULT_ACCOUNT_FOR_CONTACTS";
+        public static final String REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION =
+                "android.permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION";
+        public static final String BIND_TRACE_REPORT_SERVICE =
+                "android.permission.BIND_TRACE_REPORT_SERVICE";
+        public static final String SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE =
+                "android.permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE";
+        public static final String READ_ASSISTANT_APP_SEARCH_DATA =
+                "android.permission.READ_ASSISTANT_APP_SEARCH_DATA";
+        public static final String READ_HOME_APP_SEARCH_DATA =
+                "android.permission.READ_HOME_APP_SEARCH_DATA";
+        public static final String SEND_SAFETY_CENTER_UPDATE =
+            "android.permission.SEND_SAFETY_CENTER_UPDATE";
+        public static final String CREATE_VIRTUAL_DEVICE =
+                "android.permission.CREATE_VIRTUAL_DEVICE";
+        public static final String ACCESS_AMBIENT_CONTEXT_EVENT =
+                "android.permission.ACCESS_AMBIENT_CONTEXT_EVENT";
+        public static final String MANAGE_SAFETY_CENTER =
+                "android.permission.MANAGE_SAFETY_CENTER";
     }
 }

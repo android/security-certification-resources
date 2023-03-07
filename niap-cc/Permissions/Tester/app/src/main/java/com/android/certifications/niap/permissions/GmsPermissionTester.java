@@ -17,6 +17,7 @@
 package com.android.certifications.niap.permissions;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -26,6 +27,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.location.Location;
+import android.os.Build;
 import android.util.SparseArray;
 
 import com.android.certifications.niap.permissions.config.TestConfiguration;
@@ -56,7 +58,6 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
 
 import java.io.IOException;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -181,12 +182,13 @@ public class GmsPermissionTester extends BasePermissionTester {
                 "com.google.android.gms.vehicle.permission.SHARED_AUTO_SENSOR_DATA");
     }
 
+    @SuppressLint("MissingPermission")
     public GmsPermissionTester(TestConfiguration configuration, Activity activity) {
         super(configuration, activity);
         mPermissionTasks = new HashMap<>();
 
         mPermissionTasks.put(Manifest.permission.ACTIVITY_RECOGNITION,
-                new PermissionTest(false, () -> {
+                new PermissionTest(false,Build.VERSION_CODES.Q, () -> {
                     final String ACTIVITY_RECOGNITION_TEST = "ACTIVITY_RECOGNITION_TEST";
                     CountDownLatch[] latch = new CountDownLatch[1];
                     latch[0] = new CountDownLatch(1);
@@ -223,7 +225,8 @@ public class GmsPermissionTester extends BasePermissionTester {
                     // the Task from the #requestActivityUpdates to complete.
                     ActivityRecognitionClient activityClient = ActivityRecognition.getClient(
                             mContext);
-                    Task<Void> activityRecognitionTask = activityClient.requestActivityUpdates(0, pendingIntent);
+                    Task<Void> activityRecognitionTask =
+                            activityClient.requestActivityUpdates(0, pendingIntent);
                     try {
                         Tasks.await(activityRecognitionTask, 10, TimeUnit.SECONDS);
                     } catch (ExecutionException | TimeoutException | InterruptedException e) {
@@ -293,7 +296,7 @@ public class GmsPermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(Manifest.permission.ACCESS_FINE_LOCATION,
-                new PermissionTest(false, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.Q,() -> {
                     Task<Location> locationTask = LocationServices.getFusedLocationProviderClient(
                             mContext).getLastLocation();
                     try {
@@ -485,5 +488,9 @@ public class GmsPermissionTester extends BasePermissionTester {
                 .map(permission -> permission.name)
                 .collect(Collectors.toList());
 
+    }
+    @Override
+    public Map<String,PermissionTest> getRegisteredPermissions() {
+        return mPermissionTasks;
     }
 }

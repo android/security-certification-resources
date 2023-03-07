@@ -17,22 +17,39 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
+
+    signingConfigs {
+        platform {
+            storeFile file("../signature/platform.jks")
+            storePassword "android"
+            keyPassword "android"
+            keyAlias "platform"
+        }
+    }
 
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions.transactids"
         minSdkVersion 28
-        targetSdkVersion 31
+        targetSdkVersion 32
         versionCode 1
         versionName "1.0"
-
+        signingConfig signingConfigs.platform
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
+            signingConfig null
+            debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.platform
+        }
+        debug {
+            signingConfig null
+            debuggable true
+            signingConfig signingConfigs.platform
         }
     }
 }

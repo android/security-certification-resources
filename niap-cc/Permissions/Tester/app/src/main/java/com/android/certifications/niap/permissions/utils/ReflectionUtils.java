@@ -16,9 +16,13 @@
 
 package com.android.certifications.niap.permissions.utils;
 
+import android.util.Log;
 import com.android.certifications.niap.permissions.BasePermissionTester;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Provides utility methods for invoking methods via reflection.
@@ -42,11 +46,61 @@ public class ReflectionUtils {
             return method.invoke(targetObject, parameters);
         } catch (ReflectiveOperationException e) {
             Throwable cause = e.getCause();
-            if (cause != null && cause instanceof SecurityException) {
+            if (cause instanceof SecurityException) {
                 throw (SecurityException) cause;
             } else {
                 throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
             }
         }
+    }
+
+    //recursive function to search am exception in the nested stack trace
+    public static boolean findCauseInStackTraceElement(Boolean resp,Throwable ex,String nameMatches)
+    {
+        //Log.d("!*!name matches","in:"+resp+">"+ex.getClass().toString());
+        //boolean bRet=false;
+        if(ex.getCause() != null){
+            resp = findCauseInStackTraceElement(resp,ex.getCause(),nameMatches);
+        }
+        if(resp) {
+            return true;
+        } else {
+            if(ex.getClass().toString().indexOf(nameMatches)>-1){
+                //Log.d("!*!name matches", ex.getClass().toString() + "??" + nameMatches);
+                resp = true;
+            }
+            return resp;
+        }
+    }
+
+    /**
+     * List up declared methods of specified object. it is intended to check the prototype of
+     * transacts api.
+     */
+    public static List<String> checkDeclaredMethod(Object target,final String filter){
+        List<String> a = new ArrayList<>();
+        Class<?> clazz = target.getClass();
+        Method[] methods = clazz.getDeclaredMethods();
+        for(Method m : methods){
+            StringBuilder method = new StringBuilder(m.getName() + "(");
+            Class<?>[] types = m.getParameterTypes();
+            for(Class<?> t:types) method.append(" ").append(t.getTypeName());
+            a.add(method+")");
+        }
+        return a.stream().filter(str->str.startsWith(filter)).collect(Collectors.toList());
+    }
+
+    public static List<String> checkDeclaredMethod(Class<?> clazz,final String f){
+        List<String> a = new ArrayList<>();
+        Method[] methods = clazz.getDeclaredMethods();
+        for(Method m : methods){
+            StringBuilder method = new StringBuilder(m.getName() + "(");
+            Class<?>[] types = m.getParameterTypes();
+            for(Class<?> t:types){
+                method.append(" ").append(t.getTypeName());
+            }
+            a.add(method+")");
+        }
+        return a.stream().filter(str->str.startsWith(f)).collect(Collectors.toList());
     }
 }

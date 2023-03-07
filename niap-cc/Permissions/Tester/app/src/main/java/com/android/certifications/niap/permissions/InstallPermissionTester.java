@@ -28,7 +28,6 @@ import static android.Manifest.permission.DISABLE_KEYGUARD;
 import static android.Manifest.permission.EXPAND_STATUS_BAR;
 import static android.Manifest.permission.FOREGROUND_SERVICE;
 import static android.Manifest.permission.HIDE_OVERLAY_WINDOWS;
-import static android.Manifest.permission.HIGH_SAMPLING_RATE_SENSORS;
 import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.KILL_BACKGROUND_PROCESSES;
 import static android.Manifest.permission.MANAGE_OWN_CALLS;
@@ -36,6 +35,8 @@ import static android.Manifest.permission.MODIFY_AUDIO_SETTINGS;
 import static android.Manifest.permission.NFC;
 import static android.Manifest.permission.NFC_PREFERRED_PAYMENT_INFO;
 import static android.Manifest.permission.QUERY_ALL_PACKAGES;
+import static android.Manifest.permission.READ_BASIC_PHONE_STATE;
+import static android.Manifest.permission.READ_NEARBY_STREAMING_POLICY;
 import static android.Manifest.permission.READ_SYNC_SETTINGS;
 import static android.Manifest.permission.READ_SYNC_STATS;
 import static android.Manifest.permission.REORDER_TASKS;
@@ -48,16 +49,17 @@ import static android.Manifest.permission.SET_WALLPAPER;
 import static android.Manifest.permission.SET_WALLPAPER_HINTS;
 import static android.Manifest.permission.TRANSMIT_IR;
 import static android.Manifest.permission.USE_BIOMETRIC;
-import static android.Manifest.permission.USE_FINGERPRINT;
+import static android.Manifest.permission.USE_EXACT_ALARM;
 import static android.Manifest.permission.USE_FULL_SCREEN_INTENT;
 import static android.Manifest.permission.VIBRATE;
 import static android.Manifest.permission.WAKE_LOCK;
 import static android.Manifest.permission.WRITE_SYNC_SETTINGS;
-
 import static com.android.certifications.niap.permissions.Constants.EXTRA_PERMISSION_GRANTED;
 import static com.android.certifications.niap.permissions.Constants.EXTRA_PERMISSION_NAME;
 import static com.android.certifications.niap.permissions.utils.ReflectionUtils.invokeReflectionCall;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
@@ -84,10 +86,6 @@ import android.content.pm.VersionedPackage;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.hardware.ConsumerIrManager;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.hardware.biometrics.BiometricManager;
 import android.hardware.fingerprint.FingerprintManager;
 import android.media.AudioManager;
@@ -101,8 +99,6 @@ import android.net.wifi.WifiManager;
 import android.nfc.NfcAdapter;
 import android.nfc.cardemulation.CardEmulation;
 import android.os.Build;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -110,6 +106,9 @@ import android.service.notification.StatusBarNotification;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
+import android.telephony.TelephonyManager;
+
+import androidx.core.app.ActivityCompat;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.activities.TestActivity;
@@ -118,6 +117,7 @@ import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
 import com.android.certifications.niap.permissions.services.TestService;
+import com.android.certifications.niap.permissions.utils.Transacts;
 
 import java.net.ServerSocket;
 import java.net.SocketException;
@@ -177,7 +177,15 @@ public class InstallPermissionTester extends BasePermissionTester {
                 new PermissionTest(false, () -> mConnectivityManager.getActiveNetwork()));
 
         mPermissionTasks.put(ACCESS_WIFI_STATE,
-                new PermissionTest(false, () -> mWifiManager.getConfiguredNetworks()));
+                new PermissionTest(false, () -> {
+                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        throw new BypassTestException(
+                                "ACCESS_FINLE_LOCATION permission should be granted to run this test case");
+                    }
+                    mWifiManager.getConfiguredNetworks();
+
+                }));
 
         // android.permission.AUTHENTICATE_ACCOUNTS has been removed.
 
@@ -185,27 +193,27 @@ public class InstallPermissionTester extends BasePermissionTester {
         // been replaced by the new runtime BLUETOOTH permissions.
         mPermissionTasks.put(BLUETOOTH,
                 new PermissionTest(false, Build.VERSION_CODES.P, Build.VERSION_CODES.R, () -> {
-            if (mBluetoothAdapter == null) {
-                throw new BypassTestException(
-                        "A bluetooth adapter is not available to run this test");
-            }
-            mBluetoothAdapter.getAddress();
-        }));
+                    if (mBluetoothAdapter == null) {
+                        throw new BypassTestException(
+                                "A bluetooth adapter is not available to run this test");
+                    }
+                    mBluetoothAdapter.getAddress();
+                }));
 
         // Starting in Android 12 the BLUETOOTH_ADMIN permission is no longer used and has instead
         // been replaced by the new runtime BLUETOOTH permissions.
         mPermissionTasks.put(BLUETOOTH_ADMIN,
                 new PermissionTest(false, Build.VERSION_CODES.P, Build.VERSION_CODES.R, () -> {
-            if (mBluetoothAdapter == null) {
-                throw new BypassTestException(
-                        "A bluetooth adapter is not available to run this test");
-            }
-            if (mBluetoothAdapter.isEnabled()) {
-                mBluetoothAdapter.disable();
-                mBluetoothAdapter.enable();
-            } else {
-                mBluetoothAdapter.enable();
-            }
+                    if (mBluetoothAdapter == null) {
+                        throw new BypassTestException(
+                                "A bluetooth adapter is not available to run this test");
+                    }
+                    if (mBluetoothAdapter.isEnabled()) {
+                        mBluetoothAdapter.disable();
+                        mBluetoothAdapter.enable();
+                    } else {
+                        mBluetoothAdapter.enable();
+                    }
         }));
 
         mPermissionTasks.put(BROADCAST_STICKY, new PermissionTest(false, () -> {
@@ -241,7 +249,7 @@ public class InstallPermissionTester extends BasePermissionTester {
         }));
 
         mPermissionTasks.put(EXPAND_STATUS_BAR, new PermissionTest(false, () -> {
-            Object statusBarManager = mContext.getSystemService("statusbar");
+            @SuppressLint("WrongConstant") Object statusBarManager = mContext.getSystemService("statusbar");
             invokeReflectionCall(statusBarManager.getClass(), "expandNotificationsPanel",
                     statusBarManager, null);
             // A short sleep is required to allow the notification panel to be expanded before
@@ -420,7 +428,7 @@ public class InstallPermissionTester extends BasePermissionTester {
         // android.permission.UNINSTALL_SHORTCUT is no longer used.
 
         mPermissionTasks.put(USE_BIOMETRIC, new PermissionTest(false, () -> {
-            if (mDeviceApiLevel == Build.VERSION_CODES.P) {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
                 FingerprintManager fingerprintManager =
                         (FingerprintManager) mContext.getSystemService(
                                 Context.FINGERPRINT_SERVICE);
@@ -434,30 +442,25 @@ public class InstallPermissionTester extends BasePermissionTester {
                 // for this permission. Android 10 introduced the canAuthenticate method while
                 // Android 11 deprecated that in favor of an overloaded version that accepts
                 // an int representing Authenticators.
-                BiometricManager biometricManager = (BiometricManager) mContext.getSystemService(
+                BiometricManager biometricManager = null;
+
+                biometricManager = (BiometricManager) mContext.getSystemService(
                         Context.BIOMETRIC_SERVICE);
+
                 if (mDeviceApiLevel == Build.VERSION_CODES.Q) {
                     biometricManager.canAuthenticate();
-                } else {
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
                     biometricManager.canAuthenticate(
                             BiometricManager.Authenticators.BIOMETRIC_STRONG);
                 }
+
             }
         }));
 
         // android.permission.USE_CREDENTIALS has been removed.
 
-        mPermissionTasks.put(USE_FINGERPRINT,
-                new PermissionTest(false, () -> {
-                    FingerprintManager fingerprintManager =
-                            (FingerprintManager) mContext.getSystemService(
-                                    Context.FINGERPRINT_SERVICE);
-                    if (fingerprintManager == null) {
-                        throw new BypassTestException(
-                                "The FingerprintManager is not available on this device");
-                    }
-                    fingerprintManager.hasEnrolledFingerprints();
-                }));
+        // android.permission.USE_FINGERPRINT has been removed (as of SDK level 28)
+
 
         mPermissionTasks.put(VIBRATE, new PermissionTest(false, () -> mVibrator
                 .vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))));
@@ -466,7 +469,7 @@ public class InstallPermissionTester extends BasePermissionTester {
             PowerManager.WakeLock wakeLock = mPowerManager.newWakeLock(
                     PowerManager.PARTIAL_WAKE_LOCK,
                     InstallPermissionTester.class.getSimpleName() + "::" + TAG);
-            wakeLock.acquire();
+            wakeLock.acquire(10*60*1000L /*10 minutes*/);
             wakeLock.release();
         }));
 
@@ -486,10 +489,15 @@ public class InstallPermissionTester extends BasePermissionTester {
         // new install permissions for Q
         mPermissionTasks.put(REQUEST_PASSWORD_COMPLEXITY,
                 new PermissionTest(false, Build.VERSION_CODES.Q,
-                        () -> mDevicePolicyManager.getPasswordComplexity()));
+                        () -> {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                mDevicePolicyManager.getPasswordComplexity();
+                            }
+                }));
 
         mPermissionTasks.put(USE_FULL_SCREEN_INTENT,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.Q,Build.VERSION_CODES.S, () -> {
+
                     Intent notificationIntent = new Intent(mContext, MainActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
                             notificationIntent, PendingIntent.FLAG_IMMUTABLE);
@@ -520,6 +528,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     }
                     StatusBarNotification[] notifications =
                             notificationManager.getActiveNotifications();
+
                     if (notifications.length == 0) {
                         throw new SecurityException(
                                 "fullScreenIntent not displayed as an active notification");
@@ -535,13 +544,15 @@ public class InstallPermissionTester extends BasePermissionTester {
         // new install permissions for R
         mPermissionTasks.put(NFC_PREFERRED_PAYMENT_INFO,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
-                    NfcAdapter adapter = NfcAdapter.getDefaultAdapter(mContext);
-                    if (adapter == null) {
-                        throw new BypassTestException(
-                                "An NFC adapter is not available to run this test");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(mContext);
+                        if (adapter == null) {
+                            throw new BypassTestException(
+                                    "An NFC adapter is not available to run this test");
+                        }
+                        CardEmulation cardEmulation = CardEmulation.getInstance(adapter);
+                        cardEmulation.getDescriptionForPreferredPaymentService();
                     }
-                    CardEmulation cardEmulation = CardEmulation.getInstance(adapter);
-                    cardEmulation.getDescriptionForPreferredPaymentService();
                 }));
 
         mPermissionTasks.put(QUERY_ALL_PACKAGES,
@@ -567,11 +578,14 @@ public class InstallPermissionTester extends BasePermissionTester {
                     // run the API here where the SecurityException can be handled, and if the
                     // permission is granted then run it on the UI thread since an exception should
                     // not be thrown in that case.
-                    if (mContext.checkSelfPermission(HIDE_OVERLAY_WINDOWS) != PackageManager.PERMISSION_GRANTED) {
-                        mActivity.getWindow().setHideOverlayWindows(true);
-                    } else {
-                        mActivity.runOnUiThread(
-                                () -> mActivity.getWindow().setHideOverlayWindows(true));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        if (mContext.checkSelfPermission(HIDE_OVERLAY_WINDOWS) != PackageManager.PERMISSION_GRANTED) {
+                            mActivity.getWindow().setHideOverlayWindows(true);
+                        } else {
+                            mActivity.runOnUiThread(
+                                    () -> mActivity.getWindow().setHideOverlayWindows(true));
+
+                        }
                     }
                 }));
 
@@ -587,24 +601,28 @@ public class InstallPermissionTester extends BasePermissionTester {
                                         + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
                                         + "for this test");
                     }
-                    AssociationRequest request = new AssociationRequest.Builder().setDeviceProfile(
-                            AssociationRequest.DEVICE_PROFILE_WATCH).build();
-                    CompanionDeviceManager.Callback callback =
-                            new CompanionDeviceManager.Callback() {
-                                @Override
-                                public void onDeviceFound(IntentSender intentSender) {
-                                    mLogger.logDebug(
-                                            "onDeviceFound: intentSender = " + intentSender);
-                                }
+                    AssociationRequest request = null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        request = new AssociationRequest.Builder().setDeviceProfile(
+                                AssociationRequest.DEVICE_PROFILE_WATCH).build();
+                        CompanionDeviceManager.Callback callback =
+                                new CompanionDeviceManager.Callback() {
+                                    @Override
+                                    public void onDeviceFound(IntentSender intentSender) {
+                                        mLogger.logDebug(
+                                                "onDeviceFound: intentSender = " + intentSender);
+                                    }
 
-                                @Override
-                                public void onFailure(CharSequence charSequence) {
-                                    mLogger.logDebug("onFailure: charSequence = " + charSequence);
-                                }
-                            };
-                    CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
-                            CompanionDeviceManager.class);
-                    companionDeviceManager.associate(request, callback, null);
+                                    @Override
+                                    public void onFailure(CharSequence charSequence) {
+                                        mLogger.logDebug("onFailure: charSequence = " + charSequence);
+                                    }
+                                };
+                        CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
+                                CompanionDeviceManager.class);
+                        companionDeviceManager.associate(request, callback, null);
+                    }
+
                 }));
 
         mPermissionTasks.put(REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE,
@@ -615,9 +633,11 @@ public class InstallPermissionTester extends BasePermissionTester {
                     // Exception was not thrown back to this test. If in a future release this test
                     // fails because the Exception crosses the binder call then this test will need
                     // to differentiate between a SecurityException and the RuntimeException.
-                    CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
-                            CompanionDeviceManager.class);
-                    companionDeviceManager.startObservingDevicePresence("11:22:33:44:55:66");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
+                                CompanionDeviceManager.class);
+                        companionDeviceManager.startObservingDevicePresence("11:22:33:44:55:66");
+                    }
                 }));
 
         // UPDATE_PACKAGES_WITHOUT_USER_ACTION requires a package that can be used for the update
@@ -633,6 +653,43 @@ public class InstallPermissionTester extends BasePermissionTester {
                             pendingIntent);
                     alarmManager.cancel(pendingIntent);
                 }));
+
+        //New Install Permissions for T
+
+        //Allows read only access to phone state with a non dangerous permission,
+        //including the information like cellular network type, software version.
+        mPermissionTasks.put(READ_BASIC_PHONE_STATE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    //Get Cellular network type
+                    TelephonyManager tm = mContext.getSystemService(TelephonyManager.class);
+                    tm.getDataNetworkType();
+                }));
+
+        mPermissionTasks.put(USE_EXACT_ALARM,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    // USE_EXACT_ALARM is an install permission, and that is only
+                    // differenceies against the SCHEDULE_EXACT_ALRAM permission.
+                    Intent intent = new Intent(mContext, MainActivity.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent,
+                            PendingIntent.FLAG_IMMUTABLE);
+                    AlarmManager alarmManager = mContext.getSystemService(AlarmManager.class);
+                    alarmManager.setExact(AlarmManager.RTC, System.currentTimeMillis() + 60 * 1000,
+                            pendingIntent);
+                    alarmManager.cancel(pendingIntent);
+                }));
+
+        mPermissionTasks.put(READ_NEARBY_STREAMING_POLICY,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                        //This permission's category has been moved to install permission after Android T
+                        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_DEVICE_ADMIN)) {
+                            throw new BypassTestException("This permission requires feature "
+                                    + PackageManager.FEATURE_DEVICE_ADMIN);
+                        }
+                        mTransacts.invokeTransact(Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.getNearbyNotificationStreamingPolicy, 0);
+                    }
+                ));
     }
 
     /**
@@ -656,5 +713,10 @@ public class InstallPermissionTester extends BasePermissionTester {
             StatusLogger.logInfo("!!! FAILED - one or more install permission tests failed");
         }
         return allTestsPassed;
+    }
+
+    @Override
+    public Map<String,PermissionTest> getRegisteredPermissions() {
+        return mPermissionTasks;
     }
 }

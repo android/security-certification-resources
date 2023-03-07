@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,13 @@ package com.android.certifications.niap;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -35,28 +32,21 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
-
 import com.android.certifications.niap.niapsec.SecureConfig;
 import com.android.certifications.niap.niapsec.biometric.BiometricSupport;
 import com.android.certifications.niap.niapsec.crypto.SecureCipher;
 import com.android.certifications.niap.niapsec.net.SecureURL;
 import com.android.certifications.niap.niapsecexample.R;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.android.certifications.niap.tests.SDPAuthFailureTestWorker;
 import com.android.certifications.niap.tests.SDPTestWorker;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import java.net.URLConnection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
-import static com.android.certifications.niap.EncryptedDataService.START_FOREGROUND_ACTION;
-import static com.android.certifications.niap.EncryptedDataService.STOP_FOREGROUND_ACTION;
 
 /**
  * Sample Tool for OEMs to run Sensitive Data Protection tests using the NIAPSEC library.
@@ -143,10 +133,12 @@ public class MainActivity extends FragmentActivity {
         OneTimeWorkRequest sdpFailureTestWorker =
                 new OneTimeWorkRequest.Builder(SDPAuthFailureTestWorker.class)
                         .build();
+
         WorkManager.getInstance()
                 .beginWith(sdpTestWorker)
                 .then(sdpFailureTestWorker)
                 .enqueue();
+
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<?> future = executor.submit(new Runnable() {
             @Override
@@ -156,6 +148,7 @@ public class MainActivity extends FragmentActivity {
                     SecureURL secureURL = new SecureURL("https://www.google.com", null);
                     URLConnection conn = secureURL.openConnection();
                     conn.connect();
+
                 } catch(Exception ex) {
                     Log.e(TAG, "SecureURL Failure: " + ex.getMessage());
                     Log.e(TAG, ex.getStackTrace().toString());
@@ -168,6 +161,7 @@ public class MainActivity extends FragmentActivity {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+
 
     }
 
@@ -199,19 +193,4 @@ public class MainActivity extends FragmentActivity {
             });
         });
     }
-
-    private void startEncyptionService() {
-        Intent startIntent = new Intent(MainActivity.this, EncryptedDataService.class);
-        startIntent.setAction(START_FOREGROUND_ACTION);
-        serviceRunning = true;
-        startService(startIntent);
-    }
-
-    private void stopEncyrptionService() {
-        Intent stopIntent = new Intent(MainActivity.this, EncryptedDataService.class);
-        stopIntent.setAction(STOP_FOREGROUND_ACTION);
-        serviceRunning = false;
-        startService(stopIntent);
-    }
-
 }

@@ -33,7 +33,7 @@ import java.util.List;
  * APIs behind platform permissions.
  */
 class GmsPermissionConfiguration implements TestConfiguration {
-    private Activity mActivity;
+    private final Activity mActivity;
 
     public GmsPermissionConfiguration(Activity activity) {
         mActivity = activity;
@@ -46,7 +46,6 @@ class GmsPermissionConfiguration implements TestConfiguration {
             throw new BypassConfigException(
                     mActivity.getResources().getString(R.string.gms_not_available));
         }
-        return;
     }
 
     @Override

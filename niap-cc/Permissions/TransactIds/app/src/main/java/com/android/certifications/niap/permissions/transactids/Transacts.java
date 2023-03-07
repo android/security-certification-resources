@@ -292,6 +292,91 @@ public class Transacts {
     public static final String WINDOW_SERVICE = Context.WINDOW_SERVICE;
     public static final String WINDOW_DESCRIPTOR = "android.view.IWindowManager";
 
+    //For Android T
+    public static final String AMBIENT_CONTEXT_MANAGER_SERVICE =
+            "ambient_context";
+    public static final String AMBIENT_CONTEXT_MANAGER_DESCRIPTOR =
+            "android.app.ambientcontext.IAmbientContextManager";
+    public static final String queryServiceStatus="queryServiceStatus";
+
+    public static final String SAFETY_CENTER_MANAGER_SERVICE =
+            "safety_center";
+    public static final String SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR =
+            "android.safetycenter.ISafetyCenterManager";
+    public static final String isSafetyCenterEnabled="isSafetyCenterEnabled";
+    public static final String getSafetyCenterConfig="getSafetyCenterConfig";
+    public static final String getSafetySourceData="getSafetySourceData";
+
+    public static final String VIRTUAL_DEVICE_MANAGER_SERVICE = "virtualdevice";
+    public static final String VIRTUAL_DEVICE_MANAGER_DESCRIPTOR =
+            "android.companion.virtual.IVirtualDeviceManager";
+    public static final String createVirtualDevice="createVirtualDevice";
+    //For SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE permission of IWindowManger
+    public static final String addKeyguardLockedStateListener
+            ="addKeyguardLockedStateListener";
+    public static final String removeKeyguardLockedStateListener
+            ="removeKeyguardLockedStateListener";
+
+    public static final String ATTESTATION_VERIFICATION_SERVICE = "attestation_verification";
+    public static final String ATTESTATION_VERIFICATION_DESCRIPTOR =
+            "android.security.attestationverification.IAttestationVerificationManagerService";
+
+    public static final String verifyAttestation = "verifyAttestation";
+    public static final String verifyToken = "verifyToken";
+
+    //WindowManager
+    public static final String setInTouchMode = "setInTouchMode";
+    public static final String getInTouchMode = "getInTouchMode";
+
+    //CloudSearchManager
+    public static final String CLOUDSEARCH_SERVICE = "cloudsearch";//Context.CLOUD_SEARCH
+    public static final String CLOUDSEARCH_DESCRIPTOR =
+            "android.app.cloudsearch.ICloudSearchManager";
+    public static final String search="search";
+    //WallPaperEffectsGenerationManager
+    public static final String WALLPAPER_EFFECTS_GENERATION_SERVICE =
+            "wallpaper_effects_generation";;
+    public static final String WALLPAPER_EFFECTS_GENERATION_DESCRIPTOR
+            = "android.app.wallpapereffectsgeneration.IWallpaperEffectsGenerationManager";
+    //generateCinematicEffect(in CinematicEffectRequest request,in ICinematicEffectListener listener);
+    public static final String generateCinematicEffect="generateCinematicEffect";
+    //ClibboardService#showAccessNotificationLocked(String callingPackage, int uid, @UserIdInt int userId,
+    //            PerUserClipboard clipboard) {
+    public static final String showAccessNotificationLocked="showAccessNotificationLocked";
+    //GameManagerService#setGameServiceProvider(@Nullable String packageName)
+    public static final String setGameServiceProvider="setGameServiceProvider";
+    public static final String createGameSession="createGameSession";
+    //WindowManagerService#registerTaskFpsCallback(@IntRange(from = 0) int taskId,ITaskFpsCallback callback)
+    public static final String registerTaskFpsCallback="registerTaskFpsCallback";
+
+    //TVManager
+    public static final String getAvailableExtensionInterfaceNames="getAvailableExtensionInterfaceNames";
+    //PackageManagerService#makeUidVisible
+    public static final String makeUidVisible="makeUidVisible";
+    //AppOpsService
+    public static final String getHistoricalOps="getHistoricalOps";
+    //DevicePolicyManager#
+    public static final String setStrings="setStrings";
+    public static final String getString="getString";
+    public static final String getPermittedInputMethodsAsUser="getPermittedInputMethodsAsUser";
+
+    public static final String dispatchMessage="dispatchMessage";
+    public static final String startActivityFromGameSession="startActivityFromGameSession";
+    public static final String getWifiSsidPolicy="getWifiSsidPolicy";
+    //AudioServcie#forceRemoteSubmixFullVolume
+    public static final String forceRemoteSubmixFullVolume="forceRemoteSubmixFullVolume";
+    public static final String isConvertibleToFBE="isConvertibleToFBE";
+    public static final String setProfileOwnerOnOrganizationOwnedDevice="setProfileOwnerOnOrganizationOwnedDevice";
+    public static final String cancelStateRequest="cancelStateRequest";
+    public static final String setUserPreferredDisplayMode="setUserPreferredDisplayMode";
+    public static final String stopAppForUser="stopAppForUser";
+
+    public static final String ETHERNET_MANAGER_SERVICE = "ethernet";
+    public static final String ETHERNET_MANAGER_DESCRIPTOR =
+            "android.net.IEthernetManager";
+    //public static final String stopAppForUser
+
+
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";
     public static final String getNextEntry = "getNextEntry";
@@ -362,6 +447,7 @@ public class Transacts {
     public static final String setAlwaysFinish = "setAlwaysFinish";
     public static final String addKeyboardLayoutForInputDevice = "addKeyboardLayoutForInputDevice";
     public static final String setWallpaper = "setWallpaper";
+    public static final String setWallpaperComponent = "setWallpaperComponent";
     public static final String setStandbyEnabled = "setStandbyEnabled";
     public static final String getCacheSizeBytes = "getCacheSizeBytes";
     public static final String setUserRestriction = "setUserRestriction";

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
@@ -21,8 +22,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:4.0.0"
-
+        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath "com.google.guava:guava:24.1-jre"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -38,3 +39,98 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+import static com.google.common.base.CaseFormat.*
+
+String.metaClass.caseFormat = { from, to ->
+    from.to( to, delegate )
+}
+
+//CodeGenerator
+class Android13BindPlugin implements Plugin<Project> {
+    def PERMISSIONS=[
+            'BIND_ATTESTATION_VERIFICATION_SERVICE',
+            'BIND_TRACE_REPORT_SERVICE',
+            'BIND_GAME_SERVICE',
+            'BIND_SELECTION_TOOLBAR_RENDER_SERVICE',
+            'BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE',
+            'BIND_TV_INTERACTIVE_APP',
+            'BIND_AMBIENT_CONTEXT_DETECTION_SERVICE']
+
+
+    void apply(Project project) {
+        project.task('a13permissions') {
+            doLast {
+                def manifestTags = [];
+                for(pm in PERMISSIONS){
+                    def className =  "Test"+pm.caseFormat( UPPER_UNDERSCORE, UPPER_CAMEL )+"Service"
+                    def filePath = "${project.projectDir}/app/src/main/java/com/android/certifications/niap/permissions/companion/services/"
+                    new File(filePath+className+".java").
+                            text =
+                            "/*\n" +
+                            " * Copyright 2022 The Android Open Source Project\n" +
+                            " *\n" +
+                            " * Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
+                            " * you may not use this file except in compliance with the License.\n" +
+                            " * You may obtain a copy of the License at\n" +
+                            " *\n" +
+                            " *      http://www.apache.org/licenses/LICENSE-2.0\n" +
+                            " *\n" +
+                            " * Unless required by applicable law or agreed to in writing, software\n" +
+                            " * distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
+                            " * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
+                            " * See the License for the specific language governing permissions and\n" +
+                            " * limitations under the License.\n" +
+                            " */\n"+
+                            "package com.android.certifications.niap.permissions.companion.services;\n" +
+                            "\n" +
+                            "import android.app.Service;\n" +
+                            "import android.content.Intent;\n" +
+                            "import android.os.IBinder;\n" +
+                            "import android.util.Log;\n" +
+                            "\n" +
+                            "/**\n" +
+                            " * Exported service used to test the "+pm+" permission.\n" +
+                            " *\n" +
+                            " * This service requires clients are granted the "+pm+"\n" +
+                            " * permission to bind to it. The Permission Test Tool can attempt to bind to this service\n" +
+                            " * and invoke the {@link "+className+"Impl#testMethod()} method\n" +
+                            " * to verify that the platform properly enforces this permission requirement.\n" +
+                            " */\n"+
+                            "public class "+className+" extends Service {\n" +
+                            "    private static final String TAG = \""+className+"\";\n" +
+                            "    private "+className+"Impl bindService;\n" +
+                            "\n" +
+                            "    @Override\n" +
+                            "    public void onCreate() {\n" +
+                            "        super.onCreate();\n" +
+                            "        bindService = new "+className+"Impl();\n" +
+                            "    }\n" +
+                            "\n" +
+                            "    @Override\n" +
+                            "    public IBinder onBind(Intent intent) {\n" +
+                            "        return bindService;\n" +
+                            "    }\n" +
+                            "\n" +
+                            "    static class "+className+"Impl extends TestBindService.Stub {\n" +
+                            "        public void testMethod() {\n" +
+                            "            Log.d(TAG, \"The caller successfully invoked the test method on service \"\n" +
+                            "                    + \""+className+"\");\n" +
+                            "        }\n" +
+                            "    }\n" +
+                            "}"
+
+                    def tag = "<service android:name=\".services."+className+"\"\n" +
+                            "            android:permission=\"android.permission."+pm+"\"\n" +
+                            "            android:enabled=\"true\"\n" +
+                            "            android:exported=\"true\" />"
+                    manifestTags.push(tag);
+                }
+
+                println manifestTags.join("\n");
+            }
+        }
+    }
+}
+
+apply plugin: Android13BindPlugin

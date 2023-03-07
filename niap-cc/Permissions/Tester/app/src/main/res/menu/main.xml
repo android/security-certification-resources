@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.popularmovies.activity.MainActivity">
+    <item
+        android:id="@+id/action_output_tester_json"
+        android:title="@string/output_tester_json"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_request_runtime_permissions"
+        android:title="@string/request_runtime_permissions_for_sig"
+        app:showAsAction="never" />
+    <!--<item
+        android:id="@+id/action_device_admin_test"
+        android:title="@string/device_admin_test"
+        app:showAsAction="never" />-->
+
+</menu>

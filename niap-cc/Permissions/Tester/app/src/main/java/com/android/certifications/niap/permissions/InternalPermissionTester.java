@@ -17,25 +17,44 @@
 package com.android.certifications.niap.permissions;
 
 import static com.android.certifications.niap.permissions.utils.InternalPermissions.permission;
+import static com.android.certifications.niap.permissions.utils.ReflectionUtils.invokeReflectionCall;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.KeyguardManager;
+import android.companion.AssociationRequest;
+import android.companion.CompanionDeviceManager;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.provider.ContactsContract;
 
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
+import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.SignatureUtils;
 import com.android.certifications.niap.permissions.utils.Transacts;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 
 /**
  * Permission tester to verify all platform declared internal permissions properly guard their API,
@@ -135,8 +154,164 @@ public class InternalPermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
                     mTransacts.invokeTransact(Transacts.TELEPHONY_IMS_SERVICE,
                             Transacts.TELEPHONY_IMS_DESCRIPTOR,
-                            Transacts.triggerNetworkRegistration, 0, null, 0, "test-sip-reason");
+                            Transacts.triggerNetworkRegistration, 0,
+                            getActivityToken(), 0, "test-sip-reason");
                 }));
+
+
+        //Internal Permissions as of Android 13
+        //permission.READ_ASSISTANT_APP_SEARCH_DATA depends on specific app role
+        //permission.READ_HOME_APP_SEARCH_DATA depends on specific app role
+
+        mPermissionTasks.put(permission.SET_DEFAULT_ACCOUNT_FOR_CONTACTS,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        Bundle extras = new Bundle();
+                        mContentResolver.call(ContactsContract.AUTHORITY_URI, "setDefaultAccount", null,
+                                extras);
+                        }
+                }));
+
+        mPermissionTasks.put(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    //WindowManagerService#addKeyguardLockedStateListener.
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        KeyguardManager.KeyguardLockedStateListener listener = new KeyguardManager.KeyguardLockedStateListener() {
+                            @Override
+                            public void onKeyguardLockedStateChanged(boolean b) {
+                            }
+                        };
+                        mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
+                                Transacts.addKeyguardLockedStateListener, listener);
+                    }
+                }));
+
+        mPermissionTasks.put(permission.CREATE_VIRTUAL_DEVICE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    try {
+
+                        Class<?> clazzVDPBuilder = null;
+                        clazzVDPBuilder = Class.forName("android.companion.virtual.VirtualDeviceParams$Builder");
+                        Constructor constructor = clazzVDPBuilder.getConstructor();
+                        Object builderObj = constructor.newInstance();
+
+                        Object vdpParams =
+                                invokeReflectionCall(clazzVDPBuilder, "build", builderObj, new Class[]{});
+
+                        IBinder binder = getActivityToken();
+                        //UserHandle uh = Binder.getCallingUserHandle();
+                        mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
+                                Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
+                                Transacts.createVirtualDevice, binder,mContext.getPackageName(),
+                                0, vdpParams,null);
+
+                    } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
+                        throw new UnexpectedPermissionTestFailureException(e);
+                    }
+
+                }));
+
+        mPermissionTasks.put(permission.SEND_SAFETY_CENTER_UPDATE,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    Class<?> clazzSaftyCenter;
+                    try {
+                        clazzSaftyCenter = Class.forName("android.safetycenter.SafetyCenterManager");
+                        Object saftyCenter = mContext.getSystemService(clazzSaftyCenter);
+                        invokeReflectionCall
+                                (clazzSaftyCenter, "getSafetySourceData",
+                                        saftyCenter, new Class[]{String.class},"GooglePlaySystemUpdate");
+                    } catch (ClassNotFoundException e){
+                        throw new UnexpectedPermissionTestFailureException(e);
+                    }
+                })
+        );
+
+        mPermissionTasks.put(permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    if (!mPackageManager.hasSystemFeature(
+                            PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
+                        throw new BypassTestException(
+                                "Device does not have the "
+                                        + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
+                                        + "for this test");
+                    }
+                    AssociationRequest request;
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        request = new AssociationRequest.Builder().setDeviceProfile(
+                                AssociationRequest.DEVICE_PROFILE_AUTOMOTIVE_PROJECTION).build();
+                        CompanionDeviceManager.Callback callback =
+                                new CompanionDeviceManager.Callback() {
+                                    @Override
+                                    public void onDeviceFound(IntentSender intentSender) {
+                                        mLogger.logDebug(
+                                                "onDeviceFound: intentSender = " + intentSender);
+                                    }
+                                    @Override
+                                    public void onFailure(CharSequence charSequence) {
+                                        mLogger.logDebug("onFailure: charSequence = " + charSequence);
+                                    }
+                                };
+                        CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
+                                CompanionDeviceManager.class);
+
+                        companionDeviceManager.associate(request, callback, null);
+                    }
+
+                }));
+
+        mPermissionTasks.put(permission.ACCESS_AMBIENT_CONTEXT_EVENT,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+
+                    @SuppressLint("WrongConstant") Object ambientContextManager
+                            = mContext.getSystemService("ambient_context");
+                            //Context.AMBIENT_CONTEXT_SERVICE);
+
+                    int[] eventsArray = new int[] {-1};//AmbientContextEvent.EVENT_COUGH
+                    Set<Integer> eventTypes = Arrays.stream(eventsArray).boxed().collect(
+                            Collectors.toSet());
+
+                    invokeReflectionCall(ambientContextManager.getClass(),
+                            "queryAmbientContextServiceStatus",
+                            ambientContextManager, new Class[]{Set.class, Executor.class,
+                                    Consumer.class}, eventTypes, new Executor() {
+                                @Override
+                                public void execute(Runnable runnable) {
+
+                                }
+                            }, null);
+
+                }));
+
+        // # Skip READ_ASSISTANT_APP_SEARCH_DATA
+        //Reason : Need specific role to test this permission.
+
+        // # Skip READ_HOME_APP_SEARCH_DATA
+        //Reason : Need specific role to test this permission.
+
+        mPermissionTasks.put(permission.MANAGE_SAFETY_CENTER,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,() -> {
+                    mTransacts.invokeTransact(Transacts.SAFETY_CENTER_MANAGER_SERVICE,
+                            Transacts.SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR,
+                            Transacts.getSafetyCenterConfig);
+                }));
+
+        //The permission is moved from signature permission (since android s)
+        mPermissionTasks.put(SignaturePermissions.permission.MANAGE_SENSOR_PRIVACY,
+                new PermissionTest(false, Build.VERSION_CODES.S,() -> {
+                    // ISensorPrivacyManager#setSensorPrivacy
+                    mTransacts.invokeTransact(Transacts.SENSOR_PRIVACY_SERVICE,
+                            Transacts.SENSOR_PRIVACY_DESCRIPTOR,
+                            Transacts.setSensorPrivacy, false);
+                }));
+
+        //The permission is moved from signature permission (since android t)
+        mPermissionTasks.put(SignaturePermissions.permission.TOGGLE_AUTOMOTIVE_PROJECTION,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    mTransacts.invokeTransact(Transacts.UI_MODE_SERVICE,
+                            Transacts.UI_MODE_DESCRIPTOR, Transacts.requestProjection,
+                            getActivityToken(), 1, mPackageName);
+                }));
+
     }
 
     @Override
@@ -159,5 +334,25 @@ public class InternalPermissionTester extends BasePermissionTester {
                     "!!! FAILED - one or more internal permission tests failed");
         }
         return allTestsPassed;
+    }
+
+    @Override
+    public Map<String,PermissionTest> getRegisteredPermissions() {
+        return mPermissionTasks;
+    }
+
+    /**
+     * Returns the {@link IBinder} token for the current activity.
+     *
+     * <p>This token can be used in any binder transaction that requires the activity's token.
+     */
+    public IBinder getActivityToken() {
+        try {
+            Field tokenField = Activity.class.getDeclaredField("mToken");
+            tokenField.setAccessible(true);
+            return (IBinder) tokenField.get(mActivity);
+        } catch (ReflectiveOperationException e) {
+            throw new UnexpectedPermissionTestFailureException(e);
+        }
     }
 }

@@ -92,7 +92,7 @@ public class NonPlatformPermissionTester extends BasePermissionTester {
                         signatureBytes, PackageManager.CERT_INPUT_RAW_X509);
                 packageSignatureMatch.put(packageName, signatureMatch);
             } else {
-                signatureMatch = packageSignatureMatch.get(packageName);
+                signatureMatch = Boolean.TRUE.equals(packageSignatureMatch.get(packageName));
             }
             if (permissionGranted != (signatureMatch || mPlatformSignatureMatch)) {
                 allTestsPassed = false;
@@ -109,5 +109,11 @@ public class NonPlatformPermissionTester extends BasePermissionTester {
                     "!!! FAILED - one or more non-framework signature permission tests failed");
         }
         return allTestsPassed;
+    }
+
+    @Override
+    public Map<String,PermissionTest> getRegisteredPermissions() {
+        mLogger.logInfo("The Tester object handles all declared permissions. Ignored.");
+        return new HashMap<String,PermissionTest>();
     }
 }

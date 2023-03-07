@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import android.content.res.Resources;
 import android.util.Log;
 
 import com.android.certifications.niap.niapsec.net.SecureURL;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,7 +66,7 @@ public class ConnectionManager {
     }
 
     public Map<String, InputStream> loadCertsFromResource(Resources resources,
-                                                          Map<String, Integer> resourceIds) {
+        Map<String, Integer> resourceIds) {
         Map<String, InputStream> certs = new HashMap<>();
         for (Map.Entry<String, Integer> resourceId : resourceIds.entrySet()) {
             certs.put(resourceId.getKey(), resources.openRawResource(resourceId.getValue()));
@@ -100,7 +99,7 @@ public class ConnectionManager {
             valid = url.isValid(conn);
             Log.i(TAG, "HttpsUrlConnection Cert Revocation Check - Cert valid: " + valid);
             UpdateViewModel.updateStatus.postValue("HttpsUrlConnection - Cert valid: " +
-                    (valid ? "Passed" : "Failed"));
+                (valid ? "Passed" : "Failed"));
 
 
             int status = conn.getResponseCode();
@@ -108,10 +107,10 @@ public class ConnectionManager {
             BufferedReader in = null;
             if (status >= 400)
                 in = new BufferedReader(
-                        new InputStreamReader(conn.getErrorStream()));
+                    new InputStreamReader(conn.getErrorStream()));
             else
                 in = new BufferedReader(
-                        new InputStreamReader(conn.getInputStream()));
+                    new InputStreamReader(conn.getInputStream()));
 
             String inputLine;
             StringBuffer response = new StringBuffer();
@@ -139,7 +138,7 @@ public class ConnectionManager {
             valid = url.isValid(url.getHostname(), ssl);
             Log.i(TAG, "TLS Socket Revocation Certs/Hostname Valid: " + valid);
             UpdateViewModel.updateStatus.postValue("TLS Socket/Hostname Valid: " +
-                    (valid ? "Passed" : "Failed"));
+                (valid ? "Passed" : "Failed"));
         } catch (IOException ex) {
             Log.e(TAG, CONNECTION_ERROR_MSG + ex.getMessage());
             ex.printStackTrace();

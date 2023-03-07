@@ -19,16 +19,13 @@ package com.android.certifications.niap.permissions.config;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-
 import androidx.core.app.ActivityCompat;
-
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.Constants;
 import com.android.certifications.niap.permissions.R;
 import com.android.certifications.niap.permissions.RuntimePermissionTester;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,9 +40,9 @@ import java.util.concurrent.CountDownLatch;
  */
 class RuntimeDependentPermissionConfiguration implements TestConfiguration {
     private static final String TAG = "PermissionTester";
-    private static Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
+    private static final Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
 
-    private Activity mActivity;
+    private final Activity mActivity;
     private CountDownLatch mCountDownLatch;
 
     private static final String[] REQUIRED_PERMISSIONS = new String[]{
