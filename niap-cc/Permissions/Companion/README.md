@@ -1,4 +1,4 @@
-# Permission Test Tool Companion 
+# Permission Test Tool Companion  
 This sample app is a tool which aids OEMs in testing their devices for
 evaluation of the Common Criteria certificate through
 [NIAP](https://www.niap-ccevs.org/).
