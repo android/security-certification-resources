@@ -40,3 +40,6 @@ app/build
 
 /security
 
+buildSrc/.gradle
+builSrc/build
+.gradle/

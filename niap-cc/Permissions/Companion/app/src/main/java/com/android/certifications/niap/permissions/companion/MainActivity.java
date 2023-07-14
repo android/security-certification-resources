@@ -17,7 +17,7 @@
 package com.android.certifications.niap.permissions.companion;
 
 import static android.app.PendingIntent.FLAG_IMMUTABLE;
-import static android.app.PendingIntent.FLAG_MUTABLE;
+import static android.app.PendingIntent.FLAG_NO_CREATE;
 
 import android.Manifest;
 import android.app.Activity;
@@ -45,6 +45,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -124,6 +125,9 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * {@link AsyncTask} used to drive the setup for the permission tests.
+     *
+     * Fix: We shouldn't use AsyncTask anymore ... refine it later
+     *
      */
     private class SetupTestsAsyncTask extends AsyncTask<Void, Void, Boolean> {
         @Override
@@ -179,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
             // location request. If the cause of the exception is a ResolveableApiException then
             // the resolution from the exception can be used to prompt the user to configure GMS.
             Throwable exceptionCause = e.getCause();
-            if (exceptionCause != null && exceptionCause instanceof ApiException) {
+            if (exceptionCause instanceof ApiException) {
                 ApiException apiException = (ApiException) exceptionCause;
                 switch (apiException.getStatusCode()) {
                     case LocationSettingsStatusCodes
@@ -261,9 +265,14 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        registerReceiver(receiver, new IntentFilter(ACCESS_LOCATION_ACTION));
+        int flags = ContextCompat.RECEIVER_NOT_EXPORTED;//RECEIVER_EXPORTED
+        ContextCompat.registerReceiver
+                (this, receiver, new IntentFilter(ACCESS_LOCATION_ACTION), flags);
+        //TODO: Bug? From U+ We can't create mutable Pending Intent directly ...
+        //      We should investigate an alternative plan to verify the location service
         Intent intent = new Intent(ACCESS_LOCATION_ACTION);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, FLAG_MUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent,
+                PendingIntent.FLAG_MUTABLE|FLAG_NO_CREATE);
         FusedLocationProviderClient locationClient =
                 LocationServices.getFusedLocationProviderClient(this);
         try {
@@ -274,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
         }
         boolean locationReceived = false;
         try {
-            locationReceived = latch[0].await(60, TimeUnit.SECONDS);
+            locationReceived = latch[0].await(10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Log.e(TAG, "Caught an InterruptedException: ", e);
         }
@@ -393,6 +402,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
             int[] grantResults) {
+        //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean permissionGranted = true;
         for (int grantResult : grantResults) {
             if (grantResult != PackageManager.PERMISSION_GRANTED) {
