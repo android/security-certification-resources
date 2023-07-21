@@ -30,6 +30,9 @@ import android.location.Location;
 import android.os.Build;
 import android.util.SparseArray;
 
+import androidx.core.util.Consumer;
+
+import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -76,7 +79,10 @@ import java.util.stream.Collectors;
  */
 public class GmsPermissionTester extends BasePermissionTester {
     private static final String TAG = "GmsPermissionTester";
-    private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
+    //private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
+    private final Logger mLogger =
+            LoggerFactory.createActivityLogger(TAG,(LogListAdaptable) mActivity);
+
 
     /**
      * Map of permission to a Runnable that can be used to verify the client library API that is
@@ -403,12 +409,12 @@ public class GmsPermissionTester extends BasePermissionTester {
             Detector.Processor<Integer> processor = new Detector.Processor() {
                 @Override
                 public void receiveDetections(Detector.Detections detections) {
-                    mLogger.logDebug("receiveDetections: detections = " + detections);
+                    mLogger.logDebug("Camera Permission : detections = " + detections);
                 }
 
                 @Override
                 public void release() {
-                    mLogger.logDebug("release");
+                    mLogger.logDebug("Camera Permission : release deteced");
                 }
             };
             detector.setProcessor(processor);
@@ -432,6 +438,45 @@ public class GmsPermissionTester extends BasePermissionTester {
         }));
     }
 
+    public void runPermissionTestsByThreads(Consumer<Boolean> callback){
+        List<String> gmsDeclaredPermissions = getAllGmsDeclaredSignaturePermissions();
+        List<String> defaultPermissions = new ArrayList<>(mPermissionTasks.keySet());
+        defaultPermissions.addAll(GMS_SIGNATURE_PERMISSIONS);
+        List<String> permissions = mConfiguration.getPermissions().orElse(defaultPermissions);
+        // An app should only have access to the GMS signature permissions if it is signed with the
+        // GMS signing key or the platform signing key.
+        boolean signatureMatch = mPackageManager.hasSigningCertificate(Constants.GMS_PACKAGE_NAME,
+                mAppSignature.toByteArray(), PackageManager.CERT_INPUT_RAW_X509);
+        for (String permission : permissions) {
+            // If the permission has a corresponding task then run it.
+            Thread thread = new Thread(() -> {
+                if (mPermissionTasks.containsKey(permission)) {
+                    if (!runPermissionTest(permission, mPermissionTasks.get(permission))) {
+                        callback.accept(false);
+                    } else {
+                        callback.accept(true);
+                    }
+                } else {
+                    if (!gmsDeclaredPermissions.contains(permission)) {
+                        mLogger.logError("Permission " + permission
+                                + " is not declared as a signature permission on this version of GMS");
+                        callback.accept(false);
+                    } else {
+                        boolean permissionGranted = mContext.checkSelfPermission(permission)
+                                == PackageManager.PERMISSION_GRANTED;
+
+                        if (permissionGranted != (signatureMatch || mPlatformSignatureMatch)) {
+                            callback.accept(false);
+                        }
+                        mLogger.logSignaturePermissionStatus(permission, permissionGranted,
+                                signatureMatch, mPlatformSignatureMatch);
+                    }
+                }
+            });
+            thread.start();
+        }
+    }
+
     @Override
     public boolean runPermissionTests() {
         boolean allTestsPassed = true;
@@ -451,7 +496,7 @@ public class GmsPermissionTester extends BasePermissionTester {
                 }
             } else {
                 if (!gmsDeclaredPermissions.contains(permission)) {
-                    mLogger.logDebug("Permission " + permission
+                    mLogger.logError("Permission " + permission
                             + " is not declared as a signature permission on this version of GMS");
                     continue;
                 }
@@ -460,15 +505,15 @@ public class GmsPermissionTester extends BasePermissionTester {
                 if (permissionGranted != (signatureMatch || mPlatformSignatureMatch)) {
                     allTestsPassed = false;
                 }
-                StatusLogger.logSignaturePermissionStatus(permission, permissionGranted,
+                mLogger.logSignaturePermissionStatus(permission, permissionGranted,
                         signatureMatch, mPlatformSignatureMatch);
             }
         }
         if (allTestsPassed) {
-            StatusLogger.logInfo(
+            mLogger.logInfo(
                     "*** PASSED - all GMS permission tests completed successfully");
         } else {
-            StatusLogger.logInfo(
+            mLogger.logError(
                     "!!! FAILED - one or more GMS permission tests failed");
         }
         return allTestsPassed;

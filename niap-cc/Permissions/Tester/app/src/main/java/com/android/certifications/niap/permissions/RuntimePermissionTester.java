@@ -105,6 +105,7 @@ import android.telephony.TelephonyManager;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
+import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
@@ -130,7 +131,7 @@ import java.util.Map;
  */
 public class RuntimePermissionTester extends BasePermissionTester {
     private static final String TAG = "RuntimePermissionTester";
-    private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
+    private final Logger mLogger = LoggerFactory.createActivityLogger(TAG, (LogListAdaptable) mActivity);
 
     protected final WallpaperManager mWallpaperManager;
     protected final SensorManager mSensorManager;
@@ -165,6 +166,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
         // to the app.
 
         mPermissionTasks.put(BODY_SENSORS, new PermissionTest(false, () -> {
+
             if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE)) {
                 throw new BypassTestException(
                         "A heard rate monitor is not available to run this test");
@@ -709,19 +711,22 @@ public class RuntimePermissionTester extends BasePermissionTester {
         List<String> permissions = mConfiguration.getRuntimePermissions().orElse(
                 new ArrayList<>(mPermissionTasks.keySet()));
         for (String permission : permissions) {
+            mLogger.logDebug("Call Permission->"+permission);
             if (!runPermissionTest(permission, mPermissionTasks.get(permission))) {
                 allTestsPassed = false;
             }
         }
         if (allTestsPassed) {
-            StatusLogger.logInfo(
+            mLogger.logInfo(
                     "*** PASSED - all runtime permission tests completed successfully");
         } else {
-            StatusLogger.logInfo("!!! FAILED - one or more runtime permission tests failed");
+            mLogger.logInfo("!!! FAILED - one or more runtime permission tests failed");
         }
         return allTestsPassed;
     }
-
+    public void runPermissionTestsByThreads(androidx.core.util.Consumer<Boolean> callback){
+        mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
+    }
     /**
      * Enables the specified {@code bluetoothAdapter} if the required permission is granted.
      *

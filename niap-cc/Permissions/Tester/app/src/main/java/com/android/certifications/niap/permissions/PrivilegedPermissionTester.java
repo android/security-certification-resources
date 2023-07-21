@@ -18,6 +18,9 @@ package com.android.certifications.niap.permissions;
 
 import android.app.Activity;
 
+import androidx.core.util.Consumer;
+
+import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -34,7 +37,7 @@ import java.util.List;
  */
 public class PrivilegedPermissionTester extends SignaturePermissionTester {
     private static final String TAG = "PrivilegedPermissionTester";
-    private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
+    private final Logger mLogger = LoggerFactory.createActivityLogger(TAG,(LogListAdaptable)mActivity);
 
     private final boolean mIsPrivApp;
 
@@ -72,15 +75,18 @@ public class PrivilegedPermissionTester extends SignaturePermissionTester {
             }
         }
         if (allTestsPassed) {
-            StatusLogger.logInfo(
+            mLogger.logInfo(
                     "*** PASSED - all privileged permission tests completed successfully");
         } else {
-            StatusLogger.logInfo(
+            mLogger.logInfo(
                     "!!! FAILED - one or more privileged permission tests failed");
         }
         return allTestsPassed;
     }
+    public void runPermissionTestsByThreads(Consumer<Boolean> callback){
+        mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
 
+    }
     /**
      * Logs a status entry for the provided {@code permission}; the test app should only be granted
      * a signature level permission with the privilege flag  if it has been signed with the
@@ -106,7 +112,7 @@ public class PrivilegedPermissionTester extends SignaturePermissionTester {
         if (mPlatformSignatureMatch && !permissionGranted) {
             testPassed = false;
         }
-        StatusLogger.logInfo(
+        mLogger.logInfo(
                 permission + ": " + (testPassed ? "PASSED" : "FAILED") + " (granted = "
                         + permissionGranted + ", signature match = " + mPlatformSignatureMatch
                         + ", priv-app = " + mIsPrivApp + ")");
@@ -138,11 +144,12 @@ public class PrivilegedPermissionTester extends SignaturePermissionTester {
         if (permissionGranted != apiSuccessful) {
             testPassed = false;
         }
-        StatusLogger.logInfo(
+        mLogger.logInfo(
                 permission + ": " + (testPassed ? "PASSED" : "FAILED") + " (granted = "
                         + permissionGranted + ", api successful = " + apiSuccessful
                         + ", signature match = " + mPlatformSignatureMatch + ", priv-app = "
                         + mIsPrivApp + ")");
+
         return testPassed;
     }
 }

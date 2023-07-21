@@ -138,13 +138,14 @@ import android.view.accessibility.CaptioningManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.activities.TestActivity;
 import com.android.certifications.niap.permissions.companion.services.TestBindService;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
-import com.android.certifications.niap.permissions.log.StatusLogger;
+import com.android.certifications.niap.permissions.log.UiLogger;
 import com.android.certifications.niap.permissions.services.TestService;
 import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
@@ -176,6 +177,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -202,7 +204,7 @@ import java.util.function.Consumer;
  */
 public class SignaturePermissionTester extends BasePermissionTester {
     private static final String TAG = "SignaturePermissionTester";
-    private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
+    private final Logger mLogger = LoggerFactory.createActivityLogger(TAG,(LogListAdaptable) mActivity);
 
     protected final BluetoothAdapter mBluetoothAdapter;
     protected final BluetoothManager mBluetoothManager;
@@ -712,6 +714,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
             }
         }));
 
+        //TODO:It stucks?
         mPermissionTasks.put(permission.CRYPT_KEEPER,
                 new PermissionTest(false,Build.VERSION_CODES.P,Build.VERSION_CODES.S,() -> {
             mTransacts.invokeTransact(Transacts.MOUNT_SERVICE, Transacts.MOUNT_DESCRIPTOR,
@@ -1876,11 +1879,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     mContext.startActivity(intent);
                 }));
 
-        mPermissionTasks.put(permission.START_TASKS_FROM_RECENTS,
+        //TODO:!!!!This test crash android 14!!!
+/*        mPermissionTasks.put(permission.START_TASKS_FROM_RECENTS,
                 new PermissionTest(false, () -> {
                     mTransacts.invokeTransact(Transacts.ACTIVITY_SERVICE, Transacts.ACTIVITY_DESCRIPTOR,
                             Transacts.startActivityFromRecents, 0, 0);
-                }));
+                }));*/
 
         // android.permission.STATSCOMPANION - statscompanion service is guarded by SELinux
         // policy.
@@ -2302,10 +2306,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         try {
                             Thread.sleep(2000);
                         } catch (InterruptedException e) {
-                            Log.e(TAG,
+                            mLogger.logError(
                                     "Caught an InterruptedException while waiting for the "
-                                            + "accessibility service to be enabled",
-                                    e);
+                                            + "accessibility service to be enabled",e);
                         }
                         if (mAccessibilityManager.isTouchExplorationEnabled()) {
                             invokeReflectionCall(mAccessibilityManager.getClass(),
@@ -2556,7 +2559,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         // 30 is the value of the hidden Event.LOCUS_ID_SET field indicating a
                         // locus event.
                         if (event.getEventType() == 30) {
-                            Log.d(TAG,
+                            mLogger.logDebug(
                                     "Time of locus event: " + event.getTimeStamp() + ", package: "
                                             + event.getPackageName());
                             locusEventFound = true;
@@ -4870,6 +4873,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
             // if there is a corresponding test for this permission then run it now.
             if (mPermissionTasks.containsKey(permission)) {
                 testPassed = runPermissionTest(permission, mPermissionTasks.get(permission), true);
+                //((UiLogger) mLogger).mFrontEnd.addLogLine("test");
             } else {
                 // else log whether the permission should be granted to this app
                 testPassed = getAndLogTestStatus(permission);
@@ -4879,13 +4883,53 @@ public class SignaturePermissionTester extends BasePermissionTester {
             }
         }
         if (allTestsPassed) {
-            StatusLogger.logInfo(
+            mLogger.logInfo(
                     "*** PASSED - all signature permission tests completed successfully");
         } else {
-            StatusLogger.logInfo(
+            mLogger.logInfo(
                     "!!! FAILED - one or more signature permission tests failed");
         }
         return allTestsPassed;
+    }
+    public void runPermissionTestsByThreads(androidx.core.util.Consumer<Boolean> callback){
+
+        List<String> permissions = mConfiguration.getSignaturePermissions().orElse(
+                mSignaturePermissions);
+        Set<String> permissionsToSkip = mConfiguration.getSkippedSignaturePermissions().orElse(
+                Collections.emptySet());
+        int numperms = permissions.size();
+        int no=0;
+        for (String permission : permissions) {
+            no++;
+            // If the permission has a corresponding task then run it.
+            mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
+                    "%d/%d ",no,numperms) + permission);
+            Thread thread = new Thread(() -> {
+                // if this is a signature permission with the privileged protection flag then skip it
+                // if the app is configured to use the PrivilegedPermissionTester.
+                if (permissionsToSkip.contains(permission) || (mPrivilegedPermissions.contains(permission)
+                        && Constants.USE_PRIVILEGED_PERMISSION_TESTER)) {
+                        mLogger.logInfo(permission+" is skipped due to the configurations.");
+                } else {
+
+                    if (mPermissionTasks.containsKey(permission)) {
+                        if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
+                            callback.accept(true);
+                        } else {
+                            callback.accept(false);
+                        }
+                    } else {
+                        callback.accept(getAndLogTestStatus(permission));
+                    }
+                }
+            });
+            thread.start();
+            try {
+                thread.join(500);
+            } catch (InterruptedException e) {
+                mLogger.logError(String.format(Locale.US,"%d %s failed due to the timeout.",no,permission));
+            }
+        }
     }
 
     @Override
@@ -4934,7 +4978,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }
                 testPassed = getAndLogTestStatus(permission, permissionGranted, false);
             } catch (BypassTestException bte) {
-                StatusLogger.logTestSkipped(permission, permissionGranted, bte.getMessage());
+                mLogger.logTestSkipped(permission, permissionGranted, bte.getMessage());
             } catch (Throwable t) {
                 // Some of the signature / privileged tests can fail for other reasons (primarily
                 // due to the test app not having access to all necessary classes to invoke the
@@ -4975,7 +5019,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         if (mPlatformSignatureMatch && !permissionGranted) {
             testPassed = false;
         }
-        StatusLogger.logInfo(
+        mLogger.logInfo(
                 permission + ": " + (testPassed ? "PASSED" : "FAILED") + " (granted = "
                         + permissionGranted + ", signature match = " + mPlatformSignatureMatch
                         + ")");
@@ -5006,7 +5050,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         if (permissionGranted != apiSuccessful) {
             testPassed = false;
         }
-        StatusLogger.logInfo(
+        mLogger.logInfo(
                 permission + ": " + (testPassed ? "PASSED" : "FAILED") + " (granted = "
                         + permissionGranted + ", api successful = " + apiSuccessful
                         + ", signature match = " + mPlatformSignatureMatch + ")");

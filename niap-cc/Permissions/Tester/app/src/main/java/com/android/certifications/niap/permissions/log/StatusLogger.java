@@ -18,6 +18,11 @@ package com.android.certifications.niap.permissions.log;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 
+
+
+//Should be deprecate it
+//We should not record the log by the static class...
+
 /**
  * Logger to log the status of permission tests and testers such as the success / failure of
  * individual permission tests, overall status messages upon the completion of a {@link

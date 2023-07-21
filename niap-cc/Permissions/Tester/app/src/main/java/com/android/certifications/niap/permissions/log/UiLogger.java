@@ -19,24 +19,30 @@ package com.android.certifications.niap.permissions.log;
 import android.util.Log;
 
 import com.android.certifications.niap.permissions.Constants;
+import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 
 /**
  * {@link Logger} that uses Android's logcat for logging.
  */
-public class LogcatLogger implements Logger {
+public class UiLogger implements Logger {
     private final String mTag;
+    public final LogListAdaptable mFrontEnd;
+
+
 
     /**
      * Public constructor that uses the provide {@code tag} when writing to logcat.
      */
-    public LogcatLogger(String tag) {
+    public UiLogger(String tag,LogListAdaptable frontEnd) {
         mTag = tag;
+        mFrontEnd = frontEnd;
     }
 
     @Override
     public void logDebug(String message) {
         if (Constants.DEBUG) {
             Log.d(mTag, message);
+            mFrontEnd.addLogLine("🪲"+message);
         }
     }
 
@@ -44,27 +50,37 @@ public class LogcatLogger implements Logger {
     public void logDebug(String message, Throwable throwable) {
         if (Constants.DEBUG) {
             Log.d(mTag, message, throwable);
+            mFrontEnd.addLogLine("🪲"+message+"/"+throwable);
         }
     }
 
     @Override
     public void logInfo(String message) {
         Log.i(mTag, message);
+        mFrontEnd.addLogLine("🟢"+message);
     }
 
     @Override
     public void logError(String message) {
         Log.e(mTag, message);
+        mFrontEnd.addLogLine("🔴"+message);
     }
-    public void logWarn(String message) { Log.w(mTag,message);}
+    @Override
+    public void logWarn(String message) {
+        Log.w(mTag, message);
+        mFrontEnd.addLogLine("🔴"+message);
+    }
+
     @Override
     public void logError(String message, Throwable throwable) {
         Log.e(mTag, message, throwable);
+        mFrontEnd.addLogLine("🔴"+message+"/"+throwable);
     }
 
     @Override
     public void logSystem(String message) {
+        //Show System important message like result/un-implmented method and so on
         Log.i(mTag, message);
+        mFrontEnd.addLogLine("❗️⚙️"+message+"/");
     }
-
 }

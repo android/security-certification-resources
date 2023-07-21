@@ -35,7 +35,7 @@ public class ChooserReceiver extends BroadcastReceiver {
         int test_id = intent.getIntExtra("test_id",0);
         if(test_id == TEST_LAUNCH_DEVICE_MANAGER_SETUP){
             Object componentName = bundle.get(Intent.EXTRA_CHOSEN_COMPONENT);
-            Log.d(TAG,"*** PASSED "+test+" test case. success.("+componentName+")");
+            //Log.d(TAG,"*** PASSED "+test+" test case. success.("+componentName+")");
         }
     }
 }

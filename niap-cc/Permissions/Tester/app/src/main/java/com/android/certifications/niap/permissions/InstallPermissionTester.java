@@ -109,22 +109,26 @@ import android.telecom.TelecomManager;
 import android.telephony.TelephonyManager;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.util.Consumer;
 
+import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.activities.TestActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
-import com.android.certifications.niap.permissions.log.StatusLogger;
 import com.android.certifications.niap.permissions.services.TestService;
 import com.android.certifications.niap.permissions.utils.Transacts;
 
 import java.net.ServerSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Permission tester to verify all install permissions properly guard their API, resource, etc.
@@ -133,7 +137,7 @@ import java.util.Map;
  */
 public class InstallPermissionTester extends BasePermissionTester {
     private static final String TAG = "InstallPermissionTester";
-    private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
+    private final Logger mLogger = LoggerFactory.createActivityLogger(TAG,(LogListAdaptable)mActivity);
 
     protected final ConnectivityManager mConnectivityManager;
     protected final WifiManager mWifiManager;
@@ -280,7 +284,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                 serviceIntent.putExtra(EXTRA_PERMISSION_GRANTED, permissionGranted);
                 mContext.startForegroundService(serviceIntent);
             } catch (Throwable t) {
-                StatusLogger.logTestError(permission, t);
+                mLogger.logTestError(permission, t);
             }
         }));
 
@@ -351,7 +355,9 @@ public class InstallPermissionTester extends BasePermissionTester {
             if (adapter == null) {
                 throw new BypassTestException("An NFC adapter is not available to run this test");
             }
-            adapter.setNdefPushMessage(null, mActivity);
+            //:TODO setNdefPushMesssage is obsolated?
+            //adapter.setNdefPushMessage(null, mActivity);
+
             CardEmulation emulation = CardEmulation.getInstance(adapter);
             emulation.isDefaultServiceForCategory(new ComponentName(mContext, TestService.class),
                     CardEmulation.CATEGORY_PAYMENT);
@@ -707,14 +713,39 @@ public class InstallPermissionTester extends BasePermissionTester {
             }
         }
         if (allTestsPassed) {
-            StatusLogger.logInfo(
+            mLogger.logInfo(
                     "*** PASSED - all install permission tests completed successfully");
         } else {
-            StatusLogger.logInfo("!!! FAILED - one or more install permission tests failed");
+            mLogger.logInfo("!!! FAILED - one or more install permission tests failed");
         }
         return allTestsPassed;
     }
-
+    public void runPermissionTestsByThreads(Consumer<Boolean> callback){
+        //mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
+        List<String> permissions = mConfiguration.getInstallPermissions().orElse(
+                new ArrayList<>(mPermissionTasks.keySet()));
+        int numperms = permissions.size();
+        int no=0;
+        for (String permission : permissions) {
+            no++;
+            // If the permission has a corresponding task then run it.
+            mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
+                    "%d/%d ",no,numperms) + permission);
+            Thread thread = new Thread(() -> {
+                if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
+                    callback.accept(true);
+                } else {
+                    callback.accept(false);
+                }
+            });
+            thread.start();
+            try {
+                thread.join(500);
+            } catch (InterruptedException e) {
+                mLogger.logError(String.format(Locale.US,"%d %s failed due to the timeout.",no,permission));
+            }
+        }
+    }
     @Override
     public Map<String,PermissionTest> getRegisteredPermissions() {
         return mPermissionTasks;

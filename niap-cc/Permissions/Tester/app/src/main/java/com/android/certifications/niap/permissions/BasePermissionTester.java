@@ -27,7 +27,9 @@ import android.content.res.Resources;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.core.util.Consumer;
 
+import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -83,7 +85,7 @@ public abstract class BasePermissionTester {
         mPackageName = mContext.getPackageName();
         mUid = mAppInfo.uid;
         mPackageManager = mContext.getPackageManager();
-        mLogger = LoggerFactory.createDefaultLogger(TAG);
+        mLogger = LoggerFactory.createActivityLogger(TAG, (MainActivity) mActivity);
         mDeviceApiLevel = Build.VERSION.SDK_INT;
         mTransacts = Transacts.createTransactsForApiLevel(mDeviceApiLevel);
 
@@ -123,7 +125,7 @@ public abstract class BasePermissionTester {
      * indicating whether all tests completed successfully.
      */
     public abstract boolean runPermissionTests();
-
+    public abstract void runPermissionTestsByThreads(Consumer<Boolean> callback);
     public abstract Map<String,PermissionTest> getRegisteredPermissions();
 
     /**
@@ -220,7 +222,7 @@ public abstract class BasePermissionTester {
                     // else an Exception was not expected; treat the test as failed and log the
                     // error status.
                     testPassed = false;
-                    StatusLogger.logTestError(permission, t);
+                    mLogger.logTestError(permission, t);
                 }
             }
         }
@@ -238,7 +240,7 @@ public abstract class BasePermissionTester {
             boolean apiSuccessful) {
         // If the permission was granted then the API should have been successful.
         boolean testPassed = permissionGranted == apiSuccessful;
-        StatusLogger.logTestStatus(permission, permissionGranted, apiSuccessful);
+        mLogger.logTestStatus(permission, permissionGranted, apiSuccessful);
         return testPassed;
     }
 

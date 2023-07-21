@@ -19,6 +19,8 @@ package com.android.certifications.niap.permissions.config;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.util.Log;
+
 import androidx.core.app.ActivityCompat;
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.Constants;
@@ -26,6 +28,8 @@ import com.android.certifications.niap.permissions.R;
 import com.android.certifications.niap.permissions.RuntimePermissionTester;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
+import com.google.android.gms.common.internal.GmsLogger;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +44,7 @@ import java.util.concurrent.CountDownLatch;
  */
 class RuntimeDependentPermissionConfiguration implements TestConfiguration {
     private static final String TAG = "PermissionTester";
-    private static final Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
+    //private static final Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
 
     private final Activity mActivity;
     private CountDownLatch mCountDownLatch;
@@ -63,15 +67,17 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
     public void preRunSetup() throws BypassConfigException {
         // If the required permissions have not yet been granted then request consent as part
         // of the setup.
+
         boolean permissionRequestRequired = !areRequiredPermissionsGranted();
         if (permissionRequestRequired) {
+            Log.d(TAG,"permission request required?");
             ActivityCompat.requestPermissions(mActivity, REQUIRED_PERMISSIONS,
                     Constants.PERMISSION_CODE_RUNTIME_DEPENDENT_PERMISSIONS);
+            //Log.d(TAG,"pcall");
             mCountDownLatch = new CountDownLatch(1);
             try {
-                // Wait for the countdown on the latch; this will block the thread attempting to
-                // run the permission test while the user is prompted for consent to the required
-                // permissions.
+
+                //Log.d(TAG,"await");
                 mCountDownLatch.await();
                 // If the user has not granted the required permissions then throw a bypass
                 // exception to notify the user of this requirement.
@@ -80,11 +86,17 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
                             R.string.permissions_must_be_granted,
                             String.join(", ", REQUIRED_PERMISSIONS)));
                 }
+                // Wait for the countdown on the latch; this will block the thread attempting to
+                // run the permission test while the user is prompted for consent to the required
+                // permissions.
+
             } catch (InterruptedException e) {
                 throw new BypassConfigException(
                         mActivity.getResources().getString(R.string.exception_permission_consent,
                                 e.getMessage()));
             }
+        } else {
+
         }
     }
 
@@ -94,9 +106,13 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
     public static boolean arePermissionsUnderTestGranted(Activity activity) {
         for (String permission : PERMISSIONS_UNDER_TEST) {
             if (activity.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG,"permission granted?"+permission);
+
                 return true;
             }
         }
+        Log.d(TAG,"NG?:"+PERMISSIONS_UNDER_TEST.toString());
+
         return false;
     }
 
@@ -125,14 +141,18 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
         switch (requestCode) {
             case Constants.PERMISSION_CODE_RUNTIME_DEPENDENT_PERMISSIONS:
                 if (!permissionGranted) {
-                    sLogger.logError("The required permissions (" + String.join(", ", permissions)
-                            + ") were not granted");
+                    //sLogger.logError("The required permissions (" + String.join(", ", permissions)
+                    //        + ") were not granted");
+                    throw new RuntimeException("The required permissions (" + String.join(", ", permissions)
+                                    + ") were not granted");
                 }
                 break;
             default:
-                sLogger.logError(
-                        "An unexpected request code of " + requestCode + " with permissions "
-                                + String.join(", ", permissions) + " + was received");
+                throw new RuntimeException("An unexpected request code of " + requestCode + " with permissions "
+                        + String.join(", ", permissions) + " + was received");
+                //sLogger.logError(
+                //        "An unexpected request code of " + requestCode + " with permissions "
+                //                + String.join(", ", permissions) + " + was received");
 
         }
         mCountDownLatch.countDown();

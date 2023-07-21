@@ -327,13 +327,16 @@ public class InternalPermissionTester extends BasePermissionTester {
             }
         }
         if (allTestsPassed) {
-            StatusLogger.logInfo(
+            mLogger.logInfo(
                     "*** PASSED - all internal permission tests completed successfully");
         } else {
-            StatusLogger.logInfo(
+            mLogger.logInfo(
                     "!!! FAILED - one or more internal permission tests failed");
         }
         return allTestsPassed;
+    }
+    public void runPermissionTestsByThreads(androidx.core.util.Consumer<Boolean> callback){
+        mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
     }
 
     @Override
