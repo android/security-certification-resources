@@ -26,6 +26,7 @@
         android:supportsRtl="true"
         android:debuggable="true"
         android:theme="@style/AppTheme"
+        android:name=".TesterApplication"
         tools:ignore="HardcodedDebugMode">
         <activity
             android:name=".activities.TestActivity"

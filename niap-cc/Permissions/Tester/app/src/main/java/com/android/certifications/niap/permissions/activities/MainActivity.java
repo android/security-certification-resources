@@ -18,9 +18,14 @@ package com.android.certifications.niap.permissions.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -43,6 +48,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
@@ -53,11 +59,13 @@ import com.android.certifications.niap.permissions.InternalPermissionTester;
 import com.android.certifications.niap.permissions.R;
 import com.android.certifications.niap.permissions.RuntimePermissionTester;
 import com.android.certifications.niap.permissions.SignaturePermissionTester;
+import com.android.certifications.niap.permissions.TesterApplication;
 import com.android.certifications.niap.permissions.config.BypassConfigException;
 import com.android.certifications.niap.permissions.config.ConfigurationFactory;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
+import com.android.certifications.niap.permissions.utils.LayoutUtils;
 import com.android.certifications.niap.permissions.utils.gson.Test;
 import com.android.certifications.niap.permissions.utils.gson.TestCategory;
 import com.android.certifications.niap.permissions.utils.gson.TestSuites;
@@ -81,6 +89,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Activity to drive permission test configurations. This activity obtains the configuration(s) to
@@ -142,9 +151,40 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                 }
             });
 
+    AtomicBoolean runningTest= new AtomicBoolean(false);
+    void postTestersFinished(String message){
+        //StatusTextView.setText(statusMessage);
+        Resources resources = getResources();
+        CharSequence channelName = resources.getString(R.string.tester_channel_name);
+        NotificationChannel channel = new NotificationChannel(TAG, channelName,
+                NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+
+        Intent notificationIntent = new Intent(mContext, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, notificationIntent,
+                PendingIntent.FLAG_IMMUTABLE);
+        Notification notification =
+                new Notification.Builder(mContext, TAG)
+                        .setContentTitle(resources.getText(R.string.status_notification_title))
+                        .setContentText(message)
+                        .setSmallIcon(R.drawable.ic_launcher_foreground)
+                        .setContentIntent(pendingIntent)
+                        .setAutoCancel(true)
+                        .build();
+        notificationManager.notify(0, notification);
+        runningTest.set(false);
+        runOnUiThread(()->{
+            for (Button button : mTestButtons) {
+                button.setEnabled(true);
+            }
+        });
+    }
 
 
     BottomSheetBehavior<LinearLayout> mBottomSheet;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,10 +196,8 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
 
         mStatusTextView = new TextView(this);
         mStatusTextView.setText(R.string.tap_to_run);
-        mStatusTextView.setGravity(Gravity.CENTER);
-        mStatusTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18f);
 
-        layout.addView(mStatusTextView);
+        //layout.addView(mStatusTextView);
         setLogAdapter();
         addLogLine("Welcome!");
         // Obtain the list of configurations from the ConfigurationFactory and create a separate
@@ -171,65 +209,79 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
             testButton.setText(configuration.getButtonTextId());
             mConfiguration = configuration;//activeConfiguration
 
-            //
             //it's difficult to pass the configuration object to workManager,
             //so I would like to choose ExecutorService instead of it
             testButton.setOnClickListener((view) -> {
                 //Clear log
                 mStatusListView.setAdapter(null);
                 setLogAdapter();
+                //disable all buttons//
+                runningTest.set(true);
+                for (Button button : mTestButtons) {
+                    button.setEnabled(false);
+                }
+                //
+                ExecutorService
+                        executor = ((TesterApplication)getApplication()).executorService;
 
-                ExecutorService executor = Executors.newSingleThreadExecutor();
-                Handler handler = new Handler(Looper.getMainLooper());
-                AtomicBoolean allTestPassed = new AtomicBoolean(true);
-                Future<Boolean> future = executor.submit(new Callable<Boolean>() {
-                    @Override
-                    public Boolean call() throws Exception {
-                        try {
-
-                            handler.post(()->{
-                                sLogger.logDebug("Call config->"+configuration.toString());
-                                Activity activity = MainActivity.this;
-                                mStatusData.clear();
-                                mStatusAdapter.notifyDataSetChanged();
-                                try {
-                                    sLogger.logDebug("Config Setup ... ");
-                                    configuration.preRunSetup();
-                                    for (BasePermissionTester permissionTester : configuration.getPermissionTesters(
-                                            activity)) {
-                                        String block = permissionTester.getClass().getSimpleName();
-                                        sLogger.logInfo("Call Tester Block:"+block);
-                                        if(block.equals("SignaturePermissionTester")) continue;;
-                                        //iv(Signatu)
-                                        permissionTester.runPermissionTestsByThreads((result)->{
-                                            notifyUpdate();
-                                            if(!result){
-                                                allTestPassed.set(false);
+                AtomicInteger errorCnt= new AtomicInteger(0);
+                AtomicInteger finishedTesters= new AtomicInteger(0);
+                List<String> errorPermissions = new ArrayList<>();
+                Future<Boolean> future = executor.submit(() -> {
+                    try {
+                        Handler handler = ((TesterApplication)getApplication()).mainThreadHandler;
+                        handler.post(()->{
+                            sLogger.logDebug("Call config->"+configuration.toString());
+                            Activity activity = MainActivity.this;
+                            mStatusData.clear();
+                            mStatusAdapter.notifyDataSetChanged();
+                            try {
+                                configuration.preRunSetup();
+                                int config_length = configuration.getPermissionTesters(activity).size();
+                                for (BasePermissionTester permissionTester : configuration.getPermissionTesters(
+                                        activity)) {
+                                    String block = permissionTester.getClass().getSimpleName();
+                                    sLogger.logSystem("Start Tester Block...:"+block);
+                                    //if(!block.equals("SignaturePermissionTester")) continue;;
+                                    permissionTester.runPermissionTestsByThreads((result)->{
+                                        notifyUpdate();
+                                        if(result.getResult()) {
+                                            sLogger.logInfo("Test Passed:"+result);
+                                        } else {
+                                            sLogger.logError("Failure result for test:"+result);
+                                            errorPermissions.add(result.getName());
+                                            errorCnt.incrementAndGet();
+                                        }
+                                        if(result.getTotal() == result.getNo()){
+                                            sLogger.logSystem("the test has done. error count="+errorCnt.get()+"/"+result.getTotal()+"/Failure Test Cases:");
+                                            if(config_length == finishedTesters.incrementAndGet()){
+                                                postTestersFinished("All test has been finished. Found "+errorCnt.get()+" errors.");
+                                                for(String s : errorPermissions){
+                                                    sLogger.logError(s);
+                                                }
                                             }
-                                        });
-                                    }
-                                } catch (BypassConfigException e) {
-                                    sLogger.logDebug("Bypassing test for current configuration: " + e);
-                                    allTestPassed.set(false);
+                                        }
+                                    });
                                 }
-                            });
-                            return allTestPassed.get();
-                        } catch(Exception ex) {
-                             sLogger.logError("SecureURL Failure: " + ex.getMessage());
-                            return false;
-                        }
+                            } catch (BypassConfigException e) {
+                                sLogger.logDebug("Bypassing test for current configuration: " + e);
+                            }
+                        });
+                        return true;
+                    } catch(Exception ex) {
+                         sLogger.logError("SecureURL Failure: " + ex.getMessage());
+                        return false;
                     }
                 });
 
                 try {
                     while(!future.isDone() && !future.isCancelled()) {
-                        Thread.sleep(200);
                         notifyUpdate();
                         System.out.println("Waiting for task completion...");
                     }
 
                     Boolean result = future.get();
-                    sLogger.logSystem(String.format("All test cases have been finished : resp=%s",result.toString()));
+                    //sLogger.logSystem(String.format("All test cases have been finished : resp=%s",result.toString()));
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
@@ -381,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                 gsonTestSuites.testCategories.add(gsonCategory);
                 testCounter.put(testCategory,testCount);
             }
-            sLogger.logInfo(">The applicatin contains "+totalCounter+" test suites.");
+            sLogger.logInfo(">The application contains "+totalCounter+" test suites.");
             sLogger.logInfo(">Test Conflicts :"+dupe.toString());
 
             Gson gson = new Gson();

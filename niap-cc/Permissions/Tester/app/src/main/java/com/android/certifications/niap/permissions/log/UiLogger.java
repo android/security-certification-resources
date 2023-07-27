@@ -28,6 +28,12 @@ public class UiLogger implements Logger {
     private final String mTag;
     public final LogListAdaptable mFrontEnd;
 
+    public final int LEVEL_DEBUG = 0;
+    public final int LEVEL_INFO = 1;
+    public final int LEVEL_WARN = 2;
+    public final int LEVEL_ERROR = 3;
+    public final int LEVEL_SYSTEM = 4;
+    private int ui_level = LEVEL_ERROR;
 
 
     /**
@@ -42,7 +48,8 @@ public class UiLogger implements Logger {
     public void logDebug(String message) {
         if (Constants.DEBUG) {
             Log.d(mTag, message);
-            mFrontEnd.addLogLine("🪲"+message);
+            if(ui_level<=LEVEL_DEBUG)
+                mFrontEnd.addLogLine("🪲"+message);
         }
     }
 
@@ -50,37 +57,44 @@ public class UiLogger implements Logger {
     public void logDebug(String message, Throwable throwable) {
         if (Constants.DEBUG) {
             Log.d(mTag, message, throwable);
-            mFrontEnd.addLogLine("🪲"+message+"/"+throwable);
+            if(ui_level<=LEVEL_DEBUG)
+                mFrontEnd.addLogLine("🪲"+message+"/"+throwable);
         }
     }
 
     @Override
     public void logInfo(String message) {
         Log.i(mTag, message);
-        mFrontEnd.addLogLine("🟢"+message);
+        if(ui_level<=LEVEL_INFO)
+            mFrontEnd.addLogLine("🟢"+message);
     }
 
     @Override
-    public void logError(String message) {
-        Log.e(mTag, message);
-        mFrontEnd.addLogLine("🔴"+message);
-    }
-    @Override
     public void logWarn(String message) {
         Log.w(mTag, message);
-        mFrontEnd.addLogLine("🔴"+message);
+        if(ui_level<=LEVEL_WARN)
+            mFrontEnd.addLogLine("🔴"+message);
     }
+    @Override
+    public void logError(String message) {
+        Log.e(mTag, message);
+        if(ui_level<=LEVEL_ERROR)
+            mFrontEnd.addLogLine("🔴"+message);
+    }
+
 
     @Override
     public void logError(String message, Throwable throwable) {
         Log.e(mTag, message, throwable);
-        mFrontEnd.addLogLine("🔴"+message+"/"+throwable);
+        if(ui_level<=LEVEL_ERROR)
+            mFrontEnd.addLogLine("🔴"+message+"/"+throwable);
     }
 
     @Override
     public void logSystem(String message) {
         //Show System important message like result/un-implmented method and so on
         Log.i(mTag, message);
-        mFrontEnd.addLogLine("❗️⚙️"+message+"/");
+        if(ui_level<=LEVEL_SYSTEM)
+            mFrontEnd.addLogLine("❗"+message);
     }
 }

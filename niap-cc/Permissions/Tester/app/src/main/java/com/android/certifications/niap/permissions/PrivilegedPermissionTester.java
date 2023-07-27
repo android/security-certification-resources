@@ -28,6 +28,8 @@ import com.android.certifications.niap.permissions.log.StatusLogger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Permission tester to verify all platform declared signature permissions with the privileged flag
@@ -83,9 +85,37 @@ public class PrivilegedPermissionTester extends SignaturePermissionTester {
         }
         return allTestsPassed;
     }
-    public void runPermissionTestsByThreads(Consumer<Boolean> callback){
-        mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
+    public void runPermissionTestsByThreads(Consumer<Result> callback){
+        Result.testerName = this.getClass().getSimpleName();
 
+        mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
+        List<String> permissions = mConfiguration.getPrivilegedPermissions().orElse(
+                new ArrayList<>(mPrivilegedPermissions));
+        int numperms = permissions.size();
+        int no=0;
+        AtomicInteger cnt = new AtomicInteger(0);
+        final int total = permissions.size();
+        for (String permission : permissions) {
+            // If the permission has a corresponding task then run it.
+            mLogger.logDebug("Starting test for privileged permission: "+String.format(Locale.US,
+                    "%d/%d ",no,numperms) + permission);
+            Thread thread = new Thread(() -> {
+                if (!mPrivilegedPermissions.contains(permission)) {
+                    mLogger.logDebug(permission + " is not a privileged permission");
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total));
+                } else if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total));
+                } else {
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total));
+                }
+            });
+            thread.start();
+            try {
+                thread.join(THREAD_JOIN_DELAY);
+            } catch (InterruptedException e) {
+                mLogger.logError(String.format(Locale.US,"%d %s failed due to the timeout.",no,permission));
+            }
+        }
     }
     /**
      * Logs a status entry for the provided {@code permission}; the test app should only be granted

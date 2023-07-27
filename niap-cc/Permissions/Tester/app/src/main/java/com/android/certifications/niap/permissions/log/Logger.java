@@ -71,7 +71,7 @@ public interface Logger {
         String msg = permission + ": " + testStatus + " (granted = " + permissionGranted
                 + ", api successful = " + apiSuccessful + ")";
 
-        if(apiSuccessful){
+        if(testStatus.equals(PASSED)){
             logInfo(msg);
         } else {
             logError(msg);

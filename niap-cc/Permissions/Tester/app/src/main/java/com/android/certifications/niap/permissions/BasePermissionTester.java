@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Base class that provides standard functionality for performing permission tests. Permission
@@ -50,6 +51,65 @@ import java.util.Set;
  * test all permissions to be verified by the class.
  */
 public abstract class BasePermissionTester {
+
+    public static int THREAD_JOIN_DELAY=500;
+    public static int aiIncl(AtomicInteger n){
+        return n.incrementAndGet();
+    }
+    public static class Result {
+
+        public Result(boolean result,String name,int  no,int total){
+            this.result=result;this.name=name;this.no=no;this.total=total;this.isTarget=true;
+            this._testerName = testerName;
+        }
+        Boolean result;
+        String name;
+        int no;
+        int total;
+        Boolean isTarget;
+        String _testerName;
+        public static String testerName;
+        public Boolean getResult() {
+            return result;
+        }
+        public String getName() {
+            return name;
+        }
+
+        public int getNo() {
+            return no;
+        }
+
+        public int getTotal() {
+            return total;
+        }
+
+        public String getTesterName() {
+            return this._testerName;
+        }
+
+
+        public boolean getIsTarget()
+        {
+            return isTarget;
+        }
+        public Result markNonTarget(){
+            isTarget = false;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return "Result{" +
+                    "result=" + result +
+                    ", name='" + name + '\'' +
+                    ", no=" + no +
+                    ", total=" + total +
+                    ", testerName=" + testerName +
+                    '}';
+        }
+    }
+
     private static final String TAG = "PermissionTester";
 
     protected final Logger mLogger;
@@ -125,7 +185,7 @@ public abstract class BasePermissionTester {
      * indicating whether all tests completed successfully.
      */
     public abstract boolean runPermissionTests();
-    public abstract void runPermissionTestsByThreads(Consumer<Boolean> callback);
+    public abstract void runPermissionTestsByThreads(Consumer<Result> callback);
     public abstract Map<String,PermissionTest> getRegisteredPermissions();
 
     /**

@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Permission tester to verify signature permissions declared by preloaded apps can only be granted
@@ -115,7 +116,9 @@ public class NonPlatformPermissionTester extends BasePermissionTester {
         return allTestsPassed;
     }
 
-    public void runPermissionTestsByThreads(Consumer<Boolean> callback){
+    public void runPermissionTestsByThreads(Consumer<Result> callback){
+        Result.testerName = this.getClass().getSimpleName();
+
         //mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
 // Maintain a mapping of permissions to declaring packages; this way if a configuration
         // specifies a static list of permissions each permission can be looked up in expected
@@ -140,19 +143,15 @@ public class NonPlatformPermissionTester extends BasePermissionTester {
         // hasSigningCertificate.
         Map<String, Boolean> packageSignatureMatch = new HashMap<>();
         //
-        int numperms = permissions.size();
-        int no=0;
 
+        AtomicInteger cnt = new AtomicInteger(0);
+        final int total = permissions.size();
         //There's no runnable test
         for (String permission : permissions) {
-            no++;
+
             // If the permission has a corresponding task then run it.
             mLogger.logDebug("Starting test for non-platform permission: "+String.format(Locale.US,
-                    "%d/%d ",no,numperms) + permission);
-
-
-
-
+                    "%d/%d ",cnt.get(),total) + permission);
 
             Thread thread = new Thread(() -> {
                 // Only test those signature permissions that are declared on the device to avoid false
@@ -160,7 +159,7 @@ public class NonPlatformPermissionTester extends BasePermissionTester {
                 if (!permissionToPackage.containsKey(permission)) {
                     mLogger.logDebug("Permission " + permission
                             + " is not declared by a non-platform package on this device");
-                    callback.accept(true);
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total));
                     //continue;
                 } else {
                     String packageName = permissionToPackage.get(permission);
@@ -175,18 +174,19 @@ public class NonPlatformPermissionTester extends BasePermissionTester {
                     }
                     if (permissionGranted != (signatureMatch || mPlatformSignatureMatch)) {
                         //allTestsPassed = false;
-                        callback.accept(false);
+                        callback.accept(new Result(false, permission, aiIncl(cnt), total));
+                    } else {
+                        callback.accept(new Result(true, permission, aiIncl(cnt), total));
                     }
                     mLogger.logSignaturePermissionStatus(permission, permissionGranted, signatureMatch,
                             mPlatformSignatureMatch);
-                    callback.accept(true);
                 }
             });
             thread.start();
             try {
-                thread.join(500);
+                thread.join(THREAD_JOIN_DELAY);
             } catch (InterruptedException e) {
-                mLogger.logError(String.format(Locale.US,"%d %s failed due to the timeout.",no,permission));
+                mLogger.logError(String.format(Locale.US,"%d %s failed due to the timeout.",cnt.get(),permission));
             }
         }
     }

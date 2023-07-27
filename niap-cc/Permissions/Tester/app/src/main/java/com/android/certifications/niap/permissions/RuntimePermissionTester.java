@@ -120,7 +120,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Permission tester to verify all runtime permissions properly guard their API, resources, etc.
@@ -724,8 +726,35 @@ public class RuntimePermissionTester extends BasePermissionTester {
         }
         return allTestsPassed;
     }
-    public void runPermissionTestsByThreads(androidx.core.util.Consumer<Boolean> callback){
-        mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
+    public void runPermissionTestsByThreads(androidx.core.util.Consumer<Result> callback){
+        Result.testerName = this.getClass().getSimpleName();
+
+        boolean allTestsPassed = true;
+        List<String> permissions = mConfiguration.getRuntimePermissions().orElse(
+                new ArrayList<>(mPermissionTasks.keySet()));
+
+        AtomicInteger cnt = new AtomicInteger(0);
+        final int total = permissions.size();
+        for (String permission : permissions) {
+            // If the permission has a corresponding task then run it.
+            mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
+                    "%d/%d ",cnt.get(),total) + permission);
+            Thread thread = new Thread(() -> {
+                // if this is a signature permission with the privileged protection flag then skip it
+                // if the app is configured to use the PrivilegedPermissionTester.
+                if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total));
+                } else {
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total));
+                }
+            });
+            thread.start();
+            try {
+                thread.join(THREAD_JOIN_DELAY);
+            } catch (InterruptedException e) {
+                mLogger.logError(String.format(Locale.US,"%d %s failed due to the timeout.",cnt.get(),permission));
+            }
+        }
     }
     /**
      * Enables the specified {@code bluetoothAdapter} if the required permission is granted.

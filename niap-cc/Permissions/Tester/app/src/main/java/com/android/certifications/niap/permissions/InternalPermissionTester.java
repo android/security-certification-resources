@@ -49,9 +49,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -335,8 +337,34 @@ public class InternalPermissionTester extends BasePermissionTester {
         }
         return allTestsPassed;
     }
-    public void runPermissionTestsByThreads(androidx.core.util.Consumer<Boolean> callback){
-        mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
+    public void runPermissionTestsByThreads(androidx.core.util.Consumer<Result> callback){
+        Result.testerName = this.getClass().getSimpleName();
+
+        List<String> permissions = mConfiguration.getInternalPermissions().orElse(
+                new ArrayList<>(mPermissionTasks.keySet()));
+        int numperms = permissions.size();
+        int no=0;
+        AtomicInteger cnt = new AtomicInteger(0);
+        final int total = permissions.size();
+        for (String permission : permissions) {
+            // If the permission has a corresponding task then run it.
+            mLogger.logDebug("Starting test for internal permission: "+String.format(Locale.US,
+                    "%d/%d ",no,numperms) + permission);
+            Thread thread = new Thread(() -> {
+                if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total));
+                } else {
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total));
+                }
+            });
+            thread.start();
+            try {
+                thread.join(THREAD_JOIN_DELAY);
+            } catch (InterruptedException e) {
+                mLogger.logError(String.format(Locale.US,"%d %s failed due to the timeout.",no,permission));
+            }
+        }
+
     }
 
     @Override

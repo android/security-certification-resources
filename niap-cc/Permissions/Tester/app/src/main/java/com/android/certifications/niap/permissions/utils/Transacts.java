@@ -2362,7 +2362,7 @@ public class Transacts {
             case Build.VERSION_CODES.TIRAMISU:
                 return new BarbetApiLevel33Transacts();
             case Build.VERSION_CODES.UPSIDE_DOWN_CAKE:
-                return new BarbetApiLevel33Transacts();
+                return new BarbetApiLevel34Transacts();
             default:
                 throw new IllegalArgumentException(
                         "The provided API level, " + apiLevel + ", is not supported");

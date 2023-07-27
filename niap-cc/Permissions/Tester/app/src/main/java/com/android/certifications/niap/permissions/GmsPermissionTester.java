@@ -64,11 +64,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -438,7 +440,9 @@ public class GmsPermissionTester extends BasePermissionTester {
         }));
     }
 
-    public void runPermissionTestsByThreads(Consumer<Boolean> callback){
+    public void runPermissionTestsByThreads(Consumer<Result> callback){
+        Result.testerName = this.getClass().getSimpleName();
+
         List<String> gmsDeclaredPermissions = getAllGmsDeclaredSignaturePermissions();
         List<String> defaultPermissions = new ArrayList<>(mPermissionTasks.keySet());
         defaultPermissions.addAll(GMS_SIGNATURE_PERMISSIONS);
@@ -447,26 +451,36 @@ public class GmsPermissionTester extends BasePermissionTester {
         // GMS signing key or the platform signing key.
         boolean signatureMatch = mPackageManager.hasSigningCertificate(Constants.GMS_PACKAGE_NAME,
                 mAppSignature.toByteArray(), PackageManager.CERT_INPUT_RAW_X509);
+
+        AtomicInteger cnt = new AtomicInteger(0);
+        final int total = permissions.size();
         for (String permission : permissions) {
             // If the permission has a corresponding task then run it.
             Thread thread = new Thread(() -> {
+                //mLogger.logSystem(">"+permission+" thread run");
                 if (mPermissionTasks.containsKey(permission)) {
+                    //mLogger.logSystem(">"+permission+" contains");
                     if (!runPermissionTest(permission, mPermissionTasks.get(permission))) {
-                        callback.accept(false);
+                        callback.accept(new Result(false, permission, aiIncl(cnt), total));
                     } else {
-                        callback.accept(true);
+                        callback.accept(new Result(true, permission, aiIncl(cnt), total));
                     }
                 } else {
+                    //mLogger.logSystem(">"+permission+" not contains");
                     if (!gmsDeclaredPermissions.contains(permission)) {
+
                         mLogger.logError("Permission " + permission
                                 + " is not declared as a signature permission on this version of GMS");
-                        callback.accept(false);
+
+                        callback.accept(new Result(false, permission, aiIncl(cnt), total));
                     } else {
                         boolean permissionGranted = mContext.checkSelfPermission(permission)
                                 == PackageManager.PERMISSION_GRANTED;
 
                         if (permissionGranted != (signatureMatch || mPlatformSignatureMatch)) {
-                            callback.accept(false);
+                            callback.accept(new Result(false, permission,aiIncl(cnt), total));
+                        } else {
+                            callback.accept(new Result(true, permission,aiIncl(cnt), total));
                         }
                         mLogger.logSignaturePermissionStatus(permission, permissionGranted,
                                 signatureMatch, mPlatformSignatureMatch);
@@ -474,7 +488,12 @@ public class GmsPermissionTester extends BasePermissionTester {
                 }
             });
             thread.start();
-        }
+            try {
+                thread.join(THREAD_JOIN_DELAY);
+            } catch (InterruptedException e) {
+                mLogger.logError(String.format(Locale.US,"%d %s failed due to the timeout.",cnt.get(),permission));
+            }
+        }//Thread
     }
 
     @Override

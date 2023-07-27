@@ -129,6 +129,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Permission tester to verify all install permissions properly guard their API, resource, etc.
@@ -720,27 +721,31 @@ public class InstallPermissionTester extends BasePermissionTester {
         }
         return allTestsPassed;
     }
-    public void runPermissionTestsByThreads(Consumer<Boolean> callback){
+    public void runPermissionTestsByThreads(Consumer<Result> callback){
+        Result.testerName = this.getClass().getSimpleName();
+
         //mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
         List<String> permissions = mConfiguration.getInstallPermissions().orElse(
                 new ArrayList<>(mPermissionTasks.keySet()));
         int numperms = permissions.size();
         int no=0;
-        for (String permission : permissions) {
-            no++;
+        AtomicInteger cnt = new AtomicInteger(0);
+        final int total = permissions.size();
+           for (String permission : permissions) {
+
             // If the permission has a corresponding task then run it.
             mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
                     "%d/%d ",no,numperms) + permission);
             Thread thread = new Thread(() -> {
                 if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
-                    callback.accept(true);
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total));
                 } else {
-                    callback.accept(false);
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total));
                 }
             });
             thread.start();
             try {
-                thread.join(500);
+                thread.join(THREAD_JOIN_DELAY);
             } catch (InterruptedException e) {
                 mLogger.logError(String.format(Locale.US,"%d %s failed due to the timeout.",no,permission));
             }

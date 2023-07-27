@@ -54,26 +54,33 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="?attr/actionBarSize" />
 
+
+
     <LinearLayout
         android:id="@+id/mainLayout"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-
         android:gravity="center_horizontal|top"
-        android:background="#CCDDDDDD"
-        android:layout_margin="5dp"
-        android:padding="16dp"
+        android:background="@drawable/layer_card_background"
+        android:layout_margin="10dp"
+        android:padding="8dp"
         android:layout_marginBottom="5dp"
         android:orientation="vertical"
         android:elevation="30dp"
-        app:behavior_hideable="true"
+        app:behavior_hideable="false"
         app:behavior_peekHeight="60dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:layout_constraintTop_toTopOf="@+id/statusTextView"
         tools:ignore="MissingConstraints">
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/arrow_text"
+            android:textSize="18sp"
+            android:layout_marginBottom="10dp"
+            />
     </LinearLayout>
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

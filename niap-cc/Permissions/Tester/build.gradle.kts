@@ -21,7 +21,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.0.2")
+        classpath("com.android.tools.build:gradle:8.1.0")
         classpath("com.google.guava:guava:24.1-jre")
         classpath("org.codehaus.groovy:groovy-json:3.0.9")
         // NOTE: Do not place your application dependencies here; they belong

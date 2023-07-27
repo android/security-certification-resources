@@ -23,6 +23,7 @@ import android.content.pm.PermissionInfo;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.Constants;
+import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
