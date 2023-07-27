@@ -314,10 +314,13 @@ public class MainActivity extends AppCompatActivity {
         ContextCompat.registerReceiver
                 (this, receiver, new IntentFilter(ACCESS_LOCATION_ACTION), flags);
         //TODO: Bug? From U+ We can't create mutable Pending Intent directly ...
+        //      So we can't utilize the LocationClient in this way
         //      We should investigate an alternative plan to verify the location service
         Intent intent = new Intent(ACCESS_LOCATION_ACTION);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent,
-                PendingIntent.FLAG_MUTABLE|FLAG_NO_CREATE);
+                PendingIntent.FLAG_MUTABLE);
+        //FLAG_NO_CREATE
+
         FusedLocationProviderClient locationClient =
                 LocationServices.getFusedLocationProviderClient(this);
         try {
