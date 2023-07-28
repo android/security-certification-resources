@@ -482,6 +482,8 @@
             android:permission="android.permission.BIND_ATTESTATION_VERIFICATION_SERVICE"
             android:enabled="true"
             android:exported="true" />
+
+        <!-- Services for android U -->
         <service android:name=".services.TestBindCallStreamingServiceService"
             android:permission="android.permission.BIND_CALL_STREAMING_SERVICE"
             android:enabled="true" android:exported="true" />
@@ -504,8 +506,8 @@
             android:permission="android.permission.BIND_VISUAL_QUERY_DETECTION_SERVICE"
             android:enabled="true" android:exported="true" />
         <service android:name=".services.TestBindWearableSensingServiceService"
-        android:permission="android.permission.BIND_WEARABLE_SENSING_SERVICE"
-        android:enabled="true" android:exported="true" />
+            android:permission="android.permission.BIND_WEARABLE_SENSING_SERVICE"
+            android:enabled="true" android:exported="true" />
 
 
     </application>

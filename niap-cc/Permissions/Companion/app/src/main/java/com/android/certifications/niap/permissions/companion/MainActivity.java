@@ -313,32 +313,38 @@ public class MainActivity extends AppCompatActivity {
         int flags = ContextCompat.RECEIVER_NOT_EXPORTED;//RECEIVER_EXPORTED
         ContextCompat.registerReceiver
                 (this, receiver, new IntentFilter(ACCESS_LOCATION_ACTION), flags);
+
         //TODO: Bug? From U+ We can't create mutable Pending Intent directly ...
         //      So we can't utilize the LocationClient in this way
         //      We should investigate an alternative plan to verify the location service
-        Intent intent = new Intent(ACCESS_LOCATION_ACTION);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent,
-                PendingIntent.FLAG_MUTABLE);
-        //FLAG_NO_CREATE
-
-        FusedLocationProviderClient locationClient =
-                LocationServices.getFusedLocationProviderClient(this);
-        try {
-            locationClient.requestLocationUpdates(mLocationRequest, pendingIntent);
-        } catch (SecurityException e) {
-            logerror("Caught a SecurityException requesting location updates: ");
-            return false;
-        }
         boolean locationReceived = false;
-        try {
-            locationReceived = latch[0].await(10, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            logerror( "Caught an InterruptedException: ");
-        }
-        locationClient.removeLocationUpdates(pendingIntent);
-        unregisterReceiver(receiver);
-        if (!locationReceived) {
-            logerror("Location update not received within timeout window");
+        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            Intent intent = new Intent(ACCESS_LOCATION_ACTION);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent,
+                    PendingIntent.FLAG_MUTABLE);
+            //FLAG_NO_CREATE
+
+            FusedLocationProviderClient locationClient =
+                    LocationServices.getFusedLocationProviderClient(this);
+            try {
+                locationClient.requestLocationUpdates(mLocationRequest, pendingIntent);
+            } catch (SecurityException e) {
+                logerror("Caught a SecurityException requesting location updates: ");
+                return false;
+            }
+
+            try {
+                locationReceived = latch[0].await(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                logerror("Caught an InterruptedException: ");
+            }
+            locationClient.removeLocationUpdates(pendingIntent);
+            unregisterReceiver(receiver);
+            if (!locationReceived) {
+                logerror("Location update not received within timeout window");
+            }
+        } else {
+            logerror("We can not receive device location with pending intent after U+.");
         }
         return locationReceived;
     }
