@@ -132,7 +132,7 @@ public class GmsPermissionTester extends BasePermissionTester {
         GMS_SIGNATURE_PERMISSIONS.add(
                 "com.google.android.gms.magictether.permission.CONNECTED_HOST_CHANGED");
         GMS_SIGNATURE_PERMISSIONS.add("com.google.android.gms.permission.CONTACTS_SYNC_DELEGATION");
-        GMS_SIGNATURE_PERMISSIONS.add("com.google.android.gms.permission.GAMES_DEBUG_SETTINGS");
+        //GMS_SIGNATURE_PERMISSIONS.add("com.google.android.gms.permission.GAMES_DEBUG_SETTINGS");//Removed as of 13
         GMS_SIGNATURE_PERMISSIONS.add(
                 "com.google.android.gms.trustagent.permission.TRUSTAGENT_STATE");
         GMS_SIGNATURE_PERMISSIONS.add(

@@ -16,8 +16,6 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-
     <uses-feature android:name="android.software.companion_device_setup"
         android:required="false" />
 
@@ -1443,7 +1441,7 @@
     <uses-permission android:name="com.google.android.gms.smartdevice.permission.NOTIFY_QUICK_START_STATUS" />
 
     <uses-permission android:name="com.google.android.settings.future.biometrics.faceenroll.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-
+    <!-- non new platform permissions from barbet34 device-->
     <uses-permission android:name="com.google.sensor.private.permission.USE_RAW_SENSOR" />
     <uses-permission android:name="com.google.android.youtube.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
     <uses-permission android:name="com.google.android.deskclock.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
@@ -1540,5 +1538,24 @@
     <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.reader" />
     <uses-permission android:name="com.google.android.apps.safetyhub.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
     <uses-permission android:name="com.google.android.apps.wellbeing.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-
+    <!-- non platform oriole(pixel6) 33-->
+    <uses-permission android:name="com.google.android.apps.subscriptions.red.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.example.test_suites.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.keep.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.apps.tachyon.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.example.assets.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.apps.chromecast.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.apps.docs.editors.docs.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.apps.camera.services.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.ims.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.apps.kids.familylinkhelper.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.apps.walletnfcrel.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.example.directboot.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.apps.magazines.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.apps.dreamliner.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.apps.translate.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.apps.accessibility.voiceaccess.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.example.openurl.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.apps.podcasts.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+    <uses-permission android:name="com.google.android.gms.pay.sidecar.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
 </manifest>

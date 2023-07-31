@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class BasePermissionTester {
 
-    public static int THREAD_JOIN_DELAY=500;
+    public static int THREAD_JOIN_DELAY=100;
     public static int aiIncl(AtomicInteger n){
         return n.incrementAndGet();
     }

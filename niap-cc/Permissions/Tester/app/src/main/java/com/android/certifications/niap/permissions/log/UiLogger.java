@@ -95,6 +95,6 @@ public class UiLogger implements Logger {
         //Show System important message like result/un-implmented method and so on
         Log.i(mTag, message);
         if(ui_level<=LEVEL_SYSTEM)
-            mFrontEnd.addLogLine("❗"+message);
+            mFrontEnd.addLogLine("☛"+message);
     }
 }

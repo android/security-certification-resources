@@ -1106,6 +1106,23 @@ public class SignaturePermissions {
                 "android.permission.ACCESS_AMBIENT_CONTEXT_EVENT";
         public static final String MANAGE_ETHERNET_NETWORKS =
                 "android.permission.MANAGE_ETHERNET_NETWORKS";
+
+        public static final String BIND_CALL_STREAMING_SERVICE
+                ="android.permission.BIND_CALL_STREAMING_SERVICE";
+        public static final String BIND_CREDENTIAL_PROVIDER_SERVICE
+                ="android.permission.BIND_CREDENTIAL_PROVIDER_SERVICE";
+        public static final String BIND_FIELD_CLASSIFICATION_SERVICE
+                ="android.permission.BIND_FIELD_CLASSIFICATION_SERVICE";
+        public static final String BIND_REMOTE_LOCKSCREEN_VALIDATION_SERVICE
+                ="android.permission.BIND_REMOTE_LOCKSCREEN_VALIDATION_SERVICE";
+        public static final String BIND_SATELLITE_GATEWAY_SERVICE
+                ="android.permission.BIND_SATELLITE_GATEWAY_SERVICE";
+        public static final String BIND_SATELLITE_SERVICE
+                ="android.permission.BIND_SATELLITE_SERVICE";
+        public static final String BIND_VISUAL_QUERY_DETECTION_SERVICE
+                ="android.permission.BIND_VISUAL_QUERY_DETECTION_SERVICE";
+        public static final String BIND_WEARABLE_SENSING_SERVICE
+                ="android.permission.BIND_WEARABLE_SENSING_SERVICE";
     }
 
     /**

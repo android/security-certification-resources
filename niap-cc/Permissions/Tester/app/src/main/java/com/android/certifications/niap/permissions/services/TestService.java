@@ -23,6 +23,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 
 import com.android.certifications.niap.permissions.Constants;
@@ -41,7 +42,7 @@ public class TestService extends Service {
     private static final Logger sLogger = LoggerFactory.createDefaultLogger(TAG);
 
     private static final int NOTIFICATION_ID = 1;
-
+    private final IBinder mBinder = new LocalBinder();
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String permission = intent.getStringExtra(Constants.EXTRA_PERMISSION_NAME);
@@ -90,6 +91,12 @@ public class TestService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
+    }
+
+    public class LocalBinder extends Binder {
+        TestService getService() {
+            return TestService.this;
+        }
     }
 }

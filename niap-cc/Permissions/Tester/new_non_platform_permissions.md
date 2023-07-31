@@ -101,3 +101,23 @@ android.permission.LOCK_DEVICE
 android.permission.MANAGE_WIFI_COUNTRY_CODE
 android.permission.NETWORK_MANAGED_PROVISIONING
 android.permission.RESTART_WIFI_SUBSYSTEM
+
+<uses-permission android:name="com.google.android.apps.subscriptions.red.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+<uses-permission android:name="com.example.test_suites.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.keep.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.apps.tachyon.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.example.assets.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.apps.chromecast.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.apps.docs.editors.docs.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.apps.camera.services.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.ims.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.apps.kids.familylinkhelper.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.apps.walletnfcrel.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.example.directboot.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.apps.magazines.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.apps.dreamliner.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.apps.translate.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.apps.accessibility.voiceaccess.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.example.openurl.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.apps.podcasts.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+<uses-permission android:name="com.google.android.gms.pay.sidecar.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>

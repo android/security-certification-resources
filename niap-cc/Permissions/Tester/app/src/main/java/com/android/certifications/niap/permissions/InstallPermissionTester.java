@@ -253,24 +253,25 @@ public class InstallPermissionTester extends BasePermissionTester {
             keyguardLock.disableKeyguard();
         }));
 
-        mPermissionTasks.put(EXPAND_STATUS_BAR, new PermissionTest(false, () -> {
-            @SuppressLint("WrongConstant") Object statusBarManager = mContext.getSystemService("statusbar");
-            invokeReflectionCall(statusBarManager.getClass(), "expandNotificationsPanel",
-                    statusBarManager, null);
-            // A short sleep is required to allow the notification panel to be expanded before
-            // collapsing it to clean up after this test.
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                mLogger.logDebug("Caught an InterruptedException: ", e);
-            }
-            // Starting in Android 12 this API is no longer available without the signature
-            // permission STATUS_BAR.
-            if (mDeviceApiLevel < Build.VERSION_CODES.S) {
-                invokeReflectionCall(statusBarManager.getClass(), "collapsePanels",
-                        statusBarManager, null);
-            }
-        }));
+        //TODO:This Test Action Hide Screen
+//        mPermissionTasks.put(EXPAND_STATUS_BAR, new PermissionTest(false, () -> {
+//            @SuppressLint("WrongConstant") Object statusBarManager = mContext.getSystemService("statusbar");
+//            invokeReflectionCall(statusBarManager.getClass(), "expandNotificationsPanel",
+//                    statusBarManager, null);
+//            // A short sleep is required to allow the notification panel to be expanded before
+//            // collapsing it to clean up after this test.
+//            try {
+//                Thread.sleep(500);
+//            } catch (InterruptedException e) {
+//                mLogger.logDebug("Caught an InterruptedException: ", e);
+//            }
+//            // Starting in Android 12 this API is no longer available without the signature
+//            // permission STATUS_BAR.
+//            if (mDeviceApiLevel < Build.VERSION_CODES.S) {
+//                invokeReflectionCall(statusBarManager.getClass(), "collapsePanels",
+//                        statusBarManager, null);
+//            }
+//        }));
 
         // andorid.permission.FLASHLIGHT has been removed.
 
