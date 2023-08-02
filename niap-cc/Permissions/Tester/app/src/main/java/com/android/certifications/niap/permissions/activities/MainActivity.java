@@ -268,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                         for (BasePermissionTester permissionTester : testers) {
                             String block = permissionTester.getClass().getSimpleName();
                             //if(!block.equals("SignaturePermissionTester")) continue;
-                            if(!block.equals("InstallPermissionTester")) continue;
+                            //if(!block.equals("InstallPermissionTester")) continue;
                             sLogger.logSystem("Start Tester Block...:"+block);
                             mStatusAdapter.notifyDataSetChanged();
                             permissionTester.runPermissionTestsByThreads((result)->{

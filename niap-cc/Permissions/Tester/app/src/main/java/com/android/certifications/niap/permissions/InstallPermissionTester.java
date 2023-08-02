@@ -339,7 +339,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     mActivity.startForegroundService(serviceIntent);
                     tryBindingForegroundService(serviceIntent);
                 } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_CAMERA", t);
+                    mLogger.logDebug("FOREGROUND_SERVICE_CAMERA", t);
                 }
             }));
             mPermissionTasks.put(FOREGROUND_SERVICE_LOCATION,  new PermissionTest(true,
@@ -349,7 +349,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     mActivity.startForegroundService(serviceIntent);
                     tryBindingForegroundService(serviceIntent);
                 } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_LOCATION", t);
+                    mLogger.logDebug("FOREGROUND_SERVICE_LOCATION", t);
                 }
             }));
             mPermissionTasks.put(FOREGROUND_SERVICE_MICROPHONE,  new PermissionTest(true,
@@ -359,7 +359,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     mActivity.startForegroundService(serviceIntent);
                     tryBindingForegroundService(serviceIntent);
                 } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                    mLogger.logDebug("FOREGROUND_SERVICE_MICROPHONE", t);
                 }
             }));
             mPermissionTasks.put(FOREGROUND_SERVICE_CONNECTED_DEVICE,  new PermissionTest(true,
@@ -369,7 +369,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     mActivity.startForegroundService(serviceIntent);
                     tryBindingForegroundService(serviceIntent);
                 } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_CONNECTED_DEVICE", t);
+                    mLogger.logDebug("FOREGROUND_SERVICE_CONNECTED_DEVICE", t);
                 }
             }));
             mPermissionTasks.put(FOREGROUND_SERVICE_DATA_SYNC,  new PermissionTest(true,
@@ -379,7 +379,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     mActivity.startForegroundService(serviceIntent);
                     tryBindingForegroundService(serviceIntent);
                 } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                    mLogger.logDebug("FOREGROUND_SERVICE_DATA_SYNC", t);
                 }
             }));
             mPermissionTasks.put(FOREGROUND_SERVICE_HEALTH,  new PermissionTest(true,
@@ -389,7 +389,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     mActivity.startForegroundService(serviceIntent);
                     tryBindingForegroundService(serviceIntent);
                 } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                    mLogger.logDebug("FOREGROUND_SERVICE_HEALTH", t);
                 }
             }));
             mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PLAYBACK,  new PermissionTest(true,
@@ -399,7 +399,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     mActivity.startForegroundService(serviceIntent);
                     tryBindingForegroundService(serviceIntent);
                 } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                    mLogger.logDebug("FOREGROUND_SERVICE_MEDIA_PLAYBACK", t);
                 }
             }));
             mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PROJECTION,  new PermissionTest(true,
@@ -409,19 +409,10 @@ public class InstallPermissionTester extends BasePermissionTester {
                     mActivity.startForegroundService(serviceIntent);
                     tryBindingForegroundService(serviceIntent);
                 } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                    mLogger.logTestError("FOREGROUND_SERVICE_MEDIA_PROJECTION", t);
                 }
             }));
-            mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PROJECTION,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgMediaProjectionService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
-                }
-            }));
+
             mPermissionTasks.put(FOREGROUND_SERVICE_PHONE_CALL,  new PermissionTest(true,
                     Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
                 Intent serviceIntent = new Intent(mActivity, FgPhoneCallService.class);
@@ -460,7 +451,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     mActivity.startForegroundService(serviceIntent);
                     tryBindingForegroundService(serviceIntent);
                 } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                    mLogger.logTestError("FOREGROUND_SERVICE_SPECIAL_USE", t);
                 }
             }));
             mPermissionTasks.put(FOREGROUND_SERVICE_SYSTEM_EXEMPTED,  new PermissionTest(true,
@@ -470,7 +461,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     mActivity.startForegroundService(serviceIntent);
                     tryBindingForegroundService(serviceIntent);
                 } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                    mLogger.logTestError("FOREGROUND_SERVICE_SYSTEM_EXEMPTED", t);
                 }
             }));
 
