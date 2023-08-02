@@ -65,7 +65,9 @@ import com.android.certifications.niap.permissions.config.ConfigurationFactory;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
-import com.android.certifications.niap.permissions.utils.SignaturePermissions;
+import com.android.certifications.niap.permissions.services.FgCameraService;
+import com.android.certifications.niap.permissions.services.FgLocationService;
+import com.android.certifications.niap.permissions.services.FgMicrophoneService;
 import com.android.certifications.niap.permissions.utils.gson.Test;
 import com.android.certifications.niap.permissions.utils.gson.TestCategory;
 import com.android.certifications.niap.permissions.utils.gson.TestSuites;
@@ -100,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
 
     private static final int ADMIN_INTENT = 1;
 
-    private TextView mStatusTextView;
     private final List<Button> mTestButtons = new ArrayList<>();
     private Context mContext;
     private TestConfiguration mConfiguration;
@@ -181,99 +182,22 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
 
     BottomSheetBehavior<LinearLayout> mBottomSheet;
 
-    boolean bound=false;
-
-
-    TestBindService[] service = new TestBindService[1];
-
-    CountDownLatch mServiceConnectionLatch;
-    private ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder binder) {
-            // This is called when the connection with the service has been
-            // established, giving us the object we can use to
-            // interact with the service.  We are communicating with the
-            // service using a Messenger, so here we get a client-side
-            // representation of that from the raw IBinder object.
-            //sLogger.logSystem("Service Connect:"+className);
-            service[0] = TestBindService.Stub.asInterface(binder);
-            try {
-                service[0].testMethod();
-            } catch (RemoteException e) {
-                throw new RuntimeException(e);
-            }
-            //ServiceConnectionLatch.countDown();
-            //sLogger.logSystem("Successfully Invoke:"+className);
-            //bound = true;
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            // This is called when the connection with the service has been
-            // unexpectedly disconnected -- that is, its process crashed.
-            //mService = null;
-            //sLogger.logSystem("Service Disconnect:");
-            bound = false;
-        }
-    };
-
-    public void bindCompanionService(String serviceName)
-    {
-        mServiceConnectionLatch = new CountDownLatch(1);
-        Intent intent = new Intent();
-        //cmp=com.android.certifications.niap.permissions.companion/.services.TestBindIncallServiceService
-        //new Intent(this, TestService.class)
-
-        intent.setComponent(new ComponentName(Constants.COMPANION_PACKAGE,
-                Constants.COMPANION_PACKAGE + ".services." + serviceName));
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        boolean connectionSuccessful = false;
-        try {
-            connectionSuccessful = mServiceConnectionLatch.await(2000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            sLogger.logError("Caught an InterruptedException waiting for the service to connect: ", e);
-        }
-
-        /*if(connectionSuccessful){
-            try {
-                service[0].testMethod();
-            } catch (RemoteException e) {
-                throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
-            } finally {
-                mContext.unbindService(mConnection);
-            }
-        } else {
-            sLogger.logError("Connection(false)");
-            /*throw new SecurityException(
-                    "Unable to establish a connection to the service guarded by the "
-                            + serviceName + " permission");
-        }*/
-    }
     @Override
     protected void onStart() {
         super.onStart();
-    /*
-        String permission  = SignaturePermissions.permission.BIND_INCALL_SERVICE;
-        StringBuilder serviceName = new StringBuilder();
-        serviceName.append("Test");
-        for (String element : permission.substring(permission.lastIndexOf('.') + 1).split(
-                "_")) {
-            serviceName.append(element.charAt(0)).append(
-                    element.substring(1).toLowerCase());
-        }
-        serviceName.append("Service");
-        runOnUiThread(()->{
-        bindCompanionService(serviceName.toString());
-        });*/
-
     }
     @Override
     protected void onStop() {
         super.onStop();
-        // Unbind from the service
-//        if (bound) {
-//            unbindService(mConnection);
-//            bound = false;
-//        }
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putStringArrayList("listViewData", (ArrayList<String>) mStatusData);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -282,12 +206,30 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
 
         mContext = this;
         LinearLayout layout = findViewById(R.id.mainLayout);
-        mStatusTextView = new TextView(this);
+        TextView mStatusTextView = new TextView(this);
         mStatusTextView.setText(R.string.tap_to_run);
 
-        //layout.addView(mStatusTextView);
         setLogAdapter();
-        addLogLine("Welcome!");
+        if(savedInstanceState != null){
+            mStatusData = savedInstanceState.getStringArrayList("listViewData");
+            runOnUiThread(()->{
+                for(String s:mStatusData){
+                    addLogLine(s);
+                }
+            });
+        } else {
+            addLogLine("Welcome!");
+        }
+
+
+
+        /*Intent serviceIntent2 = new Intent(this, FgMicrophoneService.class);
+        startForegroundService(serviceIntent2);
+
+        Intent serviceIntent3 = new Intent(this, FgLocationService.class);
+        startForegroundService(serviceIntent3);*/
+
+
         // Obtain the list of configurations from the ConfigurationFactory and create a separate
         // button to allow the user to invoke each.
         List<TestConfiguration> configurations = ConfigurationFactory.getConfigurations(this);
@@ -325,22 +267,24 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                         sLogger.logDebug("Call config->" + configuration.toString());
                         for (BasePermissionTester permissionTester : testers) {
                             String block = permissionTester.getClass().getSimpleName();
-                            if(!block.equals("SignaturePermissionTester")) continue;
-                            //if(block.equals("InstallPermissionTester")) continue;
-
+                            //if(!block.equals("SignaturePermissionTester")) continue;
+                            if(!block.equals("InstallPermissionTester")) continue;
                             sLogger.logSystem("Start Tester Block...:"+block);
                             mStatusAdapter.notifyDataSetChanged();
                             permissionTester.runPermissionTestsByThreads((result)->{
                                 runOnUiThread(()-> {
                                     if (result.getResult()) {
-                                        sLogger.logInfo("Test Passed:" + result);
+                                        sLogger.logInfo("Passed:" + result);
                                     } else {
-                                        sLogger.logError("Failure result for test:" + result);
+                                        sLogger.logError("Failure:" + result.getName());
                                         errorPermissions.add(result.getName());
                                         errorCnt.incrementAndGet();
                                     }
                                     if (result.getTotal() == result.getNo()) {
                                         sLogger.logSystem("The test block has done. error count=" + errorCnt.get() + "/" + result.getTotal());
+                                        for(String pm : errorPermissions){
+                                            sLogger.logInfo(pm);
+                                        }
                                         postTestersFinished(block + "All test has been finished. Found " + errorCnt.get() + " errors.");
                                     }
                                     mStatusAdapter.notifyDataSetChanged();

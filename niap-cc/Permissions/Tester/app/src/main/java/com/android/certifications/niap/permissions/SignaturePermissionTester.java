@@ -132,6 +132,7 @@ import android.telephony.TelephonyManager;
 import android.telephony.TelephonyScanManager;
 import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.CaptioningManager;
 import android.widget.ListView;
@@ -292,7 +293,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         prepareTestBlock01();
         prepareTestBlock02();//has some problem, process destructive
-        //prepareTestBlock03();//has some problems
+        prepareTestBlock03();//has some problems
         prepareTestBlock04();
         prepareTestBlockBind();
     }
@@ -534,6 +535,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.CLEAR_APP_USER_DATA,
                 new PermissionTest(false, () -> {
+
+                    if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                        throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
                     Class<?> packageDataObserverClass;
                     try {
                         packageDataObserverClass = Class
@@ -700,6 +705,11 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.CONTROL_REMOTE_APP_TRANSITION_ANIMATIONS,
                 new PermissionTest(false, () -> {
+
+                    if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                        throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
+
                     mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
                             Transacts.overridePendingAppTransitionRemote, (IInterface) null);
                 }));
@@ -1492,7 +1502,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             mWifiManager, null);
                 }));
 
-        //TODO : Questionable? Reboot the device
+        //TODO : Reboot the device?
         mPermissionTasks.put(permission.REBOOT, new PermissionTest(false, () -> {
             if (isPermissionGranted(permission.REBOOT)) {
                 throw new BypassTestException(
@@ -1673,15 +1683,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             UserHandle.getUserHandleForUid(mUid));
                 }));
 
-        // android.permission.RUN_IN_BACKGROUND - deprecated by REQUEST_COMPANION_RUN_IN_BACKGROUND
+//         android.permission.RUN_IN_BACKGROUND - deprecated by REQUEST_COMPANION_RUN_IN_BACKGROUND
 
-        // android.permission.SCORE_NETWORKS - network_score service guarded by SELinux
-        // policy.
+//         android.permission.SCORE_NETWORKS - network_score service guarded by SELinux
+//         policy.
 
-        // android.permission.SEND_SMS_NO_CONFIRMATION - SMSDispatcher checks for this and returns
-        // true without prompting the user if it is granted.
+//         android.permission.SEND_SMS_NO_CONFIRMATION - SMSDispatcher checks for this and returns
+//         true without prompting the user if it is granted.
 
-        // android.permission.SERIAL_PORT - serial service guarded by SELinux policy.
+//         android.permission.SERIAL_PORT - serial service guarded by SELinux policy.
 
         mPermissionTasks.put(permission.SET_ACTIVITY_WATCHER,
                 new PermissionTest(false, () -> {
@@ -1876,25 +1886,29 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         //TODO: It causes Screen White Out, It shows dialogue
-//        mPermissionTasks.put(permission.START_ANY_ACTIVITY,
-//                new PermissionTest(false, () -> {
-//                    ComponentName componentName;
-//                    if (mDeviceApiLevel < Build.VERSION_CODES.R) {
-//                        componentName = new ComponentName("android",
-//                                "com.android.internal.app.AccessibilityButtonChooserActivity");
-//                    } else {
-//                        componentName = new ComponentName("android",
-//                                "com.android.internal.accessibility.dialog"
-//                                        + ".AccessibilityButtonChooserActivity");
-//                    }
-//                    Intent intent = new Intent();
-//                    intent.setComponent(componentName);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    mContext.startActivity(intent);
-//
-//                    //}
-//
-//                }));
+        mPermissionTasks.put(permission.START_ANY_ACTIVITY,
+                new PermissionTest(false, () -> {
+
+                    if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                        throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
+                    ComponentName componentName;
+                    if (mDeviceApiLevel < Build.VERSION_CODES.R) {
+                        componentName = new ComponentName("android",
+                                "com.android.internal.app.AccessibilityButtonChooserActivity");
+                    } else {
+                        componentName = new ComponentName("android",
+                                "com.android.internal.accessibility.dialog"
+                                        + ".AccessibilityButtonChooserActivity");
+                    }
+                    Intent intent = new Intent();
+                    intent.setComponent(componentName);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mContext.startActivity(intent);
+
+                    //}
+
+                }));
 
         mPermissionTasks.put(permission.START_TASKS_FROM_RECENTS,
                 new PermissionTest(false, () -> {
@@ -2177,10 +2191,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         //TODO:WE SHOULD NOT LOCK SCREEN WHILE THE TEST....
-        //mPermissionTasks.put(permission.LOCK_DEVICE,
-        //        new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
-        //            mDevicePolicyManager.lockNow();
-        //        }));
+        mPermissionTasks.put(permission.LOCK_DEVICE,
+                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+
+                    if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                        throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
+                    mDevicePolicyManager.lockNow();
+                }));
 
         mPermissionTasks.put(permission.NETWORK_SCAN,
                 new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
@@ -2246,6 +2264,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.OPEN_APP_OPEN_BY_DEFAULT_SETTINGS,
                 new PermissionTest(false, Build.VERSION_CODES.Q,
                         Build.VERSION_CODES.R, () -> {
+
+                    if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                        throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
                     // TOOD: May need to skip if the permission is granted as opening the new
                     // activity may interrupt the test app.
                     //DevicePolicyManager.ACTION_
@@ -2296,6 +2318,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
     }
+
     void prepareTestBlock03()
     {
         mPermissionTasks.put(permission.NETWORK_MANAGED_PROVISIONING,
@@ -2338,13 +2361,18 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // android.permission.APPROVE_INCIDENT_REPORTS / REQUEST_INCIDENT_REPORT_APPROVAL - both
         // the incident and incidentcompanion services are blocked by SELinux policy.
 
-        //TODO Uses startActivity need to be checked
+        //TODO : This Test Shows Dialogue
         mPermissionTasks.put(permission.REVIEW_ACCESSIBILITY_SERVICES,
                 new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+
+                    if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                        throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
                     Intent intent = new Intent(
                             "android.intent.action.REVIEW_ACCESSIBILITY_SERVICES");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     mContext.startActivity(intent);
+
                 }));
 
         // android.permission.NETWORK_SIGNAL_STRENGTH_WAKEUP - the ConnectivityService first checks
@@ -2477,9 +2505,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
 
-        //TODO: use startActivity need to be checked
         mPermissionTasks.put(permission.START_VIEW_PERMISSION_USAGE,
                 new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+
+                    if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                        throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
                     try {
                         Intent intent = new Intent("android.intent.action.VIEW_PERMISSION_USAGE")
                                 .putExtra("android.intent.extra.PERMISSION_GROUP_NAME",
@@ -2659,9 +2690,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             null);
                 }));
 
-        //TODO:Car Mode affects to UI severy
+        //TODO: This Test Hide Activity and Show Home Page
         mPermissionTasks.put(permission.ENTER_CAR_MODE_PRIORITIZED,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                    if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                        throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
                     UiModeManager uiModeManager = (UiModeManager) mContext.getSystemService(
                             Context.UI_MODE_SERVICE);
                     // The reflective call is required since a priority other than 0 must be
@@ -2669,6 +2703,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     invokeReflectionCall(uiModeManager.getClass(), "enableCarMode", uiModeManager,
                             new Class[]{int.class, int.class}, 1, 0);
                     uiModeManager.disableCarMode(UiModeManager.DISABLE_CAR_MODE_GO_HOME);
+
                 }));
 
         mPermissionTasks.put(permission.KEYPHRASE_ENROLLMENT_APPLICATION,
@@ -2763,12 +2798,16 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             UserHandle.getUserHandleForUid(mUid));
                 }));
 
-        //TODO : use startActivity
+        //TODO : Clear App Cache Dialogue
         mPermissionTasks.put(permission.MANAGE_EXTERNAL_STORAGE,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
                     // Only an app granted this permission will receive a value of true back from
                     // this API.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+
+                        if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                            throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
                         if (!Environment.isExternalStorageManager()) {
                             throw new SecurityException(
                                     "MANAGE_EXTERNAL_STORAGE: Test app is not the external storage "
@@ -3024,7 +3063,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             new Class[]{byte[].class, UserHandle.class}, new byte[0],
                             UserHandle.getUserHandleForUid(mUid));
                 }));
-///2000-3000 - activity launch
 
         mPermissionTasks.put(permission.SECURE_ELEMENT_PRIVILEGED_OPERATION,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
@@ -3285,8 +3323,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             List.of("com.example.app"));
                 }));
 
+        //The test launches Intent
         mPermissionTasks.put(permission.MANAGE_CREDENTIAL_MANAGEMENT_APP,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+
+                    if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                        throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
+
                     Intent intent = new Intent();
                     intent.setAction("android.security.IKeyChainService");
                     intent.setComponent(new ComponentName(Constants.KEY_CHAIN_PACKAGE,
@@ -3703,7 +3747,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             Transacts.set, mPackageName, 0, windowStartMs, 0, 0, FLAG_PRIORITIZE,
                             null, null, null, null, null);
                 }));
-        //TODO: Suspicous
+
         mPermissionTasks.put(permission.SEND_CATEGORY_CAR_NOTIFICATIONS,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
                     if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)) {
@@ -4215,6 +4259,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MODIFY_USER_PREFERRED_DISPLAY_MODE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
                     Display.Mode mode = mDisplayManager.getDisplays()[0].getMode();
+
                     //The method may not find if the app is signing by the platform signing key
                     //mLogger.logInfo(ReflectionUtils.checkDeclaredMethod(mDisplayManager,"setGlobalUser").toString());
                     //invokeReflectionCall(mDisplayManager.getClass(),
@@ -4290,6 +4335,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         throw new BypassTestException("This permission requires feature "
                                 + PackageManager.FEATURE_AUTOMOTIVE);
                     }
+                    if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                        throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
                     //ACTION_REVIEW_PERMISSION_DECISIONS activity is running only on th automotive device.
                     String ACTION_REVIEW_PERMISSION_DECISIONS =
                             "android.permission.action.REVIEW_PERMISSION_DECISIONS";
@@ -4356,8 +4404,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         //TODO: (Suspicous)
         mPermissionTasks.put(permission.MANAGE_GAME_ACTIVITY,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //Object o = invokeReflectionCall(mContext.getClass(),
-                    //        "getIApplicationThread",mContext, new Class[]{});
+
                     mTransacts.invokeTransact(Transacts.ACTIVITY_TASK_SERVICE, Transacts.ACTIVITY_TASK_DESCRIPTOR,
                             Transacts.startActivityFromGameSession,
                             getActivityToken(),mContext.getPackageName(),"",
@@ -4902,7 +4949,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                        try {
                            //wait almost 1 sec along increasing waiting time
                            lock.wait(10+(i*i));
-                           if(i++>=15){
+                           if(i++>=10){
                                throw new InterruptedException("Connection Timed Out");
                            }
                        } catch (InterruptedException e) {
@@ -4912,7 +4959,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                    mLogger.logInfo("Connected To Service in the Companion app="+serviceConnection.mComponentName+
                            ","+serviceConnection.binderSuccess.get());
                    if(!serviceConnection.binderSuccess.get()){
-                       throw new RuntimeException("Test for "+serviceConnection.mComponentName+" has been failed.");
+                       throw new SecurityException("Test for "+serviceConnection.mComponentName+" has been failed.");
                    }
                } catch (Exception ex){
                   throw new UnexpectedPermissionTestFailureException(ex);
@@ -5007,8 +5054,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
             boolean testPassed = true;
             // if there is a corresponding test for this permission then run it now.
             if (mPermissionTasks.containsKey(permission)) {
-                testPassed = runPermissionTest(permission, mPermissionTasks.get(permission), true);
-                //((UiLogger) mLogger).mFrontEnd.addLogLine("test");
+                testPassed = runPermissionTest(permission, mPermissionTasks.get(permission));
+
             } else {
                 // else log whether the permission should be granted to this app
                 testPassed = getAndLogTestStatus(permission);
@@ -5034,14 +5081,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
         Set<String> permissionsToSkip = mConfiguration.getSkippedSignaturePermissions().orElse(
                 Collections.emptySet());
         AtomicInteger cnt = new AtomicInteger(0);
+        int cntmap = 0;
         final int total = permissions.size();
         for (String permission : permissions) {
             // If the permission has a corresponding task then run it.
+            cntmap+=1;
             mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
-                    "%d/%d ",cnt.get(),total) + permission);
+                    "%d %d ",cntmap,total) + permission);
 
             Handler handler = ((TesterApplication) mActivity.getApplication()).mainThreadHandler;
-
             Thread thread = new Thread(() -> {
                 // if this is a signature permission with the privileged protection flag then skip it
                 // if the app is configured to use the PrivilegedPermissionTester.
@@ -5055,7 +5103,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         } else {
 
                             if (mPermissionTasks.containsKey(permission)) {
-                                if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
+                                if (runPermissionTest(permission, mPermissionTasks.get(permission))) {
                                     callback.accept(new Result(true, permission, aiIncl(cnt), total));
                                 } else {
                                     callback.accept(new Result(false, permission, aiIncl(cnt), total));
@@ -5086,6 +5134,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
     @Override
     public boolean runPermissionTest(String permission, PermissionTest test) {
         boolean testPassed = true;
+        mLogger.logInfo("Run Permission Test In "+permission);
         // if the permission does not exist then skp the test and return immediately
         if (!mPlatformPermissions.contains(permission)) {
             mLogger.logDebug("The permission " + permission
@@ -5103,15 +5152,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             + "; device API is " + mDeviceApiLevel);
             return true;
         }
-        Handler handler = ((TesterApplication) mActivity.getApplication()).mainThreadHandler;
+        //mLogger.logInfo(test.mIsCustom+"<=handler?");
         if (test.mIsCustom) {
-            //test.runTest();
-            handler.post(test.mTestRunnable);
+            test.runTest();;
         } else {
             boolean permissionGranted = isPermissionGranted(permission);
             try {
-                handler.post(test.mTestRunnable);
-                //test.runTest();
+                test.runTest();;
                 // If the permission was granted then a SecurityException should not have been
                 // thrown so the result of the test should match whether the permission was granted.
                 testPassed = getAndLogTestStatus(permission, permissionGranted, true);
@@ -5127,6 +5174,11 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 testPassed = getAndLogTestStatus(permission, permissionGranted, false);
             } catch (BypassTestException bte) {
                 mLogger.logTestSkipped(permission, permissionGranted, bte.getMessage());
+            } catch (UnexpectedPermissionTestFailureException e) {
+                //mLogger.logTestSkipped(permission, permissionGranted, bte.getMessage())
+                mLogger.logDebug(
+                        "Caught a UnexpectedPermissionTestFailureException for permission " + permission + ": ", e);
+                testPassed = getAndLogTestStatus(permission, permissionGranted, false);;
             } catch (Throwable t) {
                 // Some of the signature / privileged tests can fail for other reasons (primarily
                 // due to the test app not having access to all necessary classes to invoke the

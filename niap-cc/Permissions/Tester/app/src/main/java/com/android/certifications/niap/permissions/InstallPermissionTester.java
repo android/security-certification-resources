@@ -27,6 +27,18 @@ import static android.Manifest.permission.CHANGE_WIFI_STATE;
 import static android.Manifest.permission.DISABLE_KEYGUARD;
 import static android.Manifest.permission.EXPAND_STATUS_BAR;
 import static android.Manifest.permission.FOREGROUND_SERVICE;
+import static android.Manifest.permission.FOREGROUND_SERVICE_CAMERA;
+import static android.Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE;
+import static android.Manifest.permission.FOREGROUND_SERVICE_DATA_SYNC;
+import static android.Manifest.permission.FOREGROUND_SERVICE_HEALTH;
+import static android.Manifest.permission.FOREGROUND_SERVICE_LOCATION;
+import static android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK;
+import static android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION;
+import static android.Manifest.permission.FOREGROUND_SERVICE_MICROPHONE;
+import static android.Manifest.permission.FOREGROUND_SERVICE_PHONE_CALL;
+import static android.Manifest.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING;
+import static android.Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE;
+import static android.Manifest.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED;
 import static android.Manifest.permission.HIDE_OVERLAY_WINDOWS;
 import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.KILL_BACKGROUND_PROCESSES;
@@ -99,7 +111,9 @@ import android.net.wifi.WifiManager;
 import android.nfc.NfcAdapter;
 import android.nfc.cardemulation.CardEmulation;
 import android.os.Build;
+import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.RemoteException;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.service.notification.StatusBarNotification;
@@ -114,9 +128,22 @@ import androidx.core.util.Consumer;
 import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.activities.TestActivity;
+import com.android.certifications.niap.permissions.companion.services.TestBindService;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
+import com.android.certifications.niap.permissions.services.FgCameraService;
+import com.android.certifications.niap.permissions.services.FgConnectedDeviceService;
+import com.android.certifications.niap.permissions.services.FgDataSyncService;
+import com.android.certifications.niap.permissions.services.FgHealthService;
+import com.android.certifications.niap.permissions.services.FgLocationService;
+import com.android.certifications.niap.permissions.services.FgMediaPlaybackService;
+import com.android.certifications.niap.permissions.services.FgMediaProjectionService;
+import com.android.certifications.niap.permissions.services.FgMicrophoneService;
+import com.android.certifications.niap.permissions.services.FgPhoneCallService;
+import com.android.certifications.niap.permissions.services.FgRemoteMessagingService;
+import com.android.certifications.niap.permissions.services.FgSpecialUseService;
+import com.android.certifications.niap.permissions.services.FgSystemExemptedService;
 import com.android.certifications.niap.permissions.services.TestService;
 import com.android.certifications.niap.permissions.utils.Transacts;
 
@@ -129,6 +156,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -154,6 +184,7 @@ public class InstallPermissionTester extends BasePermissionTester {
     protected final Vibrator mVibrator;
     protected final PowerManager mPowerManager;
 
+    private final ExecutorService mExecutorService;
     private final Map<String, PermissionTest> mPermissionTasks;
 
     public InstallPermissionTester(TestConfiguration configuration, Activity activity) {
@@ -175,6 +206,8 @@ public class InstallPermissionTester extends BasePermissionTester {
                 Context.CONSUMER_IR_SERVICE);
         mVibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         mPowerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+
+        mExecutorService = ((TesterApplication)mActivity.getApplication()).executorService;
 
         mPermissionTasks = new HashMap<>();
 
@@ -254,28 +287,35 @@ public class InstallPermissionTester extends BasePermissionTester {
         }));
 
         //TODO:This Test Action Hide Screen
-//        mPermissionTasks.put(EXPAND_STATUS_BAR, new PermissionTest(false, () -> {
-//            @SuppressLint("WrongConstant") Object statusBarManager = mContext.getSystemService("statusbar");
-//            invokeReflectionCall(statusBarManager.getClass(), "expandNotificationsPanel",
-//                    statusBarManager, null);
-//            // A short sleep is required to allow the notification panel to be expanded before
-//            // collapsing it to clean up after this test.
-//            try {
-//                Thread.sleep(500);
-//            } catch (InterruptedException e) {
-//                mLogger.logDebug("Caught an InterruptedException: ", e);
-//            }
-//            // Starting in Android 12 this API is no longer available without the signature
-//            // permission STATUS_BAR.
-//            if (mDeviceApiLevel < Build.VERSION_CODES.S) {
-//                invokeReflectionCall(statusBarManager.getClass(), "collapsePanels",
-//                        statusBarManager, null);
-//            }
-//        }));
+        mPermissionTasks.put(EXPAND_STATUS_BAR, new PermissionTest(false, () -> {
+
+            if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
+            @SuppressLint("WrongConstant") Object statusBarManager = mContext.getSystemService("statusbar");
+
+            invokeReflectionCall(statusBarManager.getClass(), "expandNotificationsPanel",
+                    statusBarManager, null);
+            // A short sleep is required to allow the notification panel to be expanded before
+            // collapsing it to clean up after this test.
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                mLogger.logDebug("Caught an InterruptedException: ", e);
+            }
+            // Starting in Android 12 this API is no longer available without the signature
+            // permission STATUS_BAR.
+            if (mDeviceApiLevel < Build.VERSION_CODES.S) {
+                invokeReflectionCall(statusBarManager.getClass(), "collapsePanels",
+                        statusBarManager, null);
+            }
+        }));
 
         // andorid.permission.FLASHLIGHT has been removed.
 
-        mPermissionTasks.put(FOREGROUND_SERVICE, new PermissionTest(true, () -> {
+        //The test doesn't work after U, because foreground services requests corresponding type permission now.
+        mPermissionTasks.put(FOREGROUND_SERVICE, new PermissionTest(true,Build.VERSION_CODES.P,
+                Build.VERSION_CODES.TIRAMISU, () -> {
             // This test must run as a custom test because it requires a separate service be run in
             // in the foreground that can invoke startForeground.
             String permission = FOREGROUND_SERVICE;
@@ -289,6 +329,154 @@ public class InstallPermissionTester extends BasePermissionTester {
                 mLogger.logTestError(permission, t);
             }
         }));
+
+
+        if(mDeviceApiLevel >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            mPermissionTasks.put(FOREGROUND_SERVICE_CAMERA,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgCameraService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_CAMERA", t);
+                }
+            }));
+            mPermissionTasks.put(FOREGROUND_SERVICE_LOCATION,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgLocationService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_LOCATION", t);
+                }
+            }));
+            mPermissionTasks.put(FOREGROUND_SERVICE_MICROPHONE,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgMicrophoneService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                }
+            }));
+            mPermissionTasks.put(FOREGROUND_SERVICE_CONNECTED_DEVICE,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgConnectedDeviceService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_CONNECTED_DEVICE", t);
+                }
+            }));
+            mPermissionTasks.put(FOREGROUND_SERVICE_DATA_SYNC,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgDataSyncService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                }
+            }));
+            mPermissionTasks.put(FOREGROUND_SERVICE_HEALTH,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgHealthService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                }
+            }));
+            mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PLAYBACK,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgMediaPlaybackService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                }
+            }));
+            mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PROJECTION,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgMediaProjectionService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                }
+            }));
+            mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PROJECTION,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgMediaProjectionService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                }
+            }));
+            mPermissionTasks.put(FOREGROUND_SERVICE_PHONE_CALL,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgPhoneCallService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_PHONE_CALL", t);
+                }
+            }));
+            mPermissionTasks.put(FOREGROUND_SERVICE_REMOTE_MESSAGING,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgRemoteMessagingService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_REMOTE_MESSAGING", t);
+                }
+            }));
+           /*SHORT SERVICE?
+            mPermissionTasks.put(FOREGROUND_S,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgMediaProjectionService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                }
+            }));*/
+            mPermissionTasks.put(FOREGROUND_SERVICE_SPECIAL_USE,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgSpecialUseService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                }
+            }));
+            mPermissionTasks.put(FOREGROUND_SERVICE_SYSTEM_EXEMPTED,  new PermissionTest(true,
+                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+                Intent serviceIntent = new Intent(mActivity, FgSystemExemptedService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
+                }
+            }));
+
+
+
+        }
 
         // android.permission.GET_PACKAGE_SIZE only guards PackageManager#getPackageSizeInfoAsUser
         // which is hidden and results in an UnsupportedOperationException after O.
@@ -755,5 +943,64 @@ public class InstallPermissionTester extends BasePermissionTester {
     @Override
     public Map<String,PermissionTest> getRegisteredPermissions() {
         return mPermissionTasks;
+    }
+
+    private void tryBindingForegroundService(Intent serviceIntent){
+        FgServiceConnection serviceConnection = new FgServiceConnection();
+        mContext.bindService(serviceIntent,
+                Context.BIND_AUTO_CREATE, mExecutorService,serviceConnection);
+        synchronized (lock) {
+            try {
+                int i=0;
+                while (!serviceConnection.mConnected.get()) {
+                    try {
+                        //wait almost 1 sec along increasing waiting time
+                        lock.wait(10+(i*i));
+                        if(i++>=20){
+                            throw new InterruptedException("Connection Timed Out");
+                        }
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                mLogger.logInfo("Connected To Service in the Tester app="+serviceConnection.mComponentName+
+                        ","+serviceConnection.binderSuccess.get());
+                if(!serviceConnection.binderSuccess.get()){
+                    throw new SecurityException("Test for "+serviceConnection.mComponentName+" has been failed.");
+                }
+            } catch (Exception ex){
+                throw new UnexpectedPermissionTestFailureException(ex);
+            } finally {
+                mContext.unbindService(serviceConnection);
+            }
+        }
+    }
+    final Object lock = new Object();
+    private class FgServiceConnection implements android.content.ServiceConnection {
+        public final AtomicBoolean binderSuccess = new AtomicBoolean();
+        private final AtomicBoolean mConnected = new AtomicBoolean(false);
+        public String mComponentName = "";
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            synchronized (lock) {
+                mConnected.set(true);
+                binderSuccess.set(true);
+                mComponentName = name.getShortClassName();
+                //mLogger.logSystem("Hello Unlock!"+name);
+                TestBindService service = TestBindService.Stub.asInterface(binder);
+                try {
+                    service.testMethod();
+                } catch (RemoteException e) {
+                    binderSuccess.set(false);
+                    //e.printStackTrace();
+                    mLogger.logError(name+" failure."+e.getMessage());
+                }
+                lock.notify();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            //Unimplemented
+        }
     }
 }

@@ -17,6 +17,7 @@
 package com.android.certifications.niap.permissions;
 
 import android.app.Activity;
+import android.app.MissingForegroundServiceTypeException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -27,6 +28,7 @@ import android.content.res.Resources;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.util.Consumer;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
@@ -227,8 +229,9 @@ public abstract class BasePermissionTester {
      *
      * @return true if the test is skipped, if the test is a custom test, or if the test is passed
      */
+
     public boolean runPermissionTest(String permission, PermissionTest test,
-            boolean exceptionAllowed) {
+                                     boolean exceptionAllowed) {
         boolean testPassed = true;
         // if the permission does not exist then skp the test and return immediately.
         if (!mPlatformPermissions.contains(permission)) {
@@ -269,7 +272,13 @@ public abstract class BasePermissionTester {
                     mLogger.logDebug("SecurityException cause: ", e.getCause());
                 }
                 testPassed = getAndLogTestStatus(permission, permissionGranted, false);
+            } catch (MissingForegroundServiceTypeException e) {
+                //
+                testPassed = false;
+                StatusLogger.logError("HERE!");
+                StatusLogger.logTestError(permission, e);
             } catch (UnexpectedPermissionTestFailureException e) {
+
                 testPassed = false;
                 StatusLogger.logTestError(permission, e);
             } catch (Throwable t) {

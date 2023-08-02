@@ -55,6 +55,59 @@
             android:name=".services.TestService"
             android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE" />
 
+        <service
+            android:name=".services.FgCameraService"
+            android:foregroundServiceType="camera"
+            android:exported="false" />
+        <service
+            android:name=".services.FgLocationService"
+            android:foregroundServiceType="location"
+            android:exported="false" />
+        <service
+            android:name=".services.FgMicrophoneService"
+            android:foregroundServiceType="microphone"
+            android:exported="false" />
+        <service
+            android:name=".services.FgConnectedDeviceService"
+            android:foregroundServiceType="connectedDevice"
+            android:exported="false" />
+        <service
+            android:name=".services.FgDataSyncService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+        <service
+            android:name=".services.FgHealthService"
+            android:foregroundServiceType="health"
+            android:exported="false" />
+        <service
+            android:name=".services.FgMediaPlaybackService"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false" />
+        <service
+            android:name=".services.FgMediaProjectionService"
+            android:foregroundServiceType="mediaProjection"
+            android:exported="false" />
+        <service
+            android:name=".services.FgPhoneCallService"
+            android:foregroundServiceType="phoneCall"
+            android:exported="false" />
+        <service
+            android:name=".services.FgRemoteMessagingService"
+            android:foregroundServiceType="remoteMessaging"
+            android:exported="false" />
+        <service
+            android:name=".services.FgShortService"
+            android:foregroundServiceType="shortService"
+            android:exported="false" />
+        <service
+            android:name=".services.FgSpecialUseService"
+            android:foregroundServiceType="specialUse"
+            android:exported="false" />
+        <service
+            android:name=".services.FgSystemExemptedService"
+            android:foregroundServiceType="systemExempted"
+            android:exported="false" />
+
         <receiver
             android:name=".receivers.Admin"
             android:permission="android.permission.BIND_DEVICE_ADMIN"
