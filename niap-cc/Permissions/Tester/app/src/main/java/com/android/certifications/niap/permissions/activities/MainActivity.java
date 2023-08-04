@@ -22,6 +22,9 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.companion.AssociationRequest;
+import android.companion.BluetoothDeviceFilter;
+import android.companion.CompanionDeviceManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -31,6 +34,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.ParcelUuid;
 import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -82,6 +86,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -89,6 +94,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 /**
  * Activity to drive permission test configurations. This activity obtains the configuration(s) to
@@ -221,13 +227,6 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
             addLogLine("Welcome!");
         }
 
-
-
-        /*Intent serviceIntent2 = new Intent(this, FgMicrophoneService.class);
-        startForegroundService(serviceIntent2);
-
-        Intent serviceIntent3 = new Intent(this, FgLocationService.class);
-        startForegroundService(serviceIntent3);*/
 
 
         // Obtain the list of configurations from the ConfigurationFactory and create a separate

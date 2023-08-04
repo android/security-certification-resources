@@ -1,0 +1,62 @@
+package com.android.certifications.niap.permissions.utils;
+
+import android.app.Activity;
+import android.companion.AssociationRequest;
+import android.companion.CompanionDeviceManager;
+import android.content.pm.PackageManager;
+
+import androidx.annotation.Nullable;
+
+import com.android.certifications.niap.permissions.BasePermissionTester;
+import com.android.certifications.niap.permissions.activities.LogListAdaptable;
+import com.android.certifications.niap.permissions.log.Logger;
+import com.android.certifications.niap.permissions.log.LoggerFactory;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+public class TesterUtils {
+
+    private static final Logger mLogger = LoggerFactory.createDefaultLogger("TesterUtils");
+
+    /**
+     * Try to connect the Bluetooth companion device manager service with a certain request.
+     * With supplying the AssociationRequest by callback,
+     * We can ignore the minor changes of AssociationRequest class.
+     * These type of tests are available in Install and Signature level tester
+     * @param packageManager
+     * @param activity
+     * @param arCallback
+     */
+    public static void tryBluetoothAssociationRequest(
+            PackageManager packageManager, Activity activity,
+            CompletableFuture<AssociationRequest> arCallback
+    )  {
+        if (!packageManager.hasSystemFeature( PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
+            throw new BasePermissionTester.BypassTestException(
+                    "Device does not have the FEATURE_COMPANION_DEVICE_SETUP feature for this test require");
+        }
+        try {
+            AssociationRequest request = arCallback.get(1000, TimeUnit.MILLISECONDS);
+            if(request == null){
+                throw new BasePermissionTester.BypassTestException("Failed to create the Association Request (Insufficient version?)");
+            }
+            CompanionDeviceManager.Callback callback = new CompanionDeviceManager.Callback() {
+                @Override
+                public void onFailure(@Nullable CharSequence charSequence) {
+                    mLogger.logDebug("onFailure: charSequence = " + charSequence);
+                }
+            };
+            CompanionDeviceManager companionDeviceManager = activity.getSystemService(
+                    CompanionDeviceManager.class);
+            companionDeviceManager.associate(request, callback, null);
+        } catch (ExecutionException | InterruptedException | TimeoutException e){
+            //
+            throw new BasePermissionTester.BypassTestException(e.getMessage());
+        }
+
+    }
+
+}

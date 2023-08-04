@@ -149,6 +149,7 @@ import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.UiLogger;
 import com.android.certifications.niap.permissions.services.TestService;
+import com.android.certifications.niap.permissions.utils.InternalPermissions;
 import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.Transacts;
@@ -175,6 +176,7 @@ import java.security.cert.CertificateException;
 import java.security.spec.ECGenParameterSpec;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -194,6 +196,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Permission tester to verify all platform declared signature permissions properly guard their API,
@@ -295,6 +298,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         prepareTestBlock02();//has some problem, process destructive
         prepareTestBlock03();//has some problems
         prepareTestBlock04();
+        prepareTestBlockFor14();
         prepareTestBlockBind();
     }
     private void prepareTestBlock01()
@@ -4065,7 +4069,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         }
                     }
                 }));
-//3500-4000 safe?
+
         ////////////////////////////////////////////////////////////
         //REQUEST_COMPANION_PROFILE_* methods
 
@@ -4168,7 +4172,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
                             CompanionDeviceManager.class);
                     companionDeviceManager.associate(request, callback, null);
-                }));
+        }));
 
         mPermissionTasks.put(permission.READ_APP_SPECIFIC_LOCALES,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
@@ -4544,6 +4548,32 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
 
+    }
+    void prepareTestBlockFor14(){
+        //For Android 14
+        mPermissionTasks.put(InternalPermissions.permission.ACCESS_AMBIENT_CONTEXT_EVENT,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE,
+                        VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+
+                    @SuppressLint("WrongConstant") Object ambientContextManager
+                            = mContext.getSystemService("ambient_context");
+                    //Context.AMBIENT_CONTEXT_SERVICE);
+
+                    int[] eventsArray = new int[] {-1};//AmbientContextEvent.EVENT_COUGH
+                    Set<Integer> eventTypes = Arrays.stream(eventsArray).boxed().collect(
+                            Collectors.toSet());
+
+                    invokeReflectionCall(ambientContextManager.getClass(),
+                            "queryAmbientContextServiceStatus",
+                            ambientContextManager, new Class[]{Set.class, Executor.class,
+                                    Consumer.class}, eventTypes, new Executor() {
+                                @Override
+                                public void execute(Runnable runnable) {
+
+                                }
+                            }, null);
+
+                }));
     }
     void prepareTestBlockBind()
     {

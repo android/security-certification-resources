@@ -239,6 +239,12 @@ public abstract class BasePermissionTester {
                     + " is not declared by the platform on this device");
             return true;
         }
+        if(test == null){
+            //
+            mLogger.logDebug("The test case for " + permission + " is not found");
+            return true;
+        }
+        //mLogger.logDebug(test.toString());
         if (mDeviceApiLevel < test.mMinApiLevel) {
             mLogger.logDebug(
                     "permission " + permission + " is targeted for min API " + test.mMinApiLevel

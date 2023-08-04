@@ -78,6 +78,8 @@ public class InternalPermissionsTest {
         mPermissions.add(permission.MANAGE_SAFETY_CENTER);
         mPermissions.add(SignaturePermissions.permission.MANAGE_SENSOR_PRIVACY);
         mPermissions.add(SignaturePermissions.permission.TOGGLE_AUTOMOTIVE_PROJECTION);
+        //14
+        //mPermissions.add(permission.MANAGE_DEVICE_POLICY_ACCESSIBILITY);
     }
 
     private UiAutomation mUiAutomation;

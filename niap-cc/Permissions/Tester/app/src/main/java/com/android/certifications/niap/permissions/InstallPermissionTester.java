@@ -24,7 +24,12 @@ import static android.Manifest.permission.BROADCAST_STICKY;
 import static android.Manifest.permission.CHANGE_NETWORK_STATE;
 import static android.Manifest.permission.CHANGE_WIFI_MULTICAST_STATE;
 import static android.Manifest.permission.CHANGE_WIFI_STATE;
+import static android.Manifest.permission.CREDENTIAL_MANAGER_QUERY_CANDIDATE_CREDENTIALS;
+import static android.Manifest.permission.CREDENTIAL_MANAGER_SET_ALLOWED_PROVIDERS;
+import static android.Manifest.permission.CREDENTIAL_MANAGER_SET_ORIGIN;
+import static android.Manifest.permission.DETECT_SCREEN_CAPTURE;
 import static android.Manifest.permission.DISABLE_KEYGUARD;
+import static android.Manifest.permission.ENFORCE_UPDATE_OWNERSHIP;
 import static android.Manifest.permission.EXPAND_STATUS_BAR;
 import static android.Manifest.permission.FOREGROUND_SERVICE;
 import static android.Manifest.permission.FOREGROUND_SERVICE_CAMERA;
@@ -52,10 +57,12 @@ import static android.Manifest.permission.READ_NEARBY_STREAMING_POLICY;
 import static android.Manifest.permission.READ_SYNC_SETTINGS;
 import static android.Manifest.permission.READ_SYNC_STATS;
 import static android.Manifest.permission.REORDER_TASKS;
+import static android.Manifest.permission.REQUEST_COMPANION_PROFILE_GLASSES;
 import static android.Manifest.permission.REQUEST_COMPANION_PROFILE_WATCH;
 import static android.Manifest.permission.REQUEST_DELETE_PACKAGES;
 import static android.Manifest.permission.REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE;
 import static android.Manifest.permission.REQUEST_PASSWORD_COMPLEXITY;
+import static android.Manifest.permission.RUN_USER_INITIATED_JOBS;
 import static android.Manifest.permission.SCHEDULE_EXACT_ALARM;
 import static android.Manifest.permission.SET_WALLPAPER;
 import static android.Manifest.permission.SET_WALLPAPER_HINTS;
@@ -66,6 +73,8 @@ import static android.Manifest.permission.USE_FULL_SCREEN_INTENT;
 import static android.Manifest.permission.VIBRATE;
 import static android.Manifest.permission.WAKE_LOCK;
 import static android.Manifest.permission.WRITE_SYNC_SETTINGS;
+import static android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET;
+import static android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED;
 import static com.android.certifications.niap.permissions.Constants.EXTRA_PERMISSION_GRANTED;
 import static com.android.certifications.niap.permissions.Constants.EXTRA_PERMISSION_NAME;
 import static com.android.certifications.niap.permissions.utils.ReflectionUtils.invokeReflectionCall;
@@ -82,6 +91,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.app.admin.DevicePolicyManager;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.app.job.JobService;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.companion.AssociationRequest;
@@ -122,8 +134,21 @@ import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
 import android.telephony.TelephonyManager;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.util.Consumer;
+import androidx.credentials.CreateCredentialRequest;
+import androidx.credentials.CredentialManager;
+import androidx.credentials.CredentialManagerCallback;
+import androidx.credentials.CredentialOption;
+import androidx.credentials.GetCredentialRequest;
+import androidx.credentials.GetCredentialResponse;
+import androidx.credentials.GetPublicKeyCredentialOption;
+import androidx.credentials.PasswordCredential;
+import androidx.credentials.PrepareGetCredentialResponse;
+import androidx.credentials.exceptions.GetCredentialException;
+import androidx.test.runner.screenshot.Screenshot;
 
 import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.activities.MainActivity;
@@ -144,22 +169,34 @@ import com.android.certifications.niap.permissions.services.FgPhoneCallService;
 import com.android.certifications.niap.permissions.services.FgRemoteMessagingService;
 import com.android.certifications.niap.permissions.services.FgSpecialUseService;
 import com.android.certifications.niap.permissions.services.FgSystemExemptedService;
+import com.android.certifications.niap.permissions.services.TestJobService;
 import com.android.certifications.niap.permissions.services.TestService;
+import com.android.certifications.niap.permissions.utils.TesterUtils;
 import com.android.certifications.niap.permissions.utils.Transacts;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+
+import javax.security.auth.callback.PasswordCallback;
 
 /**
  * Permission tester to verify all install permissions properly guard their API, resource, etc.
@@ -263,7 +300,7 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(CHANGE_NETWORK_STATE, new PermissionTest(false, () -> {
             NetworkRequest networkRequest = new NetworkRequest.Builder().addCapability(
-                    NetworkCapabilities.NET_CAPABILITY_INTERNET).build();
+                    NET_CAPABILITY_INTERNET).build();
             mConnectivityManager.requestNetwork(networkRequest, new NetworkCallback() {
                 @Override
                 public void onAvailable(Network network) {
@@ -329,145 +366,128 @@ public class InstallPermissionTester extends BasePermissionTester {
                 mLogger.logTestError(permission, t);
             }
         }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_CAMERA,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgCameraService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_CAMERA", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_LOCATION,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgLocationService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_LOCATION", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_MICROPHONE,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgMicrophoneService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_MICROPHONE", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_CONNECTED_DEVICE,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgConnectedDeviceService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_CONNECTED_DEVICE", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_DATA_SYNC,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgDataSyncService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_DATA_SYNC", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_HEALTH,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgHealthService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_HEALTH", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PLAYBACK,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgMediaPlaybackService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_MEDIA_PLAYBACK", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PROJECTION,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgMediaProjectionService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logTestError("FOREGROUND_SERVICE_MEDIA_PROJECTION", t);
+            }
+        }));
 
+        mPermissionTasks.put(FOREGROUND_SERVICE_PHONE_CALL,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgPhoneCallService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logTestError("FOREGROUND_SERVICE_PHONE_CALL", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_REMOTE_MESSAGING,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgRemoteMessagingService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logTestError("FOREGROUND_SERVICE_REMOTE_MESSAGING", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_SPECIAL_USE,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgSpecialUseService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logTestError("FOREGROUND_SERVICE_SPECIAL_USE", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_SYSTEM_EXEMPTED,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgSystemExemptedService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logTestError("FOREGROUND_SERVICE_SYSTEM_EXEMPTED", t);
+            }
+        }));
 
-        if(mDeviceApiLevel >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            mPermissionTasks.put(FOREGROUND_SERVICE_CAMERA,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgCameraService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logDebug("FOREGROUND_SERVICE_CAMERA", t);
-                }
-            }));
-            mPermissionTasks.put(FOREGROUND_SERVICE_LOCATION,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgLocationService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logDebug("FOREGROUND_SERVICE_LOCATION", t);
-                }
-            }));
-            mPermissionTasks.put(FOREGROUND_SERVICE_MICROPHONE,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgMicrophoneService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logDebug("FOREGROUND_SERVICE_MICROPHONE", t);
-                }
-            }));
-            mPermissionTasks.put(FOREGROUND_SERVICE_CONNECTED_DEVICE,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgConnectedDeviceService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logDebug("FOREGROUND_SERVICE_CONNECTED_DEVICE", t);
-                }
-            }));
-            mPermissionTasks.put(FOREGROUND_SERVICE_DATA_SYNC,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgDataSyncService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logDebug("FOREGROUND_SERVICE_DATA_SYNC", t);
-                }
-            }));
-            mPermissionTasks.put(FOREGROUND_SERVICE_HEALTH,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgHealthService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logDebug("FOREGROUND_SERVICE_HEALTH", t);
-                }
-            }));
-            mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PLAYBACK,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgMediaPlaybackService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logDebug("FOREGROUND_SERVICE_MEDIA_PLAYBACK", t);
-                }
-            }));
-            mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PROJECTION,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgMediaProjectionService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_MEDIA_PROJECTION", t);
-                }
-            }));
-
-            mPermissionTasks.put(FOREGROUND_SERVICE_PHONE_CALL,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgPhoneCallService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_PHONE_CALL", t);
-                }
-            }));
-            mPermissionTasks.put(FOREGROUND_SERVICE_REMOTE_MESSAGING,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgRemoteMessagingService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_REMOTE_MESSAGING", t);
-                }
-            }));
-           /*SHORT SERVICE?
-            mPermissionTasks.put(FOREGROUND_S,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgMediaProjectionService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_MICROPHONE", t);
-                }
-            }));*/
-            mPermissionTasks.put(FOREGROUND_SERVICE_SPECIAL_USE,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgSpecialUseService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_SPECIAL_USE", t);
-                }
-            }));
-            mPermissionTasks.put(FOREGROUND_SERVICE_SYSTEM_EXEMPTED,  new PermissionTest(true,
-                    Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-                Intent serviceIntent = new Intent(mActivity, FgSystemExemptedService.class);
-                try {
-                    mActivity.startForegroundService(serviceIntent);
-                    tryBindingForegroundService(serviceIntent);
-                } catch(Throwable t){
-                    mLogger.logTestError("FOREGROUND_SERVICE_SYSTEM_EXEMPTED", t);
-                }
-            }));
-
-
-
-        }
 
         // android.permission.GET_PACKAGE_SIZE only guards PackageManager#getPackageSizeInfoAsUser
         // which is hidden and results in an UnsupportedOperationException after O.
@@ -571,7 +591,7 @@ public class InstallPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(REORDER_TASKS,
                 new PermissionTest(false, () -> mActivityManager.moveTaskToFront(2, 0)));
 
-        // android.permission.REQUEST_COMKPANION_RUN_IN_BACKGROUND requires companion device
+        // android.permission.REQUEST_COMPANION_RUN_IN_BACKGROUND requires companion device
         // with which to associate this app.
 
         // android.permission.REQUEST_COMPANION_USE_DATA_IN_BACKGROUND requires companion device
@@ -781,36 +801,16 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(REQUEST_COMPANION_PROFILE_WATCH,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
-                    if (!mPackageManager.hasSystemFeature(
-                            PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
-                        throw new BypassTestException(
-                                "Device does not have the "
-                                        + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
-                                        + "for this test");
+                    //commonize the tester routine with exposing the builder of AssociationRequest object
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                        CompletableFuture<AssociationRequest> associationRequest =
+                                new CompletableFuture<AssociationRequest>().completeAsync(() ->
+                                        new AssociationRequest.Builder().setDeviceProfile(
+                                                AssociationRequest.DEVICE_PROFILE_WATCH).build());
+                        TesterUtils.tryBluetoothAssociationRequest
+                                (mPackageManager, activity, associationRequest);
                     }
-                    AssociationRequest request = null;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        request = new AssociationRequest.Builder().setDeviceProfile(
-                                AssociationRequest.DEVICE_PROFILE_WATCH).build();
-                        CompanionDeviceManager.Callback callback =
-                                new CompanionDeviceManager.Callback() {
-                                    @Override
-                                    public void onDeviceFound(IntentSender intentSender) {
-                                        mLogger.logDebug(
-                                                "onDeviceFound: intentSender = " + intentSender);
-                                    }
-
-                                    @Override
-                                    public void onFailure(CharSequence charSequence) {
-                                        mLogger.logDebug("onFailure: charSequence = " + charSequence);
-                                    }
-                                };
-                        CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
-                                CompanionDeviceManager.class);
-                        companionDeviceManager.associate(request, callback, null);
-                    }
-
-                }));
+            }));
 
         mPermissionTasks.put(REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
@@ -877,7 +877,198 @@ public class InstallPermissionTester extends BasePermissionTester {
                                 Transacts.getNearbyNotificationStreamingPolicy, 0);
                     }
                 ));
+
+        //Android 14
+        mPermissionTasks.put(REQUEST_COMPANION_PROFILE_GLASSES,  new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            //commonize the tester routine with exposing the builder of AssociationRequest object
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                CompletableFuture<AssociationRequest> associationRequest =
+                    new CompletableFuture<AssociationRequest>().completeAsync(() -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                            return new AssociationRequest.Builder()
+                                    .setDeviceProfile(AssociationRequest.DEVICE_PROFILE_GLASSES).build();
+                        } else {
+                            return null;
+                        }
+                    });
+                TesterUtils.tryBluetoothAssociationRequest
+                        (mPackageManager,activity, associationRequest);
+            }
+        }));
+
+        mPermissionTasks.put(RUN_USER_INITIATED_JOBS,  new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            //commonize the tester routine with exposing the builder of AssociationRequest object
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                NetworkRequest nreq = new NetworkRequest.Builder()
+                        .addCapability(NET_CAPABILITY_INTERNET)
+                        .addCapability(NET_CAPABILITY_VALIDATED).build();
+                ComponentName componentName =
+                        new ComponentName(mContext, TestJobService.class);
+                JobInfo jobInfo = new JobInfo.Builder(1001,componentName)
+                        .setUserInitiated(true)
+                        .setRequiredNetwork(nreq)
+                        .setEstimatedNetworkBytes(1024 * 1024,1024 * 1024)
+                        .build();
+                JobScheduler jobScheduler = (JobScheduler)
+                        mContext.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+                jobScheduler.schedule(jobInfo);
+
+            }
+        }));
+        mPermissionTasks.put(DETECT_SCREEN_CAPTURE,  new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            if (android.os.Build.VERSION.SDK_INT >= 34) {
+                final Activity.ScreenCaptureCallback cb
+                        = new Activity.ScreenCaptureCallback() {
+                            @Override
+                            public void onScreenCaptured() {
+                                // Add logic to take action in your app.
+                                mLogger.logDebug("screen captured");
+                            }
+                        };
+                try {
+                    mActivity.registerScreenCaptureCallback(mExecutorService, cb);
+                    Screenshot.capture();
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                } catch (Throwable ex){
+                    throw ex;
+                } finally {
+                    mActivity.unregisterScreenCaptureCallback(cb);//close it anyway
+                }
+            }
+        }));
+
+
+        mPermissionTasks.put(CREDENTIAL_MANAGER_SET_ORIGIN,  new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            CredentialManager credentialManager = CredentialManager.create(mContext);
+            //credentialManager.getCredential()
+            List<CredentialOption> options = new ArrayList<>();
+            options.add(new GetPublicKeyCredentialOption("{}"));
+            GetCredentialRequest credentialRequest = new GetCredentialRequest.Builder()
+                    .setCredentialOptions(options)
+                    //Check : use setOrigin method
+                    .setOrigin("hoge")
+                    .build();
+
+            credentialManager.getCredentialAsync(mContext,
+                    credentialRequest,
+                    null,
+                    new LocalDirectExecutor(),
+                    new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                        @Override
+                        public void onResult(GetCredentialResponse getCredentialResponse) {
+                        }
+                        @Override
+                        public void onError(@NonNull GetCredentialException e) {
+                        }
+                    }
+            );
+        }));
+
+        mPermissionTasks.put(CREDENTIAL_MANAGER_SET_ALLOWED_PROVIDERS,  new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            CredentialManager credentialManager = CredentialManager.create(mContext);
+            //credentialManager.getCredential()
+            List<CredentialOption> options = new ArrayList<>();
+            Set<ComponentName> componentNames = new HashSet<>();
+            componentNames.add(new ComponentName("package","cls"));
+            //Check : add allowed provider to the option.
+            options.add(new GetPublicKeyCredentialOption("{}",null, componentNames));
+            GetCredentialRequest credentialRequest = new GetCredentialRequest.Builder()
+                    .setCredentialOptions(options)
+                    .build();
+            credentialManager.getCredentialAsync(mContext,
+                    credentialRequest,
+                    null,
+                    new LocalDirectExecutor(),
+                    new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                        @Override
+                        public void onResult(GetCredentialResponse getCredentialResponse) {
+                        }
+                        @Override
+                        public void onError(@NonNull GetCredentialException e) {
+                        }
+                    }
+            );
+        }));
+
+        //not done yet - can't raise security error as of now.
+        mPermissionTasks.put(CREDENTIAL_MANAGER_QUERY_CANDIDATE_CREDENTIALS,
+                new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+
+                    //using test builder...
+                    PrepareGetCredentialResponse response = new PrepareGetCredentialResponse.TestBuilder()
+                            .setCredentialTypeDelegate((val) ->
+                                    val.equals("password") || val.equals("otherValid"))
+                            .build();
+                    //Call restricted methods. not working.
+                    boolean a = response.hasRemoteResults();
+                    boolean b = response.hasAuthenticationResults();
+                    boolean c = response.hasCredentialResults("hoge");
+
+                    mLogger.logInfo(String.format("Credential = %b %b %b",a,b,c));
+
+        }));
+
+        //not done yet - can't raise security error as of now.
+        mPermissionTasks.put(ENFORCE_UPDATE_OWNERSHIP,  new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            PackageInstaller.Session session = null;
+            try {
+                PackageInstaller packageInstaller = mPackageInstaller;
+                PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(
+                        PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+                params.setInstallLocation(PackageInfo.INSTALL_LOCATION_INTERNAL_ONLY);
+                params.setRequestUpdateOwnership(true);//Checking parasms
+                int sessionId = packageInstaller.createSession(params);
+                PackageInstaller.SessionCallback sessionCallback = new
+                        PackageInstaller.SessionCallback() {
+                            @Override
+                            public void onCreated(int i) {
+                              ;
+                            }
+
+                            @Override
+                            public void onBadgingChanged(int i) {
+
+                            }
+
+                            @Override
+                            public void onActiveChanged(int i, boolean b) {
+                            }
+
+                            @Override
+                            public void onProgressChanged(int i, float v) {
+                            }
+                            @Override
+                            public void onFinished(int i, boolean b) {
+                            }
+                        };
+
+                packageInstaller.registerSessionCallback(sessionCallback);
+                PackageInstaller.Session s = packageInstaller.openSession(sessionId);
+            } catch (IOException ex) {
+                throw new SecurityException(ex);
+            }
+        }));
+
     }
+
+
+    class LocalDirectExecutor implements Executor {
+        public void execute(Runnable r) {
+            r.run();
+        }
+    }
+
 
     /**
      * Runs all of the permission tests for install permissions and returns a {@code boolean}

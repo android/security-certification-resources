@@ -261,8 +261,10 @@ public class InternalPermissionTester extends BasePermissionTester {
 
                 }));
 
+        //Move to Signature Permission from U
         mPermissionTasks.put(permission.ACCESS_AMBIENT_CONTEXT_EVENT,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,
+                        Build.VERSION_CODES.TIRAMISU, () -> {
 
                     @SuppressLint("WrongConstant") Object ambientContextManager
                             = mContext.getSystemService("ambient_context");
@@ -314,6 +316,11 @@ public class InternalPermissionTester extends BasePermissionTester {
                             getActivityToken(), 1, mPackageName);
                 }));
 
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_LOCK,
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+
+                }));
     }
 
     @Override
@@ -321,9 +328,20 @@ public class InternalPermissionTester extends BasePermissionTester {
         boolean allTestsPassed = true;
         List<String> permissions = mConfiguration.getInternalPermissions().orElse(
                 new ArrayList<>(mPermissionTasks.keySet()));
+
         for (String permission : permissions) {
-            boolean testPassed = runPermissionTest(permission, mPermissionTasks.get(permission),
-                    true);
+            BasePermissionTester.PermissionTest t = mPermissionTasks.get(permission);
+            boolean testPassed = true;
+            //System.out.println(permission+","+mPermissionTasks.size()+"/"+t);
+            if(t != null) {
+                testPassed = runPermissionTest(permission, mPermissionTasks.get(permission),
+                        true);
+            } else {
+                testPassed = false;
+                //mLogger.logInfo(permission+","+mPermissionTasks.size()+"/"+mPermissionTasks.keySet().toString());
+                mLogger.logInfo(
+                        "The test case for "+permission+" is not found");
+            }
             if (!testPassed) {
                 allTestsPassed = false;
             }

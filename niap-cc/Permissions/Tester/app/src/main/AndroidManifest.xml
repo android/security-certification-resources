@@ -54,7 +54,9 @@
         <service
             android:name=".services.TestService"
             android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE" />
-
+        <service
+            android:name=".services.TestJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name=".services.FgCameraService"
             android:foregroundServiceType="camera"
@@ -107,6 +109,8 @@
             android:name=".services.FgSystemExemptedService"
             android:foregroundServiceType="systemExempted"
             android:exported="false" />
+
+
 
         <receiver
             android:name=".receivers.Admin"
