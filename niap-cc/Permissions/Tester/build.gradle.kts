@@ -39,3 +39,9 @@ allprojects {
 apply {
     from("tool.gradle")
 }
+
+tasks.register("exportPackage") {
+    dependsOn("assemble");
+    doLast {
+    }
+}

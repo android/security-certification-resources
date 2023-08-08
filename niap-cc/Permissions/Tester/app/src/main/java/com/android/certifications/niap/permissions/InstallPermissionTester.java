@@ -374,6 +374,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                 tryBindingForegroundService(serviceIntent);
             } catch(Throwable t){
                 mLogger.logDebug("FOREGROUND_SERVICE_CAMERA", t);
+
             }
         }));
         mPermissionTasks.put(FOREGROUND_SERVICE_LOCATION,  new PermissionTest(true,
@@ -625,7 +626,14 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(TRANSMIT_IR, new PermissionTest(false, () -> {
             try {
-                mConsumerIrManager.getCarrierFrequencies();
+
+                mLogger.logSystem("mCIR.hasIrEmitter(): " + mConsumerIrManager.hasIrEmitter());
+                if (mConsumerIrManager.hasIrEmitter()) {
+                    mConsumerIrManager.getCarrierFrequencies();
+                } else {
+                    throw new BypassTestException("this device device doesn't have ir emitter");
+                }
+
             } catch (UnsupportedOperationException e) {
                 // This Exception indicates the app has been granted the required permission to
                 // invoke this API but the device does not have the IR feature.
@@ -1142,7 +1150,8 @@ public class InstallPermissionTester extends BasePermissionTester {
                             throw new InterruptedException("Connection Timed Out");
                         }
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        //throw new RuntimeException(e);
+                        throw new UnexpectedPermissionTestFailureException(e.getMessage());
                     }
                 }
                 mLogger.logInfo("Connected To Service in the Tester app="+serviceConnection.mComponentName+

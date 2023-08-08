@@ -16,6 +16,8 @@
 
 package com.android.certifications.niap.permissions;
 
+import static androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -28,6 +30,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.location.Location;
 import android.os.Build;
+import android.os.Looper;
 import android.util.SparseArray;
 
 import androidx.core.util.Consumer;
@@ -51,9 +54,11 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.gms.vision.CameraSource;
@@ -223,11 +228,18 @@ public class GmsPermissionTester extends BasePermissionTester {
                             }
                         }
                     };
-                    mContext.registerReceiver(receiver,
-                            new IntentFilter(ACTIVITY_RECOGNITION_TEST));
+
+                    if(Build.VERSION.SDK_INT<Build.VERSION_CODES.TIRAMISU) {
+                        mContext.registerReceiver(receiver,
+                                new IntentFilter(ACTIVITY_RECOGNITION_TEST));
+                    } else {
+                        mContext.registerReceiver(receiver,
+                                new IntentFilter(ACTIVITY_RECOGNITION_TEST), Context.RECEIVER_NOT_EXPORTED);
+                    }
+
                     Intent intent = new Intent(ACTIVITY_RECOGNITION_TEST);
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
-                            PendingIntent.FLAG_MUTABLE);
+                            PendingIntent.FLAG_IMMUTABLE);
 
                     // The ActivityRecognitionClient will throw a SecurityException when waiting for
                     // the Task from the #requestActivityUpdates to complete.
@@ -256,50 +268,86 @@ public class GmsPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(Manifest.permission.ACCESS_COARSE_LOCATION,
                 new PermissionTest(false, () -> {
-                    final String ACCESS_COARSE_LOCATION_TEST = "ACCESS_COARSE_LOCATION_TEST";
-                    CountDownLatch[] latch = new CountDownLatch[1];
-                    latch[0] = new CountDownLatch(1);
+                    if(Build.VERSION.SDK_INT<=Build.VERSION_CODES.TIRAMISU) {
+                        final String ACCESS_COARSE_LOCATION_TEST = "ACCESS_COARSE_LOCATION_TEST";
+                        CountDownLatch[] latch = new CountDownLatch[1];
+                        latch[0] = new CountDownLatch(1);
 
-                    BroadcastReceiver receiver = new BroadcastReceiver() {
-                        @Override
-                        public void onReceive(Context context, Intent intent) {
-                            LocationResult result = LocationResult.extractResult(intent);
-                            // The countdown on the latch should only occur if the provided
-                            // intent includes a valid location since additional updates can be sent
-                            // without a location.
-                            if (result != null) {
-                                Location location = result.getLastLocation();
-                                if (location != null) {
-                                    mLogger.logDebug(
-                                            "Received a lat,long of " + location.getLatitude()
-                                                    + ", "
-                                                    + location.getLongitude());
+                        BroadcastReceiver receiver = new BroadcastReceiver() {
+                            @Override
+                            public void onReceive(Context context, Intent intent) {
+                                LocationResult result = LocationResult.extractResult(intent);
+                                // The countdown on the latch should only occur if the provided
+                                // intent includes a valid location since additional updates can be sent
+                                // without a location.
+                                if (result != null) {
+                                    Location location = result.getLastLocation();
+                                    if (location != null) {
+                                        mLogger.logDebug(
+                                                "Received a lat,long of " + location.getLatitude()
+                                                        + ", "
+                                                        + location.getLongitude());
+                                        latch[0].countDown();
+                                    }
+                                }
+                            }
+                        };
+                        mContext.registerReceiver(receiver,
+                                new IntentFilter(ACCESS_COARSE_LOCATION_TEST));
+                        Intent intent = new Intent(ACCESS_COARSE_LOCATION_TEST);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
+                                PendingIntent.FLAG_MUTABLE);
+
+                        LocationRequest locationRequest = LocationRequest.create().setPriority(
+                                LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(1000);
+                        FusedLocationProviderClient locationClient =
+                                LocationServices.getFusedLocationProviderClient(mContext);
+                        locationClient.requestLocationUpdates(locationRequest, pendingIntent);
+                        boolean locationReceived = false;
+                        try {
+                            locationReceived = latch[0].await(30, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            mLogger.logError("Caught an InterruptedException: ", e);
+                        }
+                        locationClient.removeLocationUpdates(pendingIntent);
+                        mContext.unregisterReceiver(receiver);
+                        if (!locationReceived) {
+                            throw new SecurityException("A location update was not received");
+                        }
+                    } else {
+                        CountDownLatch[] latch = new CountDownLatch[1];
+                        latch[0] = new CountDownLatch(1);
+                        LocationCallback locationCallback = new LocationCallback() {
+                            @Override
+                            public void onLocationResult(LocationResult locationResult) {
+                                if (locationResult == null) {
+                                    return;
+                                }
+                                for (Location location : locationResult.getLocations()) {
+                                    mLogger.logDebug("updated location=>"+location.toString());
                                     latch[0].countDown();
                                 }
                             }
-                        }
-                    };
-                    mContext.registerReceiver(receiver,
-                            new IntentFilter(ACCESS_COARSE_LOCATION_TEST));
-                    Intent intent = new Intent(ACCESS_COARSE_LOCATION_TEST);
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
-                            PendingIntent.FLAG_MUTABLE);
+                        };
+                        LocationRequest locationRequest = new LocationRequest.Builder(5000)
+                                .setDurationMillis(100)
+                                .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY).build();
 
-                    LocationRequest locationRequest = LocationRequest.create().setPriority(
-                            LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(1000);
-                    FusedLocationProviderClient locationClient =
-                            LocationServices.getFusedLocationProviderClient(mContext);
-                    locationClient.requestLocationUpdates(locationRequest, pendingIntent);
-                    boolean locationReceived = false;
-                    try {
-                        locationReceived = latch[0].await(30, TimeUnit.SECONDS);
-                    } catch (InterruptedException e) {
-                        mLogger.logError("Caught an InterruptedException: ", e);
-                    }
-                    locationClient.removeLocationUpdates(pendingIntent);
-                    mContext.unregisterReceiver(receiver);
-                    if (!locationReceived) {
-                        throw new SecurityException("A location update was not received");
+                        FusedLocationProviderClient locationClient =
+                                LocationServices.getFusedLocationProviderClient(mContext);
+                        locationClient.requestLocationUpdates(locationRequest,
+                                locationCallback,
+                                Looper.getMainLooper());
+                        boolean locationReceived = false;
+                        try {
+                            locationReceived = latch[0].await(10, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            mLogger.logError("Caught an InterruptedException: ", e);
+                        }
+                        locationClient.removeLocationUpdates(locationCallback);
+                        if (!locationReceived) {
+                            throw new SecurityException("A location update was not received");
+                        }
                     }
                 }));
 
@@ -352,8 +400,14 @@ public class GmsPermissionTester extends BasePermissionTester {
                             }
                         }
                     };
-                    mContext.registerReceiver(receiver,
-                            new IntentFilter(ACCESS_BACKGROUND_LOCATION_TEST));
+                    if(Build.VERSION.SDK_INT<Build.VERSION_CODES.TIRAMISU) {
+                        mContext.registerReceiver(receiver,
+                                new IntentFilter(ACCESS_BACKGROUND_LOCATION_TEST));
+                    } else {
+                        mContext.registerReceiver(receiver,
+                                new IntentFilter(ACCESS_BACKGROUND_LOCATION_TEST), Context.RECEIVER_NOT_EXPORTED);
+                    }
+
                     Intent intent = new Intent(ACCESS_BACKGROUND_LOCATION_TEST);
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
                             PendingIntent.FLAG_IMMUTABLE);
