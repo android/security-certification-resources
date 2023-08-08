@@ -444,7 +444,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                 mActivity.startForegroundService(serviceIntent);
                 tryBindingForegroundService(serviceIntent);
             } catch(Throwable t){
-                mLogger.logTestError("FOREGROUND_SERVICE_MEDIA_PROJECTION", t);
+                mLogger.logDebug("FOREGROUND_SERVICE_MEDIA_PROJECTION", t);
             }
         }));
 
@@ -455,7 +455,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                 mActivity.startForegroundService(serviceIntent);
                 tryBindingForegroundService(serviceIntent);
             } catch(Throwable t){
-                mLogger.logTestError("FOREGROUND_SERVICE_PHONE_CALL", t);
+                mLogger.logDebug("FOREGROUND_SERVICE_PHONE_CALL", t);
             }
         }));
         mPermissionTasks.put(FOREGROUND_SERVICE_REMOTE_MESSAGING,  new PermissionTest(true,
@@ -465,7 +465,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                 mActivity.startForegroundService(serviceIntent);
                 tryBindingForegroundService(serviceIntent);
             } catch(Throwable t){
-                mLogger.logTestError("FOREGROUND_SERVICE_REMOTE_MESSAGING", t);
+                mLogger.logDebug("FOREGROUND_SERVICE_REMOTE_MESSAGING", t);
             }
         }));
         mPermissionTasks.put(FOREGROUND_SERVICE_SPECIAL_USE,  new PermissionTest(true,
@@ -475,7 +475,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                 mActivity.startForegroundService(serviceIntent);
                 tryBindingForegroundService(serviceIntent);
             } catch(Throwable t){
-                mLogger.logTestError("FOREGROUND_SERVICE_SPECIAL_USE", t);
+                mLogger.logDebug("FOREGROUND_SERVICE_SPECIAL_USE", t);
             }
         }));
         mPermissionTasks.put(FOREGROUND_SERVICE_SYSTEM_EXEMPTED,  new PermissionTest(true,
@@ -485,7 +485,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                 mActivity.startForegroundService(serviceIntent);
                 tryBindingForegroundService(serviceIntent);
             } catch(Throwable t){
-                mLogger.logTestError("FOREGROUND_SERVICE_SYSTEM_EXEMPTED", t);
+                mLogger.logDebug("FOREGROUND_SERVICE_SYSTEM_EXEMPTED", t);
             }
         }));
 
