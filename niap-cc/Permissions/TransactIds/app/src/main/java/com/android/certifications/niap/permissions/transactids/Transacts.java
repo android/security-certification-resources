@@ -618,6 +618,50 @@ public class Transacts {
     public static final String triggerNetworkRegistration = "triggerNetworkRegistration";
     public static final String getUidOps = "getUidOps";
 
+    /* For Android 34*/
+    //public static final String AUDIO_DESCRIPTOR = "android.media.IAudioService";
+    //public static final String TELEPHONY_DESCRIPTOR = "com.android.internal.telephony.ITelephony";
+    //public static final String CLIPBOARD_DESCRIPTOR = "android.content.IClipboard";
+    public static final String INPUTMETHOD_DESCRIPTOR = "com.android.internal.view.IInputMethodManager";
+    public static final String SUBSCRIPTION_DESCRIPTOR = "com.android.internal.telephony.ISub";
+    public static final String HEALTH_CONNECT_DESCRIPTOR = "android.health.connect.aidl.IHealthConnectService";
+    public static final String DEVICELOCK_DESCRIPTOR = "android.devicelock.IDeviceLockService";
+    //public static final String ACTIVITY_DESCRIPTOR = "android.app.IActivityManager";
+    public static final String WEARABLES_DESCRIPTOR = "android.app.wearable.IWearableSensingManager";
+    public static final String STATS_DESCRIPTOR = "android.os.IStatsManagerService";
+    //public static final String POWER_DESCRIPTOR = "android.os.IPowerManager";
+    public static final String CREDENTIAL_DESCRIPTOR = "android.credentials.ICredentialManager";
+    //public static final String DISPLAY_DESCRIPTOR = "android.hardware.display.IDisplayManager";
+    //public static final String ROLE_DESCRIPTOR = "android.app.role.IRoleManager";
+    //public static final String PACKAGE_DESCRIPTOR = "android.content.pm.IPackageManager";
+    //public static final String INPUT_DESCRIPTOR = "android.hardware.input.IInputManager";
+    public static final String LOCALE_DESCRIPTOR = "android.app.ILocaleManager";
+
+    public static final String acquireWakeLock = "acquireWakeLock";
+    public static final String areClipboardAccessNotificationsEnabledForUser = "areClipboardAccessNotificationsEnabledForUser";
+    public static final String broadcastIntentWithFeature = "broadcastIntentWithFeature";
+    public static final String deleteAllStagedRemoteData = "deleteAllStagedRemoteData";
+    public static final String getAppMetadataFd = "getAppMetadataFd";
+    public static final String getCredentialProviderServices = "getCredentialProviderServices";
+    public static final String getDefaultApplicationAsUser = "getDefaultApplicationAsUser";
+    public static final String getModifierKeyRemapping = "getModifierKeyRemapping";
+    public static final String isDeviceLocked = "isDeviceLocked";
+    public static final String isInputMethodPickerShownForTest = "isInputMethodPickerShownForTest";
+    public static final String killAllBackgroundProcesses = "killAllBackgroundProcesses";
+    public static final String logFgsApiBegin = "logFgsApiBegin";
+    public static final String provideDataStream = "provideDataStream";
+    public static final String registerKeyboardBacklightListener = "registerKeyboardBacklightListener";
+    public static final String releaseLowPowerStandbyPorts = "releaseLowPowerStandbyPorts";
+    public static final String requestIsSatelliteEnabled = "requestIsSatelliteEnabled";
+    public static final String requestSatelliteEnabled = "requestSatelliteEnabled";
+    public static final String setHdrConversionMode = "setHdrConversionMode";
+    public static final String setOverrideLocaleConfig = "setOverrideLocaleConfig";
+    public static final String setRestrictedMetricsChangedOperation = "setRestrictedMetricsChangedOperation";
+    public static final String setSubscriptionUserHandle = "setSubscriptionUserHandle";
+    public static final String setVolumeGroupVolumeIndex = "setVolumeGroupVolumeIndex";
+    public static final String startMigration = "startMigration";
+    public static final String updateDataDownloadState = "updateDataDownloadState";
+
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an
      * extension of the Transacts class for the Permission Test Tool.

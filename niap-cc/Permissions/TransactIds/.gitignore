@@ -8,6 +8,7 @@ lint.xml
 #  Android Studio
 /.idea/*
 .gradle
+.idea
 *.iml
 *.ipr
 *.iws
