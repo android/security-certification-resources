@@ -565,6 +565,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
                 @SuppressLint("Recycle") Cursor cursor = contentResolver.query(
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                         null, null, null, null);
+                //mLogger.logSystem(">READ_MEDIA"+cursor.toString());
                 if (cursor == null) {
                     throw new UnexpectedPermissionTestFailureException(
                             "Unable to obtain an sound to test READ_MEDIA_AUDIO");

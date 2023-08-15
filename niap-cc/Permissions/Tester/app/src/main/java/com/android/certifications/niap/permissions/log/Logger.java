@@ -97,7 +97,7 @@ public interface Logger {
      * permission}.
      */
     default void logTestError(String permission, Throwable throwable) {
-        logError(permission + ": TEST FAILURE", throwable);
+        logError(permission + ": ATEST FAILURE", throwable);
     }
 
     /**

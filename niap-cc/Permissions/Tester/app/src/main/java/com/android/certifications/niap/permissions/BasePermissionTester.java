@@ -281,12 +281,12 @@ public abstract class BasePermissionTester {
             } catch (MissingForegroundServiceTypeException e) {
                 //
                 testPassed = false;
-                StatusLogger.logError("HERE!");
-                StatusLogger.logTestError(permission, e);
+
+                mLogger.logInfo(permission + "/"+ e.getMessage());//becasue failed test does not always mean false behvaiour.
             } catch (UnexpectedPermissionTestFailureException e) {
 
                 testPassed = false;
-                StatusLogger.logTestError(permission, e);
+                mLogger.logInfo(permission + "/"+ e.getMessage());
             } catch (Throwable t) {
                 // Any other Throwable indicates the test did not fail due to a SecurityException;
                 // treat the API as successful if the caller specified exceptions are allowed.
@@ -297,7 +297,7 @@ public abstract class BasePermissionTester {
                     // else an Exception was not expected; treat the test as failed and log the
                     // error status.
                     testPassed = false;
-                    mLogger.logTestError(permission, t);
+                    mLogger.logInfo(permission + "/"+ t.getMessage());
                 }
             }
         }
