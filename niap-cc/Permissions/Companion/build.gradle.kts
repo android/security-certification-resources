@@ -24,7 +24,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.0.2")
+        classpath("com.android.tools.build:gradle:8.1.0")
         classpath("com.google.guava:guava:24.1-jre")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle.kts files
@@ -52,6 +52,7 @@ class BindServiceCodeGenPlugin:Plugin<Project> {
         "BIND_VISUAL_QUERY_DETECTION_SERVICE",
         "BIND_WEARABLE_SENSING_SERVICE"
     )
+
     override fun apply(project:Project){
         project.task("bindServiceCodeGen"){
             doLast {

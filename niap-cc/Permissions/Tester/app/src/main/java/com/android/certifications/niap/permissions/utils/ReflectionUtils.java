@@ -19,7 +19,11 @@ package com.android.certifications.niap.permissions.utils;
 import android.util.Log;
 import com.android.certifications.niap.permissions.BasePermissionTester;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,6 +55,34 @@ public class ReflectionUtils {
             } else {
                 throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
             }
+        }
+    }
+
+    public static Object stubRemoteCallback()  {
+        try {
+            Class<?> onResultListenerClass = Class.forName(
+                    "android.os.RemoteCallback$OnResultListener");
+            Object onResultListener = Proxy.newProxyInstance(
+                    onResultListenerClass.getClassLoader(),
+                    new Class[]{onResultListenerClass}, new InvocationHandler() {
+                        @Override
+                        public Object invoke(Object o, Method method, Object[] objects)
+                                throws Throwable {
+                            Log.d("", "invoke: " + method);
+                            return null;
+                        }
+                    });
+
+            Class<?> remoteCallbackClass = Class.forName("android.os.RemoteCallback");
+            Constructor remoteCallbackConstructor = remoteCallbackClass.getConstructor(
+                    onResultListenerClass);
+            return remoteCallbackConstructor.newInstance(
+                    (Object) onResultListener);
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
+                 InstantiationException | InvocationTargetException e){
+            e.printStackTrace();
+
+            return null;
         }
     }
 

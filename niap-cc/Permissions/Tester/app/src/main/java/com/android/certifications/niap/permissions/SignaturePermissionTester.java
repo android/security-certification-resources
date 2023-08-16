@@ -30,6 +30,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AppOpsManager;
+import android.app.BroadcastOptions;
 import android.app.KeyguardManager;
 import android.app.LocaleManager;
 import android.app.Notification;
@@ -70,6 +71,7 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.display.DisplayManager;
+import android.hardware.display.HdrConversionMode;
 import android.hardware.usb.UsbManager;
 import android.location.LocationManager;
 import android.media.AudioManager;
@@ -99,11 +101,13 @@ import android.os.IInterface;
 import android.os.Looper;
 import android.os.OutcomeReceiver;
 import android.os.Parcel;
+import android.os.ParcelFileDescriptor;
 import android.os.ParcelUuid;
 import android.os.Parcelable;
 import android.os.PersistableBundle;
 import android.os.PowerManager;
 import android.os.Process;
+import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -294,12 +298,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks = new HashMap<>();
 
-        prepareTestBlock01();
-        prepareTestBlock02();//has some problem, process destructive
-        prepareTestBlock03();//has some problems
-        prepareTestBlock04();
+        //prepareTestBlock01();
+        //prepareTestBlock02();//has some problem, process destructive
+        //prepareTestBlock03();//has some problems
+        //prepareTestBlock04();
         prepareTestBlockFor14();
-        prepareTestBlockBind();
+        //prepareTestBlockBind();
     }
     private void prepareTestBlock01()
     {
@@ -4574,6 +4578,197 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             }, null);
 
                 }));
+
+
+        //AppProtoEnums.OP_NONE
+        //Transaction Test
+//        mPermissionTasks.put(permission.BROADCAST_OPTION_INTERACTIVE,
+//                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+//                    mTransacts.invokeTransact(
+//                            Transacts.ACTIVITY_SERVICE, Transacts.ACTIVITY_DESCRIPTOR,
+//                            Transacts.broadcastIntentWithFeature,
+//                            null, null, bcIntent, null, null, 0, null, null,
+//                            requiredPermissions, null, null, android.app.AppOpsManager.OP_NONE,
+//                            bOptions.toBundle(), false, false, userId);
+//                            //1200000,1300000);
+//                }));
+
+
+        mPermissionTasks.put(permission.DELETE_STAGED_HEALTH_CONNECT_REMOTE_DATA,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    mTransacts.invokeTransact(
+                            Context.HEALTHCONNECT_SERVICE ,
+                            Transacts.HEALTH_CONNECT_DESCRIPTOR,
+                            Transacts.deleteAllStagedRemoteData,UserHandle.getUserHandleForUid(mUid));
+                }));
+
+        mPermissionTasks.put(permission.MIGRATE_HEALTH_CONNECT_DATA,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    /*PackageName,IMigrationCallback*/
+                    //Class<?> remoteCallbackClass = Class.forName("android.os.RemoteCallback");
+                    //Constructor remoteCallbackConstructor = remoteCallbackClass.getConstructor(
+                    //        onResultListenerClass);
+                    //Object remoteCallback = remoteCallbackConstructor.newInstance(
+                    //        (Object) onResultListener);
+                    Object callback = descriptorAsInterface(
+                            "android.health.connect.aidl.IMigrationCallback");
+                    Log.d(TAG,"Callback found :"+callback.getClass());
+                    if(callback != null) {
+                        mTransacts.invokeTransact(
+                                Context.HEALTHCONNECT_SERVICE,
+                                Transacts.HEALTH_CONNECT_DESCRIPTOR,
+                                Transacts.startMigration,
+                                mContext.getPackageName(), callback);
+                    }
+                }));
+
+        mPermissionTasks.put(permission.STAGE_HEALTH_CONNECT_REMOTE_DATA,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    mTransacts.invokeTransact(
+                            Context.HEALTHCONNECT_SERVICE ,
+                            Transacts.HEALTH_CONNECT_DESCRIPTOR,
+                            Transacts.updateDataDownloadState,
+                            0);
+                }));
+
+        mPermissionTasks.put(permission.GET_APP_METADATA,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.PACKAGE_SERVICE,
+                                Transacts.PACKAGE_DESCRIPTOR,
+                                Transacts.getAppMetadataFd,
+                                mContext.getPackageName(), mUid);
+                    }
+                }));
+        mPermissionTasks.put(permission.LIST_ENABLED_CREDENTIAL_PROVIDERS,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
+                        mTransacts.invokeTransact(
+                                Context.CREDENTIAL_SERVICE,
+                                Transacts.CREDENTIAL_DESCRIPTOR,
+                                Transacts.getCredentialProviderServices,
+                                mUid,0);
+                    }
+                }));
+        mPermissionTasks.put(permission.LOG_FOREGROUND_RESOURCE_USE,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
+                        mTransacts.invokeTransact(
+                                Transacts.ACTIVITY_SERVICE,
+                                Transacts.ACTIVITY_DESCRIPTOR,
+                                Transacts.logFgsApiBegin,
+                                0,mUid,Binder.getCallingPid()
+                                );
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_CLIPBOARD_ACCESS_NOTIFICATION,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
+                        mTransacts.invokeTransact(
+                                Context.CLIPBOARD_SERVICE,
+                                Transacts.CLIPBOARD_DESCRIPTOR,
+                                Transacts.areClipboardAccessNotificationsEnabledForUser,
+                                mUid
+                        );
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_SUBSCRIPTION_USER_ASSOCIATION,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
+                        mTransacts.invokeTransact(
+                                Context.TELEPHONY_SUBSCRIPTION_SERVICE,
+                                Transacts.SUBSCRIPTION_DESCRIPTOR,
+                                Transacts.setSubscriptionUserHandle,
+                                UserHandle.getUserHandleForUid(mUid),0
+                        );
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_WEARABLE_SENSING_SERVICE,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        Object callback = ReflectionUtils.stubRemoteCallback();
+                        //ParcelFileDescriptor descriptor = ParcelFileDescriptor//
+                        mTransacts.invokeTransact(
+                                "wearable_sensing",
+                                Transacts.WEARABLES_DESCRIPTOR,
+                                Transacts.provideDataStream,
+                                mUid,null,callback
+                        );
+                    }
+                }));
+        mPermissionTasks.put(permission.MODIFY_AUDIO_SETTINGS_PRIVILEGED,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Context.AUDIO_SERVICE,
+                                Transacts.AUDIO_DESCRIPTOR,
+                                Transacts.setVolumeGroupVolumeIndex,
+                                0,0,0
+                        );
+                    }
+                }));
+        mPermissionTasks.put(permission.MODIFY_HDR_CONVERSION_MODE,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Context.DISPLAY_SERVICE,
+                                Transacts.DISPLAY_DESCRIPTOR,
+                                Transacts.setHdrConversionMode,
+                                new HdrConversionMode(HdrConversionMode.HDR_CONVERSION_SYSTEM)
+                        );
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEFAULT_APPLICATIONS,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
+                        mTransacts.invokeTransact(
+                                Context.ROLE_SERVICE,
+                                Transacts.ROLE_DESCRIPTOR,
+                                Transacts.getDefaultApplicationAsUser,
+                                "dummy",mUid
+                        );
+                    }
+                }));
+
+        mPermissionTasks.put(permission.KILL_ALL_BACKGROUND_PROCESSES,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
+                        mTransacts.invokeTransact(
+                                Transacts.ACTIVITY_SERVICE,
+                                Transacts.ACTIVITY_DESCRIPTOR,
+                                Transacts.killAllBackgroundProcesses);
+                    }
+                }));
+
+        mPermissionTasks.put(permission.BROADCAST_OPTION_INTERACTIVE,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        Intent lockedBcIntent = new Intent(Intent.ACTION_SEND)
+                                .setPackage(mContext.getPackageName());
+
+                        final String[] requiredPermissions
+                                = {};
+                        final BroadcastOptions bOptions;
+
+                        bOptions = BroadcastOptions.makeBasic();
+                        ReflectionUtils.invokeReflectionCall(bOptions.getClass(),
+                                        "setInteractive",bOptions,
+                                        new Class<?>[]{boolean.class},true
+                                        );
+                        //mLogger.logDebug(">"+mUid);
+                        mTransacts.invokeTransact(
+                                Context.ACTIVITY_SERVICE,
+                                Transacts.ACTIVITY_DESCRIPTOR,
+                                Transacts.broadcastIntentWithFeature,
+                                null, null, lockedBcIntent, null, null, 0, null, null,
+                                requiredPermissions, null, null, 0,
+                                bOptions.toBundle(), false, false, mUid);//mUid);
+
+                    }
+                }));
+
     }
     void prepareTestBlockBind()
     {
@@ -4948,6 +5143,33 @@ public class SignaturePermissionTester extends BasePermissionTester {
             //Unimplemented
         }
     }
+
+    public Object descriptorAsInterface(String descriptor) {
+        Class clazz = null;
+        Constructor c = null;
+        Object o = null;
+        Log.d(TAG,"Checking :"+descriptor);
+        try {
+            clazz = Class.forName(descriptor + "$Stub");
+            //c = clazz.getDeclaredConstructor();
+            //o = c.newInstance();
+        } catch (ClassNotFoundException  e) {
+            e.printStackTrace();
+            return null;
+        }
+        Log.d(TAG,"Found :"+clazz);
+        try {
+            Method transactMethod = clazz.getDeclaredMethod("asInterface",IBinder.class);
+            transactMethod.setAccessible(true);
+            return transactMethod.invoke(o,getActivityToken());
+
+        } catch (NoSuchMethodException | IllegalAccessException |
+                 InvocationTargetException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private Runnable getBindRunnable(final String permission) {
         return () -> {
             if (SYSTEM_ONLY_BIND_PERMISSIONS.contains(permission) && isPermissionGranted(

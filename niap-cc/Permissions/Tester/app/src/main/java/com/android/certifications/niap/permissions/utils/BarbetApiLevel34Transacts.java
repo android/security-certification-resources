@@ -59,6 +59,8 @@ public class BarbetApiLevel34Transacts extends Transacts {
         transactIds = new HashMap<>();
         transactIds.put(reboot, 47);
         transactIds.put(isAmbientDisplaySuppressedForTokenByApp, 65);
+        transactIds.put(acquireWakeLock, 1);
+        transactIds.put(releaseLowPowerStandbyPorts, 45);
         // Failed to obtain transactId of setPowerSaveMode under android.os.IPowerManager: No field TRANSACTION_setPowerSaveMode in class Landroid/os/IPowerManager$Stub; (declaration of 'android.os.IPowerManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
         transactIds.put(setDynamicPowerSaveHint, 25);
         transactIds.put(setBatteryDischargePrediction, 29);
@@ -68,6 +70,10 @@ public class BarbetApiLevel34Transacts extends Transacts {
         transactIds.put(notifySystemEvent, 19);
         transactIds.put(injectCamera, 15);
         mDescriptorTransacts.put(CAMERA_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
+        transactIds.put(getCredentialProviderServices, 9);
+        mDescriptorTransacts.put(CREDENTIAL_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         // Failed to obtain transactId of isRecognitionActive under com.android.internal.app.ISoundTriggerService: No field TRANSACTION_isRecognitionActive in class Lcom/android/internal/app/ISoundTriggerService$Stub; (declaration of 'com.android.internal.app.ISoundTriggerService$Stub' appears in /system/framework/framework.jar!classes4.dex)
@@ -88,10 +94,15 @@ public class BarbetApiLevel34Transacts extends Transacts {
         mDescriptorTransacts.put(NFC_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(setOverrideLocaleConfig, 4);
+        mDescriptorTransacts.put(LOCALE_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(setRingtonePlayer, 78);
         transactIds.put(getRingtonePlayer, 79);
         transactIds.put(isAudioServerRunning, 126);
         transactIds.put(forceRemoteSubmixFullVolume, 18);
+        transactIds.put(setVolumeGroupVolumeIndex, 25);
         transactIds.put(getDeviceVolumeBehavior, 151);
         mDescriptorTransacts.put(AUDIO_DESCRIPTOR, transactIds);
 
@@ -120,6 +131,8 @@ public class BarbetApiLevel34Transacts extends Transacts {
         transactIds = new HashMap<>();
         // Failed to obtain transactId of getVtDataUsage under com.android.internal.telephony.ITelephony: No field TRANSACTION_getVtDataUsage in class Lcom/android/internal/telephony/ITelephony$Stub; (declaration of 'com.android.internal.telephony.ITelephony$Stub' appears in /system/framework/framework.jar!classes3.dex)
         transactIds.put(enableLocationUpdates, 26);
+        transactIds.put(requestIsSatelliteEnabled, 359);
+        transactIds.put(requestSatelliteEnabled, 358);
         mDescriptorTransacts.put(TELEPHONY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -128,12 +141,14 @@ public class BarbetApiLevel34Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(getPrimaryClipSource, 10);
+        transactIds.put(areClipboardAccessNotificationsEnabledForUser, 11);
         // Failed to obtain transactId of showAccessNotificationLocked under android.content.IClipboard: No field TRANSACTION_showAccessNotificationLocked in class Landroid/content/IClipboard$Stub; (declaration of 'android.content.IClipboard$Stub' appears in /system/framework/framework.jar)
         mDescriptorTransacts.put(CLIPBOARD_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(requestEmbeddedSubscriptionInfoListRefresh, 10);
-        mDescriptorTransacts.put(ISUB_DESCRIPTOR, transactIds);
+        transactIds.put(setSubscriptionUserHandle, 50);
+        mDescriptorTransacts.put(SUBSCRIPTION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         // Failed to obtain transactId of setAlwaysOnEffect under android.os.IVibratorService: android.os.IVibratorService$Stub
@@ -157,6 +172,7 @@ public class BarbetApiLevel34Transacts extends Transacts {
         mDescriptorTransacts.put(NOTIFICATION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(getAppMetadataFd, 37);
         transactIds.put(movePackage, 113);
         transactIds.put(installExistingPackageAsUser, 117);
         transactIds.put(makeUidVisible, 199);
@@ -244,8 +260,22 @@ public class BarbetApiLevel34Transacts extends Transacts {
         mDescriptorTransacts.put(DEVICE_STATE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(isInputMethodPickerShownForTest, 12);
+        mDescriptorTransacts.put(INPUTMETHOD_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(setDataSaverModeEnabled, 41);
         mDescriptorTransacts.put(NETWORK_MANAGEMENT_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
+        transactIds.put(isDeviceLocked, 3);
+        mDescriptorTransacts.put(DEVICELOCK_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
+        transactIds.put(updateDataDownloadState, 30);
+        transactIds.put(deleteAllStagedRemoteData, 29);
+        transactIds.put(startMigration, 22);
+        mDescriptorTransacts.put(HEALTH_CONNECT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         // Failed to obtain transactId of search under android.app.cloudsearch.ICloudSearchManager: android.app.cloudsearch.ICloudSearchManager$Stub
@@ -266,12 +296,15 @@ public class BarbetApiLevel34Transacts extends Transacts {
         transactIds.put(getIntentForIntentSender, 156);
         // Failed to obtain transactId of getTaskDescription under android.app.IActivityManager: No field TRANSACTION_getTaskDescription in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
         // Failed to obtain transactId of getAssistContextExtras under android.app.IActivityManager: No field TRANSACTION_getAssistContextExtras in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
+        transactIds.put(broadcastIntentWithFeature, 22);
         transactIds.put(unhandledBack, 16);
         // Failed to obtain transactId of inputDispatchingTimedOut under android.app.IActivityManager: No field TRANSACTION_inputDispatchingTimedOut in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
         // Failed to obtain transactId of setFrontActivityScreenCompatMode under android.app.IActivityManager: No field TRANSACTION_setFrontActivityScreenCompatMode in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
         transactIds.put(setAlwaysFinish, 43);
         transactIds.put(startActivityFromRecents, 173);
+        transactIds.put(killAllBackgroundProcesses, 127);
         // Failed to obtain transactId of releasePersistableUriPermission under android.app.IActivityManager: No field TRANSACTION_releasePersistableUriPermission in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
+        transactIds.put(logFgsApiBegin, 10);
         transactIds.put(requestBugReport, 146);
         // Failed to obtain transactId of getFrontActivityScreenCompatMode under android.app.IActivityManager: No field TRANSACTION_getFrontActivityScreenCompatMode in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
         transactIds.put(setProcessLimit, 51);
@@ -290,12 +323,17 @@ public class BarbetApiLevel34Transacts extends Transacts {
         mDescriptorTransacts.put(VIRTUAL_DEVICE_MANAGER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(setRestrictedMetricsChangedOperation, 15);
+        mDescriptorTransacts.put(STATS_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(awaken, 2);
         transactIds.put(isDreaming, 7);
         mDescriptorTransacts.put(DREAMS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(setRefreshRateSwitchingType, 51);
+        transactIds.put(setHdrConversionMode, 45);
         transactIds.put(setTemporaryAutoBrightnessAdjustment, 38);
         transactIds.put(startWifiDisplayScan, 6);
         transactIds.put(setUserPreferredDisplayMode, 42);
@@ -456,6 +494,10 @@ public class BarbetApiLevel34Transacts extends Transacts {
         mDescriptorTransacts.put(VPN_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(provideDataStream, 1);
+        mDescriptorTransacts.put(WEARABLES_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(hasEnrolledBiometrics, 6);
         mDescriptorTransacts.put(BIOMETRIC_DESCRIPTOR, transactIds);
 
@@ -475,6 +517,7 @@ public class BarbetApiLevel34Transacts extends Transacts {
         mDescriptorTransacts.put(MEDIA_SESSION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(getDefaultApplicationAsUser, 7);
         transactIds.put(addOnRoleHoldersChangedListenerAsUser, 9);
         transactIds.put(setBypassingRoleQualification, 12);
         mDescriptorTransacts.put(ROLE_DESCRIPTOR, transactIds);
@@ -490,6 +533,8 @@ public class BarbetApiLevel34Transacts extends Transacts {
         transactIds.put(monitorGestureInput, 44);
         transactIds.put(addKeyboardLayoutForInputDevice, 21);
         transactIds.put(enableInputDevice, 5);
+        transactIds.put(registerKeyboardBacklightListener, 65);
+        transactIds.put(getModifierKeyRemapping, 28);
         transactIds.put(tryPointerSpeed, 9);
         transactIds.put(removePortAssociation, 46);
         mDescriptorTransacts.put(INPUT_DESCRIPTOR, transactIds);

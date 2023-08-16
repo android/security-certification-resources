@@ -925,6 +925,7 @@ public class InstallPermissionTester extends BasePermissionTester {
 
             }
         }));
+
         mPermissionTasks.put(DETECT_SCREEN_CAPTURE,  new PermissionTest(false,
                 Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
             if (android.os.Build.VERSION.SDK_INT >= 34) {

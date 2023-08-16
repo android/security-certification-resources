@@ -107,6 +107,9 @@ public class MainActivity extends AppCompatActivity {
         //Transaction APIs as of Android 34
         //We should automate them ....
 
+        ProxyChecker.check("android.health.connect.aidl.IMigrationCallback",
+                "Stub");
+
         /*ProxyChecker.check("android.os.IStatsManagerService",
                 "setRestrictedMetricsChangedOperation");
         ProxyChecker.check(ACTIVITY_DESCRIPTOR,

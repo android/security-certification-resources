@@ -30,6 +30,12 @@ android {
             keyPassword "android"
             keyAlias "companion"
         }
+        platform {
+            storeFile file('../security/platform.jks')
+            storePassword "android"
+            keyPassword "android"
+            keyAlias "platform"
+        }
     }
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions.companion"
@@ -38,7 +44,7 @@ android {
         targetSdkVersion 34
         versionCode 1
         versionName "1.0"
-        signingConfig signingConfigs.companion
+        signingConfig signingConfigs.platform
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

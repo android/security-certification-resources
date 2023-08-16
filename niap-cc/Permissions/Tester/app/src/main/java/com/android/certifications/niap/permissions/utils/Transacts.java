@@ -18,6 +18,7 @@ package com.android.certifications.niap.permissions.utils;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accounts.Account;
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -34,10 +35,16 @@ import android.os.Parcelable;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 
+import java.io.FileDescriptor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -624,6 +631,42 @@ public class Transacts {
     public static final String getModuleProperties = "getModuleProperties";
     public static final String triggerNetworkRegistration = "triggerNetworkRegistration";
     public static final String getUidOps = "getUidOps";
+
+    //For SDK34
+    public static final String INPUTMETHOD_DESCRIPTOR = "com.android.internal.view.IInputMethodManager";
+    public static final String SUBSCRIPTION_DESCRIPTOR = "com.android.internal.telephony.ISub";
+    public static final String HEALTH_CONNECT_DESCRIPTOR = "android.health.connect.aidl.IHealthConnectService";
+    public static final String DEVICELOCK_DESCRIPTOR = "android.devicelock.IDeviceLockService";
+    public static final String WEARABLES_DESCRIPTOR = "android.app.wearable.IWearableSensingManager";
+    public static final String STATS_DESCRIPTOR = "android.os.IStatsManagerService";
+    public static final String CREDENTIAL_DESCRIPTOR = "android.credentials.ICredentialManager";
+    public static final String LOCALE_DESCRIPTOR = "android.app.ILocaleManager";
+
+    public static final String acquireWakeLock = "acquireWakeLock";
+    public static final String areClipboardAccessNotificationsEnabledForUser = "areClipboardAccessNotificationsEnabledForUser";
+    public static final String broadcastIntentWithFeature = "broadcastIntentWithFeature";
+    public static final String deleteAllStagedRemoteData = "deleteAllStagedRemoteData";
+    public static final String getAppMetadataFd = "getAppMetadataFd";
+    public static final String getCredentialProviderServices = "getCredentialProviderServices";
+    public static final String getDefaultApplicationAsUser = "getDefaultApplicationAsUser";
+    public static final String getModifierKeyRemapping = "getModifierKeyRemapping";
+    public static final String isDeviceLocked = "isDeviceLocked";
+    public static final String isInputMethodPickerShownForTest = "isInputMethodPickerShownForTest";
+    public static final String killAllBackgroundProcesses = "killAllBackgroundProcesses";
+    public static final String logFgsApiBegin = "logFgsApiBegin";
+    public static final String provideDataStream = "provideDataStream";
+    public static final String registerKeyboardBacklightListener = "registerKeyboardBacklightListener";
+    public static final String releaseLowPowerStandbyPorts = "releaseLowPowerStandbyPorts";
+    public static final String requestIsSatelliteEnabled = "requestIsSatelliteEnabled";
+    public static final String requestSatelliteEnabled = "requestSatelliteEnabled";
+    public static final String setHdrConversionMode = "setHdrConversionMode";
+    public static final String setOverrideLocaleConfig = "setOverrideLocaleConfig";
+    public static final String setRestrictedMetricsChangedOperation = "setRestrictedMetricsChangedOperation";
+    public static final String setSubscriptionUserHandle = "setSubscriptionUserHandle";
+    public static final String setVolumeGroupVolumeIndex = "setVolumeGroupVolumeIndex";
+    public static final String startMigration = "startMigration";
+    public static final String updateDataDownloadState = "updateDataDownloadState";
+
 
     /**
      * Contains a mapping from the descriptor to a Map of transact names to their IDs on the device
@@ -2406,6 +2449,8 @@ public class Transacts {
         return invokeTransactWithCharSequence(service, descriptor, transactName, false, parameters);
     }
 
+
+
     /**
      * Invokes a direct binder transact using the specified {@code intent} to bind to the service
      * within the provided {@code context}; the service's {@code transactName} method is invoked
@@ -2516,6 +2561,10 @@ public class Transacts {
             Parcel data = Parcel.obtain();
             data.writeInterfaceToken(descriptor);
             for (Object parameter : parameters) {
+
+                if(parameter != null)
+                    mLogger.logDebug(parameter.getClass()+"="+parameter);
+
                 if (parameter instanceof CharSequence && useCharSequence) {
                     if (parameter == null) {
                         data.writeInt(0);

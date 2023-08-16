@@ -62,7 +62,7 @@
             android:immersive="true"
             android:launchMode="singleTop"
             android:exported="true"
-            android:permission="andorid.permission.START_VIEW_PERMISSION_USAGE"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE"
             android:theme="@style/AppTheme">
             <intent-filter android:priority="11">
                 <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
@@ -408,104 +408,104 @@
             android:permission="android.permission.BIND_AUGMENTED_AUTOFILL_SERVICE" />
 
         <!-- The following services are required for new permissions in Android 12. -->
-        <service android:name=".services.TestBindCallDiagnosticServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindCallDiagnosticServiceService"
             android:permission="android.permission.BIND_CALL_DIAGNOSTIC_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindCompanionDeviceServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindCompanionDeviceServiceService"
             android:permission="android.permission.BIND_COMPANION_DEVICE_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindDisplayHashingServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindDisplayHashingServiceService"
             android:permission="android.permission.BIND_DISPLAY_HASHING_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindDomainVerificationAgentService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindDomainVerificationAgentService"
             android:permission="android.permission.BIND_DOMAIN_VERIFICATION_AGENT"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindGbaServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindGbaServiceService"
             android:permission="android.permission.BIND_GBA_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindHotwordDetectionServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindHotwordDetectionServiceService"
             android:permission="android.permission.BIND_HOTWORD_DETECTION_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindMusicRecognitionServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindMusicRecognitionServiceService"
             android:permission="android.permission.BIND_MUSIC_RECOGNITION_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindResumeOnRebootServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindResumeOnRebootServiceService"
             android:permission="android.permission.BIND_RESUME_ON_REBOOT_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindRotationResolverServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindRotationResolverServiceService"
             android:permission="android.permission.BIND_ROTATION_RESOLVER_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindTimeZoneProviderServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindTimeZoneProviderServiceService"
             android:permission="android.permission.BIND_TIME_ZONE_PROVIDER_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindTranslationServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindTranslationServiceService"
             android:permission="android.permission.BIND_TRANSLATION_SERVICE"
             android:enabled="true"
             android:exported="true" />
         <!-- Services for android T -->
 
-        <service android:name=".services.TestBindAmbientContextDetectionServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindAmbientContextDetectionServiceService"
             android:permission="android.permission.BIND_AMBIENT_CONTEXT_DETECTION_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindTvInteractiveAppService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindTvInteractiveAppService"
             android:permission="android.permission.BIND_TV_INTERACTIVE_APP"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindWallpaperEffectsGenerationServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindWallpaperEffectsGenerationServiceService"
             android:permission="android.permission.BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindSelectionToolbarRenderServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindSelectionToolbarRenderServiceService"
             android:permission="android.permission.BIND_SELECTION_TOOLBAR_RENDER_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindGameServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindGameServiceService"
             android:permission="android.permission.BIND_GAME_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindTraceReportServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindTraceReportServiceService"
             android:permission="android.permission.BIND_TRACE_REPORT_SERVICE"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".services.TestBindAttestationVerificationServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindAttestationVerificationServiceService"
             android:permission="android.permission.BIND_ATTESTATION_VERIFICATION_SERVICE"
             android:enabled="true"
             android:exported="true" />
 
         <!-- Services for android U -->
-        <service android:name=".services.TestBindCallStreamingServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindCallStreamingServiceService"
             android:permission="android.permission.BIND_CALL_STREAMING_SERVICE"
             android:enabled="true" android:exported="true" />
-        <service android:name=".services.TestBindCredentialProviderServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindCredentialProviderServiceService"
             android:permission="android.permission.BIND_CREDENTIAL_PROVIDER_SERVICE"
             android:enabled="true" android:exported="true" />
-        <service android:name=".services.TestBindFieldClassificationServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindFieldClassificationServiceService"
             android:permission="android.permission.BIND_FIELD_CLASSIFICATION_SERVICE"
             android:enabled="true" android:exported="true" />
-        <service android:name=".services.TestBindRemoteLockscreenValidationServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindRemoteLockscreenValidationServiceService"
             android:permission="android.permission.BIND_REMOTE_LOCKSCREEN_VALIDATION_SERVICE"
             android:enabled="true" android:exported="true" />
-        <service android:name=".services.TestBindSatelliteGatewayServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindSatelliteGatewayServiceService"
             android:permission="android.permission.BIND_SATELLITE_GATEWAY_SERVICE"
             android:enabled="true" android:exported="true" />
-        <service android:name=".services.TestBindSatelliteServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindSatelliteServiceService"
             android:permission="android.permission.BIND_SATELLITE_SERVICE"
             android:enabled="true" android:exported="true" />
-        <service android:name=".services.TestBindVisualQueryDetectionServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindVisualQueryDetectionServiceService"
             android:permission="android.permission.BIND_VISUAL_QUERY_DETECTION_SERVICE"
             android:enabled="true" android:exported="true" />
-        <service android:name=".services.TestBindWearableSensingServiceService"
+        <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindWearableSensingServiceService"
             android:permission="android.permission.BIND_WEARABLE_SENSING_SERVICE"
             android:enabled="true" android:exported="true" />
 
