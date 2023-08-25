@@ -16,26 +16,39 @@
 
 package com.android.certifications.niap.permissions;
 
+import static android.Manifest.permission.LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE;
+import static android.Manifest.permission.SCHEDULE_EXACT_ALARM;
+import static android.content.Intent.ACTION_LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE;
 import static com.android.certifications.niap.permissions.utils.InternalPermissions.permission;
 import static com.android.certifications.niap.permissions.utils.ReflectionUtils.invokeReflectionCall;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.KeyguardManager;
+import android.app.PendingIntent;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.pm.Signature;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.ContactsContract;
 
+import com.android.certifications.niap.permissions.activities.MainActivity;
+import com.android.certifications.niap.permissions.activities.TestActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
+import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.SignatureUtils;
 import com.android.certifications.niap.permissions.utils.Transacts;
@@ -175,7 +188,8 @@ public class InternalPermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU,
+                        Build.VERSION_CODES.TIRAMISU, () -> {
                     //WindowManagerService#addKeyguardLockedStateListener.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         KeyguardManager.KeyguardLockedStateListener listener = new KeyguardManager.KeyguardLockedStateListener() {
@@ -317,10 +331,77 @@ public class InternalPermissionTester extends BasePermissionTester {
                 }));
 
 
-        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_LOCK,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+//        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_LOCK,
+//                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+//
+//                }));
 
+
+        mPermissionTasks.put(permission.READ_RESTRICTED_STATS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        //Object callback = ReflectionUtils.stubRemoteCallback();
+                        //Uri testUri = Uri.parse("content://" + mPackageName + "/test");
+                        String STATS_MANAGER = "stats";
+                        // long[] setRestrictedMetricsChangedOperation(in PendingIntent pendingIntent, in long configKey,
+                        //            in String configPackage);
+                        Intent i = new Intent(mContext, TestActivity.class);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, i, PendingIntent.FLAG_IMMUTABLE);
+
+                        mTransacts.invokeTransact(
+                                STATS_MANAGER,
+                                Transacts.STATS_DESCRIPTOR,
+                                Transacts.setRestrictedMetricsChangedOperation,
+                                pendingIntent,1 ,mContext.getPackageName()
+                        );
+                    }
                 }));
+
+
+
+
+        mPermissionTasks.put(permission.LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    //commonize the tester routine with exposing the builder of AssociationRequest object
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        Intent featuresIntent = new Intent(ACTION_LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        final PackageManager mgr = mContext.getPackageManager();
+
+                        featuresIntent.setComponent(new
+                                ComponentName("com.android.systemui",
+                                "com.android.systemui.screenshot.appclips.AppClipsService"));
+
+                        List<ResolveInfo> list =
+                                mgr.queryIntentActivities(featuresIntent,
+                                        PackageManager.MATCH_DEFAULT_ONLY);
+                        if(list.size()>0){
+                            mActivity.startActivity(featuresIntent);
+                        } else {
+                            throw new BypassTestException("AppClipService doesn't exist in this device.");
+                        }
+
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_LOCK_STATE,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+
+
+                        //import android.devicelock.IIsDeviceLockedCallback;
+                        //MANAGE_DEVICE_LOCK_STATE
+                        mTransacts.invokeTransact(
+                                Context.DEVICE_LOCK_SERVICE,
+                                Transacts.DEVICELOCK_DESCRIPTOR,
+                                Transacts.isDeviceLocked,(Object) getActivityToken());
+
+                    }
+                }));
+
+
+
     }
 
     @Override
@@ -366,8 +447,8 @@ public class InternalPermissionTester extends BasePermissionTester {
         final int total = permissions.size();
         for (String permission : permissions) {
             // If the permission has a corresponding task then run it.
-            mLogger.logDebug("Starting test for internal permission: "+String.format(Locale.US,
-                    "%d/%d ",no,numperms) + permission);
+//            mLogger.logDebug("Starting test for internal permission: "+String.format(Locale.US,
+//                    "%d/%d ",no,numperms) + permission);
             Thread thread = new Thread(() -> {
                 if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
                     callback.accept(new Result(true, permission, aiIncl(cnt), total));

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="General">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="cb_reduce_logs"
+            android:title="Reduce Logcat logs" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Block Level Control">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cb_install"
+            android:title="Install" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cb_signature"
+            android:title="Signature" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cb_internal"
+            android:title="Internal" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cb_runtime"
+            android:title="Runtime" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Signature Fragment">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cb_sig01"
+            android:title="01" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cb_sig02"
+            android:title="02" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cb_sig03"
+            android:title="03" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cb_sig04"
+            android:title="04" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cb_sig14"
+            android:title="14" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cb_sig_bind"
+            android:title="BIND_*" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

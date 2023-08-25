@@ -360,6 +360,7 @@ public class MainActivity extends AppCompatActivity {
         // Scoped storage and the ACCESS_MEDIA_LOCATION permission were introduced in Android 10.
         boolean result = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            //Image 1
             ContentResolver contentResolver = getApplication().getContentResolver();
             ContentValues photoContentValues = new ContentValues();
             photoContentValues.put(MediaStore.Images.Media.DISPLAY_NAME, "TestImage");
@@ -384,6 +385,31 @@ public class MainActivity extends AppCompatActivity {
             }
             photoContentValues.put(MediaStore.Images.Media.IS_PENDING, 0);
             contentResolver.update(photoUri, photoContentValues, null, null);
+
+            //Image 1
+            ContentValues photoContentValues2 = new ContentValues();
+            photoContentValues2.put(MediaStore.Images.Media.DISPLAY_NAME, "PngImage");
+            photoContentValues2.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+            photoContentValues2.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/");
+            photoContentValues2.put(MediaStore.Images.Media.IS_PENDING, 1);
+            Uri collectionUri2 = MediaStore.Images.Media.getContentUri(
+                    MediaStore.VOLUME_EXTERNAL_PRIMARY);
+            Uri photoUri2 = contentResolver.insert(collectionUri2, photoContentValues2);
+
+            try (InputStream inputStream = getResources().openRawResource(R.raw.test_image2);
+                 OutputStream outputStream = contentResolver.openOutputStream(photoUri2)) {
+                byte[] bytes = new byte[2048];
+                while (inputStream.read(bytes) != -1) {
+                    outputStream.write(bytes);
+                }
+                logdebug( "Successfully wrote file to pictures directory");
+
+            } catch (IOException e) {
+                logerror("Caught an exception copying file:");
+                result = false;
+            }
+            photoContentValues2.put(MediaStore.Images.Media.IS_PENDING, 0);
+            contentResolver.update(photoUri2, photoContentValues2, null, null);
 
             //Audio
             ContentValues audioContentValues = new ContentValues();

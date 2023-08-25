@@ -21,6 +21,7 @@ import static com.android.certifications.niap.permissions.transactids.Transacts.
 import static com.android.certifications.niap.permissions.transactids.Transacts.CLIPBOARD_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.DISPLAY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.INPUT_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.LOCK_SETTINGS_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.PACKAGE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.POWER_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.ROLE_DESCRIPTOR;
@@ -107,8 +108,14 @@ public class MainActivity extends AppCompatActivity {
         //Transaction APIs as of Android 34
         //We should automate them ....
 
-        ProxyChecker.check("android.health.connect.aidl.IMigrationCallback",
-                "Stub");
+        ProxyChecker.check(ACTIVITY_DESCRIPTOR,
+                "getMimeTypeFilterAsync");
+        ProxyChecker.check(LOCK_SETTINGS_DESCRIPTOR,
+                "startRemoteLockscreenValidation");
+
+
+        //ProxyChecker.check("android.health.connect.aidl.IMigrationCallback",
+        //        "Stub");
 
         /*ProxyChecker.check("android.os.IStatsManagerService",
                 "setRestrictedMetricsChangedOperation");
@@ -703,6 +710,9 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.DISPLAY_DESCRIPTOR, Transacts.setHdrConversionMode, descriptorTransacts);
             queryTransactId(Transacts.HEALTH_CONNECT_DESCRIPTOR, Transacts.deleteAllStagedRemoteData, descriptorTransacts);
             queryTransactId(Transacts.HEALTH_CONNECT_DESCRIPTOR, Transacts.startMigration, descriptorTransacts);
+            queryTransactId(Transacts.HEALTH_CONNECT_DESCRIPTOR, Transacts.getHealthConnectDataState, descriptorTransacts);
+
+
             queryTransactId(Transacts.HEALTH_CONNECT_DESCRIPTOR, Transacts.updateDataDownloadState, descriptorTransacts);
             queryTransactId(Transacts.INPUT_DESCRIPTOR, Transacts.getModifierKeyRemapping, descriptorTransacts);
             queryTransactId(Transacts.INPUT_DESCRIPTOR, Transacts.registerKeyboardBacklightListener, descriptorTransacts);
@@ -717,7 +727,8 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.TELEPHONY_DESCRIPTOR, Transacts.requestIsSatelliteEnabled, descriptorTransacts);
             queryTransactId(Transacts.TELEPHONY_DESCRIPTOR, Transacts.requestSatelliteEnabled, descriptorTransacts);
             queryTransactId(Transacts.WEARABLES_DESCRIPTOR, Transacts.provideDataStream, descriptorTransacts);
-
+            queryTransactId(Transacts.ACTIVITY_DESCRIPTOR, Transacts.getMimeTypeFilterAsync, descriptorTransacts);
+            queryTransactId(Transacts.LOCK_SETTINGS_DESCRIPTOR, Transacts.startRemoteLockscreenValidation, descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
         }

@@ -35,7 +35,7 @@ public class ProxyChecker {
         alt_descriptor.put("com.android.internal.telephony.ISub","SUBSCRIPTION_DESCRIPTOR");
         alt_descriptor.put("android.devicelock.IDeviceLockService","DEVICELOCK_DESCRIPTOR");
         alt_descriptor.put("android.app.ILocaleManager","LOCALE_DESCRIPTOR");
-
+        //alt_descriptor.put("com.android.internal.widget.ILockSettings","LOCK_SETTINGS_DESCRIPTOR");
         for(String k:alt_descriptor.keySet()){
             System.out.println(
                     String.format("public static final String %s = \"%s\";",

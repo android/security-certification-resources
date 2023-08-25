@@ -88,9 +88,15 @@ public class StatusLogger {
         if (permissionGranted != (signatureMatch || platformSignatureMatch)) {
             testPassed = false;
         }
-        sLogger.logInfo(permission + ": " + (testPassed ? PASSED : "FAILED") + " (granted = "
+        String msg = permission + ": " + (testPassed ? PASSED : "FAILED") + " (granted = "
                 + permissionGranted + ", signature match = " + signatureMatch
-                + ", platform signature match = " + platformSignatureMatch + ")");
+                + ", platform signature match = " + platformSignatureMatch + ")";
+        if(testPassed){
+            sLogger.logDebug(msg);
+        } else {
+            sLogger.logInfo(msg);
+        }
+
     }
 
     /**

@@ -45,6 +45,7 @@ import com.android.certifications.niap.permissions.log.LoggerFactory;
 import java.io.FileDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -666,6 +667,9 @@ public class Transacts {
     public static final String setVolumeGroupVolumeIndex = "setVolumeGroupVolumeIndex";
     public static final String startMigration = "startMigration";
     public static final String updateDataDownloadState = "updateDataDownloadState";
+    public static final String getMimeTypeFilterAsync = "getMimeTypeFilterAsync";
+    public static final String startRemoteLockscreenValidation = "startRemoteLockscreenValidation";
+    public static final String getHealthConnectDataState = "getHealthConnectDataState";
 
 
     /**
@@ -2562,8 +2566,9 @@ public class Transacts {
             data.writeInterfaceToken(descriptor);
             for (Object parameter : parameters) {
 
-                if(parameter != null)
-                    mLogger.logDebug(parameter.getClass()+"="+parameter);
+                //if(parameter != null)
+                //mLogger.logDebug(parameter.getClass().toString());
+                //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(parameter,"").toString());
 
                 if (parameter instanceof CharSequence && useCharSequence) {
                     if (parameter == null) {
@@ -2584,6 +2589,8 @@ public class Transacts {
                     data.writeIntArray((int[]) parameter);
                 } else if (parameter instanceof byte[]) {
                     data.writeByteArray((byte[]) parameter);
+                } else if (parameter instanceof Proxy) {
+                    ReflectionUtils.checkDeclaredMethod(parameter,"");
                 } else if (parameter instanceof IInterface) {
                     data.writeStrongBinder(
                             parameter != null ? ((IInterface) parameter).asBinder() : null);

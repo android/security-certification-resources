@@ -38,6 +38,7 @@ public class BarbetApiLevel34Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(verifyCredential, 10);
+        transactIds.put(startRemoteLockscreenValidation, 46);
         mDescriptorTransacts.put(LOCK_SETTINGS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -275,6 +276,7 @@ public class BarbetApiLevel34Transacts extends Transacts {
         transactIds.put(updateDataDownloadState, 30);
         transactIds.put(deleteAllStagedRemoteData, 29);
         transactIds.put(startMigration, 22);
+        transactIds.put(getHealthConnectDataState, 31);
         mDescriptorTransacts.put(HEALTH_CONNECT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -300,6 +302,7 @@ public class BarbetApiLevel34Transacts extends Transacts {
         transactIds.put(unhandledBack, 16);
         // Failed to obtain transactId of inputDispatchingTimedOut under android.app.IActivityManager: No field TRANSACTION_inputDispatchingTimedOut in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
         // Failed to obtain transactId of setFrontActivityScreenCompatMode under android.app.IActivityManager: No field TRANSACTION_setFrontActivityScreenCompatMode in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
+        transactIds.put(getMimeTypeFilterAsync, 111);
         transactIds.put(setAlwaysFinish, 43);
         transactIds.put(startActivityFromRecents, 173);
         transactIds.put(killAllBackgroundProcesses, 127);

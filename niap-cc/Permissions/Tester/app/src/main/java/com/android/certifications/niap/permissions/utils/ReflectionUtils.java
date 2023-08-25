@@ -16,8 +16,11 @@
 
 package com.android.certifications.niap.permissions.utils;
 
+import android.os.Binder;
 import android.util.Log;
 import com.android.certifications.niap.permissions.BasePermissionTester;
+import com.android.certifications.niap.permissions.log.Logger;
+import com.android.certifications.niap.permissions.log.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -32,6 +35,10 @@ import java.util.stream.Collectors;
  * Provides utility methods for invoking methods via reflection.
  */
 public class ReflectionUtils {
+
+    private static final Logger mLogger = LoggerFactory.createDefaultLogger("Reflectioni Utils");
+
+
     /**
      * Invokes the specified {@code methodName} defined in the {@code targetClass} against the
      * {@code targetObject} (or {@code null} for a static method) that accepts the provided {@code
@@ -55,6 +62,39 @@ public class ReflectionUtils {
             } else {
                 throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
             }
+        }
+    }
+
+
+    public static Object stubFromInterface(String className)  {
+        try {
+            Class<?> ifListner = Class.forName(className);
+            Object listenerInstance = Proxy.newProxyInstance(
+                    ifListner.getClassLoader(), new Class<?>[]{ifListner}, new InvocationHandler() {
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    //mLogger.logDebug("callback invoked: "+proxy+","+method);
+                    if (method.getName().equals("asBinder")) {
+                        return new Binder();
+                    }
+                    if(method.getName().equals("onSuccess")){
+                        mLogger.logDebug("onSuccess");
+                        //System.out.println("ARGS: " + (Integer)args[0] + ", " + (Integer)args[1]);
+                        return 1;
+                    } else if(method.getName().equals("onError")){
+                        mLogger.logDebug("onError");
+                        //throw new SecurityException("Errror!");
+                        return 1;
+                    }
+                    else return -1;
+                }
+            });
+            mLogger.logDebug(checkDeclaredMethod(ifListner,"").toString());;
+
+            return ifListner.cast(listenerInstance);
+        } catch (ClassNotFoundException e){
+            e.printStackTrace();
+            return null;
         }
     }
 

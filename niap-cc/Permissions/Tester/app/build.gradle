@@ -116,6 +116,7 @@ dependencies {
     implementation 'androidx.work:work-runtime:2.8.1'
     implementation "androidx.credentials:credentials:1.2.0-beta02"
     implementation 'androidx.test:runner:1.4.0'
+    implementation "androidx.preference:preference:1.2.1"
     //androidx.text 1.5.0 has compatibility problems
     androidTestImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

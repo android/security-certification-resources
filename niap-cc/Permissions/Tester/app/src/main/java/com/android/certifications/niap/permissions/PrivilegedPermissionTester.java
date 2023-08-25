@@ -97,8 +97,8 @@ public class PrivilegedPermissionTester extends SignaturePermissionTester {
         final int total = permissions.size();
         for (String permission : permissions) {
             // If the permission has a corresponding task then run it.
-            mLogger.logDebug("Starting test for privileged permission: "+String.format(Locale.US,
-                    "%d/%d ",no,numperms) + permission);
+//            mLogger.logDebug("Starting test for privileged permission: "+String.format(Locale.US,
+//                    "%d/%d ",no,numperms) + permission);
             Thread thread = new Thread(() -> {
                 if (!mPrivilegedPermissions.contains(permission)) {
                     mLogger.logDebug(permission + " is not a privileged permission");

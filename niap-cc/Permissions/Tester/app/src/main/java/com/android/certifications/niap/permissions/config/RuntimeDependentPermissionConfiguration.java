@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Configuration designed to test runtime permissions that are dependent on other permissions. For
@@ -70,7 +71,7 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
 
         boolean permissionRequestRequired = !areRequiredPermissionsGranted();
         if (permissionRequestRequired) {
-            Log.d(TAG,"permission request required?");
+            //Log.d(TAG,"permission request required?");
             ActivityCompat.requestPermissions(mActivity, REQUIRED_PERMISSIONS,
                     Constants.PERMISSION_CODE_RUNTIME_DEPENDENT_PERMISSIONS);
             //Log.d(TAG,"pcall");
@@ -78,7 +79,7 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
             try {
 
                 //Log.d(TAG,"await");
-                mCountDownLatch.await();
+                mCountDownLatch.await(2000, TimeUnit.MILLISECONDS);
                 // If the user has not granted the required permissions then throw a bypass
                 // exception to notify the user of this requirement.
                 if (!areRequiredPermissionsGranted()) {

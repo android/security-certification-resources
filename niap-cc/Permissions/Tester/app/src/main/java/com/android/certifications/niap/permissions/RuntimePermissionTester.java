@@ -565,22 +565,36 @@ public class RuntimePermissionTester extends BasePermissionTester {
                 @SuppressLint("Recycle") Cursor cursor = contentResolver.query(
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                         null, null, null, null);
-                //mLogger.logSystem(">READ_MEDIA"+cursor.toString());
+
                 if (cursor == null) {
                     throw new UnexpectedPermissionTestFailureException(
                             "Unable to obtain an sound to test READ_MEDIA_AUDIO");
                 } else if (!cursor.moveToFirst()) {
+
                     throw new SecurityException("Failed to load media files:READ_MEDIA_AUDIO." +
                             "Pleaes ensure to execute the companion app before testing.");
                 }
+
             }));
 
             mPermissionTasks.put(READ_MEDIA_IMAGES, new PermissionTest(
                     false, Build.VERSION_CODES.TIRAMISU, () -> {
+
                 ContentResolver contentResolver = mContext.getContentResolver();
-                @SuppressLint("Recycle") Cursor cursor = contentResolver.query(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        null, null, null, null);
+                String[] PROJECTION_BUCKET = new String[] { "bucket_id", "bucket_display_name", "datetaken", "_data" };
+
+                String[] thumbColumns = {MediaStore.Images.Thumbnails.DATA, MediaStore.Images.Thumbnails.IMAGE_ID};
+                String[] columns = {MediaStore.Images.Media._ID, MediaStore.Images.Media.DATA, MediaStore.Images.Media.DATE_TAKEN};
+                String[] whereArgs = {"image/jpeg", "image/jpg"};
+
+                String orderBy = MediaStore.Images.Media.DATE_TAKEN+ " DESC";
+                String  where = MediaStore.Images.Media.MIME_TYPE + "=? or "
+                        + MediaStore.Images.Media.MIME_TYPE + "=?";
+
+
+                @SuppressLint("Recycle") Cursor cursor = contentResolver.query
+                    (MediaStore.Images.Media.EXTERNAL_CONTENT_URI,columns, where, whereArgs, orderBy);
+
                 if (cursor == null) {
                     throw new UnexpectedPermissionTestFailureException(
                             "Unable to obtain an image to test READ_MEDIA_IMAGES");
@@ -738,8 +752,8 @@ public class RuntimePermissionTester extends BasePermissionTester {
         final int total = permissions.size();
         for (String permission : permissions) {
             // If the permission has a corresponding task then run it.
-            mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
-                    "%d/%d ",cnt.get(),total) + permission);
+//            mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
+//                    "%d/%d ",cnt.get(),total) + permission);
             Thread thread = new Thread(() -> {
                 // if this is a signature permission with the privileged protection flag then skip it
                 // if the app is configured to use the PrivilegedPermissionTester.

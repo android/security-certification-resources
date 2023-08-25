@@ -72,9 +72,9 @@ public interface Logger {
                 + ", api successful = " + apiSuccessful + ")";
 
         if(testStatus.equals(PASSED)){
-            logInfo(msg);
+            logDebug(msg);
         } else {
-            logError(msg);
+            logInfo(msg);
         }
 
     }
@@ -121,9 +121,9 @@ public interface Logger {
                 + ", platform signature match = " + platformSignatureMatch + ")";
 
         if(testPassed){
-            logInfo(msg);
+            logDebug(msg);
         } else {
-            logError(msg);
+            logInfo(msg);
         }
     }
 }

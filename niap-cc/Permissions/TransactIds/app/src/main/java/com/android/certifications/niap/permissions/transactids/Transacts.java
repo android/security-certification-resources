@@ -661,6 +661,10 @@ public class Transacts {
     public static final String setVolumeGroupVolumeIndex = "setVolumeGroupVolumeIndex";
     public static final String startMigration = "startMigration";
     public static final String updateDataDownloadState = "updateDataDownloadState";
+    public static final String getMimeTypeFilterAsync = "getMimeTypeFilterAsync";
+    public static final String startRemoteLockscreenValidation = "startRemoteLockscreenValidation";
+
+    public static final String getHealthConnectDataState = "getHealthConnectDataState";
 
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an

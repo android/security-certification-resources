@@ -839,7 +839,7 @@ public class InstallPermissionTester extends BasePermissionTester {
         // and only determines whether the user will be prompted to allow the update.
 
         mPermissionTasks.put(SCHEDULE_EXACT_ALARM,
-                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.S,Build.VERSION_CODES.TIRAMISU, () -> {
                     Intent intent = new Intent(mContext, MainActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent,
                             PendingIntent.FLAG_IMMUTABLE);
@@ -1028,6 +1028,7 @@ public class InstallPermissionTester extends BasePermissionTester {
         }));
 
         //not done yet - can't raise security error as of now.
+        /*
         mPermissionTasks.put(ENFORCE_UPDATE_OWNERSHIP,  new PermissionTest(false,
                 Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
             PackageInstaller.Session session = null;
@@ -1067,7 +1068,10 @@ public class InstallPermissionTester extends BasePermissionTester {
             } catch (IOException ex) {
                 throw new SecurityException(ex);
             }
-        }));
+        });
+         */
+
+
 
     }
 
@@ -1114,8 +1118,8 @@ public class InstallPermissionTester extends BasePermissionTester {
            for (String permission : permissions) {
 
             // If the permission has a corresponding task then run it.
-            mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
-                    "%d/%d ",no,numperms) + permission);
+//            mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
+//                    "%d/%d ",no,numperms) + permission);
             Thread thread = new Thread(() -> {
                 if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
                     callback.accept(new Result(true, permission, aiIncl(cnt), total));

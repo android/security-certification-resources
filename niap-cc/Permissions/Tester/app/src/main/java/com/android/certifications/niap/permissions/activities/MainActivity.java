@@ -16,6 +16,7 @@
 
 package com.android.certifications.niap.permissions.activities;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
@@ -29,6 +30,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -54,6 +56,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.preference.PreferenceManager;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.Constants;
@@ -108,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
 
     private static final int ADMIN_INTENT = 1;
 
+    public boolean m_reduce_logs = false;
     private final List<Button> mTestButtons = new ArrayList<>();
     private Context mContext;
     private TestConfiguration mConfiguration;
@@ -228,6 +232,8 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
         }
 
 
+        PreferenceManager.setDefaultValues(this, R.xml.preference, false);
+
 
         // Obtain the list of configurations from the ConfigurationFactory and create a separate
         // button to allow the user to invoke each.
@@ -262,18 +268,29 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                         mStatusData.clear();
                         configuration.preRunSetup();
 
+                        SharedPreferences sp =
+                                PreferenceManager.getDefaultSharedPreferences(this);
+
+                        boolean run_install = sp.getBoolean("cb_install", false);
+                        boolean run_signature = sp.getBoolean("cb_signature", false);
+                        boolean run_runtime = sp.getBoolean("cb_runtime", false);
+                        boolean run_internal = sp.getBoolean("cb_internal", false);
+                        m_reduce_logs = sp.getBoolean("cb_reduce_logs",false);
+
                         List<BasePermissionTester> testers  = configuration.getPermissionTesters(activity);
                         sLogger.logDebug("Call config->" + configuration.toString());
                         for (BasePermissionTester permissionTester : testers) {
                             String block = permissionTester.getClass().getSimpleName();
-                            if(!block.equals("SignaturePermissionTester")) continue;
-                            //if(!block.equals("InstallPermissionTester")) continue;
+                            if(block.equals("SignaturePermissionTester") && !run_signature) continue;
+                            if(block.equals("InstallPermissionTester")   && !run_install) continue;
+                            if(block.equals("RuntimePermissionTester")   && !run_runtime) continue;
+                            if(block.equals("InternalPermissionTester")  && !run_internal) continue;
                             sLogger.logSystem("Start Tester Block...:"+block);
                             mStatusAdapter.notifyDataSetChanged();
                             permissionTester.runPermissionTestsByThreads((result)->{
                                 runOnUiThread(()-> {
                                     if (result.getResult()) {
-                                        sLogger.logInfo("Passed:" + result);
+                                        if(!m_reduce_logs) sLogger.logInfo("Passed:" + result);
                                     } else {
                                         sLogger.logError("Failure:" + result.getName());
                                         errorPermissions.add(result.getName());
@@ -281,8 +298,10 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                                     }
                                     if (result.getTotal() == result.getNo()) {
                                         sLogger.logSystem("The test block has done. error count=" + errorCnt.get() + "/" + result.getTotal());
-                                        for(String pm : errorPermissions){
-                                            sLogger.logInfo(pm);
+                                        if(!m_reduce_logs) {
+                                            for (String pm : errorPermissions) {
+                                                sLogger.logInfo(pm);
+                                            }
                                         }
                                         postTestersFinished(block + "All test has been finished. Found " + errorCnt.get() + " errors.");
                                     }
@@ -349,16 +368,26 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
             /*
              * Create a json file for checking whole testing items
              */
+            case R.id.action_show_settings:
+                Intent intent = new Intent( this, SettingsActivity.class );
+                //startActivity( intent );
+                startActivityForResult(intent, 0);
+                break;
             case R.id.action_output_tester_json:
                 writeAllTesterDetailsToJson();
                 break;
             case R.id.action_request_runtime_permissions:
                 requestRuntimePermissionsForSignatureTests();
                 break;
+            case R.id.action_request_read_media_user_selected:
+                requestRuntimePermissionsForMediaUserSelected();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -377,8 +406,14 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                                            @NonNull int[] grantResults) {
         // Delegate handling of the permission request results to the active configuration.
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(mConfiguration != null)
-            mConfiguration.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        try {
+            if (mConfiguration != null)
+                mConfiguration.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        } catch (RuntimeException ex){
+            sLogger.logError(ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
     final String[] RUNTIME_PERMS_FOR_SIG = new String[]{
@@ -400,6 +435,27 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
         String[] perms = not_granted.toArray(new String[0]);
         ActivityCompat.requestPermissions(this,perms,
                 Constants.PERMISSION_CODE_RUNTIME_DEPENDENT_PERMISSIONS);
+    }
+
+    private void requestRuntimePermissionsForMediaUserSelected() {
+        try {
+            List<String> not_granted = new ArrayList<String>();
+            if (checkSelfPermission(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+                    != PackageManager.PERMISSION_GRANTED) {
+                not_granted.add(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED);
+                not_granted.add(Manifest.permission.READ_MEDIA_IMAGES);
+            }
+            String[] perms = not_granted.toArray(new String[0]);
+            if(perms.length>0)
+                ActivityCompat.requestPermissions(this, perms,
+                        Constants.PERMISSION_CODE_RUNTIME_DEPENDENT_PERMISSIONS);
+            else
+                sLogger.logSystem("the permission is already granted.");
+        } catch (RuntimeException ex){
+            sLogger.logError(ex.getMessage());
+            ex.printStackTrace();
+        }
+
     }
 
     private void writeAllTesterDetailsToJson() {

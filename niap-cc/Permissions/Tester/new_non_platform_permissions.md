@@ -1,125 +1,36 @@
-com.google.android.youtube.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.deskclock.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.scone.connectivitymonitor.permission.WRITE_NIMBUS_DATA
-com.android.devicelockcontroller.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.systemui.falcon.nine.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-android.permission.health.READ_EXERCISE_ROUTE
-com.android.intentresolver.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.as.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.googlequicksearchbox.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.ext.adservices.api.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.soundpicker.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.markup.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.restore.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.settings.intelligence.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-android.permission.ACCESS_ADSERVICES_MANAGER
-com.google.ambient.streaming.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.marvin.talkback.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.verizon.mips.services.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.ondevicepersonalization.services.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.ar.core.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.as.oss.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.photos.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.devicelock.permission.RECEIVE_CLEAR_BROADCAST
-com.google.android.apps.work.clouddpc.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.googleapps.permission.GOOGLE_AUTH.doraemon
-com.android.systemui.falcon.eight.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.rkpdapp.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.docs.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.healthdata.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.adservices.api.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-android.permission.MANAGE_HEALTH_PERMISSIONS
-com.google.android.carrier.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.accessibility.soundamplifier.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.calculator.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-android.permission.ACCESS_PRIVILEGED_AD_ID
-com.google.android.apps.youtube.music.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.carrierlocation.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.gm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.systemui.falcon.six.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.accessibility.switchaccess.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.calendar.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.inputmethod.latin.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.healthdata.permission.START_ONBOARDING
-com.google.pixel.livewallpaper.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.internal.betterbug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.messaging.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.certifications.niap.permissions.companion.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.carrier.log.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.googleapps.permission.GOOGLE_AUTH.panoramio
-com.android.systemui.falcon.five.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.tetheringentitlement.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.carriersetup.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.credentialmanager.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.GoogleCamera.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.contacts.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.carrier.carrierwifi.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.emojiwallpaper.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.audio.hearing.visualization.accessibility.scribe.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.internal.gyotaku.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.mds.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.recorder.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.euicc.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.googleapps.permission.GOOGLE_AUTH.goanna_mobile
-com.android.certifications.niap.permissions.transactids.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.setupwizard.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.vending.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.systemui.falcon.four.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.systemui.falcon.two.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.bluetooth.companion.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.server.telecom.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.scone.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.maps.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.euiccoverlay.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.healthconnect.controller.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.wearables.maestro.companion.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.setupwizard.SETUP_BTS
-com.google.android.googleapps.permission.GOOGLE_AUTH.geowiki
-com.android.systemui.falcon.three.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.odad.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-android.permission.ACCESS_PRIVILEGED_APP_SET_ID
-com.google.SSRestartDetector.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.dialer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.search.assistant.verticals.snapshot.widgets.weather.permission.WEATHER_WIDGET_UPDATE
-com.google.android.tts.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.tips.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.systemui.accessibility.accessibilitymenu.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.gcs.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.android.systemui.falcon.one.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.turbo.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.wfcactivation.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.tycho.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.diagnosticstool.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.googleapps.permission.GOOGLE_AUTH.reader
-com.google.android.apps.safetyhub.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-com.google.android.apps.wellbeing.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
-
+android.permission.READ_MEDIA_AUDIO
 android.permission.WIFI_ACCESS_COEX_UNSAFE_CHANNELS
+android.permission.REGISTER_WINDOW_MANAGER_LISTENERS
+android.permission.CONTROL_KEYGUARD
+android.permission.ACCESS_FPS_COUNTER
+android.permission.NETWORK_STATS_PROVIDER
 android.permission.WIFI_UPDATE_COEX_UNSAFE_CHANNELS
-android.permission.REVOKE_POST_NOTIFICATIONS_WITHOUT_KILL
-android.permission.LOCK_DEVICE
-android.permission.MANAGE_WIFI_COUNTRY_CODE
-android.permission.NETWORK_MANAGED_PROVISIONING
-android.permission.RESTART_WIFI_SUBSYSTEM
-
-<uses-permission android:name="com.google.android.apps.subscriptions.red.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-<uses-permission android:name="com.example.test_suites.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.keep.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.apps.tachyon.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.example.assets.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.apps.chromecast.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.apps.docs.editors.docs.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.apps.camera.services.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.ims.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.apps.kids.familylinkhelper.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.apps.walletnfcrel.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.example.directboot.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.apps.magazines.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.apps.dreamliner.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.apps.translate.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.apps.accessibility.voiceaccess.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.example.openurl.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.apps.podcasts.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-<uses-permission android:name="com.google.android.gms.pay.sidecar.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
-[android.permission.BYPASS_ROLE_QUALIFICATION, android.permission.SET_DEFAULT_ACCOUNT_FOR_CONTACTS, android.permission.SEND_SAFETY_CENTER_UPDATE, android.permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION, android.permission.PERFORM_IMS_SINGLE_REGISTRATION, android.permission.TOGGLE_AUTOMOTIVE_PROJECTION, android.permission.ACCESS_RCS_USER_CAPABILITY_EXCHANGE, android.permission.MANAGE_SAFETY_CENTER, android.permission.CREATE_VIRTUAL_DEVICE, android.permission.ACCESS_AMBIENT_CONTEXT_EVENT, android.permission.OBSERVE_SENSOR_PRIVACY, android.permission.DOMAIN_VERIFICATION_AGENT, android.permission.MANAGE_SENSOR_PRIVACY, android.permission.ASSOCIATE_COMPANION_DEVICES, android.permission.MANAGE_HOTWORD_DETECTION, android.permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE]
-2023-08-02 17:24:02.337 15839-15866 InternalPe...sionTester com...rtifications.niap.permissions  I  The test case for android.permission.OBSERVE_SENSOR_PRIVACY is not found
+android.permission.SET_VOLUME_KEY_LONG_PRESS_LISTENER
+android.permission.REMOVE_TASKS
+android.permission.MIGRATE_HEALTH_CONNECT_DATA
+android.permission.MANAGE_PROFILE_AND_DEVICE_OWNERS
+android.permission.WRITE_EMBEDDED_SUBSCRIPTIONS
+android.permission.CONTROL_REMOTE_APP_TRANSITION_ANIMATIONS
+android.permission.KEYPHRASE_ENROLLMENT_APPLICATION
+android.permission.BROADCAST_OPTION_INTERACTIVE
+android.permission.INPUT_CONSUMER
+android.permission.GET_ANY_PROVIDER_TYPE
+android.permission.MANAGE_MUSIC_RECOGNITION
+android.permission.CONNECTIVITY_USE_RESTRICTED_NETWORKS
+android.permission.SCHEDULE_PRIORITIZED_ALARM
+android.permission.MOUNT_FORMAT_FILESYSTEMS
+android.permission.USE_ATTESTATION_VERIFICATION_SERVICE
+android.permission.CAMERA_INJECT_EXTERNAL_CAMERA
+android.permission.SUGGEST_EXTERNAL_TIME
+android.permission.QUERY_CLONED_APPS
+android.permission.MANAGE_WALLPAPER_EFFECTS_GENERATION
+android.permission.TURN_SCREEN_ON
+android.permission.STATUS_BAR
+android.permission.MANAGE_UI_TRANSLATION
+android.permission.MANAGE_DEVICE_LOCK_STATE
+android.permission.ACCESS_RCS_USER_CAPABILITY_EXCHANGE
+android.permission.CREATE_VIRTUAL_DEVICE
+android.permission.MANAGE_HOTWORD_DETECTION
+android.permission.TRANSMIT_IR
+android.permission.ENFORCE_UPDATE_OWNERSHIP
+android.permission.CREDENTIAL_MANAGER_QUERY_CANDIDATE_CREDENTIALS

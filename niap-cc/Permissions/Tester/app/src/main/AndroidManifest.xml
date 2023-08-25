@@ -48,6 +48,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.MainActivity" />
+        </activity>
 
         <!-- This service is also used to test REGISTER_SIM_SUBSCRIPTION; the API for this test
            verifies that the specified services requires BIND_TELECOM_CONNECTION_SERVICE. -->
@@ -128,6 +135,4 @@
 
     </application>
 
-    <uses-feature android:name="android.software.companion_device_setup"
-        android:required="false" />
 </manifest>

@@ -72,14 +72,16 @@ public class InternalPermissionsTest {
         mPermissions.add(permission.SET_DEFAULT_ACCOUNT_FOR_CONTACTS);
         mPermissions.add(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE);
         mPermissions.add(permission.CREATE_VIRTUAL_DEVICE);
-        mPermissions.add(permission.SEND_SAFETY_CENTER_UPDATE);
+        //Regression//mPermissions.add(permission.SEND_SAFETY_CENTER_UPDATE);
         mPermissions.add(permission.ACCESS_AMBIENT_CONTEXT_EVENT);
         mPermissions.add(permission.REQUEST_COMPANION_PROFILE_AUTOMOTIVE_PROJECTION);
         mPermissions.add(permission.MANAGE_SAFETY_CENTER);
         mPermissions.add(SignaturePermissions.permission.MANAGE_SENSOR_PRIVACY);
         mPermissions.add(SignaturePermissions.permission.TOGGLE_AUTOMOTIVE_PROJECTION);
         //14
-        //mPermissions.add(permission.MANAGE_DEVICE_POLICY_ACCESSIBILITY);
+        mPermissions.add(permission.READ_RESTRICTED_STATS);
+        mPermissions.add(permission.LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE);
+        //AA
     }
 
     private UiAutomation mUiAutomation;

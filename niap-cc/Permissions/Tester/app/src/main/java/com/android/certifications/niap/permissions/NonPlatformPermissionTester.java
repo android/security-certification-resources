@@ -150,8 +150,8 @@ public class NonPlatformPermissionTester extends BasePermissionTester {
         for (String permission : permissions) {
 
             // If the permission has a corresponding task then run it.
-            mLogger.logDebug("Starting test for non-platform permission: "+String.format(Locale.US,
-                    "%d/%d ",cnt.get(),total) + permission);
+//            mLogger.logDebug("Starting test for non-platform permission: "+String.format(Locale.US,
+//                    "%d/%d ",cnt.get(),total) + permission);
 
             Thread thread = new Thread(() -> {
                 // Only test those signature permissions that are declared on the device to avoid false
