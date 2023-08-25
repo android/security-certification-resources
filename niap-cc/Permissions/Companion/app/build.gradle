@@ -48,9 +48,19 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    def publish = project.tasks.create("publishAll")
     applicationVariants.all { variant ->
         variant.outputs.all {
             outputFileName = "${applicationName}-${variant.buildType.name}.apk"
+        }
+        if(variant.buildType.name.equals("debug")){
+            def task = project.tasks.create("publish${variant.name.capitalize()}Apk", Copy)
+            variant.outputs.all { item ->
+                task.from(item.outputFile)
+            }
+            task.into("$rootDir/../Tester/package")
+            task.dependsOn variant.assemble
+            publish.dependsOn task
         }
     }
 

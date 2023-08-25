@@ -6,7 +6,7 @@
             android:key="cb_reduce_logs"
             android:title="Reduce Logcat logs" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Block Level Control">
+    <PreferenceCategory android:title="Enabled Execution Block">
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="cb_install"
@@ -25,7 +25,7 @@
             android:title="Runtime" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Signature Fragment">
+    <PreferenceCategory android:title="Enabled Signature Block Fragment">
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="cb_sig01"

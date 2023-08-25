@@ -626,6 +626,9 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(TRANSMIT_IR, new PermissionTest(false, () -> {
             try {
+                if(mConsumerIrManager == null){
+                    throw new BypassTestException("Can not find consumer_ir service on this device");
+                }
 
                 mLogger.logSystem("mCIR.hasIrEmitter(): " + mConsumerIrManager.hasIrEmitter());
                 if (mConsumerIrManager.hasIrEmitter()) {

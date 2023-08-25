@@ -41,7 +41,12 @@ apply {
 }
 
 tasks.register("exportPackage") {
-    dependsOn("assemble");
+    dependsOn("assembleDebug");
     doLast {
+        mkdir("$buildDir/package")
+        copy {
+            from("$buildDir/app/build/intermediates/noperm/debug/Tester-noperm-debug.apk");
+            into("$buildDir/package")
+        }
     }
 }
