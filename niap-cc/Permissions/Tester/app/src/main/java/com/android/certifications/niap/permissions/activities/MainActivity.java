@@ -23,6 +23,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.admin.DevicePolicyManager;
 import android.companion.AssociationRequest;
 import android.companion.BluetoothDeviceFilter;
 import android.companion.CompanionDeviceManager;
@@ -72,6 +73,7 @@ import com.android.certifications.niap.permissions.config.ConfigurationFactory;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
+import com.android.certifications.niap.permissions.receivers.Admin;
 import com.android.certifications.niap.permissions.services.FgCameraService;
 import com.android.certifications.niap.permissions.services.FgLocationService;
 import com.android.certifications.niap.permissions.services.FgMicrophoneService;
@@ -126,6 +128,9 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
         mStatusListView = findViewById(R.id.statusTextView);
         mStatusListView.setAdapter(mStatusAdapter);
     }
+
+    private DevicePolicyManager mDevicePolicyManager;
+    ComponentName mAdminName;
 
     @Override
     public void addLogLine(String msg){
@@ -233,7 +238,8 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
 
 
         PreferenceManager.setDefaultValues(this, R.xml.preference, false);
-
+        mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        mAdminName = new ComponentName(this, Admin.class);
 
         // Obtain the list of configurations from the ConfigurationFactory and create a separate
         // button to allow the user to invoke each.
@@ -349,6 +355,16 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
             }
         });
     }
+
+    private void getPermission() {
+        if (!mDevicePolicyManager.isAdminActive(mAdminName)) {
+            Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, mAdminName);
+            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "add explanation");
+            startActivityForResult(intent, ADMIN_INTENT);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -381,6 +397,9 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                 break;
             case R.id.action_request_read_media_user_selected:
                 requestRuntimePermissionsForMediaUserSelected();
+                break;
+            case R.id.action_device_admin_test:
+                getPermission();
                 break;
         }
 

@@ -97,7 +97,17 @@ public class ReflectionUtils {
             return null;
         }
     }
-
+    public static void deviceConfigSetProperty(String a,String b,String c,boolean value)  {
+        try {
+            invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
+                    "setProperty", null,
+                    new Class[]{String.class, String.class, String.class,
+                            boolean.class}, a,b, c, false);
+        } catch (Exception e){
+            mLogger.logDebug("DeviceConfig.setProperty failed.("+a+","+b+","+c+")");
+            e.printStackTrace();
+        }
+    }
     public static Object stubRemoteCallback()  {
         try {
             Class<?> onResultListenerClass = Class.forName(

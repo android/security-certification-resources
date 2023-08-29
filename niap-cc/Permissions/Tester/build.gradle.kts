@@ -26,6 +26,7 @@ buildscript {
         classpath("org.codehaus.groovy:groovy-json:3.0.9")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle.kts files
+
     }
 }
 

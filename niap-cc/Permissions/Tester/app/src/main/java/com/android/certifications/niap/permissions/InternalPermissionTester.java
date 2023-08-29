@@ -27,6 +27,7 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.KeyguardManager;
 import android.app.PendingIntent;
+import android.app.admin.DevicePolicyManager;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
 import android.content.ComponentName;
@@ -41,6 +42,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.ContactsContract;
+
+import androidx.annotation.NonNull;
 
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.activities.TestActivity;
@@ -90,6 +93,16 @@ public class InternalPermissionTester extends BasePermissionTester {
 
     public InternalPermissionTester(TestConfiguration configuration, Activity activity) {
         super(configuration, activity);
+
+        ReflectionUtils.deviceConfigSetProperty(
+                "device_policy_manager",
+                "enable_device_policy_engine","true",false
+        );
+        ReflectionUtils.deviceConfigSetProperty(
+                "device_policy_manager",
+                "enable_permission_based_access","true",false
+        );
+
 
         mPermissionTasks = new HashMap<>();
 
@@ -396,6 +409,339 @@ public class InternalPermissionTester extends BasePermissionTester {
                                 Context.DEVICE_LOCK_SERVICE,
                                 Transacts.DEVICELOCK_DESCRIPTOR,
                                 Transacts.isDeviceLocked,(Object) getActivityToken());
+
+                    }
+                }));
+
+        //Manage Device Policy Group : Tier 1 api call check
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_CAMERA,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+                        ReflectionUtils.deviceConfigSetProperty(
+                                "device_policy_manager",
+                                "enable_device_policy_engine","true",false
+                        );
+                        //Failed for other reason
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setCameraDisabled,
+                                COMPONENT,PACKAGE_NAME,true,true
+                        );
+                        //
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_ACCOUNT_MANAGEMENT,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+                        ReflectionUtils.deviceConfigSetProperty(
+                                "device_policy_manager",
+                                "enable_device_policy_engine","true",false
+                        );
+                        //Failed for other reason
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setAccountManagementDisabled,
+                                COMPONENT,PACKAGE_NAME,"accountType",true,true
+                        );
+                        //
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_APP_EXEMPTIONS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+                        ReflectionUtils.deviceConfigSetProperty(
+                                "device_policy_manager",
+                                "enable_device_policy_engine","true",false
+                        );
+                        //Failed for other reason
+                        //java.lang.SecurityException: Calling identity is not authorized
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setApplicationExemptions,
+                                PACKAGE_NAME,PACKAGE_NAME,new int[]{4}
+                        );
+                        //
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_APP_RESTRICTIONS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+                        ReflectionUtils.deviceConfigSetProperty(
+                                "device_policy_manager",
+                                "enable_device_policy_engine","true",false
+                        );
+                        //Failed for other reason
+                        //java.lang.SecurityException: Calling identity is not authorized
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setApplicationRestrictions,COMPONENT,
+                                PACKAGE_NAME,PACKAGE_NAME,new Bundle()
+                        );
+                        //
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_APPS_CONTROL,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+                        ReflectionUtils.deviceConfigSetProperty(
+                                "device_policy_manager",
+                                "enable_device_policy_engine","true",false
+                        );
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserControlDisabledPackages,COMPONENT,
+                                PACKAGE_NAME,List.of("com.package","com.package2")
+                        );
+                        //
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_CERTIFICATES,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+                        ReflectionUtils.deviceConfigSetProperty(
+                                "device_policy_manager",
+                                "enable_device_policy_engine","true",false
+                        );
+                        ReflectionUtils.deviceConfigSetProperty(
+                                "device_policy_manager",
+                                "enable_permission_based_access","true",false
+                        );
+
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.installKeyPair,COMPONENT, PACKAGE_NAME,
+                                //privKey, cert, chain, alias, requestAccess,isUserSelectable
+                                new byte[]{0,0,0,0},new byte[]{0,0,0,0},new byte[]{0,0,0,0},"alias",true,true
+                        );
+                        //
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_COMMON_CRITERIA_MODE,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setCommonCriteriaModeEnabled,COMPONENT, PACKAGE_NAME,true
+                        );
+                        //
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_DEFAULT_SMS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setDefaultSmsApplication,COMPONENT, PACKAGE_NAME,
+                                "sms.packagename",true
+                        );
+                        //
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_FACTORY_RESET,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setFactoryResetProtectionPolicy,COMPONENT, PACKAGE_NAME,
+                                null
+                        );
+                        //
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_INPUT_METHODS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setPermittedInputMethods,COMPONENT, PACKAGE_NAME,
+                                List.of("com.package","com.package2"),false
+                        );
+                        //
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_KEYGUARD,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+                        //KEYGUARD_DISABLE_FINGERPRINT
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setKeyguardDisabledFeatures,COMPONENT, PACKAGE_NAME,
+                                0x00000020,false
+                        );
+                        //
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_LOCK,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+                        ReflectionUtils.deviceConfigSetProperty(
+                                "device_policy_manager",
+                                "enable_permission_based_access","true",false
+                        );
+
+                        //KEYGUARD_DISABLE_FINGERPRINT
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setMaximumTimeToLock,COMPONENT, PACKAGE_NAME,
+                                1000*30,false
+                        );
+                        //
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_LOCK_CREDENTIALS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+
+                        //KEYGUARD_DISABLE_FINGERPRINT
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setPasswordExpirationTimeout,COMPONENT, PACKAGE_NAME,
+                                30,false
+                        );
+                        //
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_LOCK_TASK,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+
+                        //KEYGUARD_DISABLE_FINGERPRINT
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setLockTaskPackages,COMPONENT, PACKAGE_NAME,
+                                List.of("com.package","com.package2").toArray()
+                        );
+                        //
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_MTE,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+                        try {
+                            mTransacts.invokeTransact(
+                                    Transacts.DEVICE_POLICY_SERVICE,
+                                    Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                    Transacts.setMtePolicy, DevicePolicyManager.MTE_NOT_CONTROLLED_BY_POLICY,
+                                    PACKAGE_NAME
+                            );
+
+                        } catch (UnsupportedOperationException ex){
+                            throw new BypassTestException("The device not support MTE.("+ex.getMessage()+")");
+                        }
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_ORGANIZATION_IDENTITY,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        String PACKAGE_NAME = mContext.getPackageName();
+                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
+                                PACKAGE_NAME + ".receivers.Admin");
+
+                            mTransacts.invokeTransact(
+                                    Transacts.DEVICE_POLICY_SERVICE,
+                                    Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                    Transacts.setOrganizationName,
+                                    COMPONENT,
+                                    PACKAGE_NAME, "Google LLC".toCharArray()
+                            );
 
                     }
                 }));

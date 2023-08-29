@@ -1196,6 +1196,7 @@ public class SignaturePermissions {
                 "android.permission.WAKEUP_SURFACE_FLINGER";
         public static final String WRITE_ALLOWLISTED_DEVICE_CONFIG =
                 "android.permission.WRITE_ALLOWLISTED_DEVICE_CONFIG";
+
     }
 
     /**

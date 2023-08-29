@@ -125,11 +125,10 @@
             android:exported="true">
             <meta-data
                 android:name="android.app.device_admin"
-                android:resource="@xml/admin"/>
+                android:resource="@xml/admin_settings"/>
             <intent-filter>
                 <action
                     android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
-
             </intent-filter>
         </receiver>
 

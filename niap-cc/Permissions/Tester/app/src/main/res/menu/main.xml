@@ -21,9 +21,9 @@
         android:title="Read media user selected"
         app:showAsAction="never" />
 
-    <!--<item
+    <item
         android:id="@+id/action_device_admin_test"
         android:title="@string/device_admin_test"
-        app:showAsAction="never" />-->
+        app:showAsAction="never" />
 
 </menu>
