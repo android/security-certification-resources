@@ -16,6 +16,7 @@
 
 package com.android.certifications.niap.permissions;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE;
 import static android.Manifest.permission.SCHEDULE_EXACT_ALARM;
 import static android.content.Intent.ACTION_LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE;
@@ -28,6 +29,7 @@ import android.app.AlarmManager;
 import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
+import android.app.admin.SystemUpdatePolicy;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
 import android.content.ComponentName;
@@ -103,6 +105,9 @@ public class InternalPermissionTester extends BasePermissionTester {
                 "enable_permission_based_access","true",false
         );
 
+        final String PACKAGE_NAME = mContext.getPackageName();
+        final ComponentName ADMIN_COMPONENT
+                = new ComponentName(PACKAGE_NAME,PACKAGE_NAME+".receivers.Admin");
 
         mPermissionTasks = new HashMap<>();
 
@@ -344,21 +349,15 @@ public class InternalPermissionTester extends BasePermissionTester {
                 }));
 
 
-//        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_LOCK,
-//                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-//
-//                }));
 
+        //Android 14 Implementations//
 
         mPermissionTasks.put(permission.READ_RESTRICTED_STATS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        //Object callback = ReflectionUtils.stubRemoteCallback();
-                        //Uri testUri = Uri.parse("content://" + mPackageName + "/test");
+
                         String STATS_MANAGER = "stats";
-                        // long[] setRestrictedMetricsChangedOperation(in PendingIntent pendingIntent, in long configKey,
-                        //            in String configPackage);
+
                         Intent i = new Intent(mContext, TestActivity.class);
                         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, i, PendingIntent.FLAG_IMMUTABLE);
 
@@ -370,7 +369,6 @@ public class InternalPermissionTester extends BasePermissionTester {
                         );
                     }
                 }));
-
 
 
 
@@ -402,7 +400,6 @@ public class InternalPermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
-
                         //import android.devicelock.IIsDeviceLockedCallback;
                         //MANAGE_DEVICE_LOCK_STATE
                         mTransacts.invokeTransact(
@@ -413,48 +410,27 @@ public class InternalPermissionTester extends BasePermissionTester {
                     }
                 }));
 
-        //Manage Device Policy Group : Tier 1 api call check
+        //Manage Device Policy Group :
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_CAMERA,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
-
-                        ReflectionUtils.deviceConfigSetProperty(
-                                "device_policy_manager",
-                                "enable_device_policy_engine","true",false
-                        );
-                        //Failed for other reason
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
                                 Transacts.setCameraDisabled,
-                                COMPONENT,PACKAGE_NAME,true,true
+                                ADMIN_COMPONENT,PACKAGE_NAME,true,true
                         );
-                        //
                     }
                 }));
 
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_ACCOUNT_MANAGEMENT,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
-
-                        ReflectionUtils.deviceConfigSetProperty(
-                                "device_policy_manager",
-                                "enable_device_policy_engine","true",false
-                        );
-                        //Failed for other reason
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
                                 Transacts.setAccountManagementDisabled,
-                                COMPONENT,PACKAGE_NAME,"accountType",true,true
+                                ADMIN_COMPONENT,PACKAGE_NAME,"accountType",true,true
                         );
                         //
                     }
@@ -462,15 +438,8 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_APP_EXEMPTIONS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
 
-                        ReflectionUtils.deviceConfigSetProperty(
-                                "device_policy_manager",
-                                "enable_device_policy_engine","true",false
-                        );
+
                         //Failed for other reason
                         //java.lang.SecurityException: Calling identity is not authorized
                         mTransacts.invokeTransact(
@@ -485,10 +454,6 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_APP_RESTRICTIONS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
 
                         ReflectionUtils.deviceConfigSetProperty(
                                 "device_policy_manager",
@@ -499,7 +464,7 @@ public class InternalPermissionTester extends BasePermissionTester {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setApplicationRestrictions,COMPONENT,
+                                Transacts.setApplicationRestrictions,ADMIN_COMPONENT,
                                 PACKAGE_NAME,PACKAGE_NAME,new Bundle()
                         );
                         //
@@ -509,46 +474,24 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_APPS_CONTROL,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
 
-                        ReflectionUtils.deviceConfigSetProperty(
-                                "device_policy_manager",
-                                "enable_device_policy_engine","true",false
-                        );
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setUserControlDisabledPackages,COMPONENT,
+                                Transacts.setUserControlDisabledPackages,ADMIN_COMPONENT,
                                 PACKAGE_NAME,List.of("com.package","com.package2")
                         );
-                        //
                     }
                 }));
 
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_CERTIFICATES,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
-
-                        ReflectionUtils.deviceConfigSetProperty(
-                                "device_policy_manager",
-                                "enable_device_policy_engine","true",false
-                        );
-                        ReflectionUtils.deviceConfigSetProperty(
-                                "device_policy_manager",
-                                "enable_permission_based_access","true",false
-                        );
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.installKeyPair,COMPONENT, PACKAGE_NAME,
+                                Transacts.installKeyPair,ADMIN_COMPONENT, PACKAGE_NAME,
                                 //privKey, cert, chain, alias, requestAccess,isUserSelectable
                                 new byte[]{0,0,0,0},new byte[]{0,0,0,0},new byte[]{0,0,0,0},"alias",true,true
                         );
@@ -559,15 +502,12 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_COMMON_CRITERIA_MODE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setCommonCriteriaModeEnabled,COMPONENT, PACKAGE_NAME,true
+                                Transacts.setCommonCriteriaModeEnabled,
+                                ADMIN_COMPONENT, PACKAGE_NAME,true
                         );
                         //
                     }
@@ -575,15 +515,12 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_DEFAULT_SMS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setDefaultSmsApplication,COMPONENT, PACKAGE_NAME,
+                                Transacts.setDefaultSmsApplication,
+                                ADMIN_COMPONENT, PACKAGE_NAME,
                                 "sms.packagename",true
                         );
                         //
@@ -593,15 +530,12 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_FACTORY_RESET,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setFactoryResetProtectionPolicy,COMPONENT, PACKAGE_NAME,
+                                Transacts.setFactoryResetProtectionPolicy,
+                                ADMIN_COMPONENT, PACKAGE_NAME,
                                 null
                         );
                         //
@@ -610,15 +544,12 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_INPUT_METHODS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setPermittedInputMethods,COMPONENT, PACKAGE_NAME,
+                                Transacts.setPermittedInputMethods,
+                                ADMIN_COMPONENT, PACKAGE_NAME,
                                 List.of("com.package","com.package2"),false
                         );
                         //
@@ -628,15 +559,12 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_KEYGUARD,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
-                        //KEYGUARD_DISABLE_FINGERPRINT
+
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setKeyguardDisabledFeatures,COMPONENT, PACKAGE_NAME,
+                                Transacts.setKeyguardDisabledFeatures,
+                                ADMIN_COMPONENT, PACKAGE_NAME,
                                 0x00000020,false
                         );
                         //
@@ -646,21 +574,13 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_LOCK,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
-
-                        ReflectionUtils.deviceConfigSetProperty(
-                                "device_policy_manager",
-                                "enable_permission_based_access","true",false
-                        );
 
                         //KEYGUARD_DISABLE_FINGERPRINT
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setMaximumTimeToLock,COMPONENT, PACKAGE_NAME,
+                                Transacts.setMaximumTimeToLock,
+                                ADMIN_COMPONENT, PACKAGE_NAME,
                                 1000*30,false
                         );
                         //
@@ -670,17 +590,12 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_LOCK_CREDENTIALS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
-
-
                         //KEYGUARD_DISABLE_FINGERPRINT
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setPasswordExpirationTimeout,COMPONENT, PACKAGE_NAME,
+                                Transacts.setPasswordExpirationTimeout,
+                                ADMIN_COMPONENT, PACKAGE_NAME,
                                 30,false
                         );
                         //
@@ -690,17 +605,12 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_LOCK_TASK,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
-
-
                         //KEYGUARD_DISABLE_FINGERPRINT
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setLockTaskPackages,COMPONENT, PACKAGE_NAME,
+                                Transacts.setLockTaskPackages,
+                                ADMIN_COMPONENT, PACKAGE_NAME,
                                 List.of("com.package","com.package2").toArray()
                         );
                         //
@@ -709,15 +619,12 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_MTE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
                         try {
                             mTransacts.invokeTransact(
                                     Transacts.DEVICE_POLICY_SERVICE,
                                     Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                    Transacts.setMtePolicy, DevicePolicyManager.MTE_NOT_CONTROLLED_BY_POLICY,
+                                    Transacts.setMtePolicy,
+                                    DevicePolicyManager.MTE_NOT_CONTROLLED_BY_POLICY,
                                     PACKAGE_NAME
                             );
 
@@ -730,24 +637,180 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_ORGANIZATION_IDENTITY,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        String PACKAGE_NAME = mContext.getPackageName();
-                        ComponentName COMPONENT = new ComponentName(PACKAGE_NAME,
-                                PACKAGE_NAME + ".receivers.Admin");
 
                             mTransacts.invokeTransact(
                                     Transacts.DEVICE_POLICY_SERVICE,
                                     Transacts.DEVICE_POLICY_DESCRIPTOR,
                                     Transacts.setOrganizationName,
-                                    COMPONENT,
+                                    ADMIN_COMPONENT,
                                     PACKAGE_NAME, "Google LLC".toCharArray()
                             );
 
                     }
                 }));
 
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_PACKAGE_STATE,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
 
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.isPackageSuspended,
+                                ADMIN_COMPONENT,
+                                PACKAGE_NAME, "com.google.android.youtube"
+                        );
 
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_PROFILE_INTERACTION,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.addCrossProfileWidgetProvider,
+                                ADMIN_COMPONENT,
+                                PACKAGE_NAME,"com.packagename"
+                        );
+
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_RESET_PASSWORD,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //byte array describes 'password'x4.
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setResetPasswordToken,
+                                ADMIN_COMPONENT,
+                                PACKAGE_NAME,new byte[]{
+                                        0x70,0x61,0x73,0x73,0x77,0x6f,0x72,0x64,
+                                        0x70,0x61,0x73,0x73,0x77,0x6f,0x72,0x64,
+                                        0x70,0x61,0x73,0x73,0x77,0x6f,0x72,0x64,
+                                        0x70,0x61,0x73,0x73,0x77,0x6f,0x72,0x64}
+                        );
+
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_RUNTIME_PERMISSIONS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+
+                        Object callback = ReflectionUtils.stubRemoteCallback();
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setPermissionGrantState,
+                                ADMIN_COMPONENT,
+                                PACKAGE_NAME,
+                                "com.package",ACCESS_FINE_LOCATION,
+                                DevicePolicyManager.PERMISSION_GRANT_STATE_DEFAULT,
+                                callback
+                        );
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_SCREEN_CAPTURE,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setScreenCaptureDisabled,
+                                ADMIN_COMPONENT,
+                                PACKAGE_NAME,false,true);
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_SECURITY_LOGGING,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setSecurityLoggingEnabled,
+                                ADMIN_COMPONENT,
+                                PACKAGE_NAME,true);
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_STATUS_BAR,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setStatusBarDisabled,
+                                ADMIN_COMPONENT,
+                                PACKAGE_NAME,false);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_SUPPORT_MESSAGE,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setShortSupportMessage,
+                                ADMIN_COMPONENT,
+                                PACKAGE_NAME,"Hello Short Support Message!".toCharArray());
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_SYSTEM_UPDATES,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setSystemUpdatePolicy,
+                                ADMIN_COMPONENT,
+                                PACKAGE_NAME,SystemUpdatePolicy.createAutomaticInstallPolicy());
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_USB_DATA_SIGNALLING,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUsbDataSignalingEnabled,
+                                PACKAGE_NAME,false);
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_WIFI,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.hasLockdownAdminConfiguredNetworks,
+                                ADMIN_COMPONENT);
+                    }
+                }));
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_WIPE_DATA,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setMaximumFailedPasswordsForWipe,
+                                ADMIN_COMPONENT,PACKAGE_NAME,3000,true);
+                    }
+                }));
     }
 
     @Override

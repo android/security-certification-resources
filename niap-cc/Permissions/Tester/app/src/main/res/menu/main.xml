@@ -26,4 +26,9 @@
         android:title="@string/device_admin_test"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_remove_device_admin"
+        android:title="@string/device_admin_remove"
+        app:showAsAction="never" />
+
 </menu>

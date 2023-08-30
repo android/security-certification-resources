@@ -380,12 +380,12 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id){
+        switch (id) {
             /*
              * Create a json file for checking whole testing items
              */
             case R.id.action_show_settings:
-                Intent intent = new Intent( this, SettingsActivity.class );
+                Intent intent = new Intent(this, SettingsActivity.class);
                 //startActivity( intent );
                 startActivityForResult(intent, 0);
                 break;
@@ -400,6 +400,13 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                 break;
             case R.id.action_device_admin_test:
                 getPermission();
+                break;
+            case R.id.action_remove_device_admin:
+                try {
+                    mDevicePolicyManager.clearDeviceOwnerApp(mContext.getPackageName());
+                } catch (Exception ex){
+                    ex.printStackTrace();
+                }
                 break;
         }
 
