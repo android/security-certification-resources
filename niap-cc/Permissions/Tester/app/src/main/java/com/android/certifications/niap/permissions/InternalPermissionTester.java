@@ -22,6 +22,7 @@ import static android.Manifest.permission.SCHEDULE_EXACT_ALARM;
 import static android.content.Intent.ACTION_LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE;
 import static com.android.certifications.niap.permissions.utils.InternalPermissions.permission;
 import static com.android.certifications.niap.permissions.utils.ReflectionUtils.invokeReflectionCall;
+import static com.android.certifications.niap.permissions.utils.ReflectionUtils.stubHiddenObject;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -43,6 +44,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.UserManager;
 import android.provider.ContactsContract;
 
 import androidx.annotation.NonNull;
@@ -559,14 +561,20 @@ public class InternalPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_KEYGUARD,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-
-                        mTransacts.invokeTransact(
-                                Transacts.DEVICE_POLICY_SERVICE,
-                                Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setKeyguardDisabledFeatures,
-                                ADMIN_COMPONENT, PACKAGE_NAME,
-                                0x00000020,false
-                        );
+                        Object CONFIG = stubHiddenObject("android.os.PersistableBundle");
+                        if(CONFIG != null) {
+                            ComponentName TRUST_AGENT_COMPONENT =
+                                    new ComponentName("com.trustagent", "com.trustagent.xxx");
+                            mTransacts.invokeTransact(
+                                    Transacts.DEVICE_POLICY_SERVICE,
+                                    Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                    Transacts.setTrustAgentConfiguration,
+                                    ADMIN_COMPONENT, PACKAGE_NAME, TRUST_AGENT_COMPONENT,
+                                    CONFIG, true
+                            );
+                        } else {
+                            throw new IllegalArgumentException("failed to create a PersistableBundle");
+                        }
                         //
                     }
                 }));
@@ -694,7 +702,6 @@ public class InternalPermissionTester extends BasePermissionTester {
                                         0x70,0x61,0x73,0x73,0x77,0x6f,0x72,0x64,
                                         0x70,0x61,0x73,0x73,0x77,0x6f,0x72,0x64}
                         );
-
                     }
                 }));
 
@@ -811,6 +818,297 @@ public class InternalPermissionTester extends BasePermissionTester {
                                 ADMIN_COMPONENT,PACKAGE_NAME,3000,true);
                     }
                 }));
+
+        //UserManager + DevicePolicyService related Permissions
+
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_AUDIO_OUTPUT,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_ADJUST_VOLUME,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_AUTOFILL,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_AUTOFILL,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_BLUETOOTH,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_BLUETOOTH,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_CALLS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_OUTGOING_CALLS,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_DEBUGGING_FEATURES,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_DEBUGGING_FEATURES,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_DISPLAY,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_AMBIENT_DISPLAY,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_INSTALL_UNKNOWN_SOURCES,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_LOCALE,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_CONFIG_LOCALE,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_LOCATION,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_CONFIG_LOCATION,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_MOBILE_NETWORK,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_CONFIG_MOBILE_NETWORKS,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_MODIFY_USERS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_ADD_USER,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_NEARBY_COMMUNICATION,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_OUTGOING_BEAM,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_PHYSICAL_MEDIA,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_MOUNT_PHYSICAL_MEDIA,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_PRINTING,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_PRINTING,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_PROFILES,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.ALLOW_PARENT_PROFILE_APP_LINKING,true,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_RESTRICT_PRIVATE_DNS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_CONFIG_PRIVATE_DNS,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_RUN_IN_BACKGROUND,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        String DISALLOW_RUN_IN_BACKGROUND = "no_run_in_background";//SYSTEM_API
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                DISALLOW_RUN_IN_BACKGROUND,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_SAFE_BOOT,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_SAFE_BOOT,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_SCREEN_CONTENT,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_CONTENT_CAPTURE,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_MICROPHONE,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_MICROPHONE_TOGGLE,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_SMS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_SMS,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_SYSTEM_DIALOGS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_TIME,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_CONFIG_DATE_TIME,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_VPN,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_CONFIG_VPN,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_WALLPAPER,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_SET_WALLPAPER,false,true);
+                    }
+                }));
+        mPermissionTasks.put(permission.MANAGE_DEVICE_POLICY_WINDOWS,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        mTransacts.invokeTransact(
+                                Transacts.DEVICE_POLICY_SERVICE,
+                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+                                Transacts.setUserRestriction,
+                                ADMIN_COMPONENT,PACKAGE_NAME,
+                                UserManager.DISALLOW_CREATE_WINDOWS,false,true);
+                    }
+                }));
+
     }
 
     @Override

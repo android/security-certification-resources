@@ -108,6 +108,19 @@ public class ReflectionUtils {
             e.printStackTrace();
         }
     }
+
+    public static Object stubHiddenObject(String classname)  {
+        try {
+            Class<?> remoteCallbackClass = Class.forName(classname);
+            Constructor<?> remoteCallbackConstructor = remoteCallbackClass.getConstructor();
+            return remoteCallbackConstructor.newInstance();
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
+                 InstantiationException | InvocationTargetException e){
+            e.printStackTrace();
+
+            return null;
+        }
+    }
     public static Object stubRemoteCallback()  {
         try {
             Class<?> onResultListenerClass = Class.forName(

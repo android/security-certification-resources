@@ -482,6 +482,7 @@ public class BarbetApiLevel34Transacts extends Transacts {
         // Failed to obtain transactId of markProfileOwnerOnOrganizationOwnedDevice under android.app.admin.IDevicePolicyManager: No field TRANSACTION_markProfileOwnerOnOrganizationOwnedDevice in class Landroid/app/admin/IDevicePolicyManager$Stub; (declaration of 'android.app.admin.IDevicePolicyManager$Stub' appears in /system/framework/framework.jar)
         transactIds.put(isPackageSuspended, 98);
         transactIds.put(setProfileOwnerOnOrganizationOwnedDevice, 318);
+        transactIds.put(setTrustAgentConfiguration, 211);
         transactIds.put(getString, 373);
         transactIds.put(hasLockdownAdminConfiguredNetworks, 184);
         transactIds.put(setLockTaskPackages, 175);
@@ -491,6 +492,7 @@ public class BarbetApiLevel34Transacts extends Transacts {
         transactIds.put(setDefaultSmsApplication, 124);
         transactIds.put(setPasswordExpirationTimeout, 20);
         transactIds.put(installCaCert, 100);
+        transactIds.put(setUserRestriction, 133);
         transactIds.put(setSecurityLoggingEnabled, 267);
         transactIds.put(setMaximumTimeToLock, 36);
         transactIds.put(setScreenCaptureDisabled, 55);
