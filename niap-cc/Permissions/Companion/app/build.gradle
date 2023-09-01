@@ -68,7 +68,7 @@ android {
         debug {
             signingConfig null
             debuggable true
-            signingConfig signingConfigs.companion
+            signingConfig signingConfigs.platform
         }
         release {
             signingConfig null

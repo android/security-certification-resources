@@ -26,6 +26,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_DEVICE_CONFIG" />
+    <uses-permission android:name="android.permission.WRITE_DEVICE_CONFIG" />
+
     <!--<uses-permission android:name="android.permission.LAUNCH_DEVICE_MANAGER_SETUP"/>-->
     <application
         android:allowBackup="true"

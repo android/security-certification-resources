@@ -24,7 +24,7 @@ tools:context="com.android.certifications.niap.permissions.companion.MainActivit
 
     <ListView
         android:id="@+id/statusTextView"
-        android:layout_width="343dp"
+        android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"

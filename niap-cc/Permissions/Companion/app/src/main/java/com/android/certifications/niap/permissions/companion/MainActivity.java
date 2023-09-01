@@ -37,6 +37,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.DropBoxManager;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -54,6 +55,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -61,12 +63,14 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -132,6 +136,41 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    public boolean deviceConfigSetProperty(String a,String b,String value,boolean makeDefault) {
+        try {
+            Object r = invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
+                    "setProperty", null,
+                    new Class[]{String.class, String.class, String.class,
+                            boolean.class}, a, b, value, makeDefault);
+            return (boolean)r;
+        } catch (Exception e) {
+            logdebug("DeviceConfig.setProperty failed.(" + a + "," + b + "," + value + ")");
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public String deviceConfigGetProperty(String namespace,String name) {
+        try {
+            String r = (String)invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
+                    "getProperty", null,
+                    new Class[]{String.class, String.class}, namespace,name);
+            return r;
+        } catch (Exception e) {
+            logdebug("DeviceConfig.getProperty failed.(" + namespace+","+name+")");
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public static Object invokeReflectionCall(Class<?> targetClass, String methodName,
+                                              Object targetObject, Class<?>[] parameterClasses, Object... parameters) {
+        try {
+            Method method = targetClass.getMethod(methodName, parameterClasses);
+            return method.invoke(targetObject, parameters);
+        } catch (ReflectiveOperationException e) {
+            Throwable cause = e.getCause();
+            throw (SecurityException) cause;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,6 +233,31 @@ public class MainActivity extends AppCompatActivity {
                 }
                 result = result && setupLocationTest();
             }
+            /**
+             * Set flags for enable experimental flags to new device_policy_engine
+             * as of android 14
+             */
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                String dvc =
+                        deviceConfigGetProperty("device_policy_manager", "enable_device_policy_engine");
+                if(dvc == null || !dvc.equals("true")){
+                    deviceConfigSetProperty("device_policy_manager", "enable_device_policy_engine","true",true);
+                }
+                logdebug("force a flag enable_device_policy_engine set true=>"
+                        +deviceConfigGetProperty("device_policy_manager",
+                        "enable_device_policy_engine"));
+                //2nd flag
+                dvc =
+                        deviceConfigGetProperty("device_policy_manager", "enable_permission_based_access");
+                if(dvc == null || !dvc.equals("true")){
+                    deviceConfigSetProperty("device_policy_manager", "enable_permission_based_access","true",true);
+                }
+                logdebug("force flag enable_permission_based_access set true=>"
+                        +deviceConfigGetProperty("device_policy_manager",
+                        "enable_permission_based_access"));
+            }
+
+
             return result;
         }
 
@@ -344,7 +408,36 @@ public class MainActivity extends AppCompatActivity {
                 logerror("Location update not received within timeout window");
             }
         } else {
-            logerror("We can not receive device location with pending intent after U+.");
+            //Implementtion for android UDC or later (maybe it works on more previous versions)
+            latch[0] = new CountDownLatch(1);
+            LocationCallback locationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    if (locationResult == null) {
+                        return;
+                    }
+                    for (Location location : locationResult.getLocations()) {
+                        logdebug("updated location=>"+location.toString());
+                        latch[0].countDown();
+                    }
+                }
+            };
+            LocationRequest locationRequest = new LocationRequest.Builder(5000)
+                    .setDurationMillis(100)
+                    .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY).build();
+
+            FusedLocationProviderClient locationClient =
+                    LocationServices.getFusedLocationProviderClient(getApplicationContext());
+            locationClient.requestLocationUpdates(locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper());
+            try {
+                locationReceived = latch[0].await(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                logerror("Caught an InterruptedException: "+e.getLocalizedMessage());
+            }
+            locationClient.removeLocationUpdates(locationCallback);
+
         }
         return locationReceived;
     }
