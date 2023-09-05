@@ -110,9 +110,11 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
                 Log.d(TAG,"permission granted?"+permission);
 
                 return true;
+            } else {
+                Log.d(TAG,"Not garnted:"+permission);
             }
         }
-        Log.d(TAG,"NG?:"+PERMISSIONS_UNDER_TEST.toString());
+
 
         return false;
     }

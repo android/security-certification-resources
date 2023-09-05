@@ -702,6 +702,8 @@ public class Transacts {
     public static final String setUsbDataSignalingEnabled = "setUsbDataSignalingEnabled";
     public static final String setUserControlDisabledPackages = "setUserControlDisabledPackages";
     public static final String setTrustAgentConfiguration = "setTrustAgentConfiguration";
+    public static final String removeRestrictedMetricsChangedOperation="removeRestrictedMetricsChangedOperation";
+
 
     /**
      * Contains a mapping from the descriptor to a Map of transact names to their IDs on the device

@@ -73,6 +73,7 @@ public class TestService extends Service {
                     startForeground(NOTIFICATION_ID, notification);
                     stopForeground(true);
                     StatusLogger.logTestStatus(permission, permissionGranted, true);
+                    //getAndLogTestStatus
                     break;
                 }
                 default:

@@ -665,7 +665,42 @@ public class Transacts {
     public static final String startRemoteLockscreenValidation = "startRemoteLockscreenValidation";
 
     public static final String getHealthConnectDataState = "getHealthConnectDataState";
+    public static final String setCameraDisabled = "setCameraDisabled";
 
+    public static final String addCrossProfileWidgetProvider = "addCrossProfileWidgetProvider";
+    public static final String getCrossProfileWidgetProviders = "getCrossProfileWidgetProviders";
+    public static final String hasLockdownAdminConfiguredNetworks = "hasLockdownAdminConfiguredNetworks";
+    public static final String installKeyPair = "installKeyPair";
+    public static final String installUpdateFromFile = "installUpdateFromFile";
+    public static final String isPackageSuspended = "isPackageSuspended";
+    public static final String setAccountManagementDisabled = "setAccountManagementDisabled";
+    public static final String setApplicationExemptions = "setApplicationExemptions";
+    public static final String setApplicationRestrictions = "setApplicationRestrictions";
+    public static final String setCommonCriteriaModeEnabled = "setCommonCriteriaModeEnabled";
+    public static final String setConfiguredNetworksLockdownState = "setConfiguredNetworksLockdownState";
+    public static final String setDefaultSmsApplication = "setDefaultSmsApplication";
+    public static final String setFactoryResetProtectionPolicy = "setFactoryResetProtectionPolicy";
+    public static final String setKeyguardDisabledFeatures = "setKeyguardDisabledFeatures";
+    public static final String setLockTaskPackages = "setLockTaskPackages";
+    public static final String setMaximumFailedPasswordsForWipe = "setMaximumFailedPasswordsForWipe";
+    public static final String setMaximumTimeToLock = "setMaximumTimeToLock";
+    public static final String setMtePolicy = "setMtePolicy";
+    public static final String setOrganizationName = "setOrganizationName";
+    public static final String setPasswordExpirationTimeout = "setPasswordExpirationTimeout";
+    public static final String setPermissionGrantState = "setPermissionGrantState";
+    public static final String setPermittedInputMethods = "setPermittedInputMethods";
+    public static final String setResetPasswordToken = "setResetPasswordToken";
+    public static final String setScreenCaptureDisabled = "setScreenCaptureDisabled";
+    public static final String setSecurityLoggingEnabled = "setSecurityLoggingEnabled";
+    public static final String setShortSupportMessage = "setShortSupportMessage";
+    public static final String setStatusBarDisabled = "setStatusBarDisabled";
+    public static final String setSystemUpdatePolicy = "setSystemUpdatePolicy";
+    public static final String setUsbDataSignalingEnabled = "setUsbDataSignalingEnabled";
+    public static final String setUserControlDisabledPackages = "setUserControlDisabledPackages";
+
+    public static final String setTrustAgentConfiguration = "setTrustAgentConfiguration";
+
+    public static final String removeRestrictedMetricsChangedOperation="removeRestrictedMetricsChangedOperation";
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an
      * extension of the Transacts class for the Permission Test Tool.

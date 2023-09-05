@@ -141,6 +141,12 @@ public class ConfigurationFactory {
             additionalConfigurations.add(new GmsPermissionConfiguration(activity));
         }
 
+        DevicePolicyConfiguration devicePolicyConfiguration =
+                new DevicePolicyConfiguration(activity);
+        if(devicePolicyConfiguration.enabled()){
+            additionalConfigurations.add(devicePolicyConfiguration);
+        }
+
         // TODO: Any custom configurations that are intended to be run as part of this test should
         // be added here.
 

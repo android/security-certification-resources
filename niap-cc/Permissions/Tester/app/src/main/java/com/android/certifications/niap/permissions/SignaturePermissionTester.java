@@ -4085,9 +4085,24 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.QUERY_ADMIN_POLICY,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+
+                    String devicePolicySettings="true";
+
+                    if(VERSION_CODES.UPSIDE_DOWN_CAKE>= Build.VERSION.SDK_INT){
+                        devicePolicySettings = ReflectionUtils.deviceConfigGetProperty("device_policy_manager", "enable_permission_based_access");
+                        ReflectionUtils.deviceConfigSetProperty("device_policy_manager", "enable_permission_based_access","false",false);
+                    }
+
                     invokeReflectionCall(mDevicePolicyManager.getClass(),
                             "getWifiSsidPolicy", mDevicePolicyManager,
                             new Class<?>[]{});
+
+                    //Revert the settings
+                    if(VERSION_CODES.UPSIDE_DOWN_CAKE>=Build.VERSION.SDK_INT){
+                        ReflectionUtils.deviceConfigSetProperty("device_policy_manager", "enable_permission_based_access",devicePolicySettings,true);
+
+                    }
+
                 }));
 
         mPermissionTasks.put(permission.PROVISION_DEMO_DEVICE,

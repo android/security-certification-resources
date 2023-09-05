@@ -326,6 +326,7 @@ public class BarbetApiLevel34Transacts extends Transacts {
         mDescriptorTransacts.put(VIRTUAL_DEVICE_MANAGER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(removeRestrictedMetricsChangedOperation, 16);
         transactIds.put(setRestrictedMetricsChangedOperation, 15);
         mDescriptorTransacts.put(STATS_DESCRIPTOR, transactIds);
 

@@ -75,7 +75,7 @@ public class ReflectionUtils {
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                     //mLogger.logDebug("callback invoked: "+proxy+","+method);
                     if (method.getName().equals("asBinder")) {
-                        return new Binder();
+                        return new Binder() ;
                     }
                     if(method.getName().equals("onSuccess")){
                         mLogger.logDebug("onSuccess");
@@ -97,15 +97,28 @@ public class ReflectionUtils {
             return null;
         }
     }
-    public static void deviceConfigSetProperty(String a,String b,String c,boolean value)  {
+    public static boolean deviceConfigSetProperty(String a,String b,String c,boolean value)  {
         try {
-            invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
+            Object r = invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
                     "setProperty", null,
                     new Class[]{String.class, String.class, String.class,
-                            boolean.class}, a,b, c, false);
+                            boolean.class}, a,b, c, value);
+            return (boolean)r;
         } catch (Exception e){
             mLogger.logDebug("DeviceConfig.setProperty failed.("+a+","+b+","+c+")");
             e.printStackTrace();
+            return false;
+        }
+    }
+    public static String deviceConfigGetProperty(String namespace,String name)  {
+        try {
+            String r = (String)invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
+                    "getProperty", null,
+                    new Class[]{String.class, String.class}, namespace,name);
+            return r;
+        } catch (Exception e) {
+            mLogger.logDebug("DeviceConfig.getProperty failed.(" + namespace+","+name+")");
+            return null;
         }
     }
 

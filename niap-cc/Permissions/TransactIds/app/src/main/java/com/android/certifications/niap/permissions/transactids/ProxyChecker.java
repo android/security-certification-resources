@@ -35,6 +35,9 @@ public class ProxyChecker {
         alt_descriptor.put("com.android.internal.telephony.ISub","SUBSCRIPTION_DESCRIPTOR");
         alt_descriptor.put("android.devicelock.IDeviceLockService","DEVICELOCK_DESCRIPTOR");
         alt_descriptor.put("android.app.ILocaleManager","LOCALE_DESCRIPTOR");
+        alt_descriptor.put("android.app.admin.IDevicePolicyManager","DEVICE_POLICY_DESCRIPTOR" );
+        alt_descriptor.put(LOCK_SETTINGS_DESCRIPTOR,"LOCK_SETTINGS_DESCRIPTOR" );
+
         //alt_descriptor.put("com.android.internal.widget.ILockSettings","LOCK_SETTINGS_DESCRIPTOR");
         for(String k:alt_descriptor.keySet()){
             System.out.println(
@@ -90,7 +93,7 @@ public class ProxyChecker {
         //Log.d(TAG,"Checking :"+descriptor+","+transactName);
         try {
             clazz = Class.forName(descriptor + "$Stub");
-            System.out.println(checkDeclaredMethod(clazz,""));
+            //System.out.println(checkDeclaredMethod(clazz,""));
             //System.out.println(checkDeclaredField(clazz,""));
 
         } catch (ClassNotFoundException e) {

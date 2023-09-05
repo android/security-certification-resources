@@ -91,14 +91,6 @@ public interface TestConfiguration {
      * {@link Optional#empty()} if all signature permissions should be tested.
      */
     default Optional<List<String>> getSignaturePermissions() {
-       //List<String> list = new ArrayList<>();
-       //SignatureDependentPermissionConfiguration.addPermissionsFor28(list);
-       // SignatureDependentPermissionConfiguration.addPermissionsFor29(list);
-       // SignatureDependentPermissionConfiguration.addPermissionsFor30(list);
-       // SignatureDependentPermissionConfiguration.addPermissionsFor31(list);
-        //SignatureDependentPermissionConfiguration.addPermissionsFor32(list);
-        //SignatureDependentPermissionConfiguration.addPermissionsFor33(list);
-        //return Optional.of(list);//list;
         return Optional.empty();
     }
 
@@ -134,9 +126,6 @@ public interface TestConfiguration {
      * or {@link Optional#empty()} if no signature permissions should be skipped.
      */
     default Optional<Set<String>> getSkippedSignaturePermissions() {
-        //Set<String> list = new ArraySet<>();
-        //list.add(SignaturePermissions.permission.RESTART_WIFI_SUBSYSTEM);
-        //return Optional.of(list);
         return Optional.empty();
     }
 

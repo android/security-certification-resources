@@ -316,6 +316,9 @@ public abstract class BasePermissionTester {
         // If the permission was granted then the API should have been successful.
         boolean testPassed = permissionGranted == apiSuccessful;
         mLogger.logTestStatus(permission, permissionGranted, apiSuccessful);
+
+
+
         return testPassed;
     }
 

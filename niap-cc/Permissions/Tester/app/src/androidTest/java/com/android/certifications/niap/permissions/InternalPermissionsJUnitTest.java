@@ -41,8 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
-
 /**
  * Instrumentation test to verify internal protection level permissions properly grant access to
  * their API, resources, etc., when the corresponding permission is granted. Internal
@@ -52,7 +50,7 @@ import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentat
  * behavior.
  */
 @RunWith(AndroidJUnit4.class)
-public class InternalPermissionsTest {
+public class InternalPermissionsJUnitTest {
     /**
      *
      * A list of permissions that can be granted to the shell identity.
@@ -81,6 +79,9 @@ public class InternalPermissionsTest {
         //14
         mPermissions.add(permission.READ_RESTRICTED_STATS);
         mPermissions.add(permission.LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE);
+        mPermissions.add(permission.MANAGE_DEVICE_LOCK_STATE);
+        //mPermissions.add(permission.MANAGE_DEVICE_POLICY_ACCOUNT_MANAGEMENT);
+
         //AA
     }
 
@@ -104,7 +105,8 @@ public class InternalPermissionsTest {
     public void runPermissionTests_shellIdentity_apisSuccessful() throws Exception {
         InternalPermissionTester permissionTester = new InternalPermissionTester(
                 new InternalTestConfiguration(mPermissions), rule.getActivity());
-
+        //Adopt the permission identity of the shell UID for all permissions.
+        //This allows you to call APIs protected permissions which normal apps cannot hold but are granted to the shell UID.
         mUiAutomation.adoptShellPermissionIdentity();
         //For query contacts
         mUiAutomation.grantRuntimePermission(null,"android.permission.QUERY_ALL_PACKAGES");

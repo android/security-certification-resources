@@ -257,7 +257,6 @@ public class MainActivity extends AppCompatActivity {
                         "enable_permission_based_access"));
             }
 
-
             return result;
         }
 

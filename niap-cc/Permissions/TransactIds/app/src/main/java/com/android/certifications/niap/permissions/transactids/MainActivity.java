@@ -19,6 +19,7 @@ package com.android.certifications.niap.permissions.transactids;
 import static com.android.certifications.niap.permissions.transactids.Transacts.ACTIVITY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.AUDIO_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.CLIPBOARD_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.DEVICE_POLICY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.DISPLAY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.INPUT_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.LOCK_SETTINGS_DESCRIPTOR;
@@ -108,10 +109,40 @@ public class MainActivity extends AppCompatActivity {
         //Transaction APIs as of Android 34
         //We should automate them ....
 
-        ProxyChecker.check(ACTIVITY_DESCRIPTOR,
-                "getMimeTypeFilterAsync");
-        ProxyChecker.check(LOCK_SETTINGS_DESCRIPTOR,
-                "startRemoteLockscreenValidation");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setCameraDisabled");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setAccountManagementDisabled");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setApplicationExemptions");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setApplicationRestrictions");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setUserControlDisabledPackages");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "installKeyPair");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setCommonCriteriaModeEnabled");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setDefaultSmsApplication");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setFactoryResetProtectionPolicy");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setPermittedInputMethods");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setKeyguardDisabledFeatures");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setMaximumTimeToLock");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setPasswordExpirationTimeout");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setMaximumTimeToLock");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setLockTaskPackages");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setMtePolicy");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setOrganizationName");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "isPackageSuspended");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "addCrossProfileWidgetProvider");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "getCrossProfileWidgetProviders");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setResetPasswordToken");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setPermissionGrantState");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setScreenCaptureDisabled");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setSecurityLoggingEnabled");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setStatusBarDisabled");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setShortSupportMessage");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setSystemUpdatePolicy");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "installUpdateFromFile");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setUsbDataSignalingEnabled");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "hasLockdownAdminConfiguredNetworks");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setConfiguredNetworksLockdownState");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setMaximumFailedPasswordsForWipe");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setUserRestriction");
+        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setTrustAgentConfiguration");
 
 
         //ProxyChecker.check("android.health.connect.aidl.IMigrationCallback",
@@ -729,6 +760,43 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.WEARABLES_DESCRIPTOR, Transacts.provideDataStream, descriptorTransacts);
             queryTransactId(Transacts.ACTIVITY_DESCRIPTOR, Transacts.getMimeTypeFilterAsync, descriptorTransacts);
             queryTransactId(Transacts.LOCK_SETTINGS_DESCRIPTOR, Transacts.startRemoteLockscreenValidation, descriptorTransacts);
+
+            //DevicePolicyDescriptors
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setCameraDisabled, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.addCrossProfileWidgetProvider, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.getCrossProfileWidgetProviders, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.hasLockdownAdminConfiguredNetworks, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.installKeyPair, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.installUpdateFromFile, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.isPackageSuspended, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setAccountManagementDisabled, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setApplicationExemptions, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setApplicationRestrictions, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setCommonCriteriaModeEnabled, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setConfiguredNetworksLockdownState, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setDefaultSmsApplication, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setFactoryResetProtectionPolicy, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setKeyguardDisabledFeatures, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setLockTaskPackages, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setMaximumFailedPasswordsForWipe, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setMaximumTimeToLock, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setMaximumTimeToLock, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setMtePolicy, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setOrganizationName, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setPasswordExpirationTimeout, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setPermissionGrantState, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setPermittedInputMethods, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setResetPasswordToken, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setScreenCaptureDisabled, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setSecurityLoggingEnabled, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setShortSupportMessage, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setStatusBarDisabled, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setSystemUpdatePolicy, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setUsbDataSignalingEnabled, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setUserControlDisabledPackages, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setUserRestriction, descriptorTransacts);
+            queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setTrustAgentConfiguration, descriptorTransacts);
+            queryTransactId(Transacts.STATS_DESCRIPTOR,Transacts.removeRestrictedMetricsChangedOperation,descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
         }

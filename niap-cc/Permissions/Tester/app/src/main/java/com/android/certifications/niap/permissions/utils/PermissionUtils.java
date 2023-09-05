@@ -16,10 +16,16 @@
 
 package com.android.certifications.niap.permissions.utils;
 
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionGroupInfo;
 import android.content.pm.PermissionInfo;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.Constants;
@@ -29,6 +35,7 @@ import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -91,6 +98,86 @@ public class PermissionUtils {
             BasePermissionTester.PermissionTest test = entry.getValue();
             sLogger.logInfo("  >"+entry.getKey()+"(min:"+test.mMinApiLevel+",max:"+test.mMaxApiLevel+")");
         }
+    }
+
+
+    //Port from TestDPC project
+    /**
+     * Ensures that the passed in permissions are defined in manifest and attempts to grant a
+     * permission automatically if it is considered dangerous.
+     */
+    @RequiresApi(Build.VERSION_CODES.M)
+    public static boolean ensureRequiredPermissions(
+            String[] requiredPermissions, ComponentName admin, Context context) {
+        PackageInfo packageInfo;
+        try {
+            packageInfo =
+                    context
+                            .getPackageManager()
+                            .getPackageInfo(context.getPackageName(), PackageManager.GET_PERMISSIONS);
+        } catch (PackageManager.NameNotFoundException e) {
+            sLogger.logError( "Could not find own package.", e);
+            return false;
+        }
+        List<String> manifestPermissions = Arrays.asList(packageInfo.requestedPermissions);
+        for (String expectedPermission : requiredPermissions) {
+            if (!manifestPermissions.contains(expectedPermission)) {
+                sLogger.logError("Missing required permission from manifest: " + expectedPermission);
+                return false;
+            }
+            if (!maybeGrantDangerousPermission(expectedPermission, admin, context)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Attempts to grant a permission automatically if it is considered dangerous - this only happens
+     * for PO/DO devices.
+     */
+    @RequiresApi(Build.VERSION_CODES.M)
+    private static boolean maybeGrantDangerousPermission(
+            String permission, ComponentName admin, Context context) {
+        if (!isPermissionDangerous(permission, context)) {
+            return true;
+        }
+        /*if (!ProvisioningStateUtil.isManagedByTestDPC(context)) {
+            return false;
+        }*/
+        if (hasPermissionGranted(admin, context, permission)) {
+            return true;
+        }
+        DevicePolicyManager devicePolicyManager =
+                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return devicePolicyManager.setPermissionGrantState(
+                admin,
+                context.getPackageName(),
+                permission,
+                DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
+    }
+
+    // Min API version required for DevicePolicyManager.getPermissionGrantState
+    @RequiresApi(Build.VERSION_CODES.M)
+    private static boolean hasPermissionGranted(
+            ComponentName componentName, Context context, String permission) {
+        DevicePolicyManager devicePolicyManager = context.getSystemService(DevicePolicyManager.class);
+        return devicePolicyManager.getPermissionGrantState(
+                componentName, context.getPackageName(), permission)
+                == DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED;
+    }
+
+    private static boolean isPermissionDangerous(String permission, Context context) {
+        PermissionInfo permissionInfo;
+        try {
+            permissionInfo = context.getPackageManager().getPermissionInfo(permission, 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            sLogger.logError("Failed to look up permission.", e);
+            return false;
+        }
+        return permissionInfo != null
+                && (permissionInfo.protectionLevel & PermissionInfo.PROTECTION_MASK_BASE)
+                == PermissionInfo.PROTECTION_DANGEROUS;
     }
 
 }
