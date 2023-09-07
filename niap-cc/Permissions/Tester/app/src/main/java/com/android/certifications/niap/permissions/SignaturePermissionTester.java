@@ -134,6 +134,8 @@ import android.provider.Telephony.Carriers;
 import android.provider.VoicemailContract.Voicemails;
 import android.se.omapi.Reader;
 import android.se.omapi.SEService;
+import android.security.IKeyChainService;
+import android.security.KeyChain;
 import android.security.keystore.KeyGenParameterSpec;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
@@ -2372,8 +2374,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
     void prepareTestBlock03()
     {
         mPermissionTasks.put(permission.NETWORK_MANAGED_PROVISIONING,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
+                    if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
                         // IWifiManager#setWifiEnabled
                         Parcel result = mTransacts.invokeTransact(Transacts.WIFI_SERVICE,
                                 Transacts.WIFI_DESCRIPTOR,
@@ -2386,8 +2388,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.MANAGE_ACCESSIBILITY,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
-                    if (mDeviceApiLevel == Build.VERSION_CODES.Q) {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
+                    if (mDeviceApiLevel == VERSION_CODES.Q) {
                         invokeReflectionCall(mAccessibilityManager.getClass(),
                                 "getAccessibilityShortcutService", mAccessibilityManager, null);
                     } else {
@@ -2413,7 +2415,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         //TODO : This Test Shows Dialogue
         mPermissionTasks.put(permission.REVIEW_ACCESSIBILITY_SERVICES,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
 
                     if(Constants.BYPASS_TESTS_AFFECTING_UI)
                         throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
@@ -2430,14 +2432,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // specified before the permission can be checked.
 
         mPermissionTasks.put(permission.WRITE_SETTINGS_HOMEPAGE_DATA,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
                     mContentResolver.query(Uri.parse(
                                     "content://com.android.settings.homepage.CardContentProvider/cards"),
                             null, null, null);
                 }));
 
         mPermissionTasks.put(permission.MANAGE_APP_PREDICTIONS,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
                     invokeReflectionCall(ShortcutManager.class, "getShareTargets",
                             mContext.getSystemService(Context.SHORTCUT_SERVICE),
                             new Class[]{IntentFilter.class}, new IntentFilter());
@@ -2446,7 +2448,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // android.permission.MANAGE_DEBUGGING - the adb service is guarded by SELinux policy.
 
         mPermissionTasks.put(permission.USE_BIOMETRIC_INTERNAL,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
                     mTransacts.invokeTransact(Transacts.BIOMETRIC_SERVICE, Transacts.BIOMETRIC_DESCRIPTOR,
                             Transacts.hasEnrolledBiometrics, 0, mPackageName);
                 }));
@@ -2455,7 +2457,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // SELinux policy.
 
         mPermissionTasks.put(permission.OBSERVE_ROLE_HOLDERS, new PermissionTest(false,
-                Build.VERSION_CODES.Q, () -> {
+                VERSION_CODES.Q, () -> {
             IOnRoleHoldersChangedListener listener = new IOnRoleHoldersChangedListener() {
                 @Override
                 public void onRoleHoldersChanged(String roleName, int userId) {
@@ -2475,7 +2477,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
 
         mPermissionTasks.put(permission.MANAGE_BIOMETRIC,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
 
                     try {
                         mTransacts.invokeTransact(Transacts.FACE_SERVICE, Transacts.FACE_DESCRIPTOR,
@@ -2484,7 +2486,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         // For devices without the face service the fingerprint service can be
                         // used to test this permission. The lock_settings service also uses
                         // this permission, but it is guarded by SELinux policy.
-                        if (mDeviceApiLevel >= Build.VERSION_CODES.TIRAMISU) {
+                        if (mDeviceApiLevel >= VERSION_CODES.TIRAMISU) {
                             mTransacts.invokeTransact(Transacts.FINGERPRINT_SERVICE,
                                     Transacts.FINGERPRINT_DESCRIPTOR,
                                     Transacts.cancelAuthenticationFromService, 0, getActivityToken(),
@@ -2502,16 +2504,16 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // one of the AudioEffect classes which are all guarded behind the reflection greylist.
 
         mPermissionTasks.put(permission.MANAGE_ROLLBACKS,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
                     Object manager = mContext.getSystemService("rollback");
                     invokeReflectionCall(manager.getClass(), "getAvailableRollbacks", manager,
                             null);
                 }));
 
         mPermissionTasks.put(permission.TEST_MANAGE_ROLLBACKS,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
                     // The reloadPersistedData API was only available via reflection in Q
-                    if (mDeviceApiLevel == Build.VERSION_CODES.Q) {
+                    if (mDeviceApiLevel == VERSION_CODES.Q) {
                         Object manager = mContext.getSystemService("rollback");
                         invokeReflectionCall(manager.getClass(), "reloadPersistedData", manager,
                                 null);
@@ -2524,8 +2526,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         //Moved to internal permission as of 31
         mPermissionTasks.put(permission.MANAGE_SENSOR_PRIVACY,
-                new PermissionTest(false, Build.VERSION_CODES.Q,
-                        Build.VERSION_CODES.R,() -> {
+                new PermissionTest(false, VERSION_CODES.Q,
+                        VERSION_CODES.R,() -> {
                     // ISensorPrivacyManager#setSensorPrivacy
                     mTransacts.invokeTransact(Transacts.SENSOR_PRIVACY_SERVICE,
                             Transacts.SENSOR_PRIVACY_DESCRIPTOR,
@@ -2533,18 +2535,18 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.WIFI_SET_DEVICE_MOBILITY_STATE,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
                     invokeReflectionCall(mWifiManager.getClass(), "setDeviceMobilityState",
                             mWifiManager, new Class[]{int.class}, 0);
                 }));
 
         mPermissionTasks.put(permission.MANAGE_BIOMETRIC_DIALOG,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
-                    if (mDeviceApiLevel == Build.VERSION_CODES.Q) {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
+                    if (mDeviceApiLevel == VERSION_CODES.Q) {
                         mTransacts.invokeTransact(Transacts.STATUS_BAR_SERVICE,
                                 Transacts.STATUS_BAR_DESCRIPTOR,
                                 Transacts.hideBiometricDialog);
-                    } else if (mDeviceApiLevel >= Build.VERSION_CODES.TIRAMISU) {
+                    } else if (mDeviceApiLevel >= VERSION_CODES.TIRAMISU) {
                         mTransacts.invokeTransact(Transacts.STATUS_BAR_SERVICE,
                                 Transacts.STATUS_BAR_DESCRIPTOR,
                                 Transacts.onBiometricHelp, 0, "test");
@@ -2556,7 +2558,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.START_VIEW_PERMISSION_USAGE,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
 
                     if(Constants.BYPASS_TESTS_AFFECTING_UI)
                         throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
@@ -2565,7 +2567,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         Intent intent = new Intent("android.intent.action.VIEW_PERMISSION_USAGE")
                                 .putExtra("android.intent.extra.PERMISSION_GROUP_NAME",
                                         "android.permission-group.CAMERA");
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        if (Build.VERSION.SDK_INT >= VERSION_CODES.S) {
                             //Corresponding Activity will be missing since S, so try to test an activity on
                             //the companion app instead.
                             intent.setComponent(new
@@ -2592,14 +2594,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // user.
 
         mPermissionTasks.put(permission.WIFI_UPDATE_USABILITY_STATS_SCORE,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
                     invokeReflectionCall(mWifiManager.getClass(), "updateWifiUsabilityScore",
                             mWifiManager, new Class[]{int.class, int.class, int.class}, 0, 0, 0);
                 }));
 
         mPermissionTasks.put(permission.WHITELIST_RESTRICTED_PERMISSIONS,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
+                    if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
                         Set<String> permissions = mPackageManager.getWhitelistedRestrictedPermissions(
                                 "android", PackageManager.FLAG_PERMISSION_WHITELIST_SYSTEM);
                     }
@@ -2609,7 +2611,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // SELinux policy.
 
         mPermissionTasks.put(permission.GET_RUNTIME_PERMISSIONS,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
                     invokeReflectionCall(mPackageManager.getClass(), "getPermissionFlags",
                             mPackageManager,
                             new Class[]{String.class, String.class, UserHandle.class},
@@ -2621,7 +2623,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // configuration.
 
         mPermissionTasks.put(permission.READ_DEVICE_CONFIG,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
                     try {
                         invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
                                 "getProperty", null, new Class[]{String.class, String.class},
@@ -2632,14 +2634,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.ADJUST_RUNTIME_PERMISSIONS_POLICY,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, VERSION_CODES.Q, () -> {
                     mTransacts.invokeTransact(Transacts.PACKAGE_SERVICE, Transacts.PACKAGE_DESCRIPTOR,
                             Transacts.getRuntimePermissionsVersion, 0);
                 }));
 
         // Following are the new permissions for Android 11.
         mPermissionTasks.put(permission.ACCESS_CONTEXT_HUB,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     // As of Android 11 all ACCESS_CONTEXT_HUB guarded methods are also guarded by
                     // ACCESS_LOCATION_HARDWARE.
                     Object contextHubManager = mContext.getSystemService("contexthub");
@@ -2648,7 +2650,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.ACCESS_LOCUS_ID_USAGE_STATS,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     // This permission guards access to locus events from other apps; the companion
                     // app should first be run to generate a locus event that can be queried by
                     // this test.
@@ -2674,14 +2676,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.ACCESS_MESSAGES_ON_ICC,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     SmsManager smsManager = SmsManager.getSmsManagerForSubscriptionId(0);
                     invokeReflectionCall(smsManager.getClass(), "getAllMessagesFromIcc", smsManager,
                             null);
                 }));
 
         mPermissionTasks.put(permission.ACCESS_VIBRATOR_STATE,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     mTransacts.invokeTransact(Transacts.VIBRATOR_SERVICE, Transacts.VIBRATOR_DESCRIPTOR,
                             Transacts.isVibrating);
                 }));
@@ -2689,7 +2691,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         //The permission had been removed as of SDK 31
         mPermissionTasks.put(permission.ASSOCIATE_INPUT_DEVICE_TO_DISPLAY_BY_PORT,
                 new PermissionTest(false,
-                        Build.VERSION_CODES.R,Build.VERSION_CODES.R, () -> {
+                        VERSION_CODES.R, VERSION_CODES.R, () -> {
                     mTransacts.invokeTransact(Transacts.INPUT_SERVICE, Transacts.INPUT_DESCRIPTOR,
                             Transacts.removePortAssociation, "testPort");
                 }));
@@ -2704,7 +2706,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // way to create an AudioMix for this test.
 
         mPermissionTasks.put(permission.COMPANION_APPROVE_WIFI_CONNECTIONS,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     // CompanionDeviceManager#isDeviceAssociatedForWifiConnection is the only
                     // method that is guarded by this permission. While it does check
                     // MANAGE_COMPANION_DEVICES first it will ultimately return true if all of
@@ -2727,14 +2729,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
 
         mPermissionTasks.put(permission.CONFIGURE_INTERACT_ACROSS_PROFILES,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     mTransacts.invokeTransact(Transacts.CROSS_PROFILE_APPS_SERVICE,
                             Transacts.CROSS_PROFILE_APPS_DESCRIPTOR,
                             Transacts.clearInteractAcrossProfilesAppOps);
                 }));
 
         mPermissionTasks.put(permission.CONTROL_DEVICE_LIGHTS,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     @SuppressLint("WrongConstant") Object lightsManager = mContext.getSystemService("lights");
                     invokeReflectionCall(lightsManager.getClass(), "getLights", lightsManager,
                             null);
@@ -2742,7 +2744,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         //TODO: This Test Hide Activity and Show Home Page
         mPermissionTasks.put(permission.ENTER_CAR_MODE_PRIORITIZED,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     if(Constants.BYPASS_TESTS_AFFECTING_UI)
                         throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
 
@@ -2757,15 +2759,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.KEYPHRASE_ENROLLMENT_APPLICATION,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     mTransacts.invokeTransact(Transacts.VOICE_INTERACTION_SERVICE,
                             Transacts.VOICE_INTERACTION_DESCRIPTOR,
                             Transacts.updateKeyphraseSoundModel, (Object) null);
                 }));
 
         mPermissionTasks.put(permission.LISTEN_ALWAYS_REPORTED_SIGNAL_STRENGTH,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
+                    if (Build.VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
                         //The way to using the listner was obsolated after android T, so let me choose using this option instead
                         //https://cs.android.com/android/platform/superproject/+/master:cts/tests/tests/telephony/current/src/android/telephony/cts/PhoneStateListenerTest.java;l=328;drc=e64188140ba71c7b7424b044119b37af1dde6609?=4186
                         //problem : if the signature does not match it always fail,because the method also checks MODIFY_PHONE_STATE permission
@@ -2825,14 +2827,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // policy.
 
         mPermissionTasks.put(permission.LOG_COMPAT_CHANGE,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     mTransacts.invokeTransact(Transacts.PLATFORM_COMPAT_SERVICE,
                             Transacts.PLATFORM_COMPAT_DESCRIPTOR,
                             Transacts.reportChangeByUid, 0, mUid);
                 }));
 
         mPermissionTasks.put(permission.MANAGE_COMPANION_DEVICES,
-                new PermissionTest(false, Build.VERSION_CODES.P, () -> {
+                new PermissionTest(false, VERSION_CODES.P, () -> {
                     // CompanionDeviceManager#isDeviceAssociatedForWifiConnection can be used for
                     // both this permission as well as COMPANION_APPROVE_WIFI_CONNECTION as it first
                     // checks for the MANAGE_COMPANION_DEVICES permission, then it checks if the
@@ -2850,10 +2852,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         //TODO : Clear App Cache Dialogue
         mPermissionTasks.put(permission.MANAGE_EXTERNAL_STORAGE,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     // Only an app granted this permission will receive a value of true back from
                     // this API.
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    if (Build.VERSION.SDK_INT >= VERSION_CODES.R) {
 
                         if(Constants.BYPASS_TESTS_AFFECTING_UI)
                             throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
@@ -2876,10 +2878,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.MARK_DEVICE_ORGANIZATION_OWNED,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     ComponentName componentName = new ComponentName(mContext, MainActivity.class);
                     //
-                    if (mDeviceApiLevel <= Build.VERSION_CODES.S_V2) {
+                    if (mDeviceApiLevel <= VERSION_CODES.S_V2) {
                         // If the permission is granted an active admin must first be granted to
                         // verify this test; since this is outside the scope of a permission test skip
                         // the test when the permission is granted.
@@ -2903,7 +2905,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.MEDIA_RESOURCE_OVERRIDE_PID,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     try {
                         mTransacts.invokeTransact(Transacts.RESOURCE_MANAGER_SERVICE,
                                 Transacts.RESOURCE_MANAGER_DESCRIPTOR, Transacts.overridePid,
@@ -2927,7 +2929,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.MODIFY_SETTINGS_OVERRIDEABLE_BY_RESTORE,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     invokeReflectionCall(Settings.System.class, "putString", null,
                             new Class[]{ContentResolver.class, String.class, String.class,
                                     boolean.class}, mContext.getContentResolver(), "vibrate_on",
@@ -2935,10 +2937,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.MONITOR_DEVICE_CONFIG_ACCESS,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     try {
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        if (Build.VERSION.SDK_INT >= VERSION_CODES.R) {
                             Class<?> onResultListenerClass = Class.forName(
                                     "android.os.RemoteCallback$OnResultListener");
                             Object onResultListener = Proxy.newProxyInstance(
@@ -2971,13 +2973,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.NETWORK_AIRPLANE_MODE,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     invokeReflectionCall(mConnectivityManager.getClass(), "setAirplaneMode",
                             mConnectivityManager, new Class[]{boolean.class}, false);
                 }));
 
         mPermissionTasks.put(permission.NETWORK_FACTORY,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     try {
                         HandlerThread handlerThread = new HandlerThread(TAG);
                         handlerThread.start();
@@ -3001,15 +3003,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.NETWORK_STATS_PROVIDER,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     mTransacts.invokeTransact(Transacts.NETWORK_STATS_SERVICE,
                             Transacts.NETWORK_STATS_DESCRIPTOR,
                             Transacts.registerNetworkStatsProvider, "testTag", null);
                 }));
 
         mPermissionTasks.put(permission.OBSERVE_NETWORK_POLICY,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
-                    if (mDeviceApiLevel < Build.VERSION_CODES.S) {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
+                    if (mDeviceApiLevel < VERSION_CODES.S) {
                         mTransacts.invokeTransact(Transacts.NET_POLICY_SERVICE,
                                 Transacts.NET_POLICY_DESCRIPTOR,
                                 Transacts.registerListener, (Object) null);
@@ -3021,14 +3023,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.OVERRIDE_COMPAT_CHANGE_CONFIG,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     mTransacts.invokeTransact(Transacts.PLATFORM_COMPAT_SERVICE,
                             Transacts.PLATFORM_COMPAT_DESCRIPTOR,
                             Transacts.clearOverridesForTest, mPackageName);
                 }));
 
         mPermissionTasks.put(permission.PEEK_DROPBOX_DATA,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
 
                     //Just to be safe, if the PEEK_DROPBOX_DATA permission is not granted
                     //but READ_LOGS and PACKAGE_USAGE_STATS are granted,
@@ -3068,7 +3070,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.RADIO_SCAN_WITHOUT_LOCATION,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     // if the app has been granted a location permission then skip this test as this
                     // permission is intended to allow scans without location.
                     if (mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -3093,7 +3095,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // SELinux policy.
 
         mPermissionTasks.put(permission.READ_COMPAT_CHANGE_CONFIG,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     try {
                         invokeReflectionCall(Class.forName("android.app.compat.CompatChanges"),
                                 "isChangeEnabled", null,
@@ -3105,7 +3107,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.RESTORE_RUNTIME_PERMISSIONS,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     @SuppressLint("WrongConstant") Object permissionControllerManager = mContext.getSystemService(
                             "permission_controller");
                     invokeReflectionCall(permissionControllerManager.getClass(),
@@ -3115,7 +3117,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.SECURE_ELEMENT_PRIVILEGED_OPERATION,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     final CountDownLatch latch = new CountDownLatch(1);
                     SEService.OnConnectedListener listener = () -> {
@@ -3160,13 +3162,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.SET_INITIAL_LOCK,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     invokeReflectionCall(mKeyguardManager.getClass(), "setLock", mKeyguardManager,
                             new Class[]{int.class, byte[].class, int.class}, 0, new byte[0], 0);
                 }));
 
         mPermissionTasks.put(permission.SYSTEM_CAMERA,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     try {
                         String[] cameraIds = mCameraManager.getCameraIdList();
                         for (String cameraId : cameraIds) {
@@ -3197,22 +3199,22 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // policy.
 
         mPermissionTasks.put(permission.UPGRADE_RUNTIME_PERMISSIONS,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     Object permissionManager = mContext.getSystemService("permission");
                     invokeReflectionCall(permissionManager.getClass(),
                             "getRuntimePermissionsVersion", permissionManager, null);
                 }));
 
         mPermissionTasks.put(permission.VIBRATE_ALWAYS_ON,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     mTransacts.invokeTransact(Transacts.VIBRATOR_SERVICE, Transacts.VIBRATOR_DESCRIPTOR,
                             Transacts.setAlwaysOnEffect, mUid, mPackageName, 0, null,
                             null);
                 }));
 
         mPermissionTasks.put(permission.WHITELIST_AUTO_REVOKE_PERMISSIONS,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
-                    if (mDeviceApiLevel < Build.VERSION_CODES.S) {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
+                    if (mDeviceApiLevel < VERSION_CODES.S) {
                         mTransacts.invokeTransact(Transacts.PERMISSION_MANAGER_SERVICE,
                                 Transacts.PERMISSION_MANAGER_DESCRIPTOR,
                                 Transacts.isAutoRevokeWhitelisted, mPackageName, true,
@@ -3225,7 +3227,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.USE_INSTALLER_V2,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     PackageInstaller packageInstaller = mPackageManager.getPackageInstaller();
                     try {
                         int sessionId = packageInstaller.createSession(
@@ -3240,7 +3242,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.ADD_TRUSTED_DISPLAY,
-                new PermissionTest(false, Build.VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R, () -> {
                     // DisplayManager#VIRTUAL_DISPLAY_FLAG_TRUSTED is set to 1 << 10, but the
                     // flag is hidden so use the constant value for this test.
                     mDisplayManager.createVirtualDisplay(TAG, 10, 10, 1, null,
@@ -3250,13 +3252,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         // The following are the new signature permissions for Android 12.
         mPermissionTasks.put(permission.ASSOCIATE_INPUT_DEVICE_TO_DISPLAY,
-                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                new PermissionTest(false, VERSION_CODES.S, () -> {
                     mTransacts.invokeTransact(Transacts.INPUT_SERVICE, Transacts.INPUT_DESCRIPTOR,
                             Transacts.removePortAssociation, "testPort");
                 }));
 
         mPermissionTasks.put(permission.CAMERA_INJECT_EXTERNAL_CAMERA,
-                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                new PermissionTest(false, VERSION_CODES.S, () -> {
                     Object injectionCallback;
                     Object injectionSession;
                     try {
@@ -3297,7 +3299,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         throw new UnexpectedPermissionTestFailureException(e);
                     }
                     try {
-                        if(mDeviceApiLevel >= Build.VERSION_CODES.S_V2){
+                        if(mDeviceApiLevel >= VERSION_CODES.S_V2){
                             mTransacts.invokeTransact(Transacts.CAMERA_SERVICE,
                                     Transacts.CAMERA_DESCRIPTOR,
                                     Transacts.injectCamera, mContext.getPackageName(),
@@ -3328,15 +3330,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // CAPTURE_BLACKOUT_CONTENT requires another app with FLAG_SECURE set.
 
         mPermissionTasks.put(permission.CLEAR_FREEZE_PERIOD,
-                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                new PermissionTest(false, VERSION_CODES.S, () -> {
                     mTransacts.invokeTransact(Transacts.DEVICE_POLICY_SERVICE,
                             Transacts.DEVICE_POLICY_DESCRIPTOR,
                             Transacts.clearSystemUpdatePolicyFreezePeriodRecord);
                 }));
 
         mPermissionTasks.put(permission.CONTROL_DEVICE_STATE,
-                new PermissionTest(false, Build.VERSION_CODES.S,
-                        Build.VERSION_CODES.S, () -> {
+                new PermissionTest(false, VERSION_CODES.S,
+                        VERSION_CODES.S, () -> {
                     @SuppressLint("WrongConstant") Object deviceStateManager
                             = mContext.getSystemService("device_state");
                     Class<?> deviceStateRequestClass = null;
@@ -3355,13 +3357,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // CONTROL_OEM_PAID_NETWORK_PREFERENCE requires a device that supports automotive.
 
         mPermissionTasks.put(permission.FORCE_DEVICE_POLICY_MANAGER_LOGS,
-                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                new PermissionTest(false, VERSION_CODES.S, () -> {
                     mTransacts.invokeTransact(Transacts.DEVICE_POLICY_SERVICE,
                             Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.forceSecurityLogs);
                 }));
 
         mPermissionTasks.put(permission.INPUT_CONSUMER,
-                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                new PermissionTest(false, VERSION_CODES.S, () -> {
                     mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
                             Transacts.createInputConsumer, getActivityToken(), "test", 1, null);
                 }));
@@ -3371,7 +3373,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // INSTALL_TEST_ONLY_PACKAGE check before failing.
 
         mPermissionTasks.put(permission.KEEP_UNINSTALLED_PACKAGES,
-                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                new PermissionTest(false, VERSION_CODES.S, () -> {
                     mTransacts.invokeTransact(Transacts.PACKAGE_SERVICE,
                             Transacts.PACKAGE_DESCRIPTOR, Transacts.setKeepUninstalledPackages,
                             List.of("com.example.app"));
@@ -3379,20 +3381,38 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         //The test launches Intent
         mPermissionTasks.put(permission.MANAGE_CREDENTIAL_MANAGEMENT_APP,
-                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
-
-                    if(Constants.BYPASS_TESTS_AFFECTING_UI)
-                        throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
-
+                new PermissionTest(false, VERSION_CODES.S, () -> {
 
                     Intent intent = new Intent();
                     intent.setAction("android.security.IKeyChainService");
                     intent.setComponent(new ComponentName(Constants.KEY_CHAIN_PACKAGE,
                             Constants.KEY_CHAIN_PACKAGE + ".KeyChainService"));
 
-                    mTransacts.invokeTransactWithServiceFromIntent(mContext, intent,
-                            Transacts.KEY_CHAIN_DESCRIPTOR,
-                            Transacts.removeCredentialManagementApp);
+                    if(Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE){
+                        Thread thread = new Thread(() -> {
+                            try {
+                                KeyChain.removeCredentialManagementApp(mContext);
+                            } catch (Exception ex){
+                                ex.printStackTrace();
+                                mLogger.logSystem(ex.getMessage());
+                            }
+                        });
+                        thread.start();
+                        try {
+                            thread.join(2000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    } else {
+                        mTransacts.invokeTransactWithServiceFromIntent(mContext, intent,
+                                Transacts.KEY_CHAIN_DESCRIPTOR,
+                                Transacts.removeCredentialManagementApp);
+
+                    }
+
+                   // mTransacts.invokeTransact(mKeyCh)
+
                 }));
     }
     void prepareTestBlock04()

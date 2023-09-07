@@ -24,6 +24,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
+import android.app.role.RoleManager;
 import android.companion.AssociationRequest;
 import android.companion.BluetoothDeviceFilter;
 import android.companion.CompanionDeviceManager;
@@ -237,9 +238,17 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
         }
 
 
+
+
+
         PreferenceManager.setDefaultValues(this, R.xml.preference, false);
         mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         mAdminName = new ComponentName(this, Admin.class);
+
+
+
+
+        //getRoleHolders(RoleManager.ROLE_DEVICE_POLICY_MANAGEMENT);
 
         // Obtain the list of configurations from the ConfigurationFactory and create a separate
         // button to allow the user to invoke each.
@@ -403,7 +412,16 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                 break;
             case R.id.action_remove_device_admin:
                 try {
-                    mDevicePolicyManager.clearDeviceOwnerApp(mContext.getPackageName());
+                    RoleManager rm = mContext.getSystemService(RoleManager.class);
+                    String dpmrole = "android.app.role.DEVICE_POLICY_MANAGEMENT";
+                    sLogger.logSystem(String.format(
+                            "role=%s %b %b %s",dpmrole, rm.isRoleHeld(dpmrole),rm.isRoleAvailable(dpmrole),
+                            "test"
+
+                    ));
+                    //mDevicePolicyManager.clearDeviceOwnerApp(mContext.getPackageName());
+
+
                 } catch (Exception ex){
                     ex.printStackTrace();
                 }

@@ -2671,6 +2671,7 @@ public class Transacts {
                 }
             }
             binder.transact(transactId, data, reply, 0);
+
             reply.readException();
             return reply;
         } catch (RemoteException re) {

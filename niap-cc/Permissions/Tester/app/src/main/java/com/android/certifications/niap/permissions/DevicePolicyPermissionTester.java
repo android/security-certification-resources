@@ -6,13 +6,16 @@ import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.SystemUpdatePolicy;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.UserManager;
 
 import androidx.core.util.Consumer;
 
+import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -20,6 +23,7 @@ import com.android.certifications.niap.permissions.utils.InternalPermissions;
 import com.android.certifications.niap.permissions.utils.PermissionUtils;
 import com.android.certifications.niap.permissions.utils.Transacts;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,36 +46,53 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
         mPermissionTasks = new HashMap<>();
         applyTests(mPermissionTasks);
     }
-
+    public IBinder getActivityToken() {
+        try {
+            Field tokenField = Activity.class.getDeclaredField("mToken");
+            tokenField.setAccessible(true);
+            return (IBinder) tokenField.get(mActivity);
+        } catch (ReflectiveOperationException e) {
+            throw new UnexpectedPermissionTestFailureException(e);
+        }
+    }
     private void applyTests(Map<String, PermissionTest> m) {
 
         final String PACKAGE_NAME = mContext.getPackageName();
         final ComponentName ADMIN_COMPONENT
                 = new ComponentName(PACKAGE_NAME,PACKAGE_NAME+".receivers.Admin");
+        DevicePolicyManager dpm =
+                (DevicePolicyManager)
+                        mActivity.getSystemService(Context.DEVICE_POLICY_SERVICE);
+
+        //mContext.getApplicationInfo();
+        //int id = mAppInfo.uid;//The kernel user-ID that has been assigned to this application; currently this is not a unique ID
 
 
-        //Manage Device Policy Group :
+
+         //Manage Device Policy Group :
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_CAMERA,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        mTransacts.invokeTransact(
-                                Transacts.DEVICE_POLICY_SERVICE,
-                                Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setCameraDisabled,
-                                ADMIN_COMPONENT,PACKAGE_NAME,false,true
-                        );
+//                        mTransacts.invokeTransact(
+//                                Transacts.DEVICE_POLICY_SERVICE,
+//                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+//                                Transacts.setCameraDisabled,
+//                                ADMIN_COMPONENT,PACKAGE_NAME,false,true
+//                        );
+                        dpm.setCameraDisabled(ADMIN_COMPONENT,false);
                     }
                 }));
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_ACCOUNT_MANAGEMENT,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        mTransacts.invokeTransact(
-                                Transacts.DEVICE_POLICY_SERVICE,
-                                Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setAccountManagementDisabled,
-                                ADMIN_COMPONENT,PACKAGE_NAME,"accountType",true,true
-                        );
+//                        mTransacts.invokeTransact(
+//                                Transacts.DEVICE_POLICY_SERVICE,
+//                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+//                                Transacts.setAccountManagementDisabled,
+//                                ADMIN_COMPONENT,PACKAGE_NAME,"accountType",true,true
+//                        );
+                        dpm.setAccountManagementDisabled(ADMIN_COMPONENT,"accountType",false);
                         //
                     }
                 }));
@@ -89,22 +110,21 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                                 Transacts.setApplicationExemptions,
                                 PACKAGE_NAME,PACKAGE_NAME,new int[]{4}
                         );
+
                         //
                     }
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_APP_RESTRICTIONS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-
-
-                        //Failed for other reason
                         //java.lang.SecurityException: Calling identity is not authorized
-                        mTransacts.invokeTransact(
-                                Transacts.DEVICE_POLICY_SERVICE,
-                                Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setApplicationRestrictions,ADMIN_COMPONENT,
-                                PACKAGE_NAME,PACKAGE_NAME,new Bundle()
-                        );
+//                        mTransacts.invokeTransact(
+//                                Transacts.DEVICE_POLICY_SERVICE,
+//                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+//                                Transacts.setApplicationRestrictions,ADMIN_COMPONENT,
+//                                PACKAGE_NAME,PACKAGE_NAME,new Bundle()
+//                        );
+                        dpm.setApplicationRestrictions(ADMIN_COMPONENT,PACKAGE_NAME,new Bundle());
                         //
                     }
                 }));
@@ -113,12 +133,14 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
 
-                        mTransacts.invokeTransact(
-                                Transacts.DEVICE_POLICY_SERVICE,
-                                Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setUserControlDisabledPackages,ADMIN_COMPONENT,
-                                PACKAGE_NAME,List.of("com.package","com.package2")
-                        );
+//                        mTransacts.invokeTransact(
+//                                Transacts.DEVICE_POLICY_SERVICE,
+//                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+//                                Transacts.setUserControlDisabledPackages,ADMIN_COMPONENT,
+//                                PACKAGE_NAME,List.of("com.package","com.package2")
+//                        );
+
+                        dpm.setUserControlDisabledPackages(ADMIN_COMPONENT,List.of("com.package","com.package2"));
                     }
                 }));
 
@@ -141,26 +163,28 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
 
-                        mTransacts.invokeTransact(
-                                Transacts.DEVICE_POLICY_SERVICE,
-                                Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setCommonCriteriaModeEnabled,
-                                ADMIN_COMPONENT, PACKAGE_NAME,true
-                        );
+//                        mTransacts.invokeTransact(
+//                                Transacts.DEVICE_POLICY_SERVICE,
+//                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+//                                Transacts.setCommonCriteriaModeEnabled,
+//                                ADMIN_COMPONENT, PACKAGE_NAME,true
+//                        );
+
+                        dpm.setCommonCriteriaModeEnabled(ADMIN_COMPONENT,true);
                         //
                     }
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_DEFAULT_SMS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-
-                        mTransacts.invokeTransact(
-                                Transacts.DEVICE_POLICY_SERVICE,
-                                Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setDefaultSmsApplication,
-                                ADMIN_COMPONENT, PACKAGE_NAME,
-                                "sms.packagename",true
-                        );
+//                        mTransacts.invokeTransact(
+//                                Transacts.DEVICE_POLICY_SERVICE,
+//                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+//                                Transacts.setDefaultSmsApplication,
+//                                ADMIN_COMPONENT, PACKAGE_NAME,
+//                                "sms.packagename",true
+//                        );
+                        dpm.setDefaultSmsApplication(ADMIN_COMPONENT,"sms.packagename");
                         //
                     }
                 }));
@@ -168,7 +192,6 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_FACTORY_RESET,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -425,11 +448,14 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
 
-                        mTransacts.invokeTransact(
+
+                        dpm.setUsbDataSignalingEnabled(true);
+
+                        /*mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
                                 Transacts.setUsbDataSignalingEnabled,
-                                PACKAGE_NAME,true);
+                                PACKAGE_NAME,true);*/
                     }
                 }));
 
@@ -697,66 +723,78 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_SYSTEM_DIALOGS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        mTransacts.invokeTransact(
-                                Transacts.DEVICE_POLICY_SERVICE,
-                                Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setUserRestriction,
-                                ADMIN_COMPONENT,PACKAGE_NAME,
-                                UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS,false,true);
+//                        mTransacts.invokeTransact(
+//                                Transacts.DEVICE_POLICY_SERVICE,
+//                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+//                                Transacts.setUserRestriction,
+//                                ADMIN_COMPONENT,PACKAGE_NAME,
+//                                UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS,false,true);
+                        dpm.clearUserRestriction(ADMIN_COMPONENT,UserManager.DISALLOW_SYSTEM_ERROR_DIALOGS);
                     }
                 }));
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_TIME,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        mTransacts.invokeTransact(
-                                Transacts.DEVICE_POLICY_SERVICE,
-                                Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setUserRestriction,
-                                ADMIN_COMPONENT,PACKAGE_NAME,
-                                UserManager.DISALLOW_CONFIG_DATE_TIME,false,true);
+//                        mTransacts.invokeTransact(
+//                                Transacts.DEVICE_POLICY_SERVICE,
+//                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+//                                Transacts.setUserRestriction,
+//                                ADMIN_COMPONENT,PACKAGE_NAME,
+//                                UserManager.DISALLOW_CONFIG_DATE_TIME,false,true);
+
+                        dpm.clearUserRestriction(ADMIN_COMPONENT,UserManager.DISALLOW_CONFIG_DATE_TIME);
                     }
                 }));
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_VPN,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        mTransacts.invokeTransact(
-                                Transacts.DEVICE_POLICY_SERVICE,
-                                Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setUserRestriction,
-                                ADMIN_COMPONENT,PACKAGE_NAME,
-                                UserManager.DISALLOW_CONFIG_VPN,false,true);
+//                        mTransacts.invokeTransact(
+//                                Transacts.DEVICE_POLICY_SERVICE,
+//                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+//                                Transacts.setUserRestriction,
+//                                ADMIN_COMPONENT,PACKAGE_NAME,
+//                                UserManager.DISALLOW_CONFIG_VPN,false,true);
+
+                        dpm.clearUserRestriction(ADMIN_COMPONENT,UserManager.DISALLOW_CONFIG_VPN);
                     }
                 }));
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_WALLPAPER,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        mTransacts.invokeTransact(
-                                Transacts.DEVICE_POLICY_SERVICE,
-                                Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setUserRestriction,
-                                ADMIN_COMPONENT,PACKAGE_NAME,
-                                UserManager.DISALLOW_SET_WALLPAPER,false,true);
+//                        mTransacts.invokeTransact(
+//                                Transacts.DEVICE_POLICY_SERVICE,
+//                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+//                                Transacts.setUserRestriction,
+//                                ADMIN_COMPONENT,PACKAGE_NAME,
+//                                UserManager.DISALLOW_SET_WALLPAPER,false,true);
+
+                        dpm.clearUserRestriction(ADMIN_COMPONENT,UserManager.DISALLOW_SET_WALLPAPER);
                     }
                 }));
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_WINDOWS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        mTransacts.invokeTransact(
-                                Transacts.DEVICE_POLICY_SERVICE,
-                                Transacts.DEVICE_POLICY_DESCRIPTOR,
-                                Transacts.setUserRestriction,
-                                ADMIN_COMPONENT,PACKAGE_NAME,
-                                UserManager.DISALLOW_CREATE_WINDOWS,false,true);
+//                        mTransacts.invokeTransact(
+//                                Transacts.DEVICE_POLICY_SERVICE,
+//                                Transacts.DEVICE_POLICY_DESCRIPTOR,
+//                                Transacts.setUserRestriction,
+//                                ADMIN_COMPONENT,PACKAGE_NAME,
+//                                UserManager.DISALLOW_CREATE_WINDOWS,false,true);
+
+                        dpm.clearUserRestriction(ADMIN_COMPONENT,UserManager.DISALLOW_CREATE_WINDOWS);
                     }
                 }));
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_FUN,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
+
+
+
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
