@@ -95,6 +95,7 @@ import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.provider.Telephony;
 import android.provider.VoicemailContract.Voicemails;
 import android.service.notification.StatusBarNotification;
@@ -117,6 +118,7 @@ import com.android.certifications.niap.permissions.utils.Transacts;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -570,9 +572,31 @@ public class RuntimePermissionTester extends BasePermissionTester {
                     throw new UnexpectedPermissionTestFailureException(
                             "Unable to obtain an sound to test READ_MEDIA_AUDIO");
                 } else if (!cursor.moveToFirst()) {
-
                     throw new SecurityException("Failed to load media files:READ_MEDIA_AUDIO." +
                             "Pleaes ensure to execute the companion app before testing.");
+                } else {
+                    int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    //those file can be read after android udc without permissions...
+                    String[] acceptables = new String[]{"default_ringtone",
+                            "default_alarm_alert","default_notification_sound"};
+                    List<String> result = new ArrayList<String>();
+
+                    do{
+                        String fname = cursor.getString(index);
+                        boolean record=true;
+                        for(String a: acceptables){
+                            if(fname.startsWith(a)){
+                                record=false;
+                            }
+                        }
+                        if(record){
+                            result.add(fname);
+                        }
+                    }while(cursor.moveToNext());
+                    if (result.size() == 0){
+                        throw new SecurityException
+                                ("Failed to read any audio medias (they should be setup by the companion app)");
+                    }
                 }
 
             }));

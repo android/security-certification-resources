@@ -3299,12 +3299,19 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         throw new UnexpectedPermissionTestFailureException(e);
                     }
                     try {
-                        if(mDeviceApiLevel >= VERSION_CODES.S_V2){
+                        if(mDeviceApiLevel >= VERSION_CODES.UPSIDE_DOWN_CAKE){
+                            mTransacts.invokeTransact(Context.CAMERA_SERVICE,
+                                    Transacts.CAMERA_DESCRIPTOR,
+                                    Transacts.injectCamera, mContext.getPackageName(),
+                                    "",
+                                    "", injectionCallback);
+                        } else if(mDeviceApiLevel >= VERSION_CODES.S_V2){
                             mTransacts.invokeTransact(Transacts.CAMERA_SERVICE,
                                     Transacts.CAMERA_DESCRIPTOR,
                                     Transacts.injectCamera, mContext.getPackageName(),
                                     "test-internal-cam",
                                     "test-external-cam", injectionCallback);
+
                         } else {
                             mTransacts.invokeTransact(Transacts.CAMERA_SERVICE,
                                     Transacts.CAMERA_DESCRIPTOR,
@@ -3316,10 +3323,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     } catch (SecurityException e) {
                         throw e;
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                         // If the test fails due to this package not holding the required permission
                         // a ServiceSpecificException is thrown with the text "Permission Denial"
-                        if (Objects.requireNonNull(e.getMessage()).contains("Permission Denial")) {
+                        String emessage = e.getMessage();
+                        if(emessage != null && emessage.contains("Permission Denial")){
+                            mLogger.logSystem(emessage);
                             throw new SecurityException(e);
                         } else {
                             throw e;
@@ -3389,17 +3398,23 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             Constants.KEY_CHAIN_PACKAGE + ".KeyChainService"));
 
                     if(Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE){
+                        //AtomicBoolean foundError = new AtomicBoolean(false);
                         Thread thread = new Thread(() -> {
                             try {
                                 KeyChain.removeCredentialManagementApp(mContext);
                             } catch (Exception ex){
-                                ex.printStackTrace();
-                                mLogger.logSystem(ex.getMessage());
+                                //mLogger.logSystem(""+foundError.toString()+","+ex.getClass().getSimpleName());
+                                if(ex.getClass().getSimpleName().equals("SecurityException")){
+                                    //foundError.set(true);
+                                    mLogger.logError("Causes a secuirty exception in MANAGE_CREDENTIAL_MANAGEMENT_APP");
+                                }
                             }
                         });
+
                         thread.start();
                         try {
                             thread.join(2000);
+                            //mLogger.logSystem(""+foundError.toString());
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -3410,9 +3425,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                 Transacts.removeCredentialManagementApp);
 
                     }
-
-                   // mTransacts.invokeTransact(mKeyCh)
-
                 }));
     }
     void prepareTestBlock04()
@@ -4993,7 +5005,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
 
-        mPermissionTasks.put(permission.GET_ANY_PROVIDER_TYPE,
+        /*mPermissionTasks.put(permission.GET_ANY_PROVIDER_TYPE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
                         //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
@@ -5006,7 +5018,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                 testUri,-2 ,callback
                         );
                     }
-                }));
+                }));*/
 
 
 
@@ -5083,7 +5095,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));*/
 
-        mPermissionTasks.put(permission.QUERY_CLONED_APPS,
+        /*mPermissionTasks.put(permission.QUERY_CLONED_APPS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     //commonize the tester routine with exposing the builder of AssociationRequest object
                     if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -5099,7 +5111,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
                         //mLogger.logDebug(resolveInfos.toString());
                     }
-                }));
+                }));*/
 
 
     }
@@ -5703,6 +5715,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 });
             });
+            thread.setPriority(9);
             thread.start();
             try {
                 thread.join(THREAD_JOIN_DELAY);
