@@ -346,6 +346,9 @@ public class InternalPermissionTester extends BasePermissionTester {
                     mTransacts.invokeTransact(Transacts.UI_MODE_SERVICE,
                             Transacts.UI_MODE_DESCRIPTOR, Transacts.requestProjection,
                             getActivityToken(), 1, mPackageName);
+
+                    /*mActivity.sendBroadcast(
+                            new Intent("android.intent.action.ACTION_USER_UNLOCKED"));*/
                 }));
 
 

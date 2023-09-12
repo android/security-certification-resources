@@ -411,13 +411,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
             mLauncherApps.getShortcuts(new ShortcutQuery().setQueryFlags(queryFlags),
                     Process.myUserHandle());
         }));
-
+        //CheckTransactCodeCredential(uint32_t cod)// GET_HDR_CAPABILITIES:
         mPermissionTasks.put(permission.ACCESS_SURFACE_FLINGER,
                 new PermissionTest(false, () -> {
                     // SurfaceFlinger.cpp CheckTransactCodeCredentials should check this;
                     // BOOT_FINISHED is set to FIRST_CALL_TRANSACTION since it is anticipated to be
                     // called from the ActivityManagerService.
-                    mTransacts.invokeTransact(Transacts.SURFACE_FLINGER_SERVICE,
+                    mTransacts.invokeTransact(
+                            Transacts.SURFACE_FLINGER_SERVICE,
                             Transacts.SURFACE_FLINGER_DESCRIPTOR,
                             Transacts.bootFinished);
                 }));
@@ -3400,25 +3401,29 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     if(Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE){
                         //AtomicBoolean foundError = new AtomicBoolean(false);
                         Thread thread = new Thread(() -> {
+                            boolean permissionGranted =
+                                    isPermissionGranted(permission.MANAGE_CREDENTIAL_MANAGEMENT_APP);
+                            mLogger.logSystem("Running CMANAGE_CREDENTIAL_MANAGEMENT_APP test case.");
                             try {
+
                                 KeyChain.removeCredentialManagementApp(mContext);
+                                getAndLogTestStatus(permission.MANAGE_CREDENTIAL_MANAGEMENT_APP,
+                                        permissionGranted, true);
                             } catch (Exception ex){
                                 //mLogger.logSystem(""+foundError.toString()+","+ex.getClass().getSimpleName());
-                                if(ex.getClass().getSimpleName().equals("SecurityException")){
-                                    //foundError.set(true);
-                                    mLogger.logError("Causes a secuirty exception in MANAGE_CREDENTIAL_MANAGEMENT_APP");
+                                 if(ex.getClass().getSimpleName().equals("SecurityException")){
+                                     getAndLogTestStatus(permission.MANAGE_CREDENTIAL_MANAGEMENT_APP,
+                                             permissionGranted, false);
                                 }
                             }
                         });
-
                         thread.start();
                         try {
-                            thread.join(2000);
-                            //mLogger.logSystem(""+foundError.toString());
+                            thread.join(500);
+                            throw new BypassTestException("The test launch on the new thread, it will finish after other test cases.");
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
-
                     } else {
                         mTransacts.invokeTransactWithServiceFromIntent(mContext, intent,
                                 Transacts.KEY_CHAIN_DESCRIPTOR,
@@ -4982,15 +4987,21 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                         "setInteractive",bOptions,
                                         new Class<?>[]{boolean.class},true
                                         );
-
+                        //mActivityManager.
                         //mLogger.logDebug(">"+bOptions.toString());
-                        mTransacts.invokeTransact(
+                        //https://source.corp.google.com/h/googleplex-android/platform/superproject/udc/+/udc-dev:frameworks/base/core/java/android/content/Intent.java;l=3525?q=android.intent.action.MEDIA_MOUNTED&sq=repo:googleplex-android%2Fplatform%2Fsuperproject%2Fudc%20branch:udc-dev
+
+                        mActivity.sendBroadcast(
+                                new Intent("android.intent.action.ACTION_USER_UNLOCKED"));
+                        //mActivity.sendBroadcast(
+                        //        new Intent("android.intent.action.MEDIA_SHARED"));
+                        /*mTransacts.invokeTransact(
                                 Context.ACTIVITY_SERVICE,
                                 Transacts.ACTIVITY_DESCRIPTOR,
                                 Transacts.broadcastIntentWithFeature,
                                 null, null, intent, null, null, 0, null, null,
                                 requiredPermissions, null, null, 0,
-                                bOptions, false, false, Binder.getCallingUid());//mUid);
+                                bOptions, false, false, Binder.getCallingUid());//mUid);*/
 
                     }
                 }));
@@ -5074,6 +5085,31 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                 CONTENT_URI,
                                 "SET_SYNC_DISABLED_MODE_config",null,args);
                     }
+                }));
+        mPermissionTasks.put(permission.ACCESS_GPU_SERVICE,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE,
+                        VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+
+                    //Object service = mContext.getSystemService("gpu_service");
+                    //mLogger.logSystem(""+service);
+                   // mLogger.logSystem();
+                    /*
+                    PropertyChangeSignal propertyChangeSignal = new PropertyChangeSignal();
+                    SystemProperties.addChangeCallback(propertyChangeSignal.getCountDownJob());
+                    mController.onPreferenceChange(mPreference, true);
+                    propertyChangeSignal.wait(100);
+
+                    // Step 2: verify results
+                    final String systemEGLDriver = SystemProperties.get(PROPERTY_PERSISTENT_GRAPHICS_EGL);
+                    assertThat(systemEGLDriver).isEqualTo(ANGLE_DRIVER_SUFFIX);
+
+                    // Step 3: clean up
+                    // Done with the test, remove the callback
+                    SystemProperties.removeChangeCallback(propertyChangeSignal.getCountDownJob());
+                    */
+                    //PropertyChangeS
+                     //SystemProperties.addChangeCallback
+
                 }));
 
         /*mPermissionTasks.put(permission.WAKEUP_SURFACE_FLINGER,

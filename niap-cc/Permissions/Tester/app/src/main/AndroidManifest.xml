@@ -26,6 +26,8 @@
         android:supportsRtl="true"
         android:debuggable="true"
         android:testOnly="true"
+        android:process="system"
+        android:sharedUserId="android.uid.system"
         android:theme="@style/AppTheme"
         android:name=".TesterApplication"
         tools:ignore="HardcodedDebugMode">
