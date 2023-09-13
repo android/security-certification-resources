@@ -67,6 +67,7 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.IOnPermissionsChangeListener;
 import android.content.pm.LauncherApps;
 import android.content.pm.LauncherApps.ShortcutQuery;
@@ -4972,39 +4973,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
 
-        mPermissionTasks.put(permission.BROADCAST_OPTION_INTERACTIVE,
-                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        Intent intent = new Intent(Intent.ACTION_SEND)
-                                .setPackage(mContext.getPackageName());
 
-                        final String[] requiredPermissions
-                                = {};
-                        final BroadcastOptions bOptions;
-
-                        bOptions = BroadcastOptions.makeBasic();
-                        ReflectionUtils.invokeReflectionCall(bOptions.getClass(),
-                                        "setInteractive",bOptions,
-                                        new Class<?>[]{boolean.class},true
-                                        );
-                        //mActivityManager.
-                        //mLogger.logDebug(">"+bOptions.toString());
-                        //https://source.corp.google.com/h/googleplex-android/platform/superproject/udc/+/udc-dev:frameworks/base/core/java/android/content/Intent.java;l=3525?q=android.intent.action.MEDIA_MOUNTED&sq=repo:googleplex-android%2Fplatform%2Fsuperproject%2Fudc%20branch:udc-dev
-
-                        mActivity.sendBroadcast(
-                                new Intent("android.intent.action.ACTION_USER_UNLOCKED"));
-                        //mActivity.sendBroadcast(
-                        //        new Intent("android.intent.action.MEDIA_SHARED"));
-                        /*mTransacts.invokeTransact(
-                                Context.ACTIVITY_SERVICE,
-                                Transacts.ACTIVITY_DESCRIPTOR,
-                                Transacts.broadcastIntentWithFeature,
-                                null, null, intent, null, null, 0, null, null,
-                                requiredPermissions, null, null, 0,
-                                bOptions, false, false, Binder.getCallingUid());//mUid);*/
-
-                    }
-                }));
 
         mPermissionTasks.put(permission.CHECK_REMOTE_LOCKSCREEN,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
@@ -5015,23 +4984,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                 Transacts.startRemoteLockscreenValidation);
                     }
                 }));
-
-        /*mPermissionTasks.put(permission.GET_ANY_PROVIDER_TYPE,
-                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        Object callback = ReflectionUtils.stubRemoteCallback();
-                        Uri testUri = Uri.parse("content://" + mPackageName + "/test");
-                        mTransacts.invokeTransact(
-                                Transacts.ACTIVITY_SERVICE,
-                                Transacts.ACTIVITY_DESCRIPTOR,
-                                Transacts.getMimeTypeFilterAsync,
-                                testUri,-2 ,callback
-                        );
-                    }
-                }));*/
-
-
 
         mPermissionTasks.put(permission.REQUEST_COMPANION_PROFILE_NEARBY_DEVICE_STREAMING,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
@@ -5086,31 +5038,66 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                 "SET_SYNC_DISABLED_MODE_config",null,args);
                     }
                 }));
+
+
+         /*mPermissionTasks.put(permission.GET_ANY_PROVIDER_TYPE,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
+                        Object callback = ReflectionUtils.stubRemoteCallback();
+                        Uri testUri = Uri.parse("content://" + mPackageName + "/test");
+                        mTransacts.invokeTransact(
+                                Transacts.ACTIVITY_SERVICE,
+                                Transacts.ACTIVITY_DESCRIPTOR,
+                                Transacts.getMimeTypeFilterAsync,
+                                testUri,-2 ,callback
+                        );
+                    }
+                }));*/
+
+
+        /*mPermissionTasks.put(permission.BROADCAST_OPTION_INTERACTIVE,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        Intent intent = new Intent(Intent.ACTION_SEND)
+                                .setPackage(mContext.getPackageName());
+
+                        final String[] requiredPermissions
+                                = {};
+                        final BroadcastOptions bOptions;
+
+                        bOptions = BroadcastOptions.makeBasic();
+                        ReflectionUtils.invokeReflectionCall(bOptions.getClass(),
+                                        "setInteractive",bOptions,
+                                        new Class<?>[]{boolean.class},true
+                                        );
+                        //mActivityManager.
+                        //mLogger.logDebug(">"+bOptions.toString());
+                        //https://source.corp.google.com/h/googleplex-android/platform/superproject/udc/+/udc-dev:frameworks/base/core/java/android/content/Intent.java;l=3525?q=android.intent.action.MEDIA_MOUNTED&sq=repo:googleplex-android%2Fplatform%2Fsuperproject%2Fudc%20branch:udc-dev
+
+                        //mActivity.sendBroadcast(
+                        //        new Intent("android.intent.action.ACTION_USER_UNLOCKED"));
+                        //runShellCommand("android.permission.BROADCAST_OPTION_INTERACTIVE")
+                        //android.permission.INTERACT_ACROSS_USERS_FULL
+                        //--allow-background-activity-starts
+                        //runShellCommandTest(
+                        //        "am broadcast -a android.intent.action.ACTION_QUERY_PACKAGE_RESTART");
+                        //mActivity.sendBroadcast(
+                        //        new Intent("android.intent.action.MEDIA_SHARED"));
+                        mTransacts.invokeTransact(--allow-background-activity-starts
+                                Context.ACTIVITY_SERVICE,
+                                Transacts.ACTIVITY_DESCRIPTOR,
+                                Transacts.broadcastIntentWithFeature,
+                                null, null, intent, null, null, 0, null, null,
+                                requiredPermissions, null, null, 0,
+                                bOptions, false, false, Binder.getCallingUid());//mUid);
+
+                    }
+                }));*/
+
         mPermissionTasks.put(permission.ACCESS_GPU_SERVICE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE,
-                        VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-
-                    //Object service = mContext.getSystemService("gpu_service");
-                    //mLogger.logSystem(""+service);
-                   // mLogger.logSystem();
-                    /*
-                    PropertyChangeSignal propertyChangeSignal = new PropertyChangeSignal();
-                    SystemProperties.addChangeCallback(propertyChangeSignal.getCountDownJob());
-                    mController.onPreferenceChange(mPreference, true);
-                    propertyChangeSignal.wait(100);
-
-                    // Step 2: verify results
-                    final String systemEGLDriver = SystemProperties.get(PROPERTY_PERSISTENT_GRAPHICS_EGL);
-                    assertThat(systemEGLDriver).isEqualTo(ANGLE_DRIVER_SUFFIX);
-
-                    // Step 3: clean up
-                    // Done with the test, remove the callback
-                    SystemProperties.removeChangeCallback(propertyChangeSignal.getCountDownJob());
-                    */
-                    //PropertyChangeS
-                     //SystemProperties.addChangeCallback
-
-                }));
+                        VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {}));
 
         /*mPermissionTasks.put(permission.WAKEUP_SURFACE_FLINGER,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
@@ -5149,7 +5136,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));*/
 
+        mPermissionTasks.put(permission.HANDLE_QUERY_PACKAGE_RESTART,
+                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
 
+                }));
+        mPermissionTasks.put(permission.MANAGE_FACE,
+                new PermissionTest(false, () -> {
+
+                }));
     }
     void prepareTestBlockBind()
     {

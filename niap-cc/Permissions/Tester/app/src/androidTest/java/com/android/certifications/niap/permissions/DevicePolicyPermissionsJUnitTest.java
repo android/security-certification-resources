@@ -168,21 +168,7 @@ public class DevicePolicyPermissionsJUnitTest {
         );
 
     }
-    class TestAssertLogger {
-        int inc = 0;
 
-        TestName name;
-        public TestAssertLogger(TestName name){
-            this.name = name;
-        }
-        String Msg(String desc){
-            inc++;
-            String line = name.getMethodName() + "(" + String.format("%03d",inc) +"):"+ desc;
-            Log.d("tag",line);
-
-            return line;
-        }
-    }
     public static class InternalTestConfiguration implements TestConfiguration {
         private Optional<List<String>> mPermissions;
 
