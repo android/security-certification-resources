@@ -48,6 +48,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.UiModeManager;
 import android.app.WallpaperManager;
+import android.app.admin.DeviceAdminReceiver;
 import android.app.admin.DevicePolicyManager;
 import android.app.role.IOnRoleHoldersChangedListener;
 import android.app.role.RoleManager;
@@ -71,6 +72,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.IOnPermissionsChangeListener;
 import android.content.pm.LauncherApps;
 import android.content.pm.LauncherApps.ShortcutQuery;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageInstaller;
 import android.content.pm.PackageInstaller.SessionParams;
 import android.content.pm.PackageManager;
@@ -131,6 +133,7 @@ import android.print.PrintManager;
 import android.provider.BlockedNumberContract.BlockedNumbers;
 import android.provider.CallLog.Calls;
 import android.provider.Settings;
+import android.provider.Telephony;
 import android.provider.Telephony.Carriers;
 import android.provider.VoicemailContract.Voicemails;
 import android.se.omapi.Reader;
@@ -151,10 +154,12 @@ import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.telephony.TelephonyScanManager;
+import android.text.style.BulletSpan;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.SurfaceControl;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 import android.view.accessibility.CaptioningManager;
 import android.widget.ListView;
@@ -412,7 +417,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
             mLauncherApps.getShortcuts(new ShortcutQuery().setQueryFlags(queryFlags),
                     Process.myUserHandle());
         }));
-        //CheckTransactCodeCredential(uint32_t cod)// GET_HDR_CAPABILITIES:
+
         mPermissionTasks.put(permission.ACCESS_SURFACE_FLINGER,
                 new PermissionTest(false, () -> {
                     // SurfaceFlinger.cpp CheckTransactCodeCredentials should check this;
@@ -421,7 +426,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     mTransacts.invokeTransact(
                             Transacts.SURFACE_FLINGER_SERVICE,
                             Transacts.SURFACE_FLINGER_DESCRIPTOR,
-                            Transacts.bootFinished);
+                            Transacts.showCpu);
                 }));
 
         mPermissionTasks.put(permission.ACCESS_VOICE_INTERACTION_SERVICE,
@@ -4900,14 +4905,38 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.SET_APP_SPECIFIC_LOCALECONFIG,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
+
+
+                        int n = 0;
+                        try {
+//                            List<PackageInfo> infor = mPackageManager
+//                                    .getInstalledPackages(PackageManager.PackageInfoFlags.of(0));
+//                            for(PackageInfo pi : infor){
+//                                mLogger.logSystem(""+pi.packageName);
+//                            }
+                            n = mPackageManager.getPackageUid
+                                    ("com.android.certifications.niap.permissions.companion",
+                                            mUid);
+                        } catch (PackageManager.NameNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                        mLogger.logSystem(String.format("uid %d %d %d",Binder.getCallingUid(),
+                                mUid,n));
+
                         LocaleList OVERRIDE_LOCALES =
                                 LocaleList.forLanguageTags("en-US,fr-FR,zh-Hant-TW");
-                        //mLocaleManager.setOverrideLocaleConfig(new LocaleConfig(OVERRIDE_LOCALES));
+
+
+
+                        //mLocaleManager.setOverrideLocaleConfig();
+                        //for checking it need to set other application locale config
+                        //
+
                         mTransacts.invokeTransact(
                                 Context.LOCALE_SERVICE,
                                 Transacts.LOCALE_DESCRIPTOR,
                                 Transacts.setOverrideLocaleConfig,
-                                mContext.getPackageName(),mUid,
+                                "com.android.certifications.niap.permissions.companion",mUid,
                                 new LocaleConfig(OVERRIDE_LOCALES));
                     }
                 }));
@@ -5039,84 +5068,78 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
 
+        //Skip permission check for GET_ANY_PROVIDER_TYPE//
 
-         /*mPermissionTasks.put(permission.GET_ANY_PROVIDER_TYPE,
-                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        //getMimeTypeFilterAsync(in Uri uri, int userId, in RemoteCallback resultCallback);
-                        Object callback = ReflectionUtils.stubRemoteCallback();
-                        Uri testUri = Uri.parse("content://" + mPackageName + "/test");
-                        mTransacts.invokeTransact(
-                                Transacts.ACTIVITY_SERVICE,
-                                Transacts.ACTIVITY_DESCRIPTOR,
-                                Transacts.getMimeTypeFilterAsync,
-                                testUri,-2 ,callback
-                        );
+        mPermissionTasks.put(permission.BROADCAST_OPTION_INTERACTIVE,
+            new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                if (android.os.Build.VERSION.SDK_INT >= 34) {
+
+                    final String[] requiredPermissions = {permission.BROADCAST_OPTION_INTERACTIVE};
+                    final String[] excludePermissions = {};
+                    final String[] excludePackages = {};
+                    final BroadcastOptions bOptions;
+                    bOptions = BroadcastOptions.makeBasic();
+
+                    //setInteractive true
+                    ReflectionUtils.invokeReflectionCall(bOptions.getClass(),
+                            "setInteractive",bOptions,
+                            new Class<?>[]{boolean.class},true
+                    );
+                    //isAlarmBroadcast() should be true
+                    ReflectionUtils.invokeReflectionCall(bOptions.getClass(),
+                            "setAlarmBroadcast",bOptions,
+                            new Class<?>[]{boolean.class},false
+                    );
+                    Intent[] intents = new Intent[]{new Intent(Intent.ACTION_VIEW)};
+                    //getIApplicationThread()
+                    Object activityThread = ReflectionUtils.invokeReflectionCall
+                            (Activity.class,"getActivityThread",mActivity,new Class<?>[]{});
+                    if(activityThread != null){
+                        Class atClazz;
+                        try {
+                            atClazz = Class.forName("android.app.ActivityThread");
+                            Object applicationThread = ReflectionUtils.invokeReflectionCall
+                                    (atClazz,"getApplicationThread",activityThread,
+                                            new Class<?>[]{});
+                             for(Intent i:intents) {
+                                try {
+                                    mTransacts.invokeTransact(
+                                            Context.ACTIVITY_SERVICE,
+                                            Transacts.ACTIVITY_DESCRIPTOR,
+                                            Transacts.broadcastIntentWithFeature,
+                                            applicationThread, "callingFeatureId",
+                                            i, "resolvedType", null, 0,
+                                            "resultData", new Bundle(), requiredPermissions, excludePermissions,
+                                            excludePackages, 0 /*appOp*/, bOptions.toBundle(), true, false, Binder.getCallingUid());
+
+                                } catch (Exception ex){
+                                    String name = ex.getClass().getSimpleName();
+                                    if(name.equals("SecurityException")) {
+                                        throw ex;
+                                    }
+                                }
+                            }
+                        } catch (ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
-                }));*/
 
-
-        /*mPermissionTasks.put(permission.BROADCAST_OPTION_INTERACTIVE,
-                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        Intent intent = new Intent(Intent.ACTION_SEND)
-                                .setPackage(mContext.getPackageName());
-
-                        final String[] requiredPermissions
-                                = {};
-                        final BroadcastOptions bOptions;
-
-                        bOptions = BroadcastOptions.makeBasic();
-                        ReflectionUtils.invokeReflectionCall(bOptions.getClass(),
-                                        "setInteractive",bOptions,
-                                        new Class<?>[]{boolean.class},true
-                                        );
-                        //mActivityManager.
-                        //mLogger.logDebug(">"+bOptions.toString());
-                        //https://source.corp.google.com/h/googleplex-android/platform/superproject/udc/+/udc-dev:frameworks/base/core/java/android/content/Intent.java;l=3525?q=android.intent.action.MEDIA_MOUNTED&sq=repo:googleplex-android%2Fplatform%2Fsuperproject%2Fudc%20branch:udc-dev
-
-                        //mActivity.sendBroadcast(
-                        //        new Intent("android.intent.action.ACTION_USER_UNLOCKED"));
-                        //runShellCommand("android.permission.BROADCAST_OPTION_INTERACTIVE")
-                        //android.permission.INTERACT_ACROSS_USERS_FULL
-                        //--allow-background-activity-starts
-                        //runShellCommandTest(
-                        //        "am broadcast -a android.intent.action.ACTION_QUERY_PACKAGE_RESTART");
-                        //mActivity.sendBroadcast(
-                        //        new Intent("android.intent.action.MEDIA_SHARED"));
-                        mTransacts.invokeTransact(--allow-background-activity-starts
-                                Context.ACTIVITY_SERVICE,
-                                Transacts.ACTIVITY_DESCRIPTOR,
-                                Transacts.broadcastIntentWithFeature,
-                                null, null, intent, null, null, 0, null, null,
-                                requiredPermissions, null, null, 0,
-                                bOptions, false, false, Binder.getCallingUid());//mUid);
-
-                    }
-                }));*/
+                }
+            }));
 
         mPermissionTasks.put(permission.ACCESS_GPU_SERVICE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE,
                         VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {}));
 
-        /*mPermissionTasks.put(permission.WAKEUP_SURFACE_FLINGER,
+        mPermissionTasks.put(permission.WAKEUP_SURFACE_FLINGER,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     //commonize the tester routine with exposing the builder of AssociationRequest object
                     if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                        mTransacts.invokeTransact(Transacts.SURFACE_FLINGER_SERVICE,
-                                Transacts.SURFACE_FLINGER_DESCRIPTOR, Transacts.showCpu);
-
-                        //Call setTransactionState
-
-                        //SurfaceControl c = new SurfaceControl.Builder().build();
-                        //SurfaceControl.Transaction tran = new SurfaceControl.Transaction();
-                        //setTransactionState native method contains the check for this permission.
-                        //find any method? to call it?
-                        //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(tran,"setTran").toString());
-                        //ReflectionUtils.invokeReflectionCall(tran.getClass(),
-                        //       "setEarlyWakeupStart",tran,null);
+                        //mTransacts.invokeTransact(Transacts.SURFACE_FLINGER_SERVICE,
+                        //        Transacts.SURFACE_FLINGER_DESCRIPTOR, Transacts.showCpu);
+                        throw new BypassTestException("WAKEUP_SURFACE_FLINGER permission is bypassed");
                     }
-                }));*/
+                }));
 
         /*mPermissionTasks.put(permission.QUERY_CLONED_APPS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
