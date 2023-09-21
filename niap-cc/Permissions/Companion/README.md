@@ -17,12 +17,24 @@ This app should be signed with a different signing key from that used to sign
 the Permission Test Tool; if the two apps have the same signing identity it can
 cause some of the permission tests to fail.
 
+## Functionalities
+ 
+ - This application provides entry points to the services, we can test the permissions 
+ which have 'BIND_*' prefix with these.
+ - Install several media files for testing
+ - Put a data into the DropBox
+ - Prepare hidden flags to test device policy manager test cases.
+   - You can toggle this flags by a checkbox on the bottom of the activity. 
+ - Check the behaviour of the location manager.
+
 ## Pre-requisites
 * Android SDK 28+
 
 ## Getting Started
 This sample uses the Gradle build system. To build this project, use the
 `gradlew build` command or use `Import Project` in Android Studio.
+
+Also You can publish apk file into the Tester/package directory with `./gradlew publishAll` command 
 
 ## Support
 If you've found an error in this sample, please file an issue on the github bug
