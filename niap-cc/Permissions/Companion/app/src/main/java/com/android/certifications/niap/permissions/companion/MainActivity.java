@@ -43,6 +43,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         mStatusListView.setAdapter(mStatusAdapter);
     }
     private Button mSetupButton;
+    private CheckBox mCheckBoxButton;
     private boolean mGmsAvailable;
 
     /**
@@ -192,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mSetupButton = findViewById(R.id.setupButton);
+        mCheckBoxButton = findViewById(R.id.flgDPECheckBox);
         mSetupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -238,21 +241,26 @@ public class MainActivity extends AppCompatActivity {
              * as of android 14
              */
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                String value = "false";
+                if(mCheckBoxButton.isChecked()){
+                    value = "true";
+                }
+
                 String dvc =
                         deviceConfigGetProperty("device_policy_manager", "enable_device_policy_engine");
-                if(dvc == null || !dvc.equals("true")){
-                    deviceConfigSetProperty("device_policy_manager", "enable_device_policy_engine","true",true);
+                if(dvc == null || !dvc.equals(value)){
+                    deviceConfigSetProperty("device_policy_manager", "enable_device_policy_engine",value,true);
                 }
-                logdebug("force a flag enable_device_policy_engine set true=>"
+                logdebug("force a flag enable_device_policy_engine set "+value+"=>"
                         +deviceConfigGetProperty("device_policy_manager",
                         "enable_device_policy_engine"));
                 //2nd flag
                 dvc =
                         deviceConfigGetProperty("device_policy_manager", "enable_permission_based_access");
-                if(dvc == null || !dvc.equals("true")){
-                    deviceConfigSetProperty("device_policy_manager", "enable_permission_based_access","true",true);
+                if(dvc == null || !dvc.equals(value)){
+                    deviceConfigSetProperty("device_policy_manager", "enable_permission_based_access",value,true);
                 }
-                logdebug("force flag enable_permission_based_access set true=>"
+                logdebug("force flag enable_permission_based_access set "+value+"=>"
                         +deviceConfigGetProperty("device_policy_manager",
                         "enable_permission_based_access"));
             }
