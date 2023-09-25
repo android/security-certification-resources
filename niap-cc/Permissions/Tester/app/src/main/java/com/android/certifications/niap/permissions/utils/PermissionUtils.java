@@ -106,9 +106,9 @@ public class PermissionUtils {
      * Ensures that the passed in permissions are defined in manifest and attempts to grant a
      * permission automatically if it is considered dangerous.
      */
-    @RequiresApi(Build.VERSION_CODES.M)
+    //@RequiresApi(Build.VERSION_CODES.M)
     public static boolean ensureRequiredPermissions(
-            String[] requiredPermissions, ComponentName admin, Context context) {
+            String[] requiredPermissions, Context context) {
         PackageInfo packageInfo;
         try {
             packageInfo =
@@ -125,9 +125,9 @@ public class PermissionUtils {
                 sLogger.logError("Missing required permission from manifest: " + expectedPermission);
                 return false;
             }
-            if (!maybeGrantDangerousPermission(expectedPermission, admin, context)) {
+            /*if (!maybeGrantDangerousPermission(expectedPermission, admin, context)) {
                 return false;
-            }
+            }*/
         }
         return true;
     }

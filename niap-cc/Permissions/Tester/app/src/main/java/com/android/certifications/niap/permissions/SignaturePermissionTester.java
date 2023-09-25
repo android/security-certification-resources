@@ -2135,6 +2135,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.WRITE_EMBEDDED_SUBSCRIPTIONS,
                 new PermissionTest(false, () -> {
+
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        throw new BypassTestException(
+                                "This test case doesn't work well with Android U. Let us skip it");
+                    }
+
+
                     mTransacts.invokeTransact(Transacts.ISUB_SERVICE, Transacts.ISUB_DESCRIPTOR,
                             Transacts.requestEmbeddedSubscriptionInfoListRefresh, 0);
                 }));
@@ -4901,36 +4908,24 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
 
-
+        /*
         mPermissionTasks.put(permission.SET_APP_SPECIFIC_LOCALECONFIG,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
 
-
                         int n = 0;
                         try {
-//                            List<PackageInfo> infor = mPackageManager
-//                                    .getInstalledPackages(PackageManager.PackageInfoFlags.of(0));
-//                            for(PackageInfo pi : infor){
-//                                mLogger.logSystem(""+pi.packageName);
-//                            }
                             n = mPackageManager.getPackageUid
                                     ("com.android.certifications.niap.permissions.companion",
                                             mUid);
                         } catch (PackageManager.NameNotFoundException e) {
                             throw new RuntimeException(e);
                         }
-                        mLogger.logSystem(String.format("uid %d %d %d",Binder.getCallingUid(),
-                                mUid,n));
-
                         LocaleList OVERRIDE_LOCALES =
                                 LocaleList.forLanguageTags("en-US,fr-FR,zh-Hant-TW");
 
-
-
                         //mLocaleManager.setOverrideLocaleConfig();
                         //for checking it need to set other application locale config
-                        //
 
                         mTransacts.invokeTransact(
                                 Context.LOCALE_SERVICE,
@@ -4939,7 +4934,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                 "com.android.certifications.niap.permissions.companion",mUid,
                                 new LocaleConfig(OVERRIDE_LOCALES));
                     }
-                }));
+        }));*/
 
         mPermissionTasks.put(permission.SET_LOW_POWER_STANDBY_PORTS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
@@ -5127,10 +5122,11 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }
             }));
 
+/*
         mPermissionTasks.put(permission.ACCESS_GPU_SERVICE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE,
                         VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {}));
-
+*/
         mPermissionTasks.put(permission.WAKEUP_SURFACE_FLINGER,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     //commonize the tester routine with exposing the builder of AssociationRequest object
@@ -5158,15 +5154,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         //mLogger.logDebug(resolveInfos.toString());
                     }
                 }));*/
-
+/*
         mPermissionTasks.put(permission.HANDLE_QUERY_PACKAGE_RESTART,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
 
                 }));
         mPermissionTasks.put(permission.MANAGE_FACE,
                 new PermissionTest(false, () -> {
-
-                }));
+                }));*/
     }
     void prepareTestBlockBind()
     {

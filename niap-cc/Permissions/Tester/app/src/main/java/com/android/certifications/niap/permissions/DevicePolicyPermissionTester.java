@@ -850,8 +850,8 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 = new ComponentName(PACKAGE_NAME,PACKAGE_NAME+".receivers.Admin");
 
 
-        boolean r2 = PermissionUtils.ensureRequiredPermissions(new String[]{permission},
-                    ADMIN_COMPONENT,mContext
+        boolean r2 = PermissionUtils.ensureRequiredPermissions(new String[]{permission}
+                    ,mContext
                 );
 
         mLogger.logDebug(String.format("Permission %s checkSelf=%b ensure=%b calling=%b",permission,r1,r2,r3));

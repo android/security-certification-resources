@@ -29,7 +29,6 @@ public class QueryPackageRestartReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-
         Log.d(TAG,"Query Package Restart event received");
     }
 }

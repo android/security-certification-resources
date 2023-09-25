@@ -27,6 +27,10 @@
         android:label="Tests for com.android.certifications.niap.permissions"
         android:targetPackage="com.android.certifications.niap.permissions" />
 
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+
+
     <uses-permission android:name="android.permission.REORDER_TASKS" />
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_ACCESSIBILITY" />
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_ACCOUNT_MANAGEMENT" />

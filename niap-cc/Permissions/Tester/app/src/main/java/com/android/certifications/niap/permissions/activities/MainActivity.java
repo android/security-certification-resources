@@ -450,13 +450,14 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                                            @NonNull int[] grantResults) {
         // Delegate handling of the permission request results to the active configuration.
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         try {
             if (mConfiguration != null)
                 mConfiguration.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         } catch (RuntimeException ex){
-            sLogger.logError(ex.getMessage());
-            ex.printStackTrace();
+            sLogger.logInfo("Request Permissinon Result Error=>"+ex.getMessage());
+            //ex.printStackTrace();
         }
     }
 

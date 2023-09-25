@@ -1011,26 +1011,11 @@ public class InstallPermissionTester extends BasePermissionTester {
             );
         }));
 
-        //not done yet - can't raise security error as of now.
-        mPermissionTasks.put(CREDENTIAL_MANAGER_QUERY_CANDIDATE_CREDENTIALS,
-                new PermissionTest(false,
-                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+        //Infeasible to test - can't raise security error as of now.
+        //CREDENTIAL_MANAGER_QUERY_CANDIDATE_CREDENTIALS,
 
-                    //using test builder...
-                    PrepareGetCredentialResponse response = new PrepareGetCredentialResponse.TestBuilder()
-                            .setCredentialTypeDelegate((val) ->
-                                    val.equals("password") || val.equals("otherValid"))
-                            .build();
-                    //Call restricted methods. not working.
-                    boolean a = response.hasRemoteResults();
-                    boolean b = response.hasAuthenticationResults();
-                    boolean c = response.hasCredentialResults("hoge");
-
-                    mLogger.logInfo(String.format("Credential = %b %b %b",a,b,c));
-
-        }));
-
-        //not done yet - can't raise security error as of now.
+        //Infeasible to test can't raise security error as of now.
+        //ENFORCE_UPDATE_OWNERSHIP
         /*
         mPermissionTasks.put(ENFORCE_UPDATE_OWNERSHIP,  new PermissionTest(false,
                 Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
