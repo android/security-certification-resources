@@ -1084,7 +1084,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_ACTIVITY_STACKS,
                 new PermissionTest(false,Build.VERSION_CODES.P, () -> {
                     //MANAGE_ACTIVITY_STACKS is a deprecated permission, we should bypass this permisson from s
-
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        throw new BypassTestException("MANAGE_ACTIVITY_STACKS is deprecated,we should bypass this permission from S");
+                    }
                     String service = "activity_task";
                     String descriptor = Transacts.ACTIVITY_TASK_DESCRIPTOR;
                     if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
@@ -1603,8 +1605,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.REGISTER_WINDOW_MANAGER_LISTENERS,
                 new PermissionTest(false, () -> {
+
                     mTransacts.invokeTransact(Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
-                            Transacts.registerShortcutKey, 1L, (IBinder) null);
+                            Transacts.registerShortcutKey, 1L, (IBinder)null);
+
                 }));
 
         mPermissionTasks.put(permission.REMOTE_AUDIO_PLAYBACK,
@@ -4609,6 +4613,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.MAKE_UID_VISIBLE,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                    //mPackageManager.makeUidVisible(120000,130000);
                     mTransacts.invokeTransact(Transacts.PACKAGE_SERVICE, Transacts.PACKAGE_DESCRIPTOR,
                             Transacts.makeUidVisible,1200000,1300000);
                 }));

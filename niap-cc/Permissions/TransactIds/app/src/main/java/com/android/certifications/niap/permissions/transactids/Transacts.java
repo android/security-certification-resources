@@ -699,8 +699,10 @@ public class Transacts {
     public static final String setUserControlDisabledPackages = "setUserControlDisabledPackages";
 
     public static final String setTrustAgentConfiguration = "setTrustAgentConfiguration";
+    public static final String setTransactionState = "setTransactionState";
 
     public static final String removeRestrictedMetricsChangedOperation="removeRestrictedMetricsChangedOperation";
+    public static final String requestAppKeyboardShortcuts = "requestAppKeyboardShortcuts";
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an
      * extension of the Transacts class for the Permission Test Tool.

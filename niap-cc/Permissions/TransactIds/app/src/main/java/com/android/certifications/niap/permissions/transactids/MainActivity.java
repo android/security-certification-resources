@@ -28,6 +28,7 @@ import static com.android.certifications.niap.permissions.transactids.Transacts.
 import static com.android.certifications.niap.permissions.transactids.Transacts.ROLE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.TELEPHONY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.TRANSACT_PREFIX;
+import static com.android.certifications.niap.permissions.transactids.Transacts.WINDOW_DESCRIPTOR;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -109,42 +110,43 @@ public class MainActivity extends AppCompatActivity {
         //Transaction APIs as of Android 34
         //We should automate them ....
 
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setCameraDisabled");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setAccountManagementDisabled");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setApplicationExemptions");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setApplicationRestrictions");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setUserControlDisabledPackages");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "installKeyPair");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setCommonCriteriaModeEnabled");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setDefaultSmsApplication");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setFactoryResetProtectionPolicy");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setPermittedInputMethods");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setKeyguardDisabledFeatures");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setMaximumTimeToLock");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setPasswordExpirationTimeout");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setMaximumTimeToLock");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setLockTaskPackages");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setMtePolicy");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setOrganizationName");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "isPackageSuspended");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "addCrossProfileWidgetProvider");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "getCrossProfileWidgetProviders");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setResetPasswordToken");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setPermissionGrantState");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setScreenCaptureDisabled");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setSecurityLoggingEnabled");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setStatusBarDisabled");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setShortSupportMessage");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setSystemUpdatePolicy");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "installUpdateFromFile");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setUsbDataSignalingEnabled");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "hasLockdownAdminConfiguredNetworks");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setConfiguredNetworksLockdownState");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setMaximumFailedPasswordsForWipe");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setUserRestriction");
-        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setTrustAgentConfiguration");
-
-
+        ProxyChecker.check(WINDOW_DESCRIPTOR, "requestAppKeyboardShortcuts");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setCameraDisabled");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setAccountManagementDisabled");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setApplicationExemptions");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setApplicationRestrictions");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setUserControlDisabledPackages");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "installKeyPair");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setCommonCriteriaModeEnabled");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setDefaultSmsApplication");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setFactoryResetProtectionPolicy");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setPermittedInputMethods");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setKeyguardDisabledFeatures");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setMaximumTimeToLock");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setPasswordExpirationTimeout");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setMaximumTimeToLock");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setLockTaskPackages");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setMtePolicy");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setOrganizationName");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "isPackageSuspended");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "addCrossProfileWidgetProvider");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "getCrossProfileWidgetProviders");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setResetPasswordToken");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setPermissionGrantState");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setScreenCaptureDisabled");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setSecurityLoggingEnabled");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setStatusBarDisabled");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setShortSupportMessage");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setSystemUpdatePolicy");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "installUpdateFromFile");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setUsbDataSignalingEnabled");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "hasLockdownAdminConfiguredNetworks");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setConfiguredNetworksLockdownState");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setMaximumFailedPasswordsForWipe");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setUserRestriction");
+//        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setTrustAgentConfiguration");
+        //ProxyChecker.check("com.android.server.gpu.GpuService","toggleAngleAsSystemDriver");
+        //ProxyChecker.check("android.gui.ISurfaceComposerClient","getLayerFrameStats");
         //ProxyChecker.check("android.health.connect.aidl.IMigrationCallback",
         //        "Stub");
 
@@ -797,6 +799,8 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setUserRestriction, descriptorTransacts);
             queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR, Transacts.setTrustAgentConfiguration, descriptorTransacts);
             queryTransactId(Transacts.STATS_DESCRIPTOR,Transacts.removeRestrictedMetricsChangedOperation,descriptorTransacts);
+            queryTransactId(Transacts.SURFACE_FLINGER_DESCRIPTOR,Transacts.setTransactionState,descriptorTransacts);
+            queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.requestAppKeyboardShortcuts, descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
         }
