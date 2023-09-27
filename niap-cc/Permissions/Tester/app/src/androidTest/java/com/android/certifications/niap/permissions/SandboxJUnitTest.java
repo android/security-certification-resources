@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,12 +47,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Instrumentation test to verify internal protection level permissions properly grant access to
- * their API, resources, etc., when the corresponding permission is granted. Internal
- * permissions are not granted to apps signed with the platform's signing key, but many are granted
- * to the shell user. Since instrumentation tests allow adopting the shell permission identity,
- * this test class can adopt this identity to be granted these permissions and verify the platform
- * behavior.
+ * Instrumentation test : sandbox purpose
  */
 @RunWith(AndroidJUnit4.class)
 public class SandboxJUnitTest {
@@ -85,22 +80,14 @@ public class SandboxJUnitTest {
         mUiAutomation.dropShellPermissionIdentity();
     }
     int SYSTEM_UID = 1000;
+
     @Test
     public void runPermissionTests(){
-
-        //try {
-            mContext.sendOrderedBroadcastAsUser(new Intent("android.intent.action.QUERY_PACKAGE_RESTART"),
+        mContext.sendOrderedBroadcastAsUser(new Intent("android.intent.action.QUERY_PACKAGE_RESTART"),
                     UserHandle.getUserHandleForUid(SYSTEM_UID),
                     null, null, null, 0, null, null);
-
-
-        //} catch (Exception e){
-            //assertTrue(false);
-        //am broadcast -a <ACTION名> --es <KEY> <VALUE>
-        //am broadcast -a android.intent.action.QUERY_PACKAGE_RESTART
-        //am broadcast -a android.intent.action.QUERY_PACKAGE_RESTART
-
     }
+
     @Test
     public void runPermissionTest2(){
         try {

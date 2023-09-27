@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,12 +60,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Instrumentation test to verify internal protection level permissions properly grant access to
- * their API, resources, etc., when the corresponding permission is granted. Internal
- * permissions are not granted to apps signed with the platform's signing key, but many are granted
- * to the shell user. Since instrumentation tests allow adopting the shell permission identity,
- * this test class can adopt this identity to be granted these permissions and verify the platform
- * behavior.
+ * Instrumentation test to verify READ_MEDIA_VISUAL_USER_SELECTED permission.
+ * 1. To run this test you should put at least one media image to the ContentResolver.
+ * 2. Try this test against both normal and no-perm variant apk files.
  */
 @RunWith(AndroidJUnit4.class)
 public class ReadMediaVisualUserSelectedTest {
@@ -82,7 +79,6 @@ public class ReadMediaVisualUserSelectedTest {
     private UiAutomation mUiAutomation;
     private Context mContext;
     private UiDevice mDevice;
-    private Context mShellContext;
     private Instrumentation mInstrumentation;
     @Rule
     public ActivityTestRule<MainActivity> rule = new ActivityTestRule<>(MainActivity.class, false,
@@ -93,7 +89,6 @@ public class ReadMediaVisualUserSelectedTest {
         mInstrumentation = InstrumentationRegistry.getInstrumentation();
         mUiAutomation = InstrumentationRegistry.getInstrumentation().getUiAutomation();
         mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        mShellContext = InstrumentationRegistry.getInstrumentation().getContext();
         mDevice = UiDevice.getInstance(mInstrumentation);
     }
 
@@ -182,11 +177,8 @@ public class ReadMediaVisualUserSelectedTest {
 
             String[] thumbColumns = {MediaStore.Images.Thumbnails.DATA, MediaStore.Images.Thumbnails.IMAGE_ID};
             String[] columns = {MediaStore.Images.Media._ID, MediaStore.Images.Media.DATA, MediaStore.Images.Media.DATE_TAKEN};
-            //String[] whereArgs = {"image/jpeg", "image/jpg"};
-            //Access the content provider to read something fun.
             String orderBy = MediaStore.Images.Media.DATE_TAKEN+ " DESC";
-            //String  where = MediaStore.Images.Media.MIME_TYPE + "=? or "
-            //+ MediaStore.Images.Media.MIME_TYPE + "=?";
+
             @SuppressLint("Recycle") Cursor cursor = contentResolver.query
                     (MediaStore.Images.Media.EXTERNAL_CONTENT_URI,columns, "", new String[]{}, orderBy);
 
