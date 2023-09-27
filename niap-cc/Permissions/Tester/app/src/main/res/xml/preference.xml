@@ -25,31 +25,32 @@
             android:title="Runtime" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Enabled Signature Block Fragment">
+    <PreferenceCategory android:title="Enabled Signature Test Blocks">
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="cb_sig01"
-            android:title="01" />
+            android:title="Block 01" />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="cb_sig02"
-            android:title="02" />
+            android:title="Block 02" />
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="cb_sig03"
-            android:title="03" />
+            android:key="cb_sig10"
+            android:title="Q/P/R/S" />
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="cb_sig04"
-            android:title="04" />
+            android:key="cb_sig13"
+            android:title="Tiramisu(13)"
+            />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="cb_sig14"
-            android:title="14" />
+            android:title="UDC(14)" />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="cb_sig_bind"
-            android:title="BIND_*" />
+            android:title="BIND_* Permissions" />
     </PreferenceCategory>
 
 </PreferenceScreen>

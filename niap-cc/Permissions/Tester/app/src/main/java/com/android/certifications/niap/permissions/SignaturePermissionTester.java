@@ -334,9 +334,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         if (sp.getBoolean("cb_sig01", false)) prepareTestBlock01();
         if (sp.getBoolean("cb_sig02", false)) prepareTestBlock02();
-        if (sp.getBoolean("cb_sig03", false)) prepareTestBlock03();
-        if (sp.getBoolean("cb_sig04", false)) prepareTestBlock04();
-        if (sp.getBoolean("cb_sig14", false)) prepareTestBlockFor14();
+        if (sp.getBoolean("cb_sig10", false)) prepareTestBlockForQPRS();
+        if (sp.getBoolean("cb_sig13", false)) prepareTestBlockForU();
+        if (sp.getBoolean("cb_sig14", false)) prepareTestBlockForT();
         if (sp.getBoolean("cb_sig_bind", false)) prepareTestBlockBind();
 
         //prepareTestBlockTemp();
@@ -2080,7 +2080,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         // android.permission.UPDATE_LOCK - updatelock service guarded by SELinux policy.
-
         mPermissionTasks.put(permission.UPDATE_LOCK_TASK_PACKAGES,
                 new PermissionTest(false, () -> {
                     mTransacts.invokeTransact(Transacts.ACTIVITY_SERVICE, Transacts.ACTIVITY_DESCRIPTOR,
@@ -2175,6 +2174,11 @@ public class SignaturePermissionTester extends BasePermissionTester {
             mContentResolver.insert(Voicemails.CONTENT_URI, values);
         }));
 
+
+    }
+
+    void prepareTestBlockForQPRS()
+    {
         // new permissions for Q
         mPermissionTasks.put(permission.MANAGE_APPOPS,
                 new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
@@ -2387,10 +2391,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         throw new UnexpectedPermissionTestFailureException(e);
                     }
                 }));
-    }
 
-    void prepareTestBlock03()
-    {
         mPermissionTasks.put(permission.NETWORK_MANAGED_PROVISIONING,
                 new PermissionTest(false, VERSION_CODES.Q, () -> {
                     if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
@@ -3267,7 +3268,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             1 << 10);
                 }));
 
-
+    }
+    void prepareTestBlock12()
+    {
         // The following are the new signature permissions for Android 12.
         mPermissionTasks.put(permission.ASSOCIATE_INPUT_DEVICE_TO_DISPLAY,
                 new PermissionTest(false, VERSION_CODES.S, () -> {
@@ -3292,7 +3295,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                         if (method.toString().contains("asBinder")) {
                                             return new Binder();
                                         } else if (method.toString().contains("onInjectionError")) {
-                                           // mLogger.logSystem("onInjectionError: " + method);
+                                            // mLogger.logSystem("onInjectionError: " + method);
                                             return null;
                                         }
                                         return null;
@@ -3420,17 +3423,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         Thread thread = new Thread(() -> {
                             boolean permissionGranted =
                                     isPermissionGranted(permission.MANAGE_CREDENTIAL_MANAGEMENT_APP);
-                            mLogger.logSystem("Running CMANAGE_CREDENTIAL_MANAGEMENT_APP test case.");
+                            mLogger.logSystem("Running MANAGE_CREDENTIAL_MANAGEMENT_APP test case.");
                             try {
-
                                 KeyChain.removeCredentialManagementApp(mContext);
                                 getAndLogTestStatus(permission.MANAGE_CREDENTIAL_MANAGEMENT_APP,
                                         permissionGranted, true);
                             } catch (Exception ex){
-                                //mLogger.logSystem(""+foundError.toString()+","+ex.getClass().getSimpleName());
-                                 if(ex.getClass().getSimpleName().equals("SecurityException")){
-                                     getAndLogTestStatus(permission.MANAGE_CREDENTIAL_MANAGEMENT_APP,
-                                             permissionGranted, false);
+                                if(ex.getClass().getSimpleName().equals("SecurityException")){
+                                    getAndLogTestStatus(permission.MANAGE_CREDENTIAL_MANAGEMENT_APP,
+                                            permissionGranted, false);
                                 }
                             }
                         });
@@ -3445,12 +3446,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         mTransacts.invokeTransactWithServiceFromIntent(mContext, intent,
                                 Transacts.KEY_CHAIN_DESCRIPTOR,
                                 Transacts.removeCredentialManagementApp);
-
                     }
                 }));
-    }
-    void prepareTestBlock04()
-    {
 
         mPermissionTasks.put(permission.MANAGE_GAME_MODE,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
@@ -3685,7 +3682,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             Transacts.setBatteryDischargePrediction, parcelDuration, false);
                 }));
 
-        //3000-3500 safe?
         // CAPTURE_TUNER_AUDIO_INPUT requires a tuner device, and no code in AOSP checks for this
         // permission.
 
@@ -4061,6 +4057,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             "am broadcast --allow-background-activity-starts -a com.android.shell.action.PROFCOLLECT_UPLOAD");
                 }));
 
+    }
+    void prepareTestBlockForT(){
         ////////////////////////////////////////////////////////////////////////////////
         // New Signature permissions as of TIRAMISU(13/SDK33)
 
@@ -4292,7 +4290,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
                             CompanionDeviceManager.class);
                     companionDeviceManager.associate(request, callback, null);
-        }));
+                }));
 
         mPermissionTasks.put(permission.READ_APP_SPECIFIC_LOCALES,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
@@ -4668,9 +4666,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         e.printStackTrace();
                     }
                 }));
-
     }
-    void prepareTestBlockFor14(){
+    void prepareTestBlockForU(){
         //For Android 14
         //Move From Internal Permission
         mPermissionTasks.put(InternalPermissions.permission.ACCESS_AMBIENT_CONTEXT_EVENT,
