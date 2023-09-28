@@ -277,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                 AtomicInteger errorCnt= new AtomicInteger(0);
                 AtomicInteger finishedTesters= new AtomicInteger(0);
                 List<String> errorPermissions = new ArrayList<>();
+                AtomicBoolean bTestExecuted = new AtomicBoolean(false);
                 Future<Boolean> future = executor.submit(() -> {
                     try {
                         Activity activity = MainActivity.this;
@@ -293,7 +294,8 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                         m_reduce_logs = sp.getBoolean("cb_reduce_logs",false);
 
                         List<BasePermissionTester> testers  = configuration.getPermissionTesters(activity);
-                        sLogger.logDebug("Call config->" + configuration.toString());
+                        sLogger.logDebug("Call config->" + configuration);
+
                         for (BasePermissionTester permissionTester : testers) {
                             String block = permissionTester.getClass().getSimpleName();
                             if(block.equals("SignaturePermissionTester") && !run_signature) continue;
@@ -302,6 +304,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                             if(block.equals("InternalPermissionTester")  && !run_internal) continue;
                             sLogger.logSystem("Start Tester Block...:"+block);
                             mStatusAdapter.notifyDataSetChanged();
+                            bTestExecuted.set(true);
                             permissionTester.runPermissionTestsByThreads((result)->{
                                 runOnUiThread(()-> {
                                     if (result.getResult()) {
@@ -323,7 +326,6 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                                     mStatusAdapter.notifyDataSetChanged();
                                 });
                             });
-
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -336,7 +338,12 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                     while(!future.isDone() && !future.isCancelled()) {
                         notifyUpdate();
                     }
-                    Boolean result = future.get();
+                    future.get();
+                    if(!bTestExecuted.get()){
+                        //if no test was executed
+                        sLogger.logSystem("Found no test blocks to run. See [Settings]...");
+                        postTestersFinished("No test block is executed.");
+                    }
                     //sLogger.logSystem(String.format("All test cases have been finished : resp=%s",result.toString()));
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();

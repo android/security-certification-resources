@@ -1139,7 +1139,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     try {
                         //wait almost 1 sec along increasing waiting time
                         lock.wait(10+(i*i));
-                        if(i++>=20){
+                        if(i++>=40){
                             throw new InterruptedException("Connection Timed Out");
                         }
                     } catch (InterruptedException e) {

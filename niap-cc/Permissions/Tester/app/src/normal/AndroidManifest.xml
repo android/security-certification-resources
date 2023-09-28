@@ -1559,4 +1559,18 @@
     <uses-permission android:name="com.example.openurl.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
     <uses-permission android:name="com.google.android.apps.podcasts.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
     <uses-permission android:name="com.google.android.gms.pay.sidecar.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "/>
+
+    <uses-permission android:name="com.android.systemui.clocks.inflate.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.google.android.apps.cbrsnetworkmonitor.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.google.android.finsky.permission.PLAY_BILLING_LIBRARY_BROADCAST" />
+    <uses-permission android:name="com.android.systemui.clocks.metro.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.android.systemui.clocks.weather.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.android.systemui.clocks.growth.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.android.systemui.clocks.numoverlap.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.android.DeviceAsWebcam.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.android.systemui.clocks.flex.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.android.systemui.clocks.calligraphy.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.google.android.gms.permission.ACCESS_NEARBY_SHARE_API" />
+    <uses-permission android:name="com.android.systemui.clocks.bignum.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+
 </manifest>

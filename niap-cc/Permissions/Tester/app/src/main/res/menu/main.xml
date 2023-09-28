@@ -34,6 +34,7 @@
     <item
         android:id="@+id/action_remove_device_admin"
         android:title="@string/device_admin_remove"
+        android:visible="false"
         app:showAsAction="never" />
 
 </menu>
