@@ -84,8 +84,8 @@ public class BarbetApiLevel34Transacts extends Transacts {
         mDescriptorTransacts.put(POWER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(notifySystemEvent, 20);
-        transactIds.put(injectCamera, 16);
+        transactIds.put(notifySystemEvent, 19);
+        transactIds.put(injectCamera, 15);
         mDescriptorTransacts.put(CAMERA_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -117,10 +117,10 @@ public class BarbetApiLevel34Transacts extends Transacts {
         transactIds = new HashMap<>();
         transactIds.put(setRingtonePlayer, 78);
         transactIds.put(getRingtonePlayer, 79);
-        transactIds.put(isAudioServerRunning, 131);
+        transactIds.put(isAudioServerRunning, 126);
         transactIds.put(forceRemoteSubmixFullVolume, 18);
         transactIds.put(setVolumeGroupVolumeIndex, 25);
-        transactIds.put(getDeviceVolumeBehavior, 156);
+        transactIds.put(getDeviceVolumeBehavior, 151);
         mDescriptorTransacts.put(AUDIO_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -192,8 +192,8 @@ public class BarbetApiLevel34Transacts extends Transacts {
         transactIds.put(getAppMetadataFd, 37);
         transactIds.put(movePackage, 113);
         transactIds.put(installExistingPackageAsUser, 117);
-        transactIds.put(makeUidVisible, 201);
-        transactIds.put(setKeepUninstalledPackages, 206);
+        transactIds.put(makeUidVisible, 199);
+        transactIds.put(setKeepUninstalledPackages, 204);
         transactIds.put(getRuntimePermissionsVersion, 180);
         // Failed to obtain transactId of addOnPermissionsChangeListener under android.content.pm.IPackageManager: No field TRANSACTION_addOnPermissionsChangeListener in class Landroid/content/pm/IPackageManager$Stub; (declaration of 'android.content.pm.IPackageManager$Stub' appears in /system/framework/framework.jar)
         transactIds.put(getHarmfulAppWarning, 164);
@@ -229,15 +229,15 @@ public class BarbetApiLevel34Transacts extends Transacts {
         mDescriptorTransacts.put(ACTIVITY_CLIENT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(getFrontActivityScreenCompatMode, 18);
-        transactIds.put(getTaskDescription, 27);
-        transactIds.put(getAssistContextExtras, 58);
-        transactIds.put(setFrontActivityScreenCompatMode, 19);
-        transactIds.put(getWindowOrganizerController, 65);
-        transactIds.put(startActivityFromGameSession, 11);
-        transactIds.put(startActivityAsCaller, 14);
+        transactIds.put(getFrontActivityScreenCompatMode, 19);
+        transactIds.put(getTaskDescription, 28);
+        transactIds.put(getAssistContextExtras, 59);
+        transactIds.put(setFrontActivityScreenCompatMode, 20);
+        transactIds.put(getWindowOrganizerController, 66);
+        transactIds.put(startActivityFromGameSession, 12);
+        transactIds.put(startActivityAsCaller, 15);
         // Failed to obtain transactId of dismissKeyguard under android.app.IActivityTaskManager: No field TRANSACTION_dismissKeyguard in class Landroid/app/IActivityTaskManager$Stub; (declaration of 'android.app.IActivityTaskManager$Stub' appears in /system/framework/framework.jar)
-        transactIds.put(getActivityClientController, 17);
+        transactIds.put(getActivityClientController, 18);
         mDescriptorTransacts.put(ACTIVITY_TASK_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -368,8 +368,8 @@ public class BarbetApiLevel34Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(requestAppKeyboardShortcuts, 80);
-        transactIds.put(createInputConsumer, 84);
-        transactIds.put(registerTaskFpsCallback, 135);
+        transactIds.put(createInputConsumer, 83);
+        transactIds.put(registerTaskFpsCallback, 134);
         // Failed to obtain transactId of requestUserActivityNotification under android.view.IWindowManager: No field TRANSACTION_requestUserActivityNotification in class Landroid/view/IWindowManager$Stub; (declaration of 'android.view.IWindowManager$Stub' appears in /system/framework/framework.jar!classes4.dex)
         transactIds.put(clearWindowContentFrameStats, 76);
         transactIds.put(addKeyguardLockedStateListener, 34);
@@ -382,7 +382,7 @@ public class BarbetApiLevel34Transacts extends Transacts {
         transactIds.put(removeWindowToken, 19);
         transactIds.put(thawRotation, 55);
         // Failed to obtain transactId of getInTouchMode under android.view.IWindowManager: No field TRANSACTION_getInTouchMode in class Landroid/view/IWindowManager$Stub; (declaration of 'android.view.IWindowManager$Stub' appears in /system/framework/framework.jar!classes4.dex)
-        transactIds.put(registerShortcutKey, 83);
+        transactIds.put(registerShortcutKey, 82);
         transactIds.put(overridePendingAppTransitionRemote, 24);
         mDescriptorTransacts.put(WINDOW_DESCRIPTOR, transactIds);
 
