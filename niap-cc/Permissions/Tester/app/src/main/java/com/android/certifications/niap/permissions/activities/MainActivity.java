@@ -318,13 +318,13 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                                             }
                                         }
                                         postTestersFinished(block + "All test has been finished. Found " + errorCnt.get() + " errors.");
-                                        //mCDLForSync.countDown();
+                                        mCDLForSync.countDown();
                                     }
                                     //mStatusAdapter.notifyDataSetChanged();
                                     notifyUpdate();
                                 });//runOnUi
                             });//runThread
-                            mCDLForSync.await(100,TimeUnit.MILLISECONDS);
+                            mCDLForSync.await(1000,TimeUnit.MILLISECONDS);
                             return true;
                         });//Future<Boolean>
 
