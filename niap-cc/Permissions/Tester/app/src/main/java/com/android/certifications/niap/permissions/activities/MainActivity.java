@@ -87,6 +87,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -187,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                         .setAutoCancel(true)
                         .build();
         notificationManager.notify(0, notification);
+        //
         runningTest.set(false);
         runOnUiThread(()->{
             for (Button button : mTestButtons) {
@@ -213,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
         super.onSaveInstanceState(outState);
         outState.putStringArrayList("listViewData", (ArrayList<String>) mStatusData);
     }
-
+    private CountDownLatch mCDLForSync;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -226,10 +228,10 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
         mStatusTextView.setText(R.string.tap_to_run);
 
         setLogAdapter();
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
             mStatusData = savedInstanceState.getStringArrayList("listViewData");
-            runOnUiThread(()->{
-                for(String s:mStatusData){
+            runOnUiThread(() -> {
+                for (String s : mStatusData) {
                     addLogLine(s);
                 }
             });
@@ -237,16 +239,9 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
             addLogLine("Welcome!");
         }
 
-
-
-
-
         PreferenceManager.setDefaultValues(this, R.xml.preference, false);
         mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         mAdminName = new ComponentName(this, Admin.class);
-
-
-
 
         //getRoleHolders(RoleManager.ROLE_DEVICE_POLICY_MANAGEMENT);
 
@@ -272,42 +267,44 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                 }
                 //
                 ExecutorService
-                        executor = ((TesterApplication)getApplication()).executorService;
+                        executor = ((TesterApplication) getApplication()).executorService;
 
-                AtomicInteger errorCnt= new AtomicInteger(0);
-                AtomicInteger finishedTesters= new AtomicInteger(0);
+                AtomicInteger errorCnt = new AtomicInteger(0);
+                AtomicInteger finishedTesters = new AtomicInteger(0);
                 List<String> errorPermissions = new ArrayList<>();
                 AtomicBoolean bTestExecuted = new AtomicBoolean(false);
-                Future<Boolean> future = executor.submit(() -> {
-                    try {
-                        Activity activity = MainActivity.this;
-                        mStatusData.clear();
-                        configuration.preRunSetup();
+                try {
+                    Activity activity = MainActivity.this;
+                    mStatusData.clear();
+                    configuration.preRunSetup();
+                    SharedPreferences sp =
+                            PreferenceManager.getDefaultSharedPreferences(this);
 
-                        SharedPreferences sp =
-                                PreferenceManager.getDefaultSharedPreferences(this);
+                    boolean run_install = sp.getBoolean("cb_install", false);
+                    boolean run_signature = sp.getBoolean("cb_signature", false);
+                    boolean run_runtime = sp.getBoolean("cb_runtime", false);
+                    boolean run_internal = sp.getBoolean("cb_internal", false);
+                    m_reduce_logs = sp.getBoolean("cb_reduce_logs", false);
+                    List<BasePermissionTester> testers = configuration.getPermissionTesters(activity);
+                    sLogger.logDebug("Call config->" + configuration);
 
-                        boolean run_install = sp.getBoolean("cb_install", false);
-                        boolean run_signature = sp.getBoolean("cb_signature", false);
-                        boolean run_runtime = sp.getBoolean("cb_runtime", false);
-                        boolean run_internal = sp.getBoolean("cb_internal", false);
-                        m_reduce_logs = sp.getBoolean("cb_reduce_logs",false);
+                    for (BasePermissionTester permissionTester : testers) {
 
-                        List<BasePermissionTester> testers  = configuration.getPermissionTesters(activity);
-                        sLogger.logDebug("Call config->" + configuration);
-                        for (BasePermissionTester permissionTester : testers) {
-                            String block = permissionTester.getClass().getSimpleName();
-                            if(block.equals("SignaturePermissionTester") && !run_signature) continue;
-                            if(block.equals("InstallPermissionTester")   && !run_install) continue;
-                            if(block.equals("RuntimePermissionTester")   && !run_runtime) continue;
-                            if(block.equals("InternalPermissionTester")  && !run_internal) continue;
-                            sLogger.logSystem("Start Tester Block...:"+block);
-                            mStatusAdapter.notifyDataSetChanged();
-                            bTestExecuted.set(true);
-                            permissionTester.runPermissionTestsByThreads((result)->{
-                                runOnUiThread(()-> {
+                        String block = permissionTester.getClass().getSimpleName();
+                        if (block.equals("SignaturePermissionTester") && !run_signature) continue;
+                        if (block.equals("InstallPermissionTester") && !run_install) continue;
+                        if (block.equals("RuntimePermissionTester") && !run_runtime) continue;
+                        if (block.equals("InternalPermissionTester") && !run_internal) continue;
+                        sLogger.logSystem("Start Tester Block...:" + block);
+                        mStatusAdapter.notifyDataSetChanged();
+                        bTestExecuted.set(true);
+
+                        Future<Boolean> future = executor.submit(() -> {
+                            mCDLForSync = new CountDownLatch(1);
+                            permissionTester.runPermissionTestsByThreads((result) -> {
+                                runOnUiThread(() -> {
                                     if (result.getResult()) {
-                                        if(!m_reduce_logs) sLogger.logInfo("Passed:" + result);
+                                        if (!m_reduce_logs) sLogger.logInfo("Passed:" + result);
                                     } else {
                                         sLogger.logError("Failure:" + result.getName());
                                         errorPermissions.add(result.getName());
@@ -315,61 +312,63 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                                     }
                                     if (result.getTotal() == result.getNo()) {
                                         sLogger.logSystem("The test block has done. error count=" + errorCnt.get() + "/" + result.getTotal());
-                                        if(!m_reduce_logs) {
+                                        if (!m_reduce_logs) {
                                             for (String pm : errorPermissions) {
                                                 sLogger.logInfo(pm);
                                             }
                                         }
                                         postTestersFinished(block + "All test has been finished. Found " + errorCnt.get() + " errors.");
-
+                                        //mCDLForSync.countDown();
                                     }
-                                    mStatusAdapter.notifyDataSetChanged();
-                                });
-                            });
+                                    //mStatusAdapter.notifyDataSetChanged();
+                                    notifyUpdate();
+                                });//runOnUi
+                            });//runThread
+                            mCDLForSync.await(100,TimeUnit.MILLISECONDS);
+                            return true;
+                        });//Future<Boolean>
+
+                        try {
+                            while (!future.isDone() && !future.isCancelled()) {
+                                notifyUpdate();
+                            }
+                            future.get();
+                            //sLogger.logSystem("Submit to executor : " + result);
+                            if (!bTestExecuted.get()) {
+                                //if no test was executed
+                                sLogger.logSystem("Found no test blocks to run. See [Settings]...");
+                                postTestersFinished("No test block is executed.");
+                            }
+                            //sLogger.logSystem(String.format("All test cases have been finished : resp=%s",result.toString()));
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
                         }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        return false;
-                    }
-                    return true;
-                });
 
-                try {
-                    while(!future.isDone() && !future.isCancelled()) {
-                        notifyUpdate();
-                    }
-                    future.get();
-                    if(!bTestExecuted.get()){
-                        //if no test was executed
-                        sLogger.logSystem("Found no test blocks to run. See [Settings]...");
-                        postTestersFinished("No test block is executed.");
-                    }
-                    //sLogger.logSystem(String.format("All test cases have been finished : resp=%s",result.toString()));
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
+                    }//for
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-            });
-
+            });//onClick
             layout.addView(testButton);
             mTestButtons.add(testButton);
-        }
 
 
-        Toolbar toolBar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolBar);
-        mBottomSheet = BottomSheetBehavior.from(layout);
-        mBottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+            Toolbar toolBar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolBar);
+            mBottomSheet = BottomSheetBehavior.from(layout);
+            mBottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
 
-        mStatusTextView.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                if (mBottomSheet.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                    mBottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
-                } else if (mBottomSheet.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-                    mBottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            mStatusTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mBottomSheet.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                        mBottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    } else if (mBottomSheet.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                        mBottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private void getPermission() {
