@@ -295,7 +295,6 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
 
                         List<BasePermissionTester> testers  = configuration.getPermissionTesters(activity);
                         sLogger.logDebug("Call config->" + configuration);
-
                         for (BasePermissionTester permissionTester : testers) {
                             String block = permissionTester.getClass().getSimpleName();
                             if(block.equals("SignaturePermissionTester") && !run_signature) continue;
@@ -322,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                                             }
                                         }
                                         postTestersFinished(block + "All test has been finished. Found " + errorCnt.get() + " errors.");
+
                                     }
                                     mStatusAdapter.notifyDataSetChanged();
                                 });
@@ -459,6 +459,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         try {
+            //sLogger.logSystem(">"+mConfiguration.toString());
             if (mConfiguration != null)
                 mConfiguration.onRequestPermissionsResult(requestCode, permissions, grantResults);
 

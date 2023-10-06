@@ -843,6 +843,8 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(SCHEDULE_EXACT_ALARM,
                 new PermissionTest(false, Build.VERSION_CODES.S,Build.VERSION_CODES.TIRAMISU, () -> {
+
+
                     Intent intent = new Intent(mContext, MainActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent,
                             PendingIntent.FLAG_IMMUTABLE);

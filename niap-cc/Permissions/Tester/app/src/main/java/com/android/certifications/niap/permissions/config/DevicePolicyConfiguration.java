@@ -53,7 +53,7 @@ class DevicePolicyConfiguration implements TestConfiguration {
         //Check the experimental flag //"enable_device_policy_engine";
         String d1 = ReflectionUtils.deviceConfigGetProperty("device_policy_manager", "enable_device_policy_engine");
         String d2 = ReflectionUtils.deviceConfigGetProperty("device_policy_manager", "enable_permission_based_access");
-        Log.d("TAG","device owner>"+d1+","+d2);
+        //Log.d("TAG","device owner>"+d1+","+d2);
 
         return (d1 != null && d1.equals("true")) && (d2 != null && d2.equals("true"));
    }

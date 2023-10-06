@@ -19,6 +19,7 @@ package com.android.certifications.niap.permissions;
 import static android.Manifest.permission.REQUEST_COMPANION_PROFILE_NEARBY_DEVICE_STREAMING;
 import static android.Manifest.permission.REQUEST_COMPANION_PROFILE_WATCH;
 import static android.Manifest.permission.SCHEDULE_EXACT_ALARM;
+import static android.Manifest.permission.USE_EXACT_ALARM;
 import static android.os.PowerManager.FULL_WAKE_LOCK;
 import static android.os.PowerManager.PARTIAL_WAKE_LOCK;
 import static android.os.PowerManager.SCREEN_DIM_WAKE_LOCK;
@@ -166,6 +167,7 @@ import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.credentials.CreateCredentialRequest;
 import androidx.credentials.provider.ProviderCreateCredentialRequest;
 import androidx.preference.PreferenceManager;
@@ -4712,6 +4714,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
         //Move from Install Permission
         mPermissionTasks.put(SCHEDULE_EXACT_ALARM,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+
+                    if (ActivityCompat.checkSelfPermission(mContext, USE_EXACT_ALARM)
+                            == PackageManager.PERMISSION_GRANTED &&
+                            ActivityCompat.checkSelfPermission(mContext, SCHEDULE_EXACT_ALARM)
+                                    == PackageManager.PERMISSION_DENIED){
+                        throw new BypassTestException(
+                                "If the USE_EXACT_ALARM permission is granted, the test will be passed. let's skip it");
+                    }
+
                     Intent intent = new Intent(mContext, MainActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent,
                             PendingIntent.FLAG_IMMUTABLE);
@@ -4803,7 +4814,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                 Context.CREDENTIAL_SERVICE,
                                 Transacts.CREDENTIAL_DESCRIPTOR,
                                 Transacts.getCredentialProviderServices,
-                                mUid,0);
+                                mUid,Binder.getCallingPid());
                     }
                 }));
         mPermissionTasks.put(permission.LOG_FOREGROUND_RESOURCE_USE,
@@ -5435,6 +5446,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
     static {
         SYSTEM_ONLY_BIND_PERMISSIONS = new HashSet<>();
         SYSTEM_ONLY_BIND_PERMISSIONS.add(permission.BIND_HOTWORD_DETECTION_SERVICE);
+        SYSTEM_ONLY_BIND_PERMISSIONS.add(permission.BIND_VISUAL_QUERY_DETECTION_SERVICE);
     }
 
     /**
