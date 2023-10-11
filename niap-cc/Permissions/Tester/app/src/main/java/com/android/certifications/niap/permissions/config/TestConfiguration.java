@@ -18,6 +18,7 @@ package com.android.certifications.niap.permissions.config;
 
 import android.app.Activity;
 import android.util.ArraySet;
+import android.util.Log;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.Constants;
@@ -27,6 +28,7 @@ import com.android.certifications.niap.permissions.PrivilegedPermissionTester;
 import com.android.certifications.niap.permissions.R;
 import com.android.certifications.niap.permissions.RuntimePermissionTester;
 import com.android.certifications.niap.permissions.SignaturePermissionTester;
+import com.android.certifications.niap.permissions.utils.PermissionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 
 import java.util.ArrayList;
@@ -58,7 +60,12 @@ public interface TestConfiguration {
             permissionTesters.add(new PrivilegedPermissionTester(this, activity));
         }
         permissionTesters.add(new InternalPermissionTester(this, activity));
-        permissionTesters.add(new InstallPermissionTester(this, activity));
+        if(PermissionUtils.isNoPermissionManifest(activity.getApplicationContext())){
+            Log.i("TAG","No Permission Configuration should not include the Install Permission Tester");
+        } else {
+            permissionTesters.add(new InstallPermissionTester(this, activity));
+        }
+
         return permissionTesters;
     }
 

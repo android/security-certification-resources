@@ -39,6 +39,7 @@ public class ProxyChecker {
         alt_descriptor.put(LOCK_SETTINGS_DESCRIPTOR,"LOCK_SETTINGS_DESCRIPTOR" );
         alt_descriptor.put("android.graphicsenv.IGpuService","GPU_DESCRIPTOR");
         alt_descriptor.put(WINDOW_DESCRIPTOR,"WINDOW_DESCRIPTOR");
+        alt_descriptor.put(EUICC_CONTROLLER_DESCRIPTOR,"EUICC_CONTROLLER_DESCRIPTOR");
         //alt_descriptor.put("com.android.internal.widget.ILockSettings","LOCK_SETTINGS_DESCRIPTOR");
         for(String k:alt_descriptor.keySet()){
             System.out.println(

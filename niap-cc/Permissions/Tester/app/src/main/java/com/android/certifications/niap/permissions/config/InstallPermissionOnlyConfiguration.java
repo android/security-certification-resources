@@ -17,16 +17,13 @@
 package com.android.certifications.niap.permissions.config;
 
 import android.app.Activity;
-import android.app.admin.DevicePolicyManager;
-import android.content.Context;
-import android.util.Log;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.DevicePolicyPermissionTester;
+import com.android.certifications.niap.permissions.InstallPermissionTester;
 import com.android.certifications.niap.permissions.R;
+import com.android.certifications.niap.permissions.utils.PermissionUtils;
 import com.android.certifications.niap.permissions.utils.ReflectionUtils;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,20 +32,16 @@ import java.util.List;
  * Configuration to verify the Google Play Services {GMS} client side libraries properly guard their
  * APIs behind platform permissions.
  */
-class DevicePolicyConfiguration implements TestConfiguration {
+class InstallPermissionOnlyConfiguration implements TestConfiguration {
     private final Activity mActivity;
 
-    public DevicePolicyConfiguration(Activity activity) {
+    public InstallPermissionOnlyConfiguration(Activity activity) {
         mActivity = activity;
     }
 
     public boolean enabled(){
-        String d1 = ReflectionUtils.deviceConfigGetProperty("device_policy_manager", "enable_device_policy_engine");
-        String d2 = ReflectionUtils.deviceConfigGetProperty("device_policy_manager", "enable_permission_based_access");
-        //Log.d("TAG","device owner>"+d1+","+d2);
-
-        return (d1 != null && d1.equals("true")) && (d2 != null && d2.equals("true"));
-   }
+        return PermissionUtils.isNoPermissionManifest(mActivity.getApplicationContext());
+    }
 
     @Override
     public void preRunSetup() throws BypassConfigException {
@@ -60,11 +53,11 @@ class DevicePolicyConfiguration implements TestConfiguration {
 
     @Override
     public List<BasePermissionTester> getPermissionTesters(Activity activity) {
-        return Collections.singletonList(new DevicePolicyPermissionTester(this, mActivity));
+        return Collections.singletonList(new InstallPermissionTester(this, mActivity));
     }
 
     @Override
     public int getButtonTextId() {
-        return R.string.run_dpm_test;
+        return R.string.run_install_permission_tests;
     }
 }

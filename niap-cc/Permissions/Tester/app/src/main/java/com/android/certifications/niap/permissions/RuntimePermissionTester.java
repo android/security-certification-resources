@@ -671,16 +671,16 @@ public class RuntimePermissionTester extends BasePermissionTester {
                                 .setContentIntent(pendingIntent)
                                 .build();
 
-                notificationManager.notify(1000, notification);
+                notificationManager.notify(1573, notification);
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
                 boolean found = false;
                 for (StatusBarNotification nn : notifications) {
-                    if (nn.getId() == 1000) {
+                    if (nn.getId() == 1573) {
                         mLogger.logInfo("notification found");
                         found = true;
                     }

@@ -90,6 +90,10 @@ public class PermissionUtils {
         return platformPermissions;
     }
 
+    public static boolean isNoPermissionManifest(Context c)
+    {
+        return !PermissionUtils.ensureRequiredPermissions(new String[]{"android.permission.INTERNET"},c);
+    }
 
     public static void checkTester(BasePermissionTester tester){
         Map<String, BasePermissionTester.PermissionTest> pt =tester.getRegisteredPermissions();
@@ -101,12 +105,11 @@ public class PermissionUtils {
     }
 
 
-    //Port from TestDPC project
+
     /**
      * Ensures that the passed in permissions are defined in manifest and attempts to grant a
      * permission automatically if it is considered dangerous.
      */
-    //@RequiresApi(Build.VERSION_CODES.M)
     public static boolean ensureRequiredPermissions(
             String[] requiredPermissions, Context context) {
         PackageInfo packageInfo;
@@ -125,9 +128,6 @@ public class PermissionUtils {
                 sLogger.logError("Missing required permission from manifest: " + expectedPermission);
                 return false;
             }
-            /*if (!maybeGrantDangerousPermission(expectedPermission, admin, context)) {
-                return false;
-            }*/
         }
         return true;
     }

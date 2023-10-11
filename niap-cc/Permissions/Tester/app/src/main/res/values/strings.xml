@@ -54,4 +54,5 @@
   <string name="device_admin_remove">Disable Device Admin Priviledges</string>
     <string name="run_dpm_test">Run DevicePolicyManagerTest(Experimental)</string>
     <string name="run_permission_dependent_tests2">RUN PERMISSION DEPENDENT TEST(PLAT)</string>
+    <string name="run_install_permission_tests">Run Install Permission Test</string>
 </resources>

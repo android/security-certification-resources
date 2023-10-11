@@ -123,6 +123,13 @@ public class ConfigurationFactory {
     private static List<TestConfiguration> getDefaultConfigurations(Activity activity) {
         List<TestConfiguration> configurations = new ArrayList<>();
         configurations.add(DEFAULT_CONFIGURATION);
+
+        InstallPermissionOnlyConfiguration installPermissionOnlyConfiguration =
+                new  InstallPermissionOnlyConfiguration(activity);
+        if(installPermissionOnlyConfiguration.enabled()){
+            configurations.add(installPermissionOnlyConfiguration);
+        }
+
         configurations.add(new NonFrameworkPermissionConfiguration());
         configurations.addAll(getAdditionalConfigurations(activity));
         return configurations;
@@ -146,6 +153,8 @@ public class ConfigurationFactory {
         if(devicePolicyConfiguration.enabled()){
             additionalConfigurations.add(devicePolicyConfiguration);
         }
+
+
 
         // TODO: Any custom configurations that are intended to be run as part of this test should
         // be added here.

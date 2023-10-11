@@ -703,6 +703,8 @@ public class Transacts {
 
     public static final String removeRestrictedMetricsChangedOperation="removeRestrictedMetricsChangedOperation";
     public static final String requestAppKeyboardShortcuts = "requestAppKeyboardShortcuts";
+    public static final String getSupportedCountries = "getSupportedCountries";
+
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an
      * extension of the Transacts class for the Permission Test Tool.

@@ -2142,13 +2142,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false, () -> {
 
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        throw new BypassTestException(
-                                "This test case doesn't work well with Android U. Let us skip it");
+                        mTransacts.invokeTransact(Transacts.EUICC_CONTROLLER_SERVICE,
+                                Transacts.EUICC_CONTROLLER_DESCRIPTOR,
+                                Transacts.getSupportedCountries, true);
+                    } else {
+                        mTransacts.invokeTransact(Transacts.ISUB_SERVICE, Transacts.ISUB_DESCRIPTOR,
+                                        Transacts.requestEmbeddedSubscriptionInfoListRefresh, 0);
                     }
-
-
-                    mTransacts.invokeTransact(Transacts.ISUB_SERVICE, Transacts.ISUB_DESCRIPTOR,
-                            Transacts.requestEmbeddedSubscriptionInfoListRefresh, 0);
                 }));
 
         mPermissionTasks.put(permission.WRITE_SECURE_SETTINGS,
@@ -4296,8 +4296,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.READ_APP_SPECIFIC_LOCALES,
                 new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
-                    //if the caller is not an owner of the application, the api raise a secuirty exception.
+                    //if the caller is not an owner of the application, the api raise a security exception.
                     try {
+                        //Check companion app
                         mLocaleManager.getApplicationLocales(
                                 "com.android.certifications.niap.permissions.companion");
                     } catch (IllegalArgumentException ex){
@@ -5171,10 +5172,17 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.HANDLE_QUERY_PACKAGE_RESTART,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
 
-                }));
-        mPermissionTasks.put(permission.MANAGE_FACE,
-                new PermissionTest(false, () -> {
                 }));*/
+        mPermissionTasks.put(permission.MANAGE_FACE,
+                new PermissionTest(false,VERSION_CODES.UPSIDE_DOWN_CAKE,  () -> {
+                    if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_FACE)) {
+                            throw new BypassTestException("This permission requires the feature "
+                                    + PackageManager.FEATURE_FACE);
+                        }
+                        runShellCommandTest("cmd face sync");
+                    }
+                }));
     }
     void prepareTestBlockBind()
     {

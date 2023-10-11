@@ -21,6 +21,7 @@ import static com.android.certifications.niap.permissions.transactids.Transacts.
 import static com.android.certifications.niap.permissions.transactids.Transacts.CLIPBOARD_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.DEVICE_POLICY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.DISPLAY_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.EUICC_CONTROLLER_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.INPUT_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.LOCK_SETTINGS_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.PACKAGE_DESCRIPTOR;
@@ -111,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         //We should automate them ....
 
         ProxyChecker.check(WINDOW_DESCRIPTOR, "requestAppKeyboardShortcuts");
+        ProxyChecker.check(EUICC_CONTROLLER_DESCRIPTOR,"getSupportedCountries");
 //        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setCameraDisabled");
 //        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setAccountManagementDisabled");
 //        ProxyChecker.check(DEVICE_POLICY_DESCRIPTOR, "setApplicationExemptions");
@@ -801,7 +803,7 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.STATS_DESCRIPTOR,Transacts.removeRestrictedMetricsChangedOperation,descriptorTransacts);
             queryTransactId(Transacts.SURFACE_FLINGER_DESCRIPTOR,Transacts.setTransactionState,descriptorTransacts);
             queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.requestAppKeyboardShortcuts, descriptorTransacts);
-
+            queryTransactId(EUICC_CONTROLLER_DESCRIPTOR, Transacts.getSupportedCountries, descriptorTransacts);
             return writeTransactsSourceFile(descriptorTransacts);
         }
 
