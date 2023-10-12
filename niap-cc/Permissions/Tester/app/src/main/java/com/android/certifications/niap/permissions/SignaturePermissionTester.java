@@ -16,6 +16,7 @@
 
 package com.android.certifications.niap.permissions;
 
+import static android.Manifest.permission.QUERY_ALL_PACKAGES;
 import static android.Manifest.permission.REQUEST_COMPANION_PROFILE_NEARBY_DEVICE_STREAMING;
 import static android.Manifest.permission.REQUEST_COMPANION_PROFILE_WATCH;
 import static android.Manifest.permission.SCHEDULE_EXACT_ALARM;
@@ -4810,7 +4811,11 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
         mPermissionTasks.put(permission.LIST_ENABLED_CREDENTIAL_PROVIDERS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
+                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                        if(isPermissionGranted(QUERY_ALL_PACKAGES)){
+                            throw new BypassTestException(
+                                    "This test works only when QUERY_ALL_PACKAGES permission is not granted.");
+                        }
                         mTransacts.invokeTransact(
                                 Context.CREDENTIAL_SERVICE,
                                 Transacts.CREDENTIAL_DESCRIPTOR,
