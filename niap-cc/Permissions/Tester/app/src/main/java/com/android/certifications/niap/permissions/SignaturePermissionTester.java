@@ -338,8 +338,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
         if (sp.getBoolean("cb_sig01", false)) prepareTestBlock01();
         if (sp.getBoolean("cb_sig02", false)) prepareTestBlock02();
         if (sp.getBoolean("cb_sig10", false)) prepareTestBlockForQPRS();
-        if (sp.getBoolean("cb_sig13", false)) prepareTestBlockForU();
-        if (sp.getBoolean("cb_sig14", false)) prepareTestBlockForT();
+        if (sp.getBoolean("cb_sig13", false)) prepareTestBlockForT();
+        if (sp.getBoolean("cb_sig14", false)) prepareTestBlockForU();
         if (sp.getBoolean("cb_sig_bind", false)) prepareTestBlockBind();
 
         //prepareTestBlockTemp();
@@ -5753,6 +5753,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         Set<String> permissionsToSkip = mConfiguration.getSkippedSignaturePermissions().orElse(
                 Collections.emptySet());
         AtomicInteger cnt = new AtomicInteger(0);
+        AtomicInteger err = new AtomicInteger(0);
         int cntmap = 0;
         final int total = permissions.size();
         for (String permission : permissions) {
@@ -5771,20 +5772,20 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         if (permissionsToSkip.contains(permission) || (mPrivilegedPermissions.contains(permission)
                                 && Constants.USE_PRIVILEGED_PERMISSION_TESTER)) {
                             mLogger.logInfo(permission+" is skipped due to the configurations.");
-                            callback.accept(new Result(true, permission, aiIncl(cnt), total).markNonTarget());
+                            callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()).markNonTarget());
                         } else {
 
                             if (mPermissionTasks.containsKey(permission)) {
                                 if (runPermissionTest(permission, mPermissionTasks.get(permission))) {
-                                    callback.accept(new Result(true, permission, aiIncl(cnt), total));
+                                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
                                 } else {
-                                    callback.accept(new Result(false, permission, aiIncl(cnt), total));
+                                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
                                 }
                             } else {
                                 //The task to skip.
                                 if(!((MainActivity)mActivity).m_reduce_logs)
                                     mLogger.logInfo(permission+" is not a target permission.");
-                                callback.accept(new Result(true, permission, aiIncl(cnt), total).markNonTarget());
+                                callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()).markNonTarget());
                             }
                         }
                     }

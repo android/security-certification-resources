@@ -773,6 +773,8 @@ public class RuntimePermissionTester extends BasePermissionTester {
                 new ArrayList<>(mPermissionTasks.keySet()));
 
         AtomicInteger cnt = new AtomicInteger(0);
+        AtomicInteger err = new AtomicInteger(0);
+
         final int total = permissions.size();
         for (String permission : permissions) {
             // If the permission has a corresponding task then run it.
@@ -782,9 +784,9 @@ public class RuntimePermissionTester extends BasePermissionTester {
                 // if this is a signature permission with the privileged protection flag then skip it
                 // if the app is configured to use the PrivilegedPermissionTester.
                 if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
-                    callback.accept(new Result(true, permission, aiIncl(cnt), total));
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
                 } else {
-                    callback.accept(new Result(false, permission, aiIncl(cnt), total));
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
                 }
             });
             thread.start();

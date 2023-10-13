@@ -64,32 +64,46 @@ public class ConfigurationFactory {
         }
 
         List<TestConfiguration> configurations = getDefaultConfigurations(activity);
+
+        RuntimeDependentPermissionConfiguration runtime_c =
+                new RuntimeDependentPermissionConfiguration(activity);
+
+        //Set Enable In Case Below
+        // 1. Required Runtime Permission is in Manifest and still not granted.
+        // 2. Permissions under test are granted in Manifest
+        if(runtime_c.checkStatusOfConfig()){
+            configurations.add(runtime_c);
+        }
+
+
         // If the app has been granted any of the permissions to be tested by the
         // RuntimeDependentPermissionConfiguration then it has to be the version that has requested
         // and been granted all runtime permissions; return the default configurations as the
         // runtime dependent tests request that the app be installed without runtime permissions
         // granted.
-        if (!RuntimeDependentPermissionConfiguration.arePermissionsUnderTestGranted(activity)) {
-            // The permission tester app with no permissions requested may request a single
-            // QUERY_ALL_PACKAGES permission to discover other packages and permissions on the
-            // device; if the app has requested more than one permission then treat it as the
-            // standard permission tester intended to run the runtime permission dependent tests.
-            try {
-                PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(
-                        activity.getPackageName(), PackageManager.GET_PERMISSIONS);
-                if (packageInfo.requestedPermissions != null
-                        && packageInfo.requestedPermissions.length > 1) {
-                    configurations.add(new RuntimeDependentPermissionConfiguration(activity));
-                }
-                return configurations;
-            } catch (PackageManager.NameNotFoundException e) {
-                sLogger.logError(
-                        "Caught an exception querying for this app's requested permissions",
-                        e);
-                // Since the requested permissions cannot be determined use the default
-                // configurations for the test.
-            }
-        }
+        //  if (!RuntimeDependentPermissionConfiguration.arePermissionsUnderTestGranted(activity)) {
+        //            // The permission tester app with no permissions requested may request a single
+        //            // QUERY_ALL_PACKAGES permission to discover other packages and permissions on the
+        //            // device; if the app has requested more than one permission then treat it as the
+        //            // standard permission tester intended to run the runtime permission dependent tests.
+        //            try {
+        //                PackageInfo packageInfo = activity.getPackageManager().getPackageInfo(
+        //                        activity.getPackageName(), PackageManager.GET_PERMISSIONS);
+        //                if (packageInfo.requestedPermissions != null
+        //                        && packageInfo.requestedPermissions.length > 1) {
+        //
+        //
+        //                    //sLogger.logSystem("ensure?>/"+c.enabled());
+        //                }
+        //                return configurations;
+        //            } catch (PackageManager.NameNotFoundException e) {
+        //                sLogger.logError(
+        //                        "Caught an exception querying for this app's requested permissions",
+        //                        e);
+        //                // Since the requested permissions cannot be determined use the default
+        //                // configurations for the test.
+        //            }
+        // }
         return configurations;
     }
 

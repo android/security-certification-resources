@@ -430,8 +430,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             };
             LocationRequest locationRequest = new LocationRequest.Builder(5000)
-                    .setDurationMillis(100)
-                    .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY).build();
+                    .setDurationMillis(5000)
+                    .setPriority(Priority.PRIORITY_HIGH_ACCURACY).build();
 
             FusedLocationProviderClient locationClient =
                     LocationServices.getFusedLocationProviderClient(getApplicationContext());

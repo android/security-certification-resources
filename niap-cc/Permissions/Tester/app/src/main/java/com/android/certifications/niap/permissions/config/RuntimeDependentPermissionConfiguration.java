@@ -18,6 +18,7 @@ package com.android.certifications.niap.permissions.config;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
@@ -30,6 +31,7 @@ import com.android.certifications.niap.permissions.RuntimePermissionTester;
 import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
+import com.android.certifications.niap.permissions.utils.PermissionUtils;
 import com.google.android.gms.common.internal.GmsLogger;
 
 import java.util.ArrayList;
@@ -74,6 +76,30 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
                     Manifest.permission.READ_PHONE_NUMBERS,
             };
         }
+    }
+
+    //Set Enable In Case Below
+    // 1. Required Runtime Permission is in Manifest and still not granted.
+    // 2. Permissions under test are granted in Manifest
+    public boolean checkStatusOfConfig() {
+        Context c = mActivity.getApplicationContext();
+        if(!PermissionUtils.ensureRequiredPermissions(REQUIRED_PERMISSIONS,c)){
+            mLogger.logInfo("RuntimeDependentPermissionConfiguration is disabled. Required Permission is not in the Manifest");
+            return false;
+        }
+        if(!PermissionUtils.ensureRequiredPermissions(PERMISSIONS_UNDER_TEST,c)) {
+             mLogger.logInfo("RuntimeDependentPermissionConfiguration is disabled. Target Permission is not in the Manifest");
+             return false;
+        }
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (mActivity.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
+                mLogger.logSystem(
+                        "RuntimeDependentPermission test is bypassed: "+permission+" is already granted." +
+                                "If you want to run this test configuration please revoke all runtime permissions at first.");
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -129,6 +155,9 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
      * Returns whether any of the permissions to be tested have been granted.
      */
     public static boolean arePermissionsUnderTestGranted(Activity activity) {
+
+
+
         for (String permission : PERMISSIONS_UNDER_TEST) {
             if (activity.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
                 //Log.d(TAG,"permission granted?"+permission);
@@ -146,6 +175,9 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
      * been granted.
      */
     private boolean areRequiredPermissionsGranted() {
+
+
+
         for (String permission : REQUIRED_PERMISSIONS) {
             if (mActivity.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
                 return false;
@@ -197,4 +229,6 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
     public int getButtonTextId() {
         return R.string.run_permission_dependent_tests;
     }
+
+
 }

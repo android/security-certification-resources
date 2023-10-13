@@ -60,14 +60,15 @@ public abstract class BasePermissionTester {
     }
     public static class Result {
 
-        public Result(boolean result,String name,int  no,int total){
+        public Result(boolean result,String name,int  no,int total,int err){
             this.result=result;this.name=name;this.no=no;this.total=total;this.isTarget=true;
-            this._testerName = testerName;
+            this._testerName = testerName;this.err = err;
         }
         Boolean result;
         String name;
         int no;
         int total;
+        int err;
         Boolean isTarget;
         String _testerName;
         public static String testerName;
@@ -84,6 +85,9 @@ public abstract class BasePermissionTester {
 
         public int getTotal() {
             return total;
+        }
+        public int getError() {
+            return err;
         }
 
         public String getTesterName() {

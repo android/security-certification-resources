@@ -94,6 +94,7 @@ public class PrivilegedPermissionTester extends SignaturePermissionTester {
         int numperms = permissions.size();
         int no=0;
         AtomicInteger cnt = new AtomicInteger(0);
+        AtomicInteger err = new AtomicInteger(0);
         final int total = permissions.size();
         for (String permission : permissions) {
             // If the permission has a corresponding task then run it.
@@ -102,11 +103,11 @@ public class PrivilegedPermissionTester extends SignaturePermissionTester {
             Thread thread = new Thread(() -> {
                 if (!mPrivilegedPermissions.contains(permission)) {
                     mLogger.logDebug(permission + " is not a privileged permission");
-                    callback.accept(new Result(true, permission, aiIncl(cnt), total));
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
                 } else if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
-                    callback.accept(new Result(true, permission, aiIncl(cnt), total));
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
                 } else {
-                    callback.accept(new Result(false, permission, aiIncl(cnt), total));
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
                 }
             });
             thread.start();

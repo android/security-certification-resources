@@ -330,8 +330,8 @@ public class GmsPermissionTester extends BasePermissionTester {
                             }
                         };
                         LocationRequest locationRequest = new LocationRequest.Builder(5000)
-                                .setDurationMillis(100)
-                                .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY).build();
+                                .setDurationMillis(5000)
+                                .setPriority(Priority.PRIORITY_HIGH_ACCURACY).build();
 
                         FusedLocationProviderClient locationClient =
                                 LocationServices.getFusedLocationProviderClient(mContext);
@@ -507,6 +507,8 @@ public class GmsPermissionTester extends BasePermissionTester {
                 mAppSignature.toByteArray(), PackageManager.CERT_INPUT_RAW_X509);
 
         AtomicInteger cnt = new AtomicInteger(0);
+        AtomicInteger err = new AtomicInteger(0);
+
         final int total = permissions.size();
         for (String permission : permissions) {
             // If the permission has a corresponding task then run it.
@@ -515,26 +517,25 @@ public class GmsPermissionTester extends BasePermissionTester {
                 if (mPermissionTasks.containsKey(permission)) {
                     //mLogger.logSystem(">"+permission+" contains");
                     if (!runPermissionTest(permission, mPermissionTasks.get(permission))) {
-                        callback.accept(new Result(false, permission, aiIncl(cnt), total));
+                        callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
                     } else {
-                        callback.accept(new Result(true, permission, aiIncl(cnt), total));
+                        callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
                     }
                 } else {
-                    //mLogger.logSystem(">"+permission+" not contains");
                     if (!gmsDeclaredPermissions.contains(permission)) {
 
                         mLogger.logError("Permission " + permission
                                 + " is not declared as a signature permission on this version of GMS");
 
-                        callback.accept(new Result(false, permission, aiIncl(cnt), total));
+                        callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
                     } else {
                         boolean permissionGranted = mContext.checkSelfPermission(permission)
                                 == PackageManager.PERMISSION_GRANTED;
 
                         if (permissionGranted != (signatureMatch || mPlatformSignatureMatch)) {
-                            callback.accept(new Result(false, permission,aiIncl(cnt), total));
+                            callback.accept(new Result(false, permission,aiIncl(cnt), total,aiIncl(err)));
                         } else {
-                            callback.accept(new Result(true, permission,aiIncl(cnt), total));
+                            callback.accept(new Result(true, permission,aiIncl(cnt), total,err.get()));
                         }
                         mLogger.logSignaturePermissionStatus(permission, permissionGranted,
                                 signatureMatch, mPlatformSignatureMatch);

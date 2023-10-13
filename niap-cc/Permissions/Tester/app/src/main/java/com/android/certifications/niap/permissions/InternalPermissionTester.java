@@ -491,16 +491,17 @@ public class InternalPermissionTester extends BasePermissionTester {
 
         List<String> permissions = mConfiguration.getInternalPermissions().orElse(
                 new ArrayList<>(mPermissionTasks.keySet()));
-        int numperms = permissions.size();
+
         int no=0;
         AtomicInteger cnt = new AtomicInteger(0);
+        AtomicInteger err = new AtomicInteger(0);
         final int total = permissions.size();
         for (String permission : permissions) {
             Thread thread = new Thread(() -> {
                 if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
-                    callback.accept(new Result(true, permission, aiIncl(cnt), total));
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
                 } else {
-                    callback.accept(new Result(false, permission, aiIncl(cnt), total));
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
                 }
             });
             thread.start();

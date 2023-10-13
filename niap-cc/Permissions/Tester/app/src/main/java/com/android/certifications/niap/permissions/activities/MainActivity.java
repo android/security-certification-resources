@@ -70,6 +70,7 @@ import com.android.certifications.niap.permissions.RuntimePermissionTester;
 import com.android.certifications.niap.permissions.SignaturePermissionTester;
 import com.android.certifications.niap.permissions.TesterApplication;
 import com.android.certifications.niap.permissions.companion.services.TestBindService;
+import com.android.certifications.niap.permissions.config.BypassConfigException;
 import com.android.certifications.niap.permissions.config.ConfigurationFactory;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
@@ -270,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                         executor = ((TesterApplication) getApplication()).executorService;
 
                 AtomicInteger errorCnt = new AtomicInteger(0);
-                AtomicInteger finishedTesters = new AtomicInteger(0);
+                //AtomicInteger finishedTesters = new AtomicInteger(0);
                 List<String> errorPermissions = new ArrayList<>();
                 AtomicBoolean bTestExecuted = new AtomicBoolean(false);
                 try {
@@ -286,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                     boolean run_internal = sp.getBoolean("cb_internal", false);
                     m_reduce_logs = sp.getBoolean("cb_reduce_logs", false);
                     List<BasePermissionTester> testers = configuration.getPermissionTesters(activity);
-                    sLogger.logDebug("Call config->" + configuration);
+
 
                     for (BasePermissionTester permissionTester : testers) {
 
@@ -301,6 +302,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
 
                         Future<Boolean> future = executor.submit(() -> {
                             mCDLForSync = new CountDownLatch(1);
+
                             permissionTester.runPermissionTestsByThreads((result) -> {
                                 runOnUiThread(() -> {
                                     if (result.getResult()) {
@@ -309,9 +311,10 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                                         sLogger.logError("Failure:" + result.getName());
                                         errorPermissions.add(result.getName());
                                         errorCnt.incrementAndGet();
+
                                     }
                                     if (result.getTotal() == result.getNo()) {
-                                        sLogger.logSystem("The test block has done. error count=" + errorCnt.get() + "/" + result.getTotal());
+                                        sLogger.logSystem("The test block has done.Error="+result.getError()+"/"+result.getTotal());
                                         if (!m_reduce_logs) {
                                             for (String pm : errorPermissions) {
                                                 sLogger.logInfo(pm);
@@ -345,6 +348,9 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
                         }
 
                     }//for
+                } catch (BypassConfigException ex) {
+                    sLogger.logError(configuration.getClass().getSimpleName()+" has been Bypassed => "+ex.getMessage());
+                    postTestersFinished("No test block is executed.");
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
