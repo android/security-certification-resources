@@ -420,6 +420,7 @@ public class BarbetApiLevel34Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(getSpecificationInfo, 8);
+        transactIds.put(openRanging, 9);
         mDescriptorTransacts.put(UWB_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();

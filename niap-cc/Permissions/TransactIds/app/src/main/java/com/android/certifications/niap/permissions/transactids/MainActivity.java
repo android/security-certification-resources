@@ -804,6 +804,8 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.SURFACE_FLINGER_DESCRIPTOR,Transacts.setTransactionState,descriptorTransacts);
             queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.requestAppKeyboardShortcuts, descriptorTransacts);
             queryTransactId(EUICC_CONTROLLER_DESCRIPTOR, Transacts.getSupportedCountries, descriptorTransacts);
+            queryTransactId(Transacts.UWB_DESCRIPTOR, Transacts.openRanging, descriptorTransacts);
+
             return writeTransactsSourceFile(descriptorTransacts);
         }
 

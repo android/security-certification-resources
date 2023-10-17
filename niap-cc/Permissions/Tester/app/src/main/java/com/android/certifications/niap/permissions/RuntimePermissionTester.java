@@ -59,6 +59,7 @@ import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
+import android.content.AttributionSource;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -85,7 +86,11 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.provider.BaseColumns;
 import android.provider.CalendarContract.CalendarAlerts;
 import android.provider.CalendarContract.Events;
@@ -103,6 +108,7 @@ import android.telecom.TelecomManager;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
@@ -546,6 +552,10 @@ public class RuntimePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(Manifest.permission.UWB_RANGING,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    if (!mPackageManager.hasSystemFeature("android.hardware.uwb")) {
+                        throw new BypassTestException(
+                                "This permission requires the android.hardware.uwb feature");
+                    }
                     // The API guarded by this permission is also guarded by the signature
                     // permission UWB_PRIVILEGED, so if this signature permission is not granted
                     // then skip this test.
@@ -553,10 +563,33 @@ public class RuntimePermissionTester extends BasePermissionTester {
                         throw new BypassTestException(
                                 "The UWB_PRIVILEGED permission must be granted for this test");
                     }
-                    // The UwbManager with the API guarded by this permission is hidden, so a
-                    // direct transact is required.
-                    mTransacts.invokeTransact(Transacts.UWB_SERVICE, Transacts.UWB_DESCRIPTOR,
-                            Transacts.getSpecificationInfo);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+
+                        // The UwbManager with the API guarded by this permission is hidden, so a
+                        // direct transact is required.
+                        final AttributionSource attributionSource = AttributionSource.myAttributionSource();
+                        Parcelable sessionHandle = new Parcelable() {
+                            @Override
+                            public int describeContents() {
+                                return 0;
+                            }
+
+                            @Override
+                            public void writeToParcel(@NonNull Parcel parcel, int i) {
+                                parcel.writeInt(1);
+                                parcel.writeInt(attributionSource.getUid());
+                                parcel.writeInt(attributionSource.getPid());
+                                parcel.writeString(attributionSource.getPackageName());
+                            }
+                        };
+                        mTransacts.invokeTransact(Transacts.UWB_SERVICE, Transacts.UWB_DESCRIPTOR,
+                                Transacts.openRanging, attributionSource, sessionHandle,
+                                (IBinder) null,
+                                new PersistableBundle(), "");
+                    } else {
+                        mTransacts.invokeTransact(Transacts.UWB_SERVICE, Transacts.UWB_DESCRIPTOR,
+                                Transacts.getSpecificationInfo);
+                    }
                 }));
 
         //New Runtime Permissions for T
