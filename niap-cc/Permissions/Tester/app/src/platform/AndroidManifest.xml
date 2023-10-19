@@ -1455,5 +1455,16 @@
     <!-- non platform oriole(pixel6) 33-->
     <uses-permission android:name="com.google.android.finsky.permission.PLAY_BILLING_LIBRARY_BROADCAST" />
     <uses-permission android:name="com.google.android.gms.permission.ACCESS_NEARBY_SHARE_API" />
-
+    <!-- non platform husky(pixel8pro) 34-->
+    <uses-permission android:name="com.fitbit.FitbitMobile.permission.SSO" />
+    <uses-permission android:name="com.google.android.wildlife.permission.ADVANCED_VPN_CONFIG" />
+    <uses-permission android:name="com.google.android.wildlife.permission.UPDATE_NETWORK_MONITOR" />
+    <uses-permission android:name="com.google.android.wildlife.permission.UPDATE_PACKAGE_MONITOR" />
+    <uses-permission android:name="com.google.android.wildlife.permission.VPN_APP_EXCLUSION_LAUNCH" />
+    <uses-permission android:name="com.summit.vicesdk.ACCESS_BEAM" />
+    <uses-permission android:name="com.vcast.mediamanager.Engage" />
+    <uses-permission android:name="com.verizon.messaging.vzmsgs.permission.MAPS_RECEIVE" />
+    <uses-permission android:name="com.vzw.DEFAULT_APP_CHANGE" />
+    <uses-permission android:name="com.vzw.engage.service.myverizon" />
+    <uses-permission android:name="com.vzw.hss.myverizon.CountlyPush.BROADCAST_PERMISSION" />
 </manifest>
