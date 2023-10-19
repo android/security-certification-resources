@@ -4927,33 +4927,27 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
 
-        /*
+
         mPermissionTasks.put(permission.SET_APP_SPECIFIC_LOCALECONFIG,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if (android.os.Build.VERSION.SDK_INT >= 34) {
-
-                        int n = 0;
-                        try {
-                            n = mPackageManager.getPackageUid
-                                    ("com.android.certifications.niap.permissions.companion",
-                                            mUid);
-                        } catch (PackageManager.NameNotFoundException e) {
-                            throw new RuntimeException(e);
+                        if(!isPermissionGranted(QUERY_ALL_PACKAGES)){
+                            throw new BypassTestException(
+                                    "This test works only when QUERY_ALL_PACKAGES permission is granted.");
                         }
+
                         LocaleList OVERRIDE_LOCALES =
                                 LocaleList.forLanguageTags("en-US,fr-FR,zh-Hant-TW");
 
-                        //mLocaleManager.setOverrideLocaleConfig();
                         //for checking it need to set other application locale config
-
                         mTransacts.invokeTransact(
                                 Context.LOCALE_SERVICE,
                                 Transacts.LOCALE_DESCRIPTOR,
                                 Transacts.setOverrideLocaleConfig,
-                                "com.android.certifications.niap.permissions.companion",mUid,
+                                "com.android.certifications.niap.permissions.companion",0,
                                 new LocaleConfig(OVERRIDE_LOCALES));
                     }
-        }));*/
+        }));
 
         mPermissionTasks.put(permission.SET_LOW_POWER_STANDBY_PORTS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {

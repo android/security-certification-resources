@@ -577,9 +577,10 @@ public class RuntimePermissionTester extends BasePermissionTester {
                             @Override
                             public void writeToParcel(@NonNull Parcel parcel, int i) {
                                 parcel.writeInt(1);
+                                parcel.writeString(attributionSource.getPackageName());
                                 parcel.writeInt(attributionSource.getUid());
                                 parcel.writeInt(attributionSource.getPid());
-                                parcel.writeString(attributionSource.getPackageName());
+
                             }
                         };
                         mTransacts.invokeTransact(Transacts.UWB_SERVICE, Transacts.UWB_DESCRIPTOR,
