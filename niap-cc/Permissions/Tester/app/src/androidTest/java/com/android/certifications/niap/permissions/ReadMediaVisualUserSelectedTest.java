@@ -164,6 +164,10 @@ public class ReadMediaVisualUserSelectedTest {
                 throw new RuntimeException("Can not find expected ui (Cards)");
             }
             cards.get(0).click();
+
+            mDevice.wait(Until.findObject( By.textStartsWith("Allow"))
+                   ,1000);
+
             mDevice.waitForIdle();
             UiObject2 btnAllow = mDevice.findObject(By.textStartsWith("Allow"));
             if(btnAllow==null || !btnAllow.isClickable()){
