@@ -126,6 +126,9 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
 
             mCountDownLatch = new CountDownLatch(1);
             try {
+                // Wait for the countdown on the latch; this will block the thread attempting to
+                // run the permission test while the user is prompted for consent to the required
+                // permissions.
                 mCountDownLatch.await(10, TimeUnit.SECONDS);
                 // If the user has not granted the required permissions then throw a bypass
                 // exception to notify the user of this requirement.
@@ -134,9 +137,7 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
                             R.string.permissions_must_be_granted,
                             String.join(", ", REQUIRED_PERMISSIONS)));
                 }
-                // Wait for the countdown on the latch; this will block the thread attempting to
-                // run the permission test while the user is prompted for consent to the required
-                // permissions.
+
 
             } catch (InterruptedException e) {
                 throw new BypassConfigException(
