@@ -204,11 +204,9 @@ public class ReadMediaVisualUserSelectedTest {
         }
 
         if((ok && hasPermissionInManifest) || (!ok && !hasPermissionInManifest)){
-            //Log.d(TAG,"The test successfully completed");
             errs.checkThat(a.Msg("grant: "+hasPermissionInManifest+" result:"+ok),
                     true,org.hamcrest.CoreMatchers.is(true));
         } else {
-            //a
             errs.checkThat(a.Msg("grant: "+hasPermissionInManifest+" result:"+ok),
                     false,org.hamcrest.CoreMatchers.is(true));
         }

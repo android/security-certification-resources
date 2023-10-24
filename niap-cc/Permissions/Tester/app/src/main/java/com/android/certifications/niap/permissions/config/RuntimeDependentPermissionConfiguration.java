@@ -126,7 +126,7 @@ class RuntimeDependentPermissionConfiguration implements TestConfiguration {
 
             mCountDownLatch = new CountDownLatch(1);
             try {
-                mCountDownLatch.await(5, TimeUnit.SECONDS);
+                mCountDownLatch.await(10, TimeUnit.SECONDS);
                 // If the user has not granted the required permissions then throw a bypass
                 // exception to notify the user of this requirement.
                 if (!areRequiredPermissionsGranted()) {
