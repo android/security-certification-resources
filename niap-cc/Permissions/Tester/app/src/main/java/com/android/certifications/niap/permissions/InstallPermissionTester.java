@@ -773,9 +773,22 @@ public class InstallPermissionTester extends BasePermissionTester {
                     }
                 }));
 
+        boolean signatureMatch = mPackageManager.hasSigningCertificate(Constants.GMS_PACKAGE_NAME,
+                mAppSignature.toByteArray(), PackageManager.CERT_INPUT_RAW_X509);
+
         mPermissionTasks.put(QUERY_ALL_PACKAGES,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
                     try {
+                        //If the app is running with platform signature the test will be skipped.
+                        // 1. We can test this permission with normal variant.
+                        // 2. There is a test case which fails it it is declared.
+                        if(mPlatformSignatureMatch){
+                            final String msg = "The test for QUERY_ALL_PACKAGES permission is bypassed " +
+                                    "when the app is signing with a platform signature." +
+                                    "(see details in the process document)";
+                            mLogger.logSystem(msg);
+                            throw new BypassTestException(msg);
+                        }
                         // The companion package should be installed to act as a queryable package
                         // for this test; without a <queries> tag in the AndroidManifest and without
                         // this permission granted a query for the companion package should result

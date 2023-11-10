@@ -19,6 +19,10 @@
     <uses-feature android:name="android.software.companion_device_setup"
         android:required="false" />
 
+    <queries>
+        <package android:name="com.android.certifications.niap.permissions.companion" />
+    </queries>
+
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
@@ -604,7 +608,7 @@
     <uses-permission android:name="android.permission.OBSERVE_NETWORK_POLICY" />
     <uses-permission android:name="android.permission.OVERRIDE_COMPAT_CHANGE_CONFIG" />
     <uses-permission android:name="android.permission.PEEK_DROPBOX_DATA" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <!--<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />-->
     <uses-permission android:name="android.permission.RADIO_SCAN_WITHOUT_LOCATION" />
     <uses-permission android:name="android.permission.READ_ACTIVE_EMERGENCY_SESSION" />
     <uses-permission android:name="android.permission.READ_CARRIER_APP_INFO" />
