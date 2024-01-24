@@ -44,7 +44,10 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
   final String TAG = "HUBBLE";
-  private final String VERSION = "1.3.0";   // NOTE: to be updated for every Hubble release
+
+  // semantically tie the notion of app version to versionName, which we will update for every
+  // major and minor release, instead of independently and separately update these values everytime.
+  private final String VERSION = BuildConfig.VERSION_NAME;
 
   private HashMap<String, PackageMetadata> mAllPackages;
   private HashMap<String, byte[]> mAllCertificates;
