@@ -48,6 +48,7 @@ class BaselinePackages:
       30: "data/R-GSI.json",
       31: "data/S-GSI.json",
       33: "data/T-GSI.json",  # per https://developer.android.com/reference/android/os/Build.VERSION_CODES#TIRAMISU
+      34: "data/U-GSI.json",  # per https://developer.android.com/reference/android/os/Build.VERSION_CODES#UPSIDE_DOWN_CAKE
   }
 
   @staticmethod
