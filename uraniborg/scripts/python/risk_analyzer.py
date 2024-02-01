@@ -187,6 +187,9 @@ class PlatformSignature(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger):
+    if api_level == 34:
+      logger.debug("Returning UPlatformSignature")
+      return UPlatformSignature(logger)
     if api_level == 33:
       logger.debug("Returning TPlatformSignature")
       return TPlatformSignature(logger)
@@ -319,6 +322,11 @@ class TPlatformSignature(PlatformSignature):
   BASE_SCORE = 50
 
 
+class UPlatformSignature(PlatformSignature):
+  API_LEVEL = 34
+  BASE_SCORE = 50
+
+
 class SystemUid(RiskAnalyzer):
   """Analyzer for system uid risks.
   """
@@ -332,6 +340,9 @@ class SystemUid(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger):
+    if api_level == 34:
+      logger.debug("Returning USystemUid")
+      return USystemUid(logger)
     if api_level == 33:
       logger.debug("Returning TSystemUid")
       return TSystemUid(logger)
@@ -421,6 +432,11 @@ class SSystemUid(SystemUid):
 class TSystemUid(SystemUid):
   API_LEVEL = 33
   BASE_SCORE = 30
+
+
+class USystemUid(SystemUid):
+  API_LEVEL = 34
+  BASE_SCORE = 33
 
 
 class RiskyPermissions(RiskAnalyzer):
@@ -521,6 +537,8 @@ class RiskyPermissions(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger, google_discount=False):
+    if api_level == 34:
+      return URiskyPermissions(logger, google_discount)
     if api_level == 33:
       return TRiskyPermissions(logger, google_discount)
     if api_level == 31:
@@ -752,6 +770,11 @@ class TRiskyPermissions(RiskyPermissions):
   UNGRANTED_SCORE = 200
 
 
+class URiskyPermissions(RiskyPermissions):
+  API_LEVEL = 34
+  BASE_SCORE = 542.50
+  UNGRANTED_SCORE = 162.50
+
 class CleartextTraffic(RiskAnalyzer):
   """Cleartext traffic risk analyzer.
 
@@ -763,6 +786,8 @@ class CleartextTraffic(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger, google_discount=False):
+    if api_level == 34:
+      return UCleartextTraffic(logger, google_discount)
     if api_level == 33:
       return TCleartextTraffic(logger, google_discount)
     if api_level == 31:
@@ -886,6 +911,10 @@ class SCleartextTraffic(CleartextTraffic):
 
 class TCleartextTraffic(CleartextTraffic):
   BASE_SCORE = 9
+
+
+class UCleartextTraffic(CleartextTraffic):
+  BASE_SCORE = 8
 
 
 class HostileDownloader(RiskAnalyzer):
