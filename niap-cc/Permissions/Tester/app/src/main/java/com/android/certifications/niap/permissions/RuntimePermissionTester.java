@@ -812,8 +812,8 @@ public class RuntimePermissionTester extends BasePermissionTester {
         final int total = permissions.size();
         for (String permission : permissions) {
             // If the permission has a corresponding task then run it.
-//            mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
-//                    "%d/%d ",cnt.get(),total) + permission);
+            // mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
+            // "%d/%d ",cnt.get(),total) + permission);
             Thread thread = new Thread(() -> {
                 // if this is a signature permission with the privileged protection flag then skip it
                 // if the app is configured to use the PrivilegedPermissionTester.

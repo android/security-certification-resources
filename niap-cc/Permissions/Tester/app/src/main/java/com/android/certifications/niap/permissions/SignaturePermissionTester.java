@@ -5135,11 +5135,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }
             }));
 
-/*
-        mPermissionTasks.put(permission.ACCESS_GPU_SERVICE,
-                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE,
-                        VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {}));
-*/
+        //permission.ACCESS_GPU_SERVICE
+
         mPermissionTasks.put(permission.WAKEUP_SURFACE_FLINGER,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     //commonize the tester routine with exposing the builder of AssociationRequest object
@@ -5150,28 +5147,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }));
 
-        /*mPermissionTasks.put(permission.QUERY_CLONED_APPS,
-                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    //commonize the tester routine with exposing the builder of AssociationRequest object
-                    if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                        //frameworks/base/core/java/android/provider/Settings.java
-                        int MATCH_CLONE_PROFILE = 0x20000000;
-                        Intent intent = new Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse("https://www.google.com")
-                        );
-                        List<ResolveInfo> resolveInfos
-                                =mPackageManager.queryIntentActivities(intent,
-                                PackageManager.MATCH_ALL|MATCH_CLONE_PROFILE);
+        //permission.QUERY_CLONED_APPS
 
-                        //mLogger.logDebug(resolveInfos.toString());
-                    }
-                }));*/
-/*
-        mPermissionTasks.put(permission.HANDLE_QUERY_PACKAGE_RESTART,
-                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+        //permission.HANDLE_QUERY_PACKAGE_RESTART
 
-                }));*/
         mPermissionTasks.put(permission.MANAGE_FACE,
                 new PermissionTest(false,VERSION_CODES.UPSIDE_DOWN_CAKE,  () -> {
                     if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
