@@ -60,7 +60,7 @@ public abstract class BasePermissionTester {
     }
     public static class Result {
 
-        public Result(boolean result,String name,int  no,int total,int err){
+        public Result(boolean result,String name,int  no,int total,int err,String testerName){
             this.result=result;this.name=name;this.no=no;this.total=total;this.isTarget=true;
             this._testerName = testerName;this.err = err;
         }

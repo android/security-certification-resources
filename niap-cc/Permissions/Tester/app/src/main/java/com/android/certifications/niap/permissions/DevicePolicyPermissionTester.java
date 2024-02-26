@@ -842,10 +842,11 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
         final int total = permissions.size();
         for (String permission : permissions) {
             Thread thread = new Thread(() -> {
+                String tester = this.getClass().getSimpleName();
                 if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
-                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester));
                 } else {
-                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
                 }
             });
             thread.start();

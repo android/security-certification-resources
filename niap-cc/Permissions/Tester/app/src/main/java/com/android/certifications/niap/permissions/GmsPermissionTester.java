@@ -513,13 +513,14 @@ public class GmsPermissionTester extends BasePermissionTester {
         for (String permission : permissions) {
             // If the permission has a corresponding task then run it.
             Thread thread = new Thread(() -> {
+                String tester = this.getClass().getSimpleName();
                 //mLogger.logSystem(">"+permission+" thread run");
                 if (mPermissionTasks.containsKey(permission)) {
                     //mLogger.logSystem(">"+permission+" contains");
                     if (!runPermissionTest(permission, mPermissionTasks.get(permission))) {
-                        callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
+                        callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
                     } else {
-                        callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
+                        callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester));
                     }
                 } else {
                     if (!gmsDeclaredPermissions.contains(permission)) {
@@ -527,15 +528,15 @@ public class GmsPermissionTester extends BasePermissionTester {
                         mLogger.logError("Permission " + permission
                                 + " is not declared as a signature permission on this version of GMS");
 
-                        callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
+                        callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
                     } else {
                         boolean permissionGranted = mContext.checkSelfPermission(permission)
                                 == PackageManager.PERMISSION_GRANTED;
 
                         if (permissionGranted != (signatureMatch || mPlatformSignatureMatch)) {
-                            callback.accept(new Result(false, permission,aiIncl(cnt), total,aiIncl(err)));
+                            callback.accept(new Result(false, permission,aiIncl(cnt), total,aiIncl(err),tester));
                         } else {
-                            callback.accept(new Result(true, permission,aiIncl(cnt), total,err.get()));
+                            callback.accept(new Result(true, permission,aiIncl(cnt), total,err.get(),tester));
                         }
                         mLogger.logSignaturePermissionStatus(permission, permissionGranted,
                                 signatureMatch, mPlatformSignatureMatch);

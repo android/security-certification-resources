@@ -1124,10 +1124,11 @@ public class InstallPermissionTester extends BasePermissionTester {
 //            mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
 //                    "%d/%d ",no,numperms) + permission);
             Thread thread = new Thread(() -> {
+                String tester = this.getClass().getSimpleName();
                 if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
-                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester));
                 } else {
-                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
                 }
             });
             thread.start();

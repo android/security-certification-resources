@@ -101,13 +101,14 @@ public class PrivilegedPermissionTester extends SignaturePermissionTester {
 //            mLogger.logDebug("Starting test for privileged permission: "+String.format(Locale.US,
 //                    "%d/%d ",no,numperms) + permission);
             Thread thread = new Thread(() -> {
+                String tester = this.getClass().getSimpleName();
                 if (!mPrivilegedPermissions.contains(permission)) {
                     mLogger.logDebug(permission + " is not a privileged permission");
-                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester));
                 } else if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
-                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester));
                 } else {
-                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
                 }
             });
             thread.start();

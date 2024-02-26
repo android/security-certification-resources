@@ -5742,23 +5742,24 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        String tester = this.getClass().getSimpleName();
                         if (permissionsToSkip.contains(permission) || (mPrivilegedPermissions.contains(permission)
                                 && Constants.USE_PRIVILEGED_PERMISSION_TESTER)) {
                             mLogger.logInfo(permission+" is skipped due to the configurations.");
-                            callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()).markNonTarget());
+                            callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester).markNonTarget());
                         } else {
-
                             if (mPermissionTasks.containsKey(permission)) {
                                 if (runPermissionTest(permission, mPermissionTasks.get(permission))) {
-                                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
+                                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester));
                                 } else {
-                                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
+                                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
                                 }
                             } else {
                                 //The task to skip.
                                 if(!((MainActivity)mActivity).m_reduce_logs)
                                     mLogger.logInfo(permission+" is not a target permission.");
-                                callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()).markNonTarget());
+
+                                callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester).markNonTarget());
                             }
                         }
                     }

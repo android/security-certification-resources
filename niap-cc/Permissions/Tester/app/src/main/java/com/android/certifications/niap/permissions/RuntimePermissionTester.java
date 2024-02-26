@@ -815,12 +815,13 @@ public class RuntimePermissionTester extends BasePermissionTester {
             // mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
             // "%d/%d ",cnt.get(),total) + permission);
             Thread thread = new Thread(() -> {
+                String tester = this.getClass().getSimpleName();
                 // if this is a signature permission with the privileged protection flag then skip it
                 // if the app is configured to use the PrivilegedPermissionTester.
                 if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
-                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get()));
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester));
                 } else {
-                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err)));
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
                 }
             });
             thread.start();
