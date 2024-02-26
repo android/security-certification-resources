@@ -1106,6 +1106,97 @@ public class SignaturePermissions {
                 "android.permission.ACCESS_AMBIENT_CONTEXT_EVENT";
         public static final String MANAGE_ETHERNET_NETWORKS =
                 "android.permission.MANAGE_ETHERNET_NETWORKS";
+
+        // New signature permissions as of Android 14
+        public static final String ACCESS_GPU_SERVICE =
+                "android.permission.ACCESS_GPU_SERVICE";
+        public static final String BIND_CALL_STREAMING_SERVICE =
+                "android.permission.BIND_CALL_STREAMING_SERVICE";
+        public static final String BIND_CREDENTIAL_PROVIDER_SERVICE =
+                "android.permission.BIND_CREDENTIAL_PROVIDER_SERVICE";
+        public static final String BIND_FIELD_CLASSIFICATION_SERVICE =
+                "android.permission.BIND_FIELD_CLASSIFICATION_SERVICE";
+        public static final String BIND_REMOTE_LOCKSCREEN_VALIDATION_SERVICE =
+                "android.permission.BIND_REMOTE_LOCKSCREEN_VALIDATION_SERVICE";
+        public static final String BIND_SATELLITE_GATEWAY_SERVICE =
+                "android.permission.BIND_SATELLITE_GATEWAY_SERVICE";
+        public static final String BIND_SATELLITE_SERVICE =
+                "android.permission.BIND_SATELLITE_SERVICE";
+        public static final String BIND_VISUAL_QUERY_DETECTION_SERVICE =
+                "android.permission.BIND_VISUAL_QUERY_DETECTION_SERVICE";
+        public static final String BIND_WEARABLE_SENSING_SERVICE =
+                "android.permission.BIND_WEARABLE_SENSING_SERVICE";
+        public static final String BROADCAST_OPTION_INTERACTIVE =
+                "android.permission.BROADCAST_OPTION_INTERACTIVE";
+        public static final String CHECK_REMOTE_LOCKSCREEN =
+                "android.permission.CHECK_REMOTE_LOCKSCREEN";
+        public static final String DELETE_STAGED_HEALTH_CONNECT_REMOTE_DATA =
+                "android.permission.DELETE_STAGED_HEALTH_CONNECT_REMOTE_DATA";
+        public static final String GET_ANY_PROVIDER_TYPE =
+                "android.permission.GET_ANY_PROVIDER_TYPE";
+        public static final String GET_APP_METADATA =
+                "android.permission.GET_APP_METADATA";
+        public static final String HANDLE_QUERY_PACKAGE_RESTART =
+                "android.permission.HANDLE_QUERY_PACKAGE_RESTART";
+        public static final String KILL_ALL_BACKGROUND_PROCESSES =
+                "android.permission.KILL_ALL_BACKGROUND_PROCESSES";
+        public static final String LAUNCH_CREDENTIAL_SELECTOR =
+                "android.permission.LAUNCH_CREDENTIAL_SELECTOR";
+        public static final String LIST_ENABLED_CREDENTIAL_PROVIDERS =
+                "android.permission.LIST_ENABLED_CREDENTIAL_PROVIDERS";
+        public static final String LOG_FOREGROUND_RESOURCE_USE =
+                "android.permission.LOG_FOREGROUND_RESOURCE_USE";
+        public static final String MANAGE_CLIPBOARD_ACCESS_NOTIFICATION =
+                "android.permission.MANAGE_CLIPBOARD_ACCESS_NOTIFICATION";
+        public static final String MANAGE_DEFAULT_APPLICATIONS =
+                "android.permission.MANAGE_DEFAULT_APPLICATIONS";
+        public static final String MANAGE_FACE =
+                "android.permission.MANAGE_FACE";
+        public static final String MANAGE_SUBSCRIPTION_USER_ASSOCIATION =
+                "android.permission.MANAGE_SUBSCRIPTION_USER_ASSOCIATION";
+        public static final String MANAGE_WEARABLE_SENSING_SERVICE =
+                "android.permission.MANAGE_WEARABLE_SENSING_SERVICE";
+        public static final String MIGRATE_HEALTH_CONNECT_DATA =
+                "android.permission.MIGRATE_HEALTH_CONNECT_DATA";
+        public static final String MODIFY_AUDIO_SETTINGS_PRIVILEGED =
+                "android.permission.MODIFY_AUDIO_SETTINGS_PRIVILEGED";
+        public static final String MODIFY_HDR_CONVERSION_MODE =
+                "android.permission.MODIFY_HDR_CONVERSION_MODE";
+        public static final String MONITOR_KEYBOARD_BACKLIGHT =
+                "android.permission.MONITOR_KEYBOARD_BACKLIGHT";
+        public static final String PROVIDE_DEFAULT_ENABLED_CREDENTIAL_SERVICE =
+                "android.permission.PROVIDE_DEFAULT_ENABLED_CREDENTIAL_SERVICE";
+        public static final String PROVIDE_REMOTE_CREDENTIALS =
+                "android.permission.PROVIDE_REMOTE_CREDENTIALS";
+        public static final String QUERY_CLONED_APPS =
+                "android.permission.QUERY_CLONED_APPS";
+        public static final String READ_INSTALLED_SESSION_PATHS =
+                "android.permission.READ_INSTALLED_SESSION_PATHS";
+        public static final String READ_WRITE_SYNC_DISABLED_MODE_CONFIG =
+                "android.permission.READ_WRITE_SYNC_DISABLED_MODE_CONFIG";
+        public static final String REMAP_MODIFIER_KEYS =
+                "android.permission.REMAP_MODIFIER_KEYS";
+        public static final String REQUEST_COMPANION_PROFILE_NEARBY_DEVICE_STREAMING =
+                "android.permission.REQUEST_COMPANION_PROFILE_NEARBY_DEVICE_STREAMING";
+        public static final String SATELLITE_COMMUNICATION =
+                "android.permission.SATELLITE_COMMUNICATION";
+        public static final String SET_APP_SPECIFIC_LOCALECONFIG =
+                "android.permission.SET_APP_SPECIFIC_LOCALECONFIG";
+        public static final String SET_LOW_POWER_STANDBY_PORTS =
+                "android.permission.SET_LOW_POWER_STANDBY_PORTS";
+        public static final String SET_UNRESTRICTED_GESTURE_EXCLUSION =
+                "android.permission.SET_UNRESTRICTED_GESTURE_EXCLUSION";
+        public static final String STAGE_HEALTH_CONNECT_REMOTE_DATA =
+                "android.permission.STAGE_HEALTH_CONNECT_REMOTE_DATA";
+        public static final String TEST_INPUT_METHOD =
+                "android.permission.TEST_INPUT_METHOD";
+        public static final String TURN_SCREEN_ON =
+                "android.permission.TURN_SCREEN_ON";
+        public static final String WAKEUP_SURFACE_FLINGER =
+                "android.permission.WAKEUP_SURFACE_FLINGER";
+        public static final String WRITE_ALLOWLISTED_DEVICE_CONFIG =
+                "android.permission.WRITE_ALLOWLISTED_DEVICE_CONFIG";
+
     }
 
     /**

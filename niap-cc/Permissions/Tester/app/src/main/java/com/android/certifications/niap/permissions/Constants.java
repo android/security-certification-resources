@@ -30,6 +30,7 @@ public class Constants {
      * Logger}.
      */
     public static final boolean DEBUG = true;
+
     /**
      * Indicates whether the {@link ConfigurationFactory}
      * should return a debug configuration
@@ -83,4 +84,10 @@ public class Constants {
      * The name of the Google Play Services package.
      */
     public static final String GMS_PACKAGE_NAME = "com.google.android.gms";
+
+    /**
+     * It determine if testers runs the test cases which are affect user interfaces destructively.
+     */
+    public static final boolean BYPASS_TESTS_AFFECTING_UI = false;
+
 }

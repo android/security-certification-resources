@@ -17,7 +17,6 @@ package android.security;
 
 import android.security.AppUriAuthenticationPolicy;
 import android.net.Uri;
-
 import java.util.List;
 
 interface IKeyChainService {

@@ -16,6 +16,8 @@
 
 package com.android.certifications.niap.permissions;
 
+import static androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -28,8 +30,12 @@ import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.location.Location;
 import android.os.Build;
+import android.os.Looper;
 import android.util.SparseArray;
 
+import androidx.core.util.Consumer;
+
+import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -48,9 +54,11 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.gms.vision.CameraSource;
@@ -61,11 +69,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -76,7 +86,10 @@ import java.util.stream.Collectors;
  */
 public class GmsPermissionTester extends BasePermissionTester {
     private static final String TAG = "GmsPermissionTester";
-    private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
+    //private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
+    private final Logger mLogger =
+            LoggerFactory.createActivityLogger(TAG,(LogListAdaptable) mActivity);
+
 
     /**
      * Map of permission to a Runnable that can be used to verify the client library API that is
@@ -124,7 +137,7 @@ public class GmsPermissionTester extends BasePermissionTester {
         GMS_SIGNATURE_PERMISSIONS.add(
                 "com.google.android.gms.magictether.permission.CONNECTED_HOST_CHANGED");
         GMS_SIGNATURE_PERMISSIONS.add("com.google.android.gms.permission.CONTACTS_SYNC_DELEGATION");
-        GMS_SIGNATURE_PERMISSIONS.add("com.google.android.gms.permission.GAMES_DEBUG_SETTINGS");
+        //GMS_SIGNATURE_PERMISSIONS.add("com.google.android.gms.permission.GAMES_DEBUG_SETTINGS");//Removed as of 13
         GMS_SIGNATURE_PERMISSIONS.add(
                 "com.google.android.gms.trustagent.permission.TRUSTAGENT_STATE");
         GMS_SIGNATURE_PERMISSIONS.add(
@@ -215,11 +228,18 @@ public class GmsPermissionTester extends BasePermissionTester {
                             }
                         }
                     };
-                    mContext.registerReceiver(receiver,
-                            new IntentFilter(ACTIVITY_RECOGNITION_TEST));
+
+                    if(Build.VERSION.SDK_INT<Build.VERSION_CODES.TIRAMISU) {
+                        mContext.registerReceiver(receiver,
+                                new IntentFilter(ACTIVITY_RECOGNITION_TEST));
+                    } else {
+                        mContext.registerReceiver(receiver,
+                                new IntentFilter(ACTIVITY_RECOGNITION_TEST), Context.RECEIVER_NOT_EXPORTED);
+                    }
+
                     Intent intent = new Intent(ACTIVITY_RECOGNITION_TEST);
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
-                            PendingIntent.FLAG_MUTABLE);
+                            PendingIntent.FLAG_IMMUTABLE);
 
                     // The ActivityRecognitionClient will throw a SecurityException when waiting for
                     // the Task from the #requestActivityUpdates to complete.
@@ -248,50 +268,86 @@ public class GmsPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(Manifest.permission.ACCESS_COARSE_LOCATION,
                 new PermissionTest(false, () -> {
-                    final String ACCESS_COARSE_LOCATION_TEST = "ACCESS_COARSE_LOCATION_TEST";
-                    CountDownLatch[] latch = new CountDownLatch[1];
-                    latch[0] = new CountDownLatch(1);
+                    if(Build.VERSION.SDK_INT<=Build.VERSION_CODES.TIRAMISU) {
+                        final String ACCESS_COARSE_LOCATION_TEST = "ACCESS_COARSE_LOCATION_TEST";
+                        CountDownLatch[] latch = new CountDownLatch[1];
+                        latch[0] = new CountDownLatch(1);
 
-                    BroadcastReceiver receiver = new BroadcastReceiver() {
-                        @Override
-                        public void onReceive(Context context, Intent intent) {
-                            LocationResult result = LocationResult.extractResult(intent);
-                            // The countdown on the latch should only occur if the provided
-                            // intent includes a valid location since additional updates can be sent
-                            // without a location.
-                            if (result != null) {
-                                Location location = result.getLastLocation();
-                                if (location != null) {
-                                    mLogger.logDebug(
-                                            "Received a lat,long of " + location.getLatitude()
-                                                    + ", "
-                                                    + location.getLongitude());
+                        BroadcastReceiver receiver = new BroadcastReceiver() {
+                            @Override
+                            public void onReceive(Context context, Intent intent) {
+                                LocationResult result = LocationResult.extractResult(intent);
+                                // The countdown on the latch should only occur if the provided
+                                // intent includes a valid location since additional updates can be sent
+                                // without a location.
+                                if (result != null) {
+                                    Location location = result.getLastLocation();
+                                    if (location != null) {
+                                        mLogger.logDebug(
+                                                "Received a lat,long of " + location.getLatitude()
+                                                        + ", "
+                                                        + location.getLongitude());
+                                        latch[0].countDown();
+                                    }
+                                }
+                            }
+                        };
+                        mContext.registerReceiver(receiver,
+                                new IntentFilter(ACCESS_COARSE_LOCATION_TEST));
+                        Intent intent = new Intent(ACCESS_COARSE_LOCATION_TEST);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
+                                PendingIntent.FLAG_MUTABLE);
+
+                        LocationRequest locationRequest = LocationRequest.create().setPriority(
+                                LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(1000);
+                        FusedLocationProviderClient locationClient =
+                                LocationServices.getFusedLocationProviderClient(mContext);
+                        locationClient.requestLocationUpdates(locationRequest, pendingIntent);
+                        boolean locationReceived = false;
+                        try {
+                            locationReceived = latch[0].await(30, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            mLogger.logError("Caught an InterruptedException: ", e);
+                        }
+                        locationClient.removeLocationUpdates(pendingIntent);
+                        mContext.unregisterReceiver(receiver);
+                        if (!locationReceived) {
+                            throw new SecurityException("A location update was not received");
+                        }
+                    } else {
+                        CountDownLatch[] latch = new CountDownLatch[1];
+                        latch[0] = new CountDownLatch(1);
+                        LocationCallback locationCallback = new LocationCallback() {
+                            @Override
+                            public void onLocationResult(LocationResult locationResult) {
+                                if (locationResult == null) {
+                                    return;
+                                }
+                                for (Location location : locationResult.getLocations()) {
+                                    mLogger.logDebug("updated location=>"+location.toString());
                                     latch[0].countDown();
                                 }
                             }
-                        }
-                    };
-                    mContext.registerReceiver(receiver,
-                            new IntentFilter(ACCESS_COARSE_LOCATION_TEST));
-                    Intent intent = new Intent(ACCESS_COARSE_LOCATION_TEST);
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
-                            PendingIntent.FLAG_MUTABLE);
+                        };
+                        LocationRequest locationRequest = new LocationRequest.Builder(5000)
+                                .setDurationMillis(5000)
+                                .setPriority(Priority.PRIORITY_HIGH_ACCURACY).build();
 
-                    LocationRequest locationRequest = LocationRequest.create().setPriority(
-                            LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(1000);
-                    FusedLocationProviderClient locationClient =
-                            LocationServices.getFusedLocationProviderClient(mContext);
-                    locationClient.requestLocationUpdates(locationRequest, pendingIntent);
-                    boolean locationReceived = false;
-                    try {
-                        locationReceived = latch[0].await(30, TimeUnit.SECONDS);
-                    } catch (InterruptedException e) {
-                        mLogger.logError("Caught an InterruptedException: ", e);
-                    }
-                    locationClient.removeLocationUpdates(pendingIntent);
-                    mContext.unregisterReceiver(receiver);
-                    if (!locationReceived) {
-                        throw new SecurityException("A location update was not received");
+                        FusedLocationProviderClient locationClient =
+                                LocationServices.getFusedLocationProviderClient(mContext);
+                        locationClient.requestLocationUpdates(locationRequest,
+                                locationCallback,
+                                Looper.getMainLooper());
+                        boolean locationReceived = false;
+                        try {
+                            locationReceived = latch[0].await(10, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            mLogger.logError("Caught an InterruptedException: ", e);
+                        }
+                        locationClient.removeLocationUpdates(locationCallback);
+                        if (!locationReceived) {
+                            throw new SecurityException("A location update was not received");
+                        }
                     }
                 }));
 
@@ -344,8 +400,14 @@ public class GmsPermissionTester extends BasePermissionTester {
                             }
                         }
                     };
-                    mContext.registerReceiver(receiver,
-                            new IntentFilter(ACCESS_BACKGROUND_LOCATION_TEST));
+                    if(Build.VERSION.SDK_INT<Build.VERSION_CODES.TIRAMISU) {
+                        mContext.registerReceiver(receiver,
+                                new IntentFilter(ACCESS_BACKGROUND_LOCATION_TEST));
+                    } else {
+                        mContext.registerReceiver(receiver,
+                                new IntentFilter(ACCESS_BACKGROUND_LOCATION_TEST), Context.RECEIVER_NOT_EXPORTED);
+                    }
+
                     Intent intent = new Intent(ACCESS_BACKGROUND_LOCATION_TEST);
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
                             PendingIntent.FLAG_IMMUTABLE);
@@ -403,12 +465,12 @@ public class GmsPermissionTester extends BasePermissionTester {
             Detector.Processor<Integer> processor = new Detector.Processor() {
                 @Override
                 public void receiveDetections(Detector.Detections detections) {
-                    mLogger.logDebug("receiveDetections: detections = " + detections);
+                    mLogger.logDebug("Camera Permission : detections = " + detections);
                 }
 
                 @Override
                 public void release() {
-                    mLogger.logDebug("release");
+                    mLogger.logDebug("Camera Permission : release deteced");
                 }
             };
             detector.setProcessor(processor);
@@ -432,6 +494,64 @@ public class GmsPermissionTester extends BasePermissionTester {
         }));
     }
 
+    public void runPermissionTestsByThreads(Consumer<Result> callback){
+        Result.testerName = this.getClass().getSimpleName();
+
+        List<String> gmsDeclaredPermissions = getAllGmsDeclaredSignaturePermissions();
+        List<String> defaultPermissions = new ArrayList<>(mPermissionTasks.keySet());
+        defaultPermissions.addAll(GMS_SIGNATURE_PERMISSIONS);
+        List<String> permissions = mConfiguration.getPermissions().orElse(defaultPermissions);
+        // An app should only have access to the GMS signature permissions if it is signed with the
+        // GMS signing key or the platform signing key.
+        boolean signatureMatch = mPackageManager.hasSigningCertificate(Constants.GMS_PACKAGE_NAME,
+                mAppSignature.toByteArray(), PackageManager.CERT_INPUT_RAW_X509);
+
+        AtomicInteger cnt = new AtomicInteger(0);
+        AtomicInteger err = new AtomicInteger(0);
+
+        final int total = permissions.size();
+        for (String permission : permissions) {
+            // If the permission has a corresponding task then run it.
+            Thread thread = new Thread(() -> {
+                String tester = this.getClass().getSimpleName();
+                //mLogger.logSystem(">"+permission+" thread run");
+                if (mPermissionTasks.containsKey(permission)) {
+                    //mLogger.logSystem(">"+permission+" contains");
+                    if (!runPermissionTest(permission, mPermissionTasks.get(permission))) {
+                        callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
+                    } else {
+                        callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester));
+                    }
+                } else {
+                    if (!gmsDeclaredPermissions.contains(permission)) {
+
+                        mLogger.logError("Permission " + permission
+                                + " is not declared as a signature permission on this version of GMS");
+
+                        callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
+                    } else {
+                        boolean permissionGranted = mContext.checkSelfPermission(permission)
+                                == PackageManager.PERMISSION_GRANTED;
+
+                        if (permissionGranted != (signatureMatch || mPlatformSignatureMatch)) {
+                            callback.accept(new Result(false, permission,aiIncl(cnt), total,aiIncl(err),tester));
+                        } else {
+                            callback.accept(new Result(true, permission,aiIncl(cnt), total,err.get(),tester));
+                        }
+                        mLogger.logSignaturePermissionStatus(permission, permissionGranted,
+                                signatureMatch, mPlatformSignatureMatch);
+                    }
+                }
+            });
+            thread.start();
+            try {
+                thread.join(THREAD_JOIN_DELAY);
+            } catch (InterruptedException e) {
+                mLogger.logError(String.format(Locale.US,"%d %s failed due to the timeout.",cnt.get(),permission));
+            }
+        }//Thread
+    }
+
     @Override
     public boolean runPermissionTests() {
         boolean allTestsPassed = true;
@@ -451,7 +571,7 @@ public class GmsPermissionTester extends BasePermissionTester {
                 }
             } else {
                 if (!gmsDeclaredPermissions.contains(permission)) {
-                    mLogger.logDebug("Permission " + permission
+                    mLogger.logError("Permission " + permission
                             + " is not declared as a signature permission on this version of GMS");
                     continue;
                 }
@@ -460,15 +580,15 @@ public class GmsPermissionTester extends BasePermissionTester {
                 if (permissionGranted != (signatureMatch || mPlatformSignatureMatch)) {
                     allTestsPassed = false;
                 }
-                StatusLogger.logSignaturePermissionStatus(permission, permissionGranted,
+                mLogger.logSignaturePermissionStatus(permission, permissionGranted,
                         signatureMatch, mPlatformSignatureMatch);
             }
         }
         if (allTestsPassed) {
-            StatusLogger.logInfo(
+            mLogger.logInfo(
                     "*** PASSED - all GMS permission tests completed successfully");
         } else {
-            StatusLogger.logInfo(
+            mLogger.logError(
                     "!!! FAILED - one or more GMS permission tests failed");
         }
         return allTestsPassed;

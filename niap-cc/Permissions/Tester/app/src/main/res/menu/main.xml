@@ -2,17 +2,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.popularmovies.activity.MainActivity">
+
+    <item
+        android:id="@+id/action_show_settings"
+        android:title="@string/action_show_settings"
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_output_tester_json"
         android:title="@string/output_tester_json"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        android:visible="false"
+        />
     <item
         android:id="@+id/action_request_runtime_permissions"
         android:title="@string/request_runtime_permissions_for_sig"
+        app:showAsAction="never"
+        android:visible="false"
+        />
+
+    <item
+        android:id="@+id/action_request_read_media_user_selected"
+        android:title="Read media user selected"
+        android:visible="false"
         app:showAsAction="never" />
-    <!--<item
+
+    <item
         android:id="@+id/action_device_admin_test"
         android:title="@string/device_admin_test"
-        app:showAsAction="never" />-->
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_remove_device_admin"
+        android:title="@string/device_admin_remove"
+        android:visible="false"
+        app:showAsAction="never" />
 
 </menu>

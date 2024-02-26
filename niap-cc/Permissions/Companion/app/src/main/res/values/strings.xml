@@ -19,7 +19,7 @@
     <string name="setup_complete">Setup complete</string>
     <string name="setup_failed">Setup failed</string>
     <string name="tap_to_run">Tap the button to set up permission tests</string>
-    <string name="button_text">Setup Tests</string>
+    <string name="button_text">Configure Preliminary Settings</string>
     <string name="location_settings_update">Location settings update required</string>
     <string name="location_permission_required">Location permission required</string>
 </resources>
