@@ -112,9 +112,14 @@ public class MainActivity extends AppCompatActivity {
      * Used to ensure the GMS location settings are configured as required for the location tests.
      */
     private LocationRequest mLocationRequest;
-    private void logdebug(String text)
+
+
+    private void logdebug(String text){
+        logdebug(text,null);
+    }
+    private void logdebug(String text,Throwable tr)
     {
-        Log.d(TAG, text);
+        Log.d(TAG, text,tr);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -124,15 +129,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private void logerror(String text)
+
+
+    private void logerror(String text){
+        logerror(text,null);
+    }
+    private void logerror(String text,Throwable tr)
     {
-        Log.e(TAG, text);
+        Log.e(TAG, text,tr);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if(mStatusAdapter != null){
                     mStatusAdapter.add("🔴"+text);
-
                 }
             }
         });
@@ -146,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                             boolean.class}, a, b, value, makeDefault);
             return (boolean)r;
         } catch (Exception e) {
-            logdebug("DeviceConfig.setProperty failed.(" + a + "," + b + "," + value + ")");
+            logdebug("DeviceConfig.setProperty failed.(" + a + "," + b + "," + value + ")",e);
             e.printStackTrace();
             return false;
         }
@@ -158,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                     new Class[]{String.class, String.class}, namespace,name);
             return r;
         } catch (Exception e) {
-            logdebug("DeviceConfig.getProperty failed.(" + namespace+","+name+")");
+            logdebug("DeviceConfig.getProperty failed.(" + namespace+","+name+")",e);
             e.printStackTrace();
             return null;
         }
@@ -313,29 +322,29 @@ public class MainActivity extends AppCompatActivity {
                             } catch (IntentSender.SendIntentException intentException) {
                                 logerror(
                                         "Caught a SendIntentException attempting to launch the "
-                                                + "Settings page");
+                                                + "Settings page",e);
                             }
                         } else {
                             logerror(
                                     "Settings resolution is required to access location, but "
                                             + "Exception is not an instanceof "
-                                            + "ResolvableApiException");
+                                            + "ResolvableApiException",e);
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
                         logerror(
                                 "Settings resolution is required to access location, but the "
-                                        + "change is unavailable from this app");
+                                        + "change is unavailable from this app",e);
                         break;
                     default:
                         logerror("Received unknown status code " + apiException.getStatusCode()
-                                + " from exception: "+e.getLocalizedMessage());
+                                + " from exception: "+e.getLocalizedMessage(),e);
                 }
             } else {
-                logerror( "Caught an ExecutionException verifying the location settings: ");
+                logerror( "Caught an ExecutionException verifying the location settings: ",e);
             }
         } catch (TimeoutException | InterruptedException e) {
-            logerror( "An exception was caught verifying the location settings: ");
+            logerror( "An exception was caught verifying the location settings: ",e);
         }
         return false;
     }
@@ -385,9 +394,8 @@ public class MainActivity extends AppCompatActivity {
         ContextCompat.registerReceiver
                 (this, receiver, new IntentFilter(ACCESS_LOCATION_ACTION), flags);
 
-        //TODO: Bug? From U+ We can't create mutable Pending Intent directly ...
-        //      So we can't utilize the LocationClient in this way
-        //      We should investigate an alternative plan to verify the location service
+        // Change
+        // https://developer.android.com/about/versions/14/behavior-changes-14#safer-intents :
         boolean locationReceived = false;
         if(Build.VERSION.SDK_INT<Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             Intent intent = new Intent(ACCESS_LOCATION_ACTION);
@@ -400,14 +408,14 @@ public class MainActivity extends AppCompatActivity {
             try {
                 locationClient.requestLocationUpdates(mLocationRequest, pendingIntent);
             } catch (SecurityException e) {
-                logerror("Caught a SecurityException requesting location updates: ");
+                logerror("Caught a SecurityException requesting location updates: ",e);
                 return false;
             }
 
             try {
                 locationReceived = latch[0].await(10, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                logerror("Caught an InterruptedException: ");
+                logerror("Caught an InterruptedException: ",e);
             }
             locationClient.removeLocationUpdates(pendingIntent);
             unregisterReceiver(receiver);
@@ -415,7 +423,7 @@ public class MainActivity extends AppCompatActivity {
                 logerror("Location update not received within timeout window");
             }
         } else {
-            //Implementtion for android UDC or later (maybe it works on more previous versions)
+            //Implementation for android UDC or later (maybe it works on more previous versions)
             latch[0] = new CountDownLatch(1);
             LocationCallback locationCallback = new LocationCallback() {
                 @Override
@@ -441,7 +449,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 locationReceived = latch[0].await(10, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                logerror("Caught an InterruptedException: "+e.getLocalizedMessage());
+                logerror("Caught an InterruptedException: "+e.getLocalizedMessage(),e);
             }
             locationClient.removeLocationUpdates(locationCallback);
 
@@ -480,7 +488,7 @@ public class MainActivity extends AppCompatActivity {
                 logdebug( "Successfully wrote file to pictures directory");
 
             } catch (IOException e) {
-                logerror("Caught an exception copying file:");
+                logerror("Caught an exception copying file:",e);
                 result = false;
             }
             photoContentValues.put(MediaStore.Images.Media.IS_PENDING, 0);
@@ -505,7 +513,7 @@ public class MainActivity extends AppCompatActivity {
                 logdebug( "Successfully wrote file to pictures directory");
 
             } catch (IOException e) {
-                logerror("Caught an exception copying file:");
+                logerror("Caught an exception copying file:",e);
                 result = false;
             }
             photoContentValues2.put(MediaStore.Images.Media.IS_PENDING, 0);
@@ -529,7 +537,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 logdebug( "Successfully wrote file to Music directory");
             } catch (IOException e) {
-                logerror("Caught an exception copying file:");
+                logerror("Caught an exception copying file:",e);
                 result = false;
             }
             audioContentValues.put(MediaStore.Audio.Media.IS_PENDING, 0);
@@ -583,7 +591,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
             int[] grantResults) {
-        //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //Inspector request below line but in this case we shouldn't call super method.
+        //    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean permissionGranted = true;
         for (int grantResult : grantResults) {
             if (grantResult != PackageManager.PERMISSION_GRANTED) {
@@ -595,8 +604,6 @@ public class MainActivity extends AppCompatActivity {
                 if (!permissionGranted) {
                     logerror( "The required permissions (" + String.join(", ", permissions)
                             + ") were not granted");
-                    //runOnUiThread(
-                    //        () -> mStatusAdapter.add(getResources().getString(R.string.location_permission_required));
                 } else {
                     logdebug( "The location permission was granted; rerunning setup tasks");
                     new SetupTestsAsyncTask().execute();

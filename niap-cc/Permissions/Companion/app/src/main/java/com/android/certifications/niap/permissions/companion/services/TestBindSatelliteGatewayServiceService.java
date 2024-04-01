@@ -21,9 +21,9 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * Exported service used to test the BIND_AMBIENT_CONTEXT_DETECTION_SERVICE permission.
+ * Exported service used to test the BIND_SATELLITE_GATEWAY_SERVICE permission.
  *
- * This service requires clients are granted the BIND_AMBIENT_CONTEXT_DETECTION_SERVICE
+ * This service requires clients are granted the BIND_SATELLITE_GATEWAY_SERVICE
  * permission to bind to it. The Permission Test Tool can attempt to bind to this service
  * and invoke the {@link TestBindSatelliteGatewayServiceServiceImpl#testMethod()} method
  * to verify that the platform properly enforces this permission requirement.
