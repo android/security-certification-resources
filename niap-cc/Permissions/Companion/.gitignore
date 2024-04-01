@@ -39,8 +39,10 @@ tmp/build
 app/build
 
 /security
-
-buildSrc/.gradle
-builSrc/build
+/buildSrc
+/buildSrc/.gradle
+/buildSrc/.gradle/*
+/builSrc/build
+/builSrc/build/*
 .gradle/
 .idea/
