@@ -18,7 +18,6 @@ package com.android.certifications.niap.permissions.utils;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.accounts.Account;
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -35,16 +34,10 @@ import android.os.Parcelable;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 
-import java.io.FileDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
@@ -2444,9 +2437,9 @@ public class Transacts {
             case Build.VERSION_CODES.S_V2:
                 return new S2Transacts();
             case Build.VERSION_CODES.TIRAMISU:
-                return new BarbetApiLevel33Transacts();
+                return new SdkS_Transacts();
             case Build.VERSION_CODES.UPSIDE_DOWN_CAKE:
-                return new BarbetApiLevel34Transacts();
+                return new SdkT_Transacts();
             default:
                 throw new IllegalArgumentException(
                         "The provided API level, " + apiLevel + ", is not supported");

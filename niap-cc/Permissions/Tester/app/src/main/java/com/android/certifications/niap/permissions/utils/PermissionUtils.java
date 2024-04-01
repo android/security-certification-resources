@@ -107,8 +107,7 @@ public class PermissionUtils {
 
 
     /**
-     * Ensures that the passed in permissions are defined in manifest and attempts to grant a
-     * permission automatically if it is considered dangerous.
+     * The function to ensure that the passed in permissions are defined in manifest
      */
     public static boolean ensureRequiredPermissions(
             String[] requiredPermissions, Context context) {

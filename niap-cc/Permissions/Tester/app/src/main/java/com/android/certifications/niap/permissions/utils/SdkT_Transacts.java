@@ -3,8 +3,8 @@ package com.android.certifications.niap.permissions.utils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BarbetApiLevel34Transacts extends Transacts {
-    public BarbetApiLevel34Transacts() {
+public class SdkT_Transacts extends Transacts {
+    public SdkT_Transacts() {
         mDeviceApiLevel = 34;
         Map<String, Integer> transactIds;
 

@@ -140,11 +140,8 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(mStatusAdapter != null)
-                    mStatusAdapter.add(msg);
-
                 assert mStatusAdapter != null;
-                //mStatusAdapter.notifyDataSetChanged();
+                mStatusAdapter.add(msg);
             }
         });
     }

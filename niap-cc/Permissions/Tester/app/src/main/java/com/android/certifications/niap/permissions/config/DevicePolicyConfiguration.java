@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Configuration to verify the Google Play Services {GMS} client side libraries properly guard their
- * APIs behind platform permissions.
+ * Configuration file for the permission test cases related to DevicePolicyManager
+ * The Configuration is still experimental.
  */
 class DevicePolicyConfiguration implements TestConfiguration {
     private final Activity mActivity;

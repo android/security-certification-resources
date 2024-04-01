@@ -61,6 +61,7 @@ public interface TestConfiguration {
         }
         permissionTesters.add(new InternalPermissionTester(this, activity));
         if(PermissionUtils.isNoPermissionManifest(activity.getApplicationContext())){
+            //Separate Install permission tester to other configuration to avoid inevitable ANR.
             Log.i("TAG","No Permission Configuration should not include the Install Permission Tester");
         } else {
             permissionTesters.add(new InstallPermissionTester(this, activity));

@@ -97,15 +97,15 @@ public class ReflectionUtils {
             return null;
         }
     }
-    public static boolean deviceConfigSetProperty(String a,String b,String c,boolean value)  {
+    public static boolean deviceConfigSetProperty(String namespace,String name,String value,boolean makeDefault)  {
         try {
             Object r = invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
                     "setProperty", null,
                     new Class[]{String.class, String.class, String.class,
-                            boolean.class}, a,b, c, value);
+                            boolean.class}, namespace,name, value, makeDefault);
             return (boolean)r;
         } catch (Exception e){
-            mLogger.logDebug("DeviceConfig.setProperty failed.("+a+","+b+","+c+")");
+            mLogger.logDebug("DeviceConfig.setProperty failed.("+namespace+","+name+","+value+")");
             e.printStackTrace();
             return false;
         }

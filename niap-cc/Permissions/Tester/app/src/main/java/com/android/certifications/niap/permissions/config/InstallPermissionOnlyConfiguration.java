@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Configuration to verify the Google Play Services {GMS} client side libraries properly guard their
- * APIs behind platform permissions.
+ * Configuration to verify Install Permission Tester Stand Alone.
+ * This configuration utilizes to separate InstallPermissionTester
+ * from Platform Test Configuration(TestConfiguration.java)
+ * Because of the application could not finish the test cases
+ * due to the overloads for awaiting api timeouts when there is no permission declaration.
  */
 class InstallPermissionOnlyConfiguration implements TestConfiguration {
     private final Activity mActivity;

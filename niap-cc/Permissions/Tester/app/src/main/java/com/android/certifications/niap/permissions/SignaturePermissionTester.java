@@ -2142,7 +2142,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.WRITE_EMBEDDED_SUBSCRIPTIONS,
                 new PermissionTest(false, () -> {
 
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(Transacts.EUICC_CONTROLLER_SERVICE,
                                 Transacts.EUICC_CONTROLLER_DESCRIPTOR,
                                 Transacts.getSupportedCountries, true);
@@ -4143,7 +4143,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
                     String devicePolicySettings="true";
 
-                    if(VERSION_CODES.UPSIDE_DOWN_CAKE>= Build.VERSION.SDK_INT){
+                    if(Build.VERSION.SDK_INT>=VERSION_CODES.UPSIDE_DOWN_CAKE){
                         devicePolicySettings = ReflectionUtils.deviceConfigGetProperty("device_policy_manager", "enable_permission_based_access");
                         ReflectionUtils.deviceConfigSetProperty("device_policy_manager", "enable_permission_based_access","false",false);
                     }
@@ -4153,7 +4153,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             new Class<?>[]{});
 
                     //Revert the settings
-                    if(VERSION_CODES.UPSIDE_DOWN_CAKE>=Build.VERSION.SDK_INT){
+                    if(Build.VERSION.SDK_INT>=VERSION_CODES.UPSIDE_DOWN_CAKE){
                         ReflectionUtils.deviceConfigSetProperty("device_policy_manager", "enable_permission_based_access",devicePolicySettings,true);
 
                     }
@@ -4801,7 +4801,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.GET_APP_METADATA,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.PACKAGE_SERVICE,
                                 Transacts.PACKAGE_DESCRIPTOR,
@@ -4811,78 +4811,70 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
         mPermissionTasks.put(permission.LIST_ENABLED_CREDENTIAL_PROVIDERS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        if(isPermissionGranted(QUERY_ALL_PACKAGES)){
-                            throw new BypassTestException(
-                                    "This test works only when QUERY_ALL_PACKAGES permission is not granted.");
-                        }
-                        mTransacts.invokeTransact(
-                                Context.CREDENTIAL_SERVICE,
-                                Transacts.CREDENTIAL_DESCRIPTOR,
-                                Transacts.getCredentialProviderServices,
-                                mUid,Binder.getCallingPid());
+                    if(isPermissionGranted(QUERY_ALL_PACKAGES)){
+                        throw new BypassTestException(
+                                "This test works only when QUERY_ALL_PACKAGES permission is not granted.");
                     }
+                    mTransacts.invokeTransact(
+                            Context.CREDENTIAL_SERVICE,
+                            Transacts.CREDENTIAL_DESCRIPTOR,
+                            Transacts.getCredentialProviderServices,
+                            mUid,Binder.getCallingPid());
+
                 }));
         mPermissionTasks.put(permission.LOG_FOREGROUND_RESOURCE_USE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
-                        mTransacts.invokeTransact(
-                                Transacts.ACTIVITY_SERVICE,
-                                Transacts.ACTIVITY_DESCRIPTOR,
-                                Transacts.logFgsApiBegin,
-                                0,mUid,Binder.getCallingPid()
-                                );
-                    }
+                    mTransacts.invokeTransact(
+                            Transacts.ACTIVITY_SERVICE,
+                            Transacts.ACTIVITY_DESCRIPTOR,
+                            Transacts.logFgsApiBegin,
+                            0,mUid,Binder.getCallingPid()
+                            );
                 }));
         mPermissionTasks.put(permission.MANAGE_CLIPBOARD_ACCESS_NOTIFICATION,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
-                        mTransacts.invokeTransact(
-                                Context.CLIPBOARD_SERVICE,
-                                Transacts.CLIPBOARD_DESCRIPTOR,
-                                Transacts.areClipboardAccessNotificationsEnabledForUser,
-                                mUid
-                        );
-                    }
+                    mTransacts.invokeTransact(
+                            Context.CLIPBOARD_SERVICE,
+                            Transacts.CLIPBOARD_DESCRIPTOR,
+                            Transacts.areClipboardAccessNotificationsEnabledForUser,
+                            mUid
+                    );
+
                 }));
         mPermissionTasks.put(permission.MANAGE_SUBSCRIPTION_USER_ASSOCIATION,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
-                        mTransacts.invokeTransact(
-                                Context.TELEPHONY_SUBSCRIPTION_SERVICE,
-                                Transacts.SUBSCRIPTION_DESCRIPTOR,
-                                Transacts.setSubscriptionUserHandle,
-                                UserHandle.getUserHandleForUid(mUid),0
-                        );
-                    }
+                    mTransacts.invokeTransact(
+                            Context.TELEPHONY_SUBSCRIPTION_SERVICE,
+                            Transacts.SUBSCRIPTION_DESCRIPTOR,
+                            Transacts.setSubscriptionUserHandle,
+                            UserHandle.getUserHandleForUid(mUid),0
+                    );
                 }));
         mPermissionTasks.put(permission.MANAGE_WEARABLE_SENSING_SERVICE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        Object callback = ReflectionUtils.stubRemoteCallback();
-                        //ParcelFileDescriptor descriptor = ParcelFileDescriptor//
-                        mTransacts.invokeTransact(
-                                "wearable_sensing",
-                                Transacts.WEARABLES_DESCRIPTOR,
-                                Transacts.provideDataStream,
-                                mUid,null,callback
-                        );
-                    }
+                    Object callback = ReflectionUtils.stubRemoteCallback();
+                    //ParcelFileDescriptor descriptor = ParcelFileDescriptor//
+                    mTransacts.invokeTransact(
+                            "wearable_sensing",
+                            Transacts.WEARABLES_DESCRIPTOR,
+                            Transacts.provideDataStream,
+                            mUid,null,callback
+                    );
+
                 }));
         mPermissionTasks.put(permission.MODIFY_AUDIO_SETTINGS_PRIVILEGED,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        mTransacts.invokeTransact(
-                                Context.AUDIO_SERVICE,
-                                Transacts.AUDIO_DESCRIPTOR,
-                                Transacts.setVolumeGroupVolumeIndex,
-                                0,0,0
-                        );
-                    }
+                    mTransacts.invokeTransact(
+                            Context.AUDIO_SERVICE,
+                            Transacts.AUDIO_DESCRIPTOR,
+                            Transacts.setVolumeGroupVolumeIndex,
+                            0,0,0
+                    );
+
                 }));
         mPermissionTasks.put(permission.MODIFY_HDR_CONVERSION_MODE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Context.DISPLAY_SERVICE,
                                 Transacts.DISPLAY_DESCRIPTOR,
@@ -4893,44 +4885,33 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
         mPermissionTasks.put(permission.MONITOR_KEYBOARD_BACKLIGHT,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
-
-                        mTransacts.invokeTransact(
-                                Context.INPUT_SERVICE,
-                                Transacts.INPUT_DESCRIPTOR,
-                                Transacts.registerKeyboardBacklightListener,
-                                getActivityToken());
-
-                    }
+                    mTransacts.invokeTransact(
+                            Context.INPUT_SERVICE,
+                            Transacts.INPUT_DESCRIPTOR,
+                            Transacts.registerKeyboardBacklightListener,
+                            getActivityToken());
                 }));
         mPermissionTasks.put(permission.REMAP_MODIFIER_KEYS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    mTransacts.invokeTransact(
+                            Context.INPUT_SERVICE,
+                            Transacts.INPUT_DESCRIPTOR,
+                            Transacts.getModifierKeyRemapping);
 
-                        mTransacts.invokeTransact(
-                                Context.INPUT_SERVICE,
-                                Transacts.INPUT_DESCRIPTOR,
-                                Transacts.getModifierKeyRemapping);
-
-                    }
                 }));
 
         mPermissionTasks.put(permission.SATELLITE_COMMUNICATION,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
-
-                        mTransacts.invokeTransact(
-                                Context.TELEPHONY_SERVICE,
-                                Transacts.TELEPHONY_DESCRIPTOR,
-                                Transacts.requestIsSatelliteEnabled);
-
-                    }
+                    mTransacts.invokeTransact(
+                            Context.TELEPHONY_SERVICE,
+                            Transacts.TELEPHONY_DESCRIPTOR,
+                            Transacts.requestIsSatelliteEnabled);
                 }));
 
 
         mPermissionTasks.put(permission.SET_APP_SPECIFIC_LOCALECONFIG,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         if(!isPermissionGranted(QUERY_ALL_PACKAGES)){
                             throw new BypassTestException(
                                     "This test works only when QUERY_ALL_PACKAGES permission is granted.");
@@ -4951,29 +4932,27 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.SET_LOW_POWER_STANDBY_PORTS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
-                        mTransacts.invokeTransact(
-                                Context.POWER_SERVICE,
-                                Transacts.POWER_DESCRIPTOR,
-                                Transacts.releaseLowPowerStandbyPorts,
-                                getActivityToken());
-                    }
+                    mTransacts.invokeTransact(
+                            Context.POWER_SERVICE,
+                            Transacts.POWER_DESCRIPTOR,
+                            Transacts.releaseLowPowerStandbyPorts,
+                            getActivityToken());
+
                 }));
 
         mPermissionTasks.put(permission.TEST_INPUT_METHOD,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
-                        mTransacts.invokeTransact(
-                                Context.INPUT_METHOD_SERVICE,
-                                Transacts.INPUTMETHOD_DESCRIPTOR,
-                                Transacts.isInputMethodPickerShownForTest
-                        );
-                    }
+                    mTransacts.invokeTransact(
+                            Context.INPUT_METHOD_SERVICE,
+                            Transacts.INPUTMETHOD_DESCRIPTOR,
+                            Transacts.isInputMethodPickerShownForTest
+                    );
+
                 }));
 
         mPermissionTasks.put(permission.TURN_SCREEN_ON,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         //Hidden Options
                         final int SYSTEM_WAKELOCK = 0x80000000;
                         final int ACQUIRE_CAUSES_WAKEUP = 0x10000000;
@@ -4990,41 +4969,35 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.MANAGE_DEFAULT_APPLICATIONS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
-                        mTransacts.invokeTransact(
-                                Context.ROLE_SERVICE,
-                                Transacts.ROLE_DESCRIPTOR,
-                                Transacts.getDefaultApplicationAsUser,
-                                "dummy",mUid
-                        );
-                    }
+                    mTransacts.invokeTransact(
+                            Context.ROLE_SERVICE,
+                            Transacts.ROLE_DESCRIPTOR,
+                            Transacts.getDefaultApplicationAsUser,
+                            "dummy",mUid
+                    );
                 }));
 
         mPermissionTasks.put(permission.KILL_ALL_BACKGROUND_PROCESSES,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
-                        mTransacts.invokeTransact(
-                                Transacts.ACTIVITY_SERVICE,
-                                Transacts.ACTIVITY_DESCRIPTOR,
-                                Transacts.killAllBackgroundProcesses);
-                    }
+                    mTransacts.invokeTransact(
+                            Transacts.ACTIVITY_SERVICE,
+                            Transacts.ACTIVITY_DESCRIPTOR,
+                            Transacts.killAllBackgroundProcesses);
+
                 }));
 
 
 
         mPermissionTasks.put(permission.CHECK_REMOTE_LOCKSCREEN,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {;
-                        mTransacts.invokeTransact(
-                                Transacts.LOCK_SETTINGS_SERVICE,
-                                Transacts.LOCK_SETTINGS_DESCRIPTOR,
-                                Transacts.startRemoteLockscreenValidation);
-                    }
+                    mTransacts.invokeTransact(
+                            Transacts.LOCK_SETTINGS_SERVICE,
+                            Transacts.LOCK_SETTINGS_DESCRIPTOR,
+                            Transacts.startRemoteLockscreenValidation);
                 }));
 
         mPermissionTasks.put(permission.REQUEST_COMPANION_PROFILE_NEARBY_DEVICE_STREAMING,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    //commonize the tester routine with exposing the builder of AssociationRequest object
                     if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         CompletableFuture<AssociationRequest> associationRequest =
                                 new CompletableFuture<AssociationRequest>().completeAsync(() ->
@@ -5038,7 +5011,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.LAUNCH_CREDENTIAL_SELECTOR,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    //commonize the tester routine with exposing the builder of AssociationRequest object
                     if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         Intent featuresIntent = new Intent().addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         featuresIntent.setComponent(new
@@ -5050,7 +5022,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.WRITE_ALLOWLISTED_DEVICE_CONFIG,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    //commonize the tester routine with exposing the builder of AssociationRequest object
                     if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         //frameworks/base/core/java/android/provider/Settings.java
                         Uri CONTENT_URI = Uri.parse("content://settings/config");
@@ -5080,7 +5051,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.BROADCAST_OPTION_INTERACTIVE,
             new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                if (android.os.Build.VERSION.SDK_INT >= 34) {
+                if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
                     final String[] requiredPermissions = {permission.BROADCAST_OPTION_INTERACTIVE};
                     final String[] excludePermissions = {};
@@ -5128,7 +5099,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                 }
                             }
                         } catch (ClassNotFoundException e) {
-                            throw new RuntimeException(e);
+                            throw new UnexpectedPermissionTestFailureException(e);
                         }
                     }
 
