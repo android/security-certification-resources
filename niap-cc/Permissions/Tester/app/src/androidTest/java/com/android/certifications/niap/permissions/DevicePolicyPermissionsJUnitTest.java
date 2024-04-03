@@ -128,10 +128,6 @@ public class DevicePolicyPermissionsJUnitTest {
         mPermissions.add(permission.MANAGE_DEVICE_POLICY_WIFI);
         mPermissions.add(permission.MANAGE_DEVICE_POLICY_WINDOWS);
         mPermissions.add(permission.MANAGE_DEVICE_POLICY_WIPE_DATA);
-
-
-
-        //AA
     }
 
     private UiAutomation mUiAutomation;

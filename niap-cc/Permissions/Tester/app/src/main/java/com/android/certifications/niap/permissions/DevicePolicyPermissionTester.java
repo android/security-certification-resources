@@ -87,7 +87,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
          //Manage Device Policy Group :
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_CAMERA,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 //                        mTransacts.invokeTransact(
 //                                Transacts.DEVICE_POLICY_SERVICE,
 //                                Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -100,7 +100,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_ACCOUNT_MANAGEMENT,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 //                        mTransacts.invokeTransact(
 //                                Transacts.DEVICE_POLICY_SERVICE,
 //                                Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -114,7 +114,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_APP_EXEMPTIONS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
 
                         //Failed for other reason
@@ -131,7 +131,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_APP_RESTRICTIONS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         //java.lang.SecurityException: Calling identity is not authorized
 //                        mTransacts.invokeTransact(
 //                                Transacts.DEVICE_POLICY_SERVICE,
@@ -146,7 +146,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_APPS_CONTROL,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
 //                        mTransacts.invokeTransact(
 //                                Transacts.DEVICE_POLICY_SERVICE,
@@ -161,7 +161,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_CERTIFICATES,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
@@ -176,7 +176,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_COMMON_CRITERIA_MODE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
 //                        mTransacts.invokeTransact(
 //                                Transacts.DEVICE_POLICY_SERVICE,
@@ -191,7 +191,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_DEFAULT_SMS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 //                        mTransacts.invokeTransact(
 //                                Transacts.DEVICE_POLICY_SERVICE,
 //                                Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -206,7 +206,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_FACTORY_RESET,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -219,7 +219,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_INPUT_METHODS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
@@ -234,7 +234,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_KEYGUARD,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         Object CONFIG = stubHiddenObject("android.os.PersistableBundle");
                         if(CONFIG != null) {
                             ComponentName TRUST_AGENT_COMPONENT =
@@ -255,7 +255,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_LOCK,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
                         //KEYGUARD_DISABLE_FINGERPRINT
                         mTransacts.invokeTransact(
@@ -271,7 +271,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_LOCK_CREDENTIALS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         //KEYGUARD_DISABLE_FINGERPRINT
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
@@ -286,7 +286,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_LOCK_TASK,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         //KEYGUARD_DISABLE_FINGERPRINT
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
@@ -300,7 +300,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_MTE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         try {
                             mTransacts.invokeTransact(
                                     Transacts.DEVICE_POLICY_SERVICE,
@@ -318,14 +318,14 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_ORGANIZATION_IDENTITY,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
                                 Transacts.setOrganizationName,
                                 ADMIN_COMPONENT,
-                                PACKAGE_NAME, "Google LLC".toCharArray()
+                                PACKAGE_NAME, "Organization Name".toCharArray()
                         );
 
                     }
@@ -333,7 +333,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_PACKAGE_STATE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
@@ -348,7 +348,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_PROFILE_INTERACTION,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
@@ -363,7 +363,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_RESET_PASSWORD,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         //byte array describes 'password'x4.
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
@@ -382,7 +382,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
         /*
         m.put(permission.MANAGE_DEVICE_POLICY_RUNTIME_PERMISSIONS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
                         Object callback = ReflectionUtils.stubRemoteCallback();
                         mTransacts.invokeTransact(
@@ -400,7 +400,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_SCREEN_CAPTURE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
@@ -413,7 +413,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_SECURITY_LOGGING,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
@@ -426,7 +426,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_STATUS_BAR,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
@@ -438,7 +438,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_SUPPORT_MESSAGE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -450,7 +450,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_SYSTEM_UPDATES,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -461,7 +461,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_USB_DATA_SIGNALLING,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
 
                         dpm.setUsbDataSignalingEnabled(true);
@@ -476,7 +476,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_WIFI,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
@@ -488,7 +488,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_WIPE_DATA,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -501,7 +501,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_AUDIO_OUTPUT,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -512,7 +512,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_AUTOFILL,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -524,7 +524,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_BLUETOOTH,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -536,7 +536,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_CALLS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -547,7 +547,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_DEBUGGING_FEATURES,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -558,7 +558,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_DISPLAY,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -569,7 +569,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_INSTALL_UNKNOWN_SOURCES,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -580,7 +580,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_LOCALE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -591,7 +591,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_LOCATION,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -602,7 +602,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_MOBILE_NETWORK,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -613,7 +613,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_MODIFY_USERS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -624,7 +624,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_NEARBY_COMMUNICATION,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -635,7 +635,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_PHYSICAL_MEDIA,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -646,7 +646,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_PRINTING,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -657,7 +657,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_PROFILES,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -668,7 +668,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_RESTRICT_PRIVATE_DNS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -679,7 +679,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_RUN_IN_BACKGROUND,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         String DISALLOW_RUN_IN_BACKGROUND = "no_run_in_background";//SYSTEM_API
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
@@ -691,7 +691,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_SAFE_BOOT,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -702,7 +702,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_SCREEN_CONTENT,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -713,7 +713,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_MICROPHONE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -725,7 +725,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_SMS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         mTransacts.invokeTransact(
                                 Transacts.DEVICE_POLICY_SERVICE,
                                 Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -737,7 +737,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_SYSTEM_DIALOGS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 //                        mTransacts.invokeTransact(
 //                                Transacts.DEVICE_POLICY_SERVICE,
 //                                Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -750,7 +750,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_TIME,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 //                        mTransacts.invokeTransact(
 //                                Transacts.DEVICE_POLICY_SERVICE,
 //                                Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -764,7 +764,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_VPN,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 //                        mTransacts.invokeTransact(
 //                                Transacts.DEVICE_POLICY_SERVICE,
 //                                Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -778,7 +778,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_WALLPAPER,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 //                        mTransacts.invokeTransact(
 //                                Transacts.DEVICE_POLICY_SERVICE,
 //                                Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -792,7 +792,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_WINDOWS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 //                        mTransacts.invokeTransact(
 //                                Transacts.DEVICE_POLICY_SERVICE,
 //                                Transacts.DEVICE_POLICY_DESCRIPTOR,
@@ -806,7 +806,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_FUN,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
 
 
 

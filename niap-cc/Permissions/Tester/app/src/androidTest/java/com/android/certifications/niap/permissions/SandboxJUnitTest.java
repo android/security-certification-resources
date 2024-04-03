@@ -51,10 +51,7 @@ import java.util.Optional;
  */
 @RunWith(AndroidJUnit4.class)
 public class SandboxJUnitTest {
-    /**
-     *
-     * A list of permissions that can be granted to the shell identity.
-     */
+
     @Rule
     public
     ErrorCollector errs = new ErrorCollector();
@@ -73,6 +70,7 @@ public class SandboxJUnitTest {
         mUiAutomation = InstrumentationRegistry.getInstrumentation().getUiAutomation();
         mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         mShellContext = InstrumentationRegistry.getInstrumentation().getContext();
+        mUiAutomation.adoptShellPermissionIdentity();
     }
 
     @After
@@ -83,23 +81,12 @@ public class SandboxJUnitTest {
 
     @Test
     public void runPermissionTests(){
+        //Here's just a placeeholder to try new implementations.
         mContext.sendOrderedBroadcastAsUser(new Intent("android.intent.action.QUERY_PACKAGE_RESTART"),
                     UserHandle.getUserHandleForUid(SYSTEM_UID),
                     null, null, null, 0, null, null);
     }
 
-    @Test
-    public void runPermissionTest2(){
-        try {
-            mShellContext.sendOrderedBroadcastAsUser(new Intent("android.intent.action.QUERY_PACKAGE_RESTART"),
-                    UserHandle.getUserHandleForUid(SYSTEM_UID),
-                    null, null, null, 0, null, null);
-        } catch (Exception e){
-            e.printStackTrace();
-            assertTrue(false);
-        }
-
-    }
 
 
 }

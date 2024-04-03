@@ -141,10 +141,12 @@ public class ReadMediaVisualUserSelectedTest {
                 not_granted.add(Manifest.permission.READ_MEDIA_IMAGES);
             }
 
+            //* Set System Language Setting as 'English (United States)' to find
+            //* an ui object.
             //Wait dialogue shown and click "Select phtos and videos"
             //1-1.Wait chooser dialogue and then choose first one
             //1-2.Wait chooser dialgoue and then choose nothing
-            //2. close chooser/
+            //2. close chooser
             String[] perms = not_granted.toArray(new String[0]);
             if(perms.length>0)
                 ActivityCompat.requestPermissions(activity, perms,
@@ -152,6 +154,9 @@ public class ReadMediaVisualUserSelectedTest {
             else
                 Log.d("tag","the permission is already granted.");
             mDevice.waitForIdle();
+            //Find a button with text (the line expects language setting as 'English')
+
+
             UiObject2 btnUserSelected = mDevice.findObject(By.text("Select photos and videos"));
             if(btnUserSelected==null || !btnUserSelected.isClickable()){
                 throw new RuntimeException("Can not find expected ui");

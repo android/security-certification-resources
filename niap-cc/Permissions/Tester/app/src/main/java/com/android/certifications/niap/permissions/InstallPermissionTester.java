@@ -773,8 +773,6 @@ public class InstallPermissionTester extends BasePermissionTester {
                     }
                 }));
 
-        boolean signatureMatch = mPackageManager.hasSigningCertificate(Constants.GMS_PACKAGE_NAME,
-                mAppSignature.toByteArray(), PackageManager.CERT_INPUT_RAW_X509);
 
         mPermissionTasks.put(QUERY_ALL_PACKAGES,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
@@ -925,7 +923,7 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(RUN_USER_INITIATED_JOBS,  new PermissionTest(false,
                 Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
-            //commonize the tester routine with exposing the builder of AssociationRequest object
+
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 NetworkRequest nreq = new NetworkRequest.Builder()
                         .addCapability(NET_CAPABILITY_INTERNET)
@@ -1121,8 +1119,8 @@ public class InstallPermissionTester extends BasePermissionTester {
            for (String permission : permissions) {
 
             // If the permission has a corresponding task then run it.
-//            mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
-//                    "%d/%d ",no,numperms) + permission);
+            // mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
+            //"%d/%d ",no,numperms) + permission);
             Thread thread = new Thread(() -> {
                 String tester = this.getClass().getSimpleName();
                 if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {

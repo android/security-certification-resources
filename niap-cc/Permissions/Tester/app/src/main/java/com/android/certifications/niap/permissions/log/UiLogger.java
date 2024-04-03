@@ -70,6 +70,13 @@ public class UiLogger implements Logger {
     }
 
     @Override
+    public void logInfo(String message, Throwable throwable) {
+        Log.i(mTag, message,throwable);
+        if(ui_level<=LEVEL_INFO)
+            mFrontEnd.addLogLine("🟢"+message);
+    }
+
+    @Override
     public void logWarn(String message) {
         Log.w(mTag, message);
         if(ui_level<=LEVEL_WARN)

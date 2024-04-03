@@ -56,6 +56,11 @@ public interface Logger {
     void logInfo(String message);
 
     /**
+     * Logs the provided {@code message} at the info level.
+     */
+    void logInfo(String message, Throwable throwable);
+
+    /**
      * Logs the provided {@code message} at the error level.
      */
     void logError(String message);

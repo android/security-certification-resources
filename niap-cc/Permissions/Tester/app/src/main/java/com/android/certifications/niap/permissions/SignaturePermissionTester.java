@@ -1085,11 +1085,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
 
         mPermissionTasks.put(permission.MANAGE_ACTIVITY_STACKS,
-                new PermissionTest(false,Build.VERSION_CODES.P, () -> {
+                new PermissionTest(false,Build.VERSION_CODES.P, VERSION_CODES.R, () -> {
                     //MANAGE_ACTIVITY_STACKS is a deprecated permission, we should bypass this permisson from s
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        throw new BypassTestException("MANAGE_ACTIVITY_STACKS is deprecated,we should bypass this permission from S");
-                    }
+
                     String service = "activity_task";
                     String descriptor = Transacts.ACTIVITY_TASK_DESCRIPTOR;
                     if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
@@ -2029,12 +2027,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     Transacts.isInTabletMode);
         }));
 
+        // TemporaryEnableAccessibilityStateUntilKeyguardRemoved api has been removed from Android 14.
         mPermissionTasks.put(permission.TEMPORARY_ENABLE_ACCESSIBILITY,
-                new PermissionTest(false, () -> {
-                    if(mDeviceApiLevel>= VERSION_CODES.UPSIDE_DOWN_CAKE){
-                        throw new BypassTestException(
-                        "temporaryEnableAccessibilityStateUntilKeyguardRemoved api has been removed from Android 14.");
-                    }
+                new PermissionTest(false, VERSION_CODES.M,VERSION_CODES.TIRAMISU, () -> {
+
                     ComponentName componentName = new ComponentName(mContext, MainActivity.class);
                     mTransacts.invokeTransact(Transacts.ACCESSIBILITY_SERVICE,
                             Transacts.ACCESSIBILITY_DESCRIPTOR,
@@ -3329,7 +3325,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                     Transacts.injectCamera, mContext.getPackageName(),
                                     "",
                                     "", injectionCallback);
-                        } else if(mDeviceApiLevel >= VERSION_CODES.S_V2){
+                        } else if(mDeviceApiLevel == VERSION_CODES.TIRAMISU){
                             mTransacts.invokeTransact(Transacts.CAMERA_SERVICE,
                                     Transacts.CAMERA_DESCRIPTOR,
                                     Transacts.injectCamera, mContext.getPackageName(),

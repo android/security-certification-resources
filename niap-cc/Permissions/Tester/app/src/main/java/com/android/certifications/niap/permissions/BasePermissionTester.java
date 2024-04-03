@@ -286,7 +286,7 @@ public abstract class BasePermissionTester {
                 //
                 testPassed = false;
 
-                mLogger.logInfo(permission + "/"+ e.getMessage());//becasue failed test does not always mean false behvaiour.
+                mLogger.logInfo(permission + "/"+ e.getMessage(),e);//becasue failed test does not always mean false behvaiour.
             } catch (UnexpectedPermissionTestFailureException e) {
 
                 testPassed = false;
@@ -301,7 +301,7 @@ public abstract class BasePermissionTester {
                     // else an Exception was not expected; treat the test as failed and log the
                     // error status.
                     testPassed = false;
-                    mLogger.logInfo(permission + "/"+ t.getMessage());
+                    mLogger.logInfo(permission + "/"+ t.getMessage(),t);
                 }
             }
         }
