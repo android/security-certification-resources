@@ -290,7 +290,7 @@ public abstract class BasePermissionTester {
             } catch (UnexpectedPermissionTestFailureException e) {
 
                 testPassed = false;
-                mLogger.logInfo(permission + "/"+ e.getMessage());
+                mLogger.logInfo(permission + "/"+ e.getMessage(),e);
             } catch (Throwable t) {
                 // Any other Throwable indicates the test did not fail due to a SecurityException;
                 // treat the API as successful if the caller specified exceptions are allowed.

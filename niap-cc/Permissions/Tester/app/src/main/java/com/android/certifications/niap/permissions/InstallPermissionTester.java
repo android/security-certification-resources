@@ -1190,7 +1190,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                 } catch (RemoteException e) {
                     binderSuccess.set(false);
                     //e.printStackTrace();
-                    mLogger.logError(name+" failure."+e.getMessage());
+                    mLogger.logError(name+" failure."+e.getMessage(),e);
                 }
                 lock.notify();
             }

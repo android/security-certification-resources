@@ -5492,7 +5492,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 } catch (RemoteException e) {
                     binderSuccess.set(false);
                     //e.printStackTrace();
-                    mLogger.logError(name+" failure."+e.getMessage());
+                    mLogger.logError(name+" failure."+e.getMessage(),e);
                 }
                 lock.notify();
             }
@@ -5785,7 +5785,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 // should have been thrown so the result of the test should be the opposite of
                 // whether the permission was granted.
                 mLogger.logDebug(
-                        "Caught a SecurityException for permission " + permission + ": ", e);
+                        "Caught a SecurityException for permission " + permission, e);
                 if (e.getCause() != null) {
                     mLogger.logDebug("Cause of SecurityException: ", e.getCause());
                 }
@@ -5793,9 +5793,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
             } catch (BypassTestException bte) {
                 mLogger.logTestSkipped(permission, permissionGranted, bte.getMessage());
             } catch (UnexpectedPermissionTestFailureException e) {
-                //mLogger.logTestSkipped(permission, permissionGranted, bte.getMessage())
                 mLogger.logDebug(
-                        "Caught a UnexpectedPermissionTestFailureException for permission " + permission + ": ", e);
+                        "Caught a UnexpectedPermissionTestFailureException for permission " + permission , e);
                 testPassed = getAndLogTestStatus(permission, permissionGranted, false);;
             } catch (Throwable t) {
                 // Some of the signature / privileged tests can fail for other reasons (primarily
@@ -5803,7 +5802,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 // APIs guarded by signature permissions), but if they make it past the
                 // SecurityException then the API should be considered successfully invoked.
                 if (Constants.DEBUG) {
-                    mLogger.logDebug("Caught a Throwable for permission " + permission + ": ", t);
+                    mLogger.logDebug("Caught a Throwable for permission " + permission , t);
                 }
                 testPassed = getAndLogTestStatus(permission, permissionGranted, true);
             }
