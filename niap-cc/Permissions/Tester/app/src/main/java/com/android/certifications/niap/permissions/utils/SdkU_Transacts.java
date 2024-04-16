@@ -1,36 +1,22 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.android.certifications.niap.permissions.utils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SdkS_Transacts extends Transacts {
-    public SdkS_Transacts() {
-        mDeviceApiLevel = 33;
+public class SdkU_Transacts extends Transacts {
+    public SdkU_Transacts() {
+        mDeviceApiLevel = 34;
         Map<String, Integer> transactIds;
 
         transactIds = new HashMap<>();
-        transactIds.put(updateState, 33);
-        transactIds.put(getActiveServiceComponentName, 18);
+        transactIds.put(updateState, 35);
+        transactIds.put(getActiveServiceComponentName, 19);
         transactIds.put(updateKeyphraseSoundModel, 14);
-        transactIds.put(isSessionRunning, 22);
+        transactIds.put(isSessionRunning, 23);
         mDescriptorTransacts.put(VOICE_INTERACTION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        // Failed to obtain transactId of setTransactionState under android.ui.ISurfaceComposer: android.ui.ISurfaceComposer$Stub
         transactIds.put(bootFinished, 1);
         transactIds.put(showCpu, 1000);
         mDescriptorTransacts.put(SURFACE_FLINGER_DESCRIPTOR, transactIds);
@@ -44,6 +30,7 @@ public class SdkS_Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(retainSubscriptionsForFactoryReset, 14);
+        transactIds.put(getSupportedCountries, 16);
         mDescriptorTransacts.put(EUICC_CONTROLLER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -53,6 +40,7 @@ public class SdkS_Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(verifyCredential, 10);
+        transactIds.put(startRemoteLockscreenValidation, 46);
         mDescriptorTransacts.put(LOCK_SETTINGS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -72,17 +60,23 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(MUSIC_RECOGNITION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(reboot, 36);
-        transactIds.put(isAmbientDisplaySuppressedForTokenByApp, 54);
-        // Failed to obtain transactId of setPowerSaveMode under android.os.IPowerManager: No field TRANSACTION_setPowerSaveMode in class Landroid/os/IPowerManager$Stub; (declaration of 'android.os.IPowerManager$Stub' appears in /system/framework/framework.jar!classes2.dex)
-        transactIds.put(setDynamicPowerSaveHint, 22);
-        transactIds.put(setBatteryDischargePrediction, 26);
+        transactIds.put(reboot, 47);
+        transactIds.put(isAmbientDisplaySuppressedForTokenByApp, 65);
+        transactIds.put(acquireWakeLock, 1);
+        transactIds.put(releaseLowPowerStandbyPorts, 45);
+        // Failed to obtain transactId of setPowerSaveMode under android.os.IPowerManager: No field TRANSACTION_setPowerSaveMode in class Landroid/os/IPowerManager$Stub; (declaration of 'android.os.IPowerManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
+        transactIds.put(setDynamicPowerSaveHint, 25);
+        transactIds.put(setBatteryDischargePrediction, 29);
         mDescriptorTransacts.put(POWER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(notifySystemEvent, 19);
         transactIds.put(injectCamera, 15);
         mDescriptorTransacts.put(CAMERA_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
+        transactIds.put(getCredentialProviderServices, 9);
+        mDescriptorTransacts.put(CREDENTIAL_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         // Failed to obtain transactId of isRecognitionActive under com.android.internal.app.ISoundTriggerService: No field TRANSACTION_isRecognitionActive in class Lcom/android/internal/app/ISoundTriggerService$Stub; (declaration of 'com.android.internal.app.ISoundTriggerService$Stub' appears in /system/framework/framework.jar!classes4.dex)
@@ -99,20 +93,25 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(AUTH_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(isControllerAlwaysOnSupported, 30);
+        transactIds.put(isControllerAlwaysOnSupported, 25);
         mDescriptorTransacts.put(NFC_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setRingtonePlayer, 69);
-        transactIds.put(getRingtonePlayer, 70);
-        transactIds.put(isAudioServerRunning, 103);
-        transactIds.put(forceRemoteSubmixFullVolume, 15);
-        transactIds.put(getDeviceVolumeBehavior, 121);
+        transactIds.put(setOverrideLocaleConfig, 4);
+        mDescriptorTransacts.put(LOCALE_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
+        transactIds.put(setRingtonePlayer, 78);
+        transactIds.put(getRingtonePlayer, 79);
+        transactIds.put(isAudioServerRunning, 126);
+        transactIds.put(forceRemoteSubmixFullVolume, 18);
+        transactIds.put(setVolumeGroupVolumeIndex, 25);
+        transactIds.put(getDeviceVolumeBehavior, 151);
         mDescriptorTransacts.put(AUDIO_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(noteStartAudio, 5);
-        transactIds.put(getAwakeTimeBattery, 76);
+        transactIds.put(getAwakeTimeBattery, 77);
         mDescriptorTransacts.put(BATTERY_STATS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -133,8 +132,10 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(WALLPAPER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        // Failed to obtain transactId of getVtDataUsage under com.android.internal.telephony.ITelephony: No field TRANSACTION_getVtDataUsage in class Lcom/android/internal/telephony/ITelephony$Stub; (declaration of 'com.android.internal.telephony.ITelephony$Stub' appears in /system/framework/framework.jar!classes4.dex)
-        transactIds.put(enableLocationUpdates, 23);
+        // Failed to obtain transactId of getVtDataUsage under com.android.internal.telephony.ITelephony: No field TRANSACTION_getVtDataUsage in class Lcom/android/internal/telephony/ITelephony$Stub; (declaration of 'com.android.internal.telephony.ITelephony$Stub' appears in /system/framework/framework.jar!classes3.dex)
+        transactIds.put(enableLocationUpdates, 26);
+        transactIds.put(requestIsSatelliteEnabled, 359);
+        transactIds.put(requestSatelliteEnabled, 358);
         mDescriptorTransacts.put(TELEPHONY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -143,12 +144,14 @@ public class SdkS_Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(getPrimaryClipSource, 10);
+        transactIds.put(areClipboardAccessNotificationsEnabledForUser, 11);
         // Failed to obtain transactId of showAccessNotificationLocked under android.content.IClipboard: No field TRANSACTION_showAccessNotificationLocked in class Landroid/content/IClipboard$Stub; (declaration of 'android.content.IClipboard$Stub' appears in /system/framework/framework.jar)
         mDescriptorTransacts.put(CLIPBOARD_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(requestEmbeddedSubscriptionInfoListRefresh, 11);
-        mDescriptorTransacts.put(ISUB_DESCRIPTOR, transactIds);
+        transactIds.put(requestEmbeddedSubscriptionInfoListRefresh, 10);
+        transactIds.put(setSubscriptionUserHandle, 50);
+        mDescriptorTransacts.put(SUBSCRIPTION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         // Failed to obtain transactId of setAlwaysOnEffect under android.os.IVibratorService: android.os.IVibratorService$Stub
@@ -164,25 +167,26 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(PEOPLE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(getActiveNotifications, 64);
+        transactIds.put(getActiveNotifications, 62);
         transactIds.put(getZenRules, 128);
         transactIds.put(isNotificationPolicyAccessGrantedForPackage, 124);
         transactIds.put(getEnabledNotificationListeners, 110);
-        transactIds.put(setToastRateLimitingEnabled, 147);
+        transactIds.put(setToastRateLimitingEnabled, 148);
         mDescriptorTransacts.put(NOTIFICATION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(movePackage, 111);
-        transactIds.put(installExistingPackageAsUser, 115);
+        transactIds.put(getAppMetadataFd, 37);
+        transactIds.put(movePackage, 113);
+        transactIds.put(installExistingPackageAsUser, 117);
         transactIds.put(makeUidVisible, 199);
         transactIds.put(setKeepUninstalledPackages, 204);
         transactIds.put(getRuntimePermissionsVersion, 180);
         // Failed to obtain transactId of addOnPermissionsChangeListener under android.content.pm.IPackageManager: No field TRANSACTION_addOnPermissionsChangeListener in class Landroid/content/pm/IPackageManager$Stub; (declaration of 'android.content.pm.IPackageManager$Stub' appears in /system/framework/framework.jar)
-        transactIds.put(getHarmfulAppWarning, 163);
-        transactIds.put(isPackageDeviceAdminOnAnyUser, 151);
+        transactIds.put(getHarmfulAppWarning, 164);
+        transactIds.put(isPackageDeviceAdminOnAnyUser, 152);
         transactIds.put(isPackageStateProtected, 176);
-        transactIds.put(getMoveStatus, 108);
-        transactIds.put(resetApplicationPreferences, 53);
+        transactIds.put(getMoveStatus, 110);
+        transactIds.put(resetApplicationPreferences, 55);
         mDescriptorTransacts.put(PACKAGE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -193,7 +197,7 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(NET_POLICY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(queryServiceStatus, 3);
+        transactIds.put(queryServiceStatus, 4);
         mDescriptorTransacts.put(AMBIENT_CONTEXT_MANAGER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -203,19 +207,19 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(ALARM_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(getActiveProjectionInfo, 4);
+        transactIds.put(getActiveProjectionInfo, 6);
         mDescriptorTransacts.put(MEDIA_PROJECTION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(dismissKeyguard, 52);
+        transactIds.put(dismissKeyguard, 59);
         mDescriptorTransacts.put(ACTIVITY_CLIENT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(getFrontActivityScreenCompatMode, 19);
         transactIds.put(getTaskDescription, 28);
-        transactIds.put(getAssistContextExtras, 58);
+        transactIds.put(getAssistContextExtras, 59);
         transactIds.put(setFrontActivityScreenCompatMode, 20);
-        transactIds.put(getWindowOrganizerController, 65);
+        transactIds.put(getWindowOrganizerController, 66);
         transactIds.put(startActivityFromGameSession, 12);
         transactIds.put(startActivityAsCaller, 15);
         // Failed to obtain transactId of dismissKeyguard under android.app.IActivityTaskManager: No field TRANSACTION_dismissKeyguard in class Landroid/app/IActivityTaskManager$Stub; (declaration of 'android.app.IActivityTaskManager$Stub' appears in /system/framework/framework.jar)
@@ -234,18 +238,18 @@ public class SdkS_Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(createAssociation, 12);
-        transactIds.put(dispatchMessage, 13);
+        // Failed to obtain transactId of dispatchMessage under android.companion.ICompanionDeviceManager: No field TRANSACTION_dispatchMessage in class Landroid/companion/ICompanionDeviceManager$Stub; (declaration of 'android.companion.ICompanionDeviceManager$Stub' appears in /system/framework/framework.jar)
         mDescriptorTransacts.put(COMPANION_DEVICE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(getCacheSizeBytes, 77);
-        // Failed to obtain transactId of getEncryptionState under android.os.storage.IStorageManager: No field TRANSACTION_getEncryptionState in class Landroid/os/storage/IStorageManager$Stub; (declaration of 'android.os.storage.IStorageManager$Stub' appears in /system/framework/framework.jar!classes2.dex)
+        // Failed to obtain transactId of getEncryptionState under android.os.storage.IStorageManager: No field TRANSACTION_getEncryptionState in class Landroid/os/storage/IStorageManager$Stub; (declaration of 'android.os.storage.IStorageManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
         transactIds.put(benchmark, 60);
-        // Failed to obtain transactId of isConvertibleToFBE under android.os.storage.IStorageManager: No field TRANSACTION_isConvertibleToFBE in class Landroid/os/storage/IStorageManager$Stub; (declaration of 'android.os.storage.IStorageManager$Stub' appears in /system/framework/framework.jar!classes2.dex)
+        // Failed to obtain transactId of isConvertibleToFBE under android.os.storage.IStorageManager: No field TRANSACTION_isConvertibleToFBE in class Landroid/os/storage/IStorageManager$Stub; (declaration of 'android.os.storage.IStorageManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
         mDescriptorTransacts.put(MOUNT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(suggestExternalTime, 3);
+        transactIds.put(suggestExternalTime, 8);
         transactIds.put(getCapabilitiesAndConfig, 1);
         mDescriptorTransacts.put(TIME_DETECTOR_DESCRIPTOR, transactIds);
 
@@ -259,41 +263,60 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(DEVICE_STATE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(isInputMethodPickerShownForTest, 12);
+        mDescriptorTransacts.put(INPUTMETHOD_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(setDataSaverModeEnabled, 41);
         mDescriptorTransacts.put(NETWORK_MANAGEMENT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(search, 1);
+        transactIds.put(isDeviceLocked, 3);
+        mDescriptorTransacts.put(DEVICELOCK_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
+        transactIds.put(updateDataDownloadState, 30);
+        transactIds.put(deleteAllStagedRemoteData, 29);
+        transactIds.put(startMigration, 22);
+        transactIds.put(getHealthConnectDataState, 31);
+        mDescriptorTransacts.put(HEALTH_CONNECT_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
+        // Failed to obtain transactId of search under android.app.cloudsearch.ICloudSearchManager: android.app.cloudsearch.ICloudSearchManager$Stub
         mDescriptorTransacts.put(CLOUDSEARCH_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(resetAppErrors, 217);
-        transactIds.put(bindBackupAgent, 84);
-        transactIds.put(performIdleMaintenance, 158);
-        transactIds.put(setDumpHeapDebugLimit, 175);
-        transactIds.put(updateLockTaskPackages, 177);
-        transactIds.put(stopAppForUser, 73);
+        transactIds.put(resetAppErrors, 228);
+        transactIds.put(bindBackupAgent, 92);
+        transactIds.put(performIdleMaintenance, 166);
+        transactIds.put(setDumpHeapDebugLimit, 183);
+        transactIds.put(updateLockTaskPackages, 185);
+        transactIds.put(stopAppForUser, 80);
         // Failed to obtain transactId of getGrantedUriPermissions under android.app.IActivityManager: No field TRANSACTION_getGrantedUriPermissions in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
-        transactIds.put(setHasTopUi, 196);
+        transactIds.put(setHasTopUi, 205);
         // Failed to obtain transactId of dismissKeyguard under android.app.IActivityManager: No field TRANSACTION_dismissKeyguard in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
-        transactIds.put(resumeAppSwitches, 83);
-        transactIds.put(getContentProviderExternal, 120);
-        transactIds.put(getIntentForIntentSender, 148);
+        transactIds.put(resumeAppSwitches, 91);
+        transactIds.put(getContentProviderExternal, 128);
+        transactIds.put(getIntentForIntentSender, 156);
         // Failed to obtain transactId of getTaskDescription under android.app.IActivityManager: No field TRANSACTION_getTaskDescription in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
         // Failed to obtain transactId of getAssistContextExtras under android.app.IActivityManager: No field TRANSACTION_getAssistContextExtras in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
-        transactIds.put(unhandledBack, 10);
+        transactIds.put(broadcastIntentWithFeature, 22);
+        transactIds.put(unhandledBack, 16);
         // Failed to obtain transactId of inputDispatchingTimedOut under android.app.IActivityManager: No field TRANSACTION_inputDispatchingTimedOut in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
         // Failed to obtain transactId of setFrontActivityScreenCompatMode under android.app.IActivityManager: No field TRANSACTION_setFrontActivityScreenCompatMode in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
-        transactIds.put(setAlwaysFinish, 36);
-        transactIds.put(startActivityFromRecents, 165);
+        transactIds.put(getMimeTypeFilterAsync, 111);
+        transactIds.put(setAlwaysFinish, 43);
+        transactIds.put(startActivityFromRecents, 173);
+        transactIds.put(killAllBackgroundProcesses, 127);
         // Failed to obtain transactId of releasePersistableUriPermission under android.app.IActivityManager: No field TRANSACTION_releasePersistableUriPermission in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
-        transactIds.put(requestBugReport, 138);
+        transactIds.put(logFgsApiBegin, 10);
+        transactIds.put(requestBugReport, 146);
         // Failed to obtain transactId of getFrontActivityScreenCompatMode under android.app.IActivityManager: No field TRANSACTION_getFrontActivityScreenCompatMode in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
-        transactIds.put(setProcessLimit, 44);
-        transactIds.put(signalPersistentProcesses, 52);
-        transactIds.put(updateConfiguration, 41);
-        transactIds.put(appNotRespondingViaProvider, 159);
-        transactIds.put(shutdown, 81);
+        transactIds.put(setProcessLimit, 51);
+        transactIds.put(signalPersistentProcesses, 59);
+        transactIds.put(updateConfiguration, 48);
+        transactIds.put(appNotRespondingViaProvider, 167);
+        transactIds.put(shutdown, 89);
         mDescriptorTransacts.put(ACTIVITY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -305,62 +328,69 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(VIRTUAL_DEVICE_MANAGER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(removeRestrictedMetricsChangedOperation, 16);
+        transactIds.put(setRestrictedMetricsChangedOperation, 15);
+        mDescriptorTransacts.put(STATS_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(awaken, 2);
         transactIds.put(isDreaming, 7);
         mDescriptorTransacts.put(DREAMS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setRefreshRateSwitchingType, 46);
-        transactIds.put(setTemporaryAutoBrightnessAdjustment, 37);
+        transactIds.put(setRefreshRateSwitchingType, 51);
+        transactIds.put(setHdrConversionMode, 45);
+        transactIds.put(setTemporaryAutoBrightnessAdjustment, 38);
         transactIds.put(startWifiDisplayScan, 6);
-        transactIds.put(setUserPreferredDisplayMode, 41);
-        transactIds.put(shouldAlwaysRespectAppRequestedMode, 45);
-        transactIds.put(requestColorMode, 19);
+        transactIds.put(setUserPreferredDisplayMode, 42);
+        transactIds.put(shouldAlwaysRespectAppRequestedMode, 50);
+        transactIds.put(requestColorMode, 20);
         mDescriptorTransacts.put(DISPLAY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(requestProjection, 18);
-        transactIds.put(getActiveProjectionTypes, 23);
+        transactIds.put(requestProjection, 19);
+        transactIds.put(getActiveProjectionTypes, 24);
         mDescriptorTransacts.put(UI_MODE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(requestAppKeyboardShortcuts, 80);
         transactIds.put(createInputConsumer, 83);
-        transactIds.put(registerTaskFpsCallback, 130);
-        // Failed to obtain transactId of requestUserActivityNotification under android.view.IWindowManager: No field TRANSACTION_requestUserActivityNotification in class Landroid/view/IWindowManager$Stub; (declaration of 'android.view.IWindowManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
-        transactIds.put(clearWindowContentFrameStats, 75);
-        transactIds.put(addKeyguardLockedStateListener, 33);
-        transactIds.put(setRecentsVisibility, 67);
-        transactIds.put(stopFreezingScreen, 26);
-        transactIds.put(setInTouchMode, 42);
-        transactIds.put(dismissKeyguard, 32);
-        transactIds.put(screenshotWallpaper, 59);
-        transactIds.put(setAnimationScale, 39);
-        transactIds.put(removeWindowToken, 18);
-        transactIds.put(thawRotation, 52);
-        // Failed to obtain transactId of getInTouchMode under android.view.IWindowManager: No field TRANSACTION_getInTouchMode in class Landroid/view/IWindowManager$Stub; (declaration of 'android.view.IWindowManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
+        transactIds.put(registerTaskFpsCallback, 134);
+        // Failed to obtain transactId of requestUserActivityNotification under android.view.IWindowManager: No field TRANSACTION_requestUserActivityNotification in class Landroid/view/IWindowManager$Stub; (declaration of 'android.view.IWindowManager$Stub' appears in /system/framework/framework.jar!classes4.dex)
+        transactIds.put(clearWindowContentFrameStats, 76);
+        transactIds.put(addKeyguardLockedStateListener, 34);
+        transactIds.put(setRecentsVisibility, 70);
+        transactIds.put(stopFreezingScreen, 27);
+        transactIds.put(setInTouchMode, 43);
+        transactIds.put(dismissKeyguard, 33);
+        transactIds.put(screenshotWallpaper, 62);
+        transactIds.put(setAnimationScale, 40);
+        transactIds.put(removeWindowToken, 19);
+        transactIds.put(thawRotation, 55);
+        // Failed to obtain transactId of getInTouchMode under android.view.IWindowManager: No field TRANSACTION_getInTouchMode in class Landroid/view/IWindowManager$Stub; (declaration of 'android.view.IWindowManager$Stub' appears in /system/framework/framework.jar!classes4.dex)
         transactIds.put(registerShortcutKey, 82);
-        transactIds.put(overridePendingAppTransitionRemote, 23);
+        transactIds.put(overridePendingAppTransitionRemote, 24);
         mDescriptorTransacts.put(WINDOW_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(clearHistory, 26);
-        transactIds.put(setUserRestriction, 34);
-        transactIds.put(getHistoricalOps, 19);
-        transactIds.put(getUidOps, 28);
+        transactIds.put(clearHistory, 27);
+        transactIds.put(setUserRestriction, 35);
+        transactIds.put(getHistoricalOps, 20);
+        transactIds.put(getUidOps, 29);
         transactIds.put(noteOperation, 2);
         mDescriptorTransacts.put(APP_OPS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(getSafetyCenterConfig, 6);
+        transactIds.put(getSafetyCenterConfig, 7);
         transactIds.put(getSafetySourceData, 3);
         transactIds.put(isSafetyCenterEnabled, 1);
         mDescriptorTransacts.put(SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(temporaryEnableAccessibilityStateUntilKeyguardRemoved, 12);
+        // Failed to obtain transactId of temporaryEnableAccessibilityStateUntilKeyguardRemoved under android.view.accessibility.IAccessibilityManager: No field TRANSACTION_temporaryEnableAccessibilityStateUntilKeyguardRemoved in class Landroid/view/accessibility/IAccessibilityManager$Stub; (declaration of 'android.view.accessibility.IAccessibilityManager$Stub' appears in /system/framework/framework.jar!classes4.dex)
         transactIds.put(registerUiTestAutomationService, 10);
         transactIds.put(setPictureInPictureActionReplacingConnection, 9);
-        transactIds.put(getWindowToken, 13);
+        transactIds.put(getWindowToken, 12);
         mDescriptorTransacts.put(ACCESSIBILITY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -372,11 +402,11 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(TRANSLATION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setBindAppWidgetPermission, 20);
+        transactIds.put(setBindAppWidgetPermission, 21);
         mDescriptorTransacts.put(APPWIDGET_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setBackupEnabled, 13);
+        transactIds.put(setBackupEnabled, 14);
         mDescriptorTransacts.put(BACKUP_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -389,7 +419,8 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(FONT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(getSpecificationInfo, 6);
+        transactIds.put(getSpecificationInfo, 8);
+        transactIds.put(openRanging, 9);
         mDescriptorTransacts.put(UWB_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -403,17 +434,17 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(SENSOR_PRIVACY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(getWifiApConfiguration, 75);
-        transactIds.put(stopSoftAp, 67);
-        transactIds.put(setCoexUnsafeChannels, 62);
-        transactIds.put(setOverrideCountryCode, 42);
-        transactIds.put(unregisterCoexCallback, 64);
-        transactIds.put(setWifiEnabled, 37);
-        transactIds.put(restartWifiSubsystem, 140);
+        transactIds.put(getWifiApConfiguration, 83);
+        transactIds.put(stopSoftAp, 74);
+        transactIds.put(setCoexUnsafeChannels, 69);
+        transactIds.put(setOverrideCountryCode, 49);
+        transactIds.put(unregisterCoexCallback, 71);
+        transactIds.put(setWifiEnabled, 42);
+        transactIds.put(restartWifiSubsystem, 156);
         mDescriptorTransacts.put(WIFI_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(getControlFd, 34);
+        transactIds.put(getControlFd, 36);
         mDescriptorTransacts.put(USB_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -423,7 +454,7 @@ public class SdkS_Transacts extends Transacts {
         transactIds = new HashMap<>();
         transactIds.put(isAutoRevokeExempted, 26);
         transactIds.put(addOnPermissionsChangeListener, 10);
-        // Failed to obtain transactId of isAutoRevokeWhitelisted under android.permission.IPermissionManager: No field TRANSACTION_isAutoRevokeWhitelisted in class Landroid/permission/IPermissionManager$Stub; (declaration of 'android.permission.IPermissionManager$Stub' appears in /system/framework/framework.jar!classes2.dex)
+        // Failed to obtain transactId of isAutoRevokeWhitelisted under android.permission.IPermissionManager: No field TRANSACTION_isAutoRevokeWhitelisted in class Landroid/permission/IPermissionManager$Stub; (declaration of 'android.permission.IPermissionManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
         mDescriptorTransacts.put(PERMISSION_MANAGER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -431,23 +462,56 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(SOUND_TRIGGER_SESSION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(getPermittedInputMethodsAsUser, 142);
-        transactIds.put(installCaCert, 100);
+        transactIds.put(setUserControlDisabledPackages, 335);
+        transactIds.put(setKeyguardDisabledFeatures, 61);
+        transactIds.put(getDoNotAskCredentialsOnBoot, 232);
+        transactIds.put(setShortSupportMessage, 246);
         transactIds.put(getNearbyNotificationStreamingPolicy, 58);
-        // Failed to obtain transactId of markProfileOwnerOnOrganizationOwnedDevice under android.app.admin.IDevicePolicyManager: No field TRANSACTION_markProfileOwnerOnOrganizationOwnedDevice in class Landroid/app/admin/IDevicePolicyManager$Stub; (declaration of 'android.app.admin.IDevicePolicyManager$Stub' appears in /system/framework/framework.jar)
-        transactIds.put(setStrings, 359);
-        transactIds.put(getWifiSsidPolicy, 352);
-        transactIds.put(setProfileOwnerOnOrganizationOwnedDevice, 306);
-        transactIds.put(forceSecurityLogs, 260);
-        transactIds.put(getDoNotAskCredentialsOnBoot, 220);
-        transactIds.put(clearSystemUpdatePolicyFreezePeriodRecord, 217);
-        transactIds.put(getString, 361);
+        transactIds.put(setPermittedInputMethods, 143);
+        transactIds.put(setStrings, 371);
+        transactIds.put(setApplicationRestrictions, 126);
+        transactIds.put(getWifiSsidPolicy, 364);
+        transactIds.put(setPermissionGrantState, 237);
+        transactIds.put(setUsbDataSignalingEnabled, 357);
+        transactIds.put(forceSecurityLogs, 272);
+        transactIds.put(setResetPasswordToken, 290);
+        transactIds.put(setFactoryResetProtectionPolicy, 42);
+        transactIds.put(addCrossProfileWidgetProvider, 213);
+        transactIds.put(setConfiguredNetworksLockdownState, 183);
+        transactIds.put(setCommonCriteriaModeEnabled, 337);
+        transactIds.put(getCrossProfileWidgetProviders, 215);
+        transactIds.put(setAccountManagementDisabled, 168);
+        transactIds.put(setStatusBarDisabled, 230);
+        transactIds.put(setSystemUpdatePolicy, 226);
         transactIds.put(setDeviceOwner, 78);
+        // Failed to obtain transactId of markProfileOwnerOnOrganizationOwnedDevice under android.app.admin.IDevicePolicyManager: No field TRANSACTION_markProfileOwnerOnOrganizationOwnedDevice in class Landroid/app/admin/IDevicePolicyManager$Stub; (declaration of 'android.app.admin.IDevicePolicyManager$Stub' appears in /system/framework/framework.jar)
+        transactIds.put(isPackageSuspended, 98);
+        transactIds.put(setProfileOwnerOnOrganizationOwnedDevice, 318);
+        transactIds.put(setTrustAgentConfiguration, 211);
+        transactIds.put(getString, 373);
+        transactIds.put(hasLockdownAdminConfiguredNetworks, 184);
+        transactIds.put(setLockTaskPackages, 175);
+        transactIds.put(setOrganizationName, 257);
+        transactIds.put(getPermittedInputMethodsAsUser, 145);
+        transactIds.put(setApplicationExemptions, 377);
+        transactIds.put(setDefaultSmsApplication, 124);
+        transactIds.put(setPasswordExpirationTimeout, 20);
+        transactIds.put(installCaCert, 100);
+        transactIds.put(setUserRestriction, 133);
+        transactIds.put(setSecurityLoggingEnabled, 267);
+        transactIds.put(setMaximumTimeToLock, 36);
+        transactIds.put(setScreenCaptureDisabled, 55);
+        transactIds.put(clearSystemUpdatePolicyFreezePeriodRecord, 228);
+        transactIds.put(setCameraDisabled, 53);
+        transactIds.put(installUpdateFromFile, 319);
+        transactIds.put(setMtePolicy, 379);
+        transactIds.put(setMaximumFailedPasswordsForWipe, 33);
+        transactIds.put(installKeyPair, 105);
         mDescriptorTransacts.put(DEVICE_POLICY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(getAvailableExtensionInterfaceNames, 5);
-        transactIds.put(getCurrentTunedInfos, 39);
+        transactIds.put(getCurrentTunedInfos, 41);
         mDescriptorTransacts.put(TV_INPUT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -471,6 +535,10 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(VPN_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(provideDataStream, 1);
+        mDescriptorTransacts.put(WEARABLES_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(hasEnrolledBiometrics, 6);
         mDescriptorTransacts.put(BIOMETRIC_DESCRIPTOR, transactIds);
 
@@ -490,8 +558,9 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(MEDIA_SESSION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(addOnRoleHoldersChangedListenerAsUser, 7);
-        transactIds.put(setBypassingRoleQualification, 10);
+        transactIds.put(getDefaultApplicationAsUser, 7);
+        transactIds.put(addOnRoleHoldersChangedListenerAsUser, 9);
+        transactIds.put(setBypassingRoleQualification, 12);
         mDescriptorTransacts.put(ROLE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -500,13 +569,15 @@ public class SdkS_Transacts extends Transacts {
         mDescriptorTransacts.put(DOMAIN_VERIFICATION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setTouchCalibrationForInputDevice, 13);
-        transactIds.put(isInTabletMode, 23);
-        transactIds.put(monitorGestureInput, 38);
-        transactIds.put(addKeyboardLayoutForInputDevice, 20);
-        transactIds.put(enableInputDevice, 4);
-        transactIds.put(tryPointerSpeed, 8);
-        transactIds.put(removePortAssociation, 40);
+        transactIds.put(setTouchCalibrationForInputDevice, 14);
+        transactIds.put(isInTabletMode, 30);
+        transactIds.put(monitorGestureInput, 44);
+        transactIds.put(addKeyboardLayoutForInputDevice, 21);
+        transactIds.put(enableInputDevice, 5);
+        transactIds.put(registerKeyboardBacklightListener, 65);
+        transactIds.put(getModifierKeyRemapping, 28);
+        transactIds.put(tryPointerSpeed, 9);
+        transactIds.put(removePortAssociation, 46);
         mDescriptorTransacts.put(INPUT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -515,7 +586,7 @@ public class SdkS_Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         // Failed to obtain transactId of hideBiometricDialog under com.android.internal.statusbar.IStatusBarService: No field TRANSACTION_hideBiometricDialog in class Lcom/android/internal/statusbar/IStatusBarService$Stub; (declaration of 'com.android.internal.statusbar.IStatusBarService$Stub' appears in /system/framework/framework.jar!classes4.dex)
-        transactIds.put(onBiometricHelp, 48);
+        transactIds.put(onBiometricHelp, 49);
         mDescriptorTransacts.put(STATUS_BAR_DESCRIPTOR, transactIds);
     }
 }

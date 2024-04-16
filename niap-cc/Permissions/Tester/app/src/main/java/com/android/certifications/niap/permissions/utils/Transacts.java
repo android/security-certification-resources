@@ -2437,9 +2437,9 @@ public class Transacts {
             case Build.VERSION_CODES.S_V2:
                 return new S2Transacts();
             case Build.VERSION_CODES.TIRAMISU:
-                return new SdkS_Transacts();
-            case Build.VERSION_CODES.UPSIDE_DOWN_CAKE:
                 return new SdkT_Transacts();
+            case Build.VERSION_CODES.UPSIDE_DOWN_CAKE:
+                return new SdkU_Transacts();
             default:
                 throw new IllegalArgumentException(
                         "The provided API level, " + apiLevel + ", is not supported");
