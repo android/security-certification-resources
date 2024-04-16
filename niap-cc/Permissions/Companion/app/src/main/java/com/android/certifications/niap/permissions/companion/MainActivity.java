@@ -147,12 +147,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-    public boolean deviceConfigSetProperty(String a,String b,String value,boolean makeDefault) {
+    public boolean deviceConfigSetProperty(String namespace,String name,String value,boolean makeDefault) {
         try {
             Object r = invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
                     "setProperty", null,
                     new Class[]{String.class, String.class, String.class,
-                            boolean.class}, a, b, value, makeDefault);
+                            boolean.class}, namespace, name, value, makeDefault);
             return (boolean)r;
         } catch (Exception e) {
             logdebug("DeviceConfig.setProperty failed.(" + a + "," + b + "," + value + ")",e);
