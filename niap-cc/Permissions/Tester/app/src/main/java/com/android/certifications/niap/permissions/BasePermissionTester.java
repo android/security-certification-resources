@@ -17,6 +17,7 @@
 package com.android.certifications.niap.permissions;
 
 import android.app.Activity;
+import android.app.MissingForegroundServiceTypeException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -27,7 +28,10 @@ import android.content.res.Resources;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.util.Consumer;
 
+import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -41,6 +45,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Base class that provides standard functionality for performing permission tests. Permission
@@ -48,6 +53,69 @@ import java.util.Set;
  * test all permissions to be verified by the class.
  */
 public abstract class BasePermissionTester {
+
+    public static int THREAD_JOIN_DELAY=100;
+    public static int aiIncl(AtomicInteger n){
+        return n.incrementAndGet();
+    }
+    public static class Result {
+
+        public Result(boolean result,String name,int  no,int total,int err,String testerName){
+            this.result=result;this.name=name;this.no=no;this.total=total;this.isTarget=true;
+            this._testerName = testerName;this.err = err;
+        }
+        Boolean result;
+        String name;
+        int no;
+        int total;
+        int err;
+        Boolean isTarget;
+        String _testerName;
+        public static String testerName;
+        public Boolean getResult() {
+            return result;
+        }
+        public String getName() {
+            return name;
+        }
+
+        public int getNo() {
+            return no;
+        }
+
+        public int getTotal() {
+            return total;
+        }
+        public int getError() {
+            return err;
+        }
+
+        public String getTesterName() {
+            return this._testerName;
+        }
+
+
+        public boolean getIsTarget()
+        {
+            return isTarget;
+        }
+        public Result markNonTarget(){
+            isTarget = false;
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return "Result{" +
+                    "result=" + result +
+                    ", name='" + name + '\'' +
+                    ", no=" + no +
+                    ", total=" + total +
+                    ", testerName=" + testerName +
+                    '}';
+        }
+    }
+
     private static final String TAG = "PermissionTester";
 
     protected final Logger mLogger;
@@ -83,7 +151,7 @@ public abstract class BasePermissionTester {
         mPackageName = mContext.getPackageName();
         mUid = mAppInfo.uid;
         mPackageManager = mContext.getPackageManager();
-        mLogger = LoggerFactory.createDefaultLogger(TAG);
+        mLogger = LoggerFactory.createActivityLogger(TAG, (MainActivity) mActivity);
         mDeviceApiLevel = Build.VERSION.SDK_INT;
         mTransacts = Transacts.createTransactsForApiLevel(mDeviceApiLevel);
 
@@ -123,7 +191,7 @@ public abstract class BasePermissionTester {
      * indicating whether all tests completed successfully.
      */
     public abstract boolean runPermissionTests();
-
+    public abstract void runPermissionTestsByThreads(Consumer<Result> callback);
     public abstract Map<String,PermissionTest> getRegisteredPermissions();
 
     /**
@@ -165,8 +233,9 @@ public abstract class BasePermissionTester {
      *
      * @return true if the test is skipped, if the test is a custom test, or if the test is passed
      */
+
     public boolean runPermissionTest(String permission, PermissionTest test,
-            boolean exceptionAllowed) {
+                                     boolean exceptionAllowed) {
         boolean testPassed = true;
         // if the permission does not exist then skp the test and return immediately.
         if (!mPlatformPermissions.contains(permission)) {
@@ -174,6 +243,12 @@ public abstract class BasePermissionTester {
                     + " is not declared by the platform on this device");
             return true;
         }
+        if(test == null){
+            //
+            mLogger.logDebug("The test case for " + permission + " is not found");
+            return true;
+        }
+        //mLogger.logDebug(test.toString());
         if (mDeviceApiLevel < test.mMinApiLevel) {
             mLogger.logDebug(
                     "permission " + permission + " is targeted for min API " + test.mMinApiLevel
@@ -207,9 +282,15 @@ public abstract class BasePermissionTester {
                     mLogger.logDebug("SecurityException cause: ", e.getCause());
                 }
                 testPassed = getAndLogTestStatus(permission, permissionGranted, false);
-            } catch (UnexpectedPermissionTestFailureException e) {
+            } catch (MissingForegroundServiceTypeException e) {
+                //
                 testPassed = false;
-                StatusLogger.logTestError(permission, e);
+
+                mLogger.logInfo(permission + "/"+ e.getMessage(),e);//becasue failed test does not always mean false behvaiour.
+            } catch (UnexpectedPermissionTestFailureException e) {
+
+                testPassed = false;
+                mLogger.logInfo(permission + "/"+ e.getMessage(),e);
             } catch (Throwable t) {
                 // Any other Throwable indicates the test did not fail due to a SecurityException;
                 // treat the API as successful if the caller specified exceptions are allowed.
@@ -220,7 +301,7 @@ public abstract class BasePermissionTester {
                     // else an Exception was not expected; treat the test as failed and log the
                     // error status.
                     testPassed = false;
-                    StatusLogger.logTestError(permission, t);
+                    mLogger.logInfo(permission + "/"+ t.getMessage(),t);
                 }
             }
         }
@@ -238,7 +319,10 @@ public abstract class BasePermissionTester {
             boolean apiSuccessful) {
         // If the permission was granted then the API should have been successful.
         boolean testPassed = permissionGranted == apiSuccessful;
-        StatusLogger.logTestStatus(permission, permissionGranted, apiSuccessful);
+        mLogger.logTestStatus(permission, permissionGranted, apiSuccessful);
+
+
+
         return testPassed;
     }
 

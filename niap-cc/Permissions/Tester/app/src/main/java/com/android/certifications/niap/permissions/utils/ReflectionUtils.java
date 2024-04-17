@@ -16,10 +16,17 @@
 
 package com.android.certifications.niap.permissions.utils;
 
+import android.os.Binder;
 import android.util.Log;
 import com.android.certifications.niap.permissions.BasePermissionTester;
+import com.android.certifications.niap.permissions.log.Logger;
+import com.android.certifications.niap.permissions.log.LoggerFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +35,10 @@ import java.util.stream.Collectors;
  * Provides utility methods for invoking methods via reflection.
  */
 public class ReflectionUtils {
+
+    private static final Logger mLogger = LoggerFactory.createDefaultLogger("Reflectioni Utils");
+
+
     /**
      * Invokes the specified {@code methodName} defined in the {@code targetClass} against the
      * {@code targetObject} (or {@code null} for a static method) that accepts the provided {@code
@@ -51,6 +62,103 @@ public class ReflectionUtils {
             } else {
                 throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
             }
+        }
+    }
+
+
+    public static Object stubFromInterface(String className)  {
+        try {
+            Class<?> ifListner = Class.forName(className);
+            Object listenerInstance = Proxy.newProxyInstance(
+                    ifListner.getClassLoader(), new Class<?>[]{ifListner}, new InvocationHandler() {
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    //mLogger.logDebug("callback invoked: "+proxy+","+method);
+                    if (method.getName().equals("asBinder")) {
+                        return new Binder() ;
+                    }
+                    if(method.getName().equals("onSuccess")){
+                        mLogger.logDebug("onSuccess");
+                        //System.out.println("ARGS: " + (Integer)args[0] + ", " + (Integer)args[1]);
+                        return 1;
+                    } else if(method.getName().equals("onError")){
+                        mLogger.logDebug("onError");
+                        //throw new SecurityException("Errror!");
+                        return 1;
+                    }
+                    else return -1;
+                }
+            });
+            mLogger.logDebug(checkDeclaredMethod(ifListner,"").toString());;
+
+            return ifListner.cast(listenerInstance);
+        } catch (ClassNotFoundException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public static boolean deviceConfigSetProperty(String namespace,String name,String value,boolean makeDefault)  {
+        try {
+            Object r = invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
+                    "setProperty", null,
+                    new Class[]{String.class, String.class, String.class,
+                            boolean.class}, namespace,name, value, makeDefault);
+            return (boolean)r;
+        } catch (Exception e){
+            mLogger.logDebug("DeviceConfig.setProperty failed.("+namespace+","+name+","+value+")");
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public static String deviceConfigGetProperty(String namespace,String name)  {
+        try {
+            String r = (String)invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
+                    "getProperty", null,
+                    new Class[]{String.class, String.class}, namespace,name);
+            return r;
+        } catch (Exception e) {
+            mLogger.logDebug("DeviceConfig.getProperty failed.(" + namespace+","+name+")");
+            return null;
+        }
+    }
+
+    public static Object stubHiddenObject(String classname)  {
+        try {
+            Class<?> remoteCallbackClass = Class.forName(classname);
+            Constructor<?> remoteCallbackConstructor = remoteCallbackClass.getConstructor();
+            return remoteCallbackConstructor.newInstance();
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
+                 InstantiationException | InvocationTargetException e){
+            e.printStackTrace();
+
+            return null;
+        }
+    }
+    public static Object stubRemoteCallback()  {
+        try {
+            Class<?> onResultListenerClass = Class.forName(
+                    "android.os.RemoteCallback$OnResultListener");
+            Object onResultListener = Proxy.newProxyInstance(
+                    onResultListenerClass.getClassLoader(),
+                    new Class[]{onResultListenerClass}, new InvocationHandler() {
+                        @Override
+                        public Object invoke(Object o, Method method, Object[] objects)
+                                throws Throwable {
+                            Log.d("", "invoke: " + method);
+                            return null;
+                        }
+                    });
+
+            Class<?> remoteCallbackClass = Class.forName("android.os.RemoteCallback");
+            Constructor remoteCallbackConstructor = remoteCallbackClass.getConstructor(
+                    onResultListenerClass);
+            return remoteCallbackConstructor.newInstance(
+                    (Object) onResultListener);
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
+                 InstantiationException | InvocationTargetException e){
+            e.printStackTrace();
+
+            return null;
         }
     }
 

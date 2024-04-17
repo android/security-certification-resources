@@ -39,3 +39,5 @@ tmp/build
 app/build
 /security
 
+/package
+/package/*

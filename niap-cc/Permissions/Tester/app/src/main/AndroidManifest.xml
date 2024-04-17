@@ -15,8 +15,7 @@
  limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.android.certifications.niap.permissions">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:allowBackup="true"
@@ -26,7 +25,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:debuggable="true"
+        android:testOnly="true"
+        android:process="system"
         android:theme="@style/AppTheme"
+        android:name=".TesterApplication"
         tools:ignore="HardcodedDebugMode">
         <activity
             android:name=".activities.TestActivity"
@@ -48,12 +50,76 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.MainActivity" />
+        </activity>
 
         <!-- This service is also used to test REGISTER_SIM_SUBSCRIPTION; the API for this test
            verifies that the specified services requires BIND_TELECOM_CONNECTION_SERVICE. -->
         <service
             android:name=".services.TestService"
             android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE" />
+        <service
+            android:name=".services.TestJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".services.FgCameraService"
+            android:foregroundServiceType="camera"
+            android:exported="false" />
+        <service
+            android:name=".services.FgLocationService"
+            android:foregroundServiceType="location"
+            android:exported="false" />
+        <service
+            android:name=".services.FgMicrophoneService"
+            android:foregroundServiceType="microphone"
+            android:exported="false" />
+        <service
+            android:name=".services.FgConnectedDeviceService"
+            android:foregroundServiceType="connectedDevice"
+            android:exported="false" />
+        <service
+            android:name=".services.FgDataSyncService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+        <service
+            android:name=".services.FgHealthService"
+            android:foregroundServiceType="health"
+            android:exported="false" />
+        <service
+            android:name=".services.FgMediaPlaybackService"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false" />
+        <service
+            android:name=".services.FgMediaProjectionService"
+            android:foregroundServiceType="mediaProjection"
+            android:exported="false" />
+        <service
+            android:name=".services.FgPhoneCallService"
+            android:foregroundServiceType="phoneCall"
+            android:exported="false" />
+        <service
+            android:name=".services.FgRemoteMessagingService"
+            android:foregroundServiceType="remoteMessaging"
+            android:exported="false" />
+        <service
+            android:name=".services.FgShortService"
+            android:foregroundServiceType="shortService"
+            android:exported="false" />
+        <service
+            android:name=".services.FgSpecialUseService"
+            android:foregroundServiceType="specialUse"
+            android:exported="false" />
+        <service
+            android:name=".services.FgSystemExemptedService"
+            android:foregroundServiceType="systemExempted"
+            android:exported="false" />
+
+
 
         <receiver
             android:name=".receivers.Admin"
@@ -61,16 +127,20 @@
             android:exported="true">
             <meta-data
                 android:name="android.app.device_admin"
-                android:resource="@xml/admin"/>
+                android:resource="@xml/admin_settings"/>
             <intent-filter>
                 <action
                     android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
 
+
+        <receiver android:name=".receivers.QueryPackageRestartReceiver"  android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_QUERY_PACKAGE_RESTART"/>
             </intent-filter>
         </receiver>
 
     </application>
 
-    <uses-feature android:name="android.software.companion_device_setup"
-        android:required="false" />
 </manifest>

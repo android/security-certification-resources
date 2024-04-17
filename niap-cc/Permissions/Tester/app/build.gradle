@@ -42,18 +42,44 @@ android {
             keyPassword 'android'
         }
     }
+
+    def publish = project.tasks.create("publishAll")
+    testVariants.all { variant->
+        if(variant.buildType.name.equals("debug")){
+            def task = project.tasks.create("publish${variant.name.capitalize()}Test", Copy)
+            mkdir("$rootDir/package")
+            variant.outputs.all { item ->
+                task.from(item.outputFile)
+                //println(item.outputFile)
+            }
+            task.into("$rootDir/package")
+            task.dependsOn variant.assemble
+            publish.dependsOn task
+        }
+    }
     applicationVariants.all { variant ->
         variant.outputs.all {
             def flavor = variant.productFlavors.name[0]
             outputFileName = "${applicationName}-${flavor}-${variant.buildType.name}.apk"
         }
+        if(variant.buildType.name.equals("debug")){
+            def task = project.tasks.create("publish${variant.name.capitalize()}Apk", Copy)
+            mkdir("$rootDir/package")
+            variant.outputs.all { item ->
+                task.from(item.outputFile)
+            }
+            task.into("$rootDir/package")
+            task.dependsOn variant.assemble
+            publish.dependsOn task
+        }
     }
-
-    compileSdkVersion 33
+    compileSdk 34
+    //compileSdkVersion 34
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions"
-        minSdkVersion 28
-        targetSdkVersion 33
+        minSdkVersion 29
+        //noinspection EditedTargetSdkVersion
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -94,27 +120,35 @@ android {
         abortOnError false
     }
     namespace 'com.android.certifications.niap.permissions'
+    buildFeatures {
+        aidl true
+    }
 
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.google.android.gms:play-services-location:20.0.0'
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation 'com.google.android.gms:play-services-vision:20.1.3'
-    implementation 'com.google.android.gms:play-services-base:18.1.0'
-    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'com.google.android.gms:play-services-base:18.2.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    //implementation 'androidx.work:work-runtime:2.7.1'
-    implementation "com.google.guava:guava:27.0.1-android"
-    implementation 'com.google.code.gson:gson:2.8.6'
-
+    implementation "com.google.guava:guava:31.1-jre"
+    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'androidx.work:work-runtime:2.8.1'
+    implementation "androidx.credentials:credentials:1.2.0-beta02"
+    implementation 'androidx.test:runner:1.4.0'
+    implementation "androidx.preference:preference:1.2.1"
+    //androidx.text 1.5.0 has compatibility problems
     androidTestImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test:core:1.4.0'
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation 'androidx.test:rules:1.4.0'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0-alpha04'
 
 }

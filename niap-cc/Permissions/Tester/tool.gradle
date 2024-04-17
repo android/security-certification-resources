@@ -28,7 +28,7 @@ ext {
 
     signatureConstants = { json, version ->
         json.each { category, list ->
-            if (category.equals("Signature") || category.equals("Internal")) {
+            if (category.equals("signature") || category.equals("internal")) {
                 println "// New $category permissions as of Android $version"
                 list.each { item ->
                     println " public static final String $item =\n" +
@@ -43,7 +43,7 @@ ext {
         doLast {
             def src = new File("permissions.json").text;
             def json2 = new JsonSlurper().parseText(src)
-            signatureConstants(json2.T, "13")
+            signatureConstants(json2.U, "14")
         }
     }
 
@@ -67,7 +67,7 @@ ext {
         doLast {
             def src = new File("permissions.json").text;
             def json4 = new JsonSlurper().parseText(src)
-            testPlaceHodlers(json4.T, "TIRAMISU", "Signature")
+            testPlaceHodlers(json4.U, "UDC", "Signature")
         }
     }
 

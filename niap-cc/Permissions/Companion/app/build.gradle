@@ -17,7 +17,7 @@
 apply plugin: 'com.android.application'
 def applicationName = 'Companion'
 android {
-    compileSdkVersion 33
+    compileSdk 34
     signingConfigs {
         // TODO :
         // Prepare your own companion.jks and put it into
@@ -30,20 +30,37 @@ android {
             keyPassword "android"
             keyAlias "companion"
         }
+        platform {
+            storeFile file('../security/platform.jks')
+            storePassword "android"
+            keyPassword "android"
+            keyAlias "platform"
+        }
     }
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions.companion"
         minSdkVersion 28
-        targetSdkVersion 33
+        //noinspection EditedTargetSdkVersion,OldTargetApi
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
-        signingConfig signingConfigs.companion
+        signingConfig signingConfigs.platform
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    def publish = project.tasks.create("publishAll")
     applicationVariants.all { variant ->
         variant.outputs.all {
             outputFileName = "${applicationName}-${variant.buildType.name}.apk"
+        }
+        if(variant.buildType.name.equals("debug")){
+            def task = project.tasks.create("publish${variant.name.capitalize()}Apk", Copy)
+            variant.outputs.all { item ->
+                task.from(item.outputFile)
+            }
+            task.into("$rootDir/../Tester/package")
+            task.dependsOn variant.assemble
+            publish.dependsOn task
         }
     }
 
@@ -51,7 +68,7 @@ android {
         debug {
             signingConfig null
             debuggable true
-            signingConfig signingConfigs.companion
+            signingConfig signingConfigs.platform
         }
         release {
             signingConfig null
@@ -65,19 +82,28 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    lintOptions {
+    namespace 'com.android.certifications.niap.permissions.companion'
+    buildFeatures {
+        aidl true
+    }
+    lint {
         abortOnError false
     }
-    namespace 'com.android.certifications.niap.permissions.companion'
+}
+
+configurations.implementation {
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.google.android.material:material:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    testImplementation 'junit:junit:4.12'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation 'com.google.android.gms:play-services-location:17.0.0'
+
 }

@@ -17,7 +17,7 @@
 package com.android.certifications.niap.permissions.companion;
 
 import static android.app.PendingIntent.FLAG_IMMUTABLE;
-import static android.app.PendingIntent.FLAG_MUTABLE;
+import static android.app.PendingIntent.FLAG_NO_CREATE;
 
 import android.Manifest;
 import android.app.Activity;
@@ -37,20 +37,26 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.DropBoxManager;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -58,12 +64,16 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -83,8 +93,19 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION,
     };
 
-    private TextView mStatusTextView;
+    private ListView mStatusListView;
+    static List<String> mStatusData = new ArrayList<String>();
+    static ArrayAdapter<String> mStatusAdapter;
+
+    protected void setAdapters(){
+        mStatusAdapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_list_item_1,
+                mStatusData);
+        mStatusListView.setAdapter(mStatusAdapter);
+    }
     private Button mSetupButton;
+    private CheckBox mCheckBoxButton;
     private boolean mGmsAvailable;
 
     /**
@@ -92,12 +113,85 @@ public class MainActivity extends AppCompatActivity {
      */
     private LocationRequest mLocationRequest;
 
+
+    private void logdebug(String text){
+        logdebug(text,null);
+    }
+    private void logdebug(String text,Throwable tr)
+    {
+        Log.d(TAG, text,tr);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(mStatusAdapter != null){
+                    mStatusAdapter.add("🟩"+text);
+                }
+            }
+        });
+    }
+
+
+    private void logerror(String text){
+        logerror(text,null);
+    }
+    private void logerror(String text,Throwable tr)
+    {
+        Log.e(TAG, text,tr);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(mStatusAdapter != null){
+                    mStatusAdapter.add("🔴"+text);
+                }
+            }
+        });
+
+    }
+    public boolean deviceConfigSetProperty(String namespace,String name,String value,boolean makeDefault) {
+        try {
+            Object r = invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
+                    "setProperty", null,
+                    new Class[]{String.class, String.class, String.class,
+                            boolean.class}, namespace, name, value, makeDefault);
+            return (boolean)r;
+        } catch (Exception e) {
+            logdebug("DeviceConfig.setProperty failed.(" + a + "," + b + "," + value + ")",e);
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public String deviceConfigGetProperty(String namespace,String name) {
+        try {
+            String r = (String)invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
+                    "getProperty", null,
+                    new Class[]{String.class, String.class}, namespace,name);
+            return r;
+        } catch (Exception e) {
+            logdebug("DeviceConfig.getProperty failed.(" + namespace+","+name+")",e);
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public static Object invokeReflectionCall(Class<?> targetClass, String methodName,
+                                              Object targetObject, Class<?>[] parameterClasses, Object... parameters) {
+        try {
+            Method method = targetClass.getMethod(methodName, parameterClasses);
+            return method.invoke(targetObject, parameters);
+        } catch (ReflectiveOperationException e) {
+            Throwable cause = e.getCause();
+            throw (SecurityException) cause;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.d(TAG, "Running permission tester companion setup on build " + Build.FINGERPRINT);
+        mStatusListView = findViewById(R.id.statusTextView);
+        setAdapters();
+
+        logdebug("Running permission tester companion setup on build " + Build.FINGERPRINT);
 
         mGmsAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
                 == ConnectionResult.SUCCESS;
@@ -105,11 +199,11 @@ public class MainActivity extends AppCompatActivity {
             mLocationRequest = LocationRequest.create().setPriority(
                     LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(1000);
         } else {
-            Log.d(TAG, "GMS is not available on this device");
+            logdebug( "GMS is not available on this device");
         }
 
-        mStatusTextView = findViewById(R.id.statusTextView);
         mSetupButton = findViewById(R.id.setupButton);
+        mCheckBoxButton = findViewById(R.id.flgDPECheckBox);
         mSetupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -119,16 +213,22 @@ public class MainActivity extends AppCompatActivity {
 
         long currTimeMs = System.currentTimeMillis();
         final DropBoxManager db = (DropBoxManager) getApplicationContext().getSystemService(Context.DROPBOX_SERVICE);
+        logdebug("Put a data into the DropBox Manager");
         db.addText("test-companion-tag","Companion:PEEK_DROPBOX_DATA test at :"+currTimeMs);
+
     }
 
     /**
      * {@link AsyncTask} used to drive the setup for the permission tests.
+     *
+     * Fix: We shouldn't use AsyncTask anymore ... refine it later
+     *
      */
     private class SetupTestsAsyncTask extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected void onPreExecute() {
-            mStatusTextView.setText(R.string.setup_in_progress);
+            //mStatusTextView.setText(R.string.setup_in_progress);
+            logdebug("Setup in progress");
             mSetupButton.setEnabled(false);
         }
 
@@ -145,15 +245,44 @@ public class MainActivity extends AppCompatActivity {
                 }
                 result = result && setupLocationTest();
             }
+            /**
+             * Set flags for enable experimental flags to new device_policy_engine
+             * as of android 14
+             */
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                String value = "false";
+                if(mCheckBoxButton.isChecked()){
+                    value = "true";
+                }
+
+                String dvc =
+                        deviceConfigGetProperty("device_policy_manager", "enable_device_policy_engine");
+                if(dvc == null || !dvc.equals(value)){
+                    deviceConfigSetProperty("device_policy_manager", "enable_device_policy_engine",value,true);
+                }
+                logdebug("force a flag enable_device_policy_engine set "+value+"=>"
+                        +deviceConfigGetProperty("device_policy_manager",
+                        "enable_device_policy_engine"));
+                //2nd flag
+                dvc =
+                        deviceConfigGetProperty("device_policy_manager", "enable_permission_based_access");
+                if(dvc == null || !dvc.equals(value)){
+                    deviceConfigSetProperty("device_policy_manager", "enable_permission_based_access",value,true);
+                }
+                logdebug("force flag enable_permission_based_access set "+value+"=>"
+                        +deviceConfigGetProperty("device_policy_manager",
+                        "enable_permission_based_access"));
+            }
+
             return result;
         }
 
         @Override
         protected void onPostExecute(Boolean setupComplete) {
             if (!setupComplete) {
-                mStatusTextView.setText(R.string.setup_failed);
+                logerror("Setup failed");
             } else {
-                mStatusTextView.setText(R.string.setup_complete);
+                logdebug("☑️Setup complete with no error");
             }
             mSetupButton.setEnabled(true);
         }
@@ -172,14 +301,14 @@ public class MainActivity extends AppCompatActivity {
                 this).checkLocationSettings(locationSettingsRequest);
         try {
             Tasks.await(result, 10, TimeUnit.SECONDS);
-            Log.d(TAG, "Location settings indicate location should be available");
+            logdebug( "Location settings indicate location should be available");
             return true;
         } catch (ExecutionException e) {
             // An ExecutionException indicates that GMS is not properly configured to support this
             // location request. If the cause of the exception is a ResolveableApiException then
             // the resolution from the exception can be used to prompt the user to configure GMS.
             Throwable exceptionCause = e.getCause();
-            if (exceptionCause != null && exceptionCause instanceof ApiException) {
+            if (exceptionCause instanceof ApiException) {
                 ApiException apiException = (ApiException) exceptionCause;
                 switch (apiException.getStatusCode()) {
                     case LocationSettingsStatusCodes
@@ -191,31 +320,31 @@ public class MainActivity extends AppCompatActivity {
                                 resolvableApiException.startResolutionForResult(this,
                                         REQUEST_LOCATION_SETTINGS);
                             } catch (IntentSender.SendIntentException intentException) {
-                                Log.d(TAG,
+                                logerror(
                                         "Caught a SendIntentException attempting to launch the "
-                                                + "Settings page");
+                                                + "Settings page",e);
                             }
                         } else {
-                            Log.d(TAG,
+                            logerror(
                                     "Settings resolution is required to access location, but "
                                             + "Exception is not an instanceof "
-                                            + "ResolvableApiException");
+                                            + "ResolvableApiException",e);
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        Log.d(TAG,
+                        logerror(
                                 "Settings resolution is required to access location, but the "
-                                        + "change is unavailable from this app");
+                                        + "change is unavailable from this app",e);
                         break;
                     default:
-                        Log.d(TAG, "Received unknown status code " + apiException.getStatusCode()
-                                + " from exception: ", e);
+                        logerror("Received unknown status code " + apiException.getStatusCode()
+                                + " from exception: "+e.getLocalizedMessage(),e);
                 }
             } else {
-                Log.d(TAG, "Caught an ExecutionException verifying the location settings: ", e);
+                logerror( "Caught an ExecutionException verifying the location settings: ",e);
             }
         } catch (TimeoutException | InterruptedException e) {
-            Log.d(TAG, "An exception was caught verifying the location settings: ", e);
+            logerror( "An exception was caught verifying the location settings: ",e);
         }
         return false;
     }
@@ -236,12 +365,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "Location permission has not been granted; prompting for it now");
+            logerror( "Location permission has not been granted; prompting for it now");
             ActivityCompat.requestPermissions(this, LOCATION_PERMISSIONS,
                     REQUEST_LOCATION_PERMISSION);
             return false;
         } else {
-            Log.d(TAG, "ACCESS_FINE_LOCATION permission has been granted");
+            logdebug( "ACCESS_FINE_LOCATION permission has been granted");
         }
 
         BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -253,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
                 if (result != null) {
                     Location location = result.getLastLocation();
                     if (location != null) {
-                        Log.d(TAG, "Received a lat,long of " + location.getLatitude() + ", "
+                        logdebug( "Received a lat,long of " + location.getLatitude() + ", "
                                 + location.getLongitude());
                         latch[0].countDown();
                     }
@@ -261,27 +390,69 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        registerReceiver(receiver, new IntentFilter(ACCESS_LOCATION_ACTION));
-        Intent intent = new Intent(ACCESS_LOCATION_ACTION);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, FLAG_MUTABLE);
-        FusedLocationProviderClient locationClient =
-                LocationServices.getFusedLocationProviderClient(this);
-        try {
-            locationClient.requestLocationUpdates(mLocationRequest, pendingIntent);
-        } catch (SecurityException e) {
-            Log.e(TAG, "Caught a SecurityException requesting location updates: ", e);
-            return false;
-        }
+        int flags = ContextCompat.RECEIVER_NOT_EXPORTED;//RECEIVER_EXPORTED
+        ContextCompat.registerReceiver
+                (this, receiver, new IntentFilter(ACCESS_LOCATION_ACTION), flags);
+
+        // Change
+        // https://developer.android.com/about/versions/14/behavior-changes-14#safer-intents :
         boolean locationReceived = false;
-        try {
-            locationReceived = latch[0].await(60, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Caught an InterruptedException: ", e);
-        }
-        locationClient.removeLocationUpdates(pendingIntent);
-        unregisterReceiver(receiver);
-        if (!locationReceived) {
-            Log.d(TAG, "Location update not received within timeout window");
+        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            Intent intent = new Intent(ACCESS_LOCATION_ACTION);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent,
+                    PendingIntent.FLAG_MUTABLE);
+            //FLAG_NO_CREATE
+
+            FusedLocationProviderClient locationClient =
+                    LocationServices.getFusedLocationProviderClient(this);
+            try {
+                locationClient.requestLocationUpdates(mLocationRequest, pendingIntent);
+            } catch (SecurityException e) {
+                logerror("Caught a SecurityException requesting location updates: ",e);
+                return false;
+            }
+
+            try {
+                locationReceived = latch[0].await(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                logerror("Caught an InterruptedException: ",e);
+            }
+            locationClient.removeLocationUpdates(pendingIntent);
+            unregisterReceiver(receiver);
+            if (!locationReceived) {
+                logerror("Location update not received within timeout window");
+            }
+        } else {
+            //Implementation for android UDC or later (maybe it works on more previous versions)
+            latch[0] = new CountDownLatch(1);
+            LocationCallback locationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    if (locationResult == null) {
+                        return;
+                    }
+                    for (Location location : locationResult.getLocations()) {
+                        logdebug("updated location=>"+location.toString());
+                        latch[0].countDown();
+                    }
+                }
+            };
+            LocationRequest locationRequest = new LocationRequest.Builder(5000)
+                    .setDurationMillis(5000)
+                    .setPriority(Priority.PRIORITY_HIGH_ACCURACY).build();
+
+            FusedLocationProviderClient locationClient =
+                    LocationServices.getFusedLocationProviderClient(getApplicationContext());
+            locationClient.requestLocationUpdates(locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper());
+            try {
+                locationReceived = latch[0].await(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                logerror("Caught an InterruptedException: "+e.getLocalizedMessage(),e);
+            }
+            locationClient.removeLocationUpdates(locationCallback);
+
         }
         return locationReceived;
     }
@@ -297,6 +468,7 @@ public class MainActivity extends AppCompatActivity {
         // Scoped storage and the ACCESS_MEDIA_LOCATION permission were introduced in Android 10.
         boolean result = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            //Image 1
             ContentResolver contentResolver = getApplication().getContentResolver();
             ContentValues photoContentValues = new ContentValues();
             photoContentValues.put(MediaStore.Images.Media.DISPLAY_NAME, "TestImage");
@@ -313,13 +485,39 @@ public class MainActivity extends AppCompatActivity {
                 while (inputStream.read(bytes) != -1) {
                     outputStream.write(bytes);
                 }
-                Log.d(TAG, "Successfully wrote file to pictures directory");
+                logdebug( "Successfully wrote file to pictures directory");
+
             } catch (IOException e) {
-                Log.e(TAG, "Caught an exception copying file:", e);
+                logerror("Caught an exception copying file:",e);
                 result = false;
             }
             photoContentValues.put(MediaStore.Images.Media.IS_PENDING, 0);
             contentResolver.update(photoUri, photoContentValues, null, null);
+
+            //Image 1
+            ContentValues photoContentValues2 = new ContentValues();
+            photoContentValues2.put(MediaStore.Images.Media.DISPLAY_NAME, "PngImage");
+            photoContentValues2.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+            photoContentValues2.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/");
+            photoContentValues2.put(MediaStore.Images.Media.IS_PENDING, 1);
+            Uri collectionUri2 = MediaStore.Images.Media.getContentUri(
+                    MediaStore.VOLUME_EXTERNAL_PRIMARY);
+            Uri photoUri2 = contentResolver.insert(collectionUri2, photoContentValues2);
+
+            try (InputStream inputStream = getResources().openRawResource(R.raw.test_image2);
+                 OutputStream outputStream = contentResolver.openOutputStream(photoUri2)) {
+                byte[] bytes = new byte[2048];
+                while (inputStream.read(bytes) != -1) {
+                    outputStream.write(bytes);
+                }
+                logdebug( "Successfully wrote file to pictures directory");
+
+            } catch (IOException e) {
+                logerror("Caught an exception copying file:",e);
+                result = false;
+            }
+            photoContentValues2.put(MediaStore.Images.Media.IS_PENDING, 0);
+            contentResolver.update(photoUri2, photoContentValues2, null, null);
 
             //Audio
             ContentValues audioContentValues = new ContentValues();
@@ -337,9 +535,9 @@ public class MainActivity extends AppCompatActivity {
                 while (inputStream.read(bytes) != -1) {
                     outputStream.write(bytes);
                 }
-                Log.d(TAG, "Successfully wrote file to Music directory");
+                logdebug( "Successfully wrote file to Music directory");
             } catch (IOException e) {
-                Log.e(TAG, "Caught an exception copying file:", e);
+                logerror("Caught an exception copying file:",e);
                 result = false;
             }
             audioContentValues.put(MediaStore.Audio.Media.IS_PENDING, 0);
@@ -360,9 +558,9 @@ public class MainActivity extends AppCompatActivity {
                 while (inputStream.read(bytes) != -1) {
                     outputStream.write(bytes);
                 }
-                Log.d(TAG, "Successfully wrote file to Movies directory");
+                logdebug("Successfully wrote file to Movies directory");
             } catch (IOException e) {
-                Log.e(TAG, "Caught an exception copying file:", e);
+                logerror("Caught an exception copying file:");
                 result = false;
             }
             videoContentValues.put(MediaStore.Video.Media.IS_PENDING, 0);
@@ -393,6 +591,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
             int[] grantResults) {
+        //Inspector request below line but in this case we shouldn't call super method.
+        //    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean permissionGranted = true;
         for (int grantResult : grantResults) {
             if (grantResult != PackageManager.PERMISSION_GRANTED) {
@@ -402,17 +602,15 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_LOCATION_PERMISSION:
                 if (!permissionGranted) {
-                    Log.d(TAG, "The required permissions (" + String.join(", ", permissions)
+                    logerror( "The required permissions (" + String.join(", ", permissions)
                             + ") were not granted");
-                    runOnUiThread(
-                            () -> mStatusTextView.setText(R.string.location_permission_required));
                 } else {
-                    Log.d(TAG, "The location permission was granted; rerunning setup tasks");
+                    logdebug( "The location permission was granted; rerunning setup tasks");
                     new SetupTestsAsyncTask().execute();
                 }
                 break;
             default:
-                Log.d(TAG, "An unexpected request code of " + requestCode + " with permissions "
+                logerror("An unexpected request code of " + requestCode + " with permissions "
                         + String.join(", ", permissions) + " + was received");
 
         }
@@ -424,21 +622,19 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_LOCATION_SETTINGS:
                 LocationSettingsStates locationStates = LocationSettingsStates.fromIntent(data);
-                Log.d(TAG,
+                logdebug(
                         "isLocationUsable: " + locationStates.isLocationUsable() + ", isGpsUsable: "
                                 + locationStates.isGpsUsable() + ", isNetworkLocationUsable: "
                                 + locationStates.isNetworkLocationUsable());
                 if (resultCode == Activity.RESULT_OK) {
-                    Log.d(TAG, "Location settings have been updated; rerunning setup");
+                    logdebug("Location settings have been updated; rerunning setup");
                     new SetupTestsAsyncTask().execute();
                 } else {
-                    Log.d(TAG,
-                            "Location settings request completed with result code " + resultCode);
-                    runOnUiThread(() -> mStatusTextView.setText(R.string.location_settings_update));
+                    logdebug("Location settings request completed with result code " + resultCode);
                 }
                 break;
             default:
-                Log.d(TAG, "An unknown activity result was received: requestCode = " + requestCode
+                logerror("An unknown activity result was received: requestCode = " + requestCode
                         + ", resultCode = " + resultCode);
         }
     }

@@ -16,6 +16,9 @@
 
 package com.android.certifications.niap.permissions.log;
 
+import com.android.certifications.niap.permissions.activities.LogListAdaptable;
+import com.android.certifications.niap.permissions.activities.MainActivity;
+
 /**
  * Factory to create {@link Logger} instances.
  */
@@ -30,4 +33,9 @@ public class LoggerFactory {
     public static Logger createDefaultLogger(String tag) {
         return new LogcatLogger(tag);
     }
+
+    public static Logger createActivityLogger(String tag, LogListAdaptable adaptable) {
+        return new UiLogger(tag,adaptable);
+    }
+
 }

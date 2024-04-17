@@ -38,6 +38,7 @@ import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -624,6 +625,82 @@ public class Transacts {
     public static final String getModuleProperties = "getModuleProperties";
     public static final String triggerNetworkRegistration = "triggerNetworkRegistration";
     public static final String getUidOps = "getUidOps";
+
+    //For SDK34
+    public static final String INPUTMETHOD_DESCRIPTOR = "com.android.internal.view.IInputMethodManager";
+    public static final String SUBSCRIPTION_DESCRIPTOR = "com.android.internal.telephony.ISub";
+    public static final String HEALTH_CONNECT_DESCRIPTOR = "android.health.connect.aidl.IHealthConnectService";
+    public static final String DEVICELOCK_DESCRIPTOR = "android.devicelock.IDeviceLockService";
+    public static final String WEARABLES_DESCRIPTOR = "android.app.wearable.IWearableSensingManager";
+    public static final String STATS_DESCRIPTOR = "android.os.IStatsManagerService";
+    public static final String CREDENTIAL_DESCRIPTOR = "android.credentials.ICredentialManager";
+    public static final String LOCALE_DESCRIPTOR = "android.app.ILocaleManager";
+
+    public static final String acquireWakeLock = "acquireWakeLock";
+    public static final String areClipboardAccessNotificationsEnabledForUser = "areClipboardAccessNotificationsEnabledForUser";
+    public static final String broadcastIntentWithFeature = "broadcastIntentWithFeature";
+    public static final String deleteAllStagedRemoteData = "deleteAllStagedRemoteData";
+    public static final String getAppMetadataFd = "getAppMetadataFd";
+    public static final String getCredentialProviderServices = "getCredentialProviderServices";
+    public static final String getDefaultApplicationAsUser = "getDefaultApplicationAsUser";
+    public static final String getModifierKeyRemapping = "getModifierKeyRemapping";
+    public static final String isDeviceLocked = "isDeviceLocked";
+    public static final String isInputMethodPickerShownForTest = "isInputMethodPickerShownForTest";
+    public static final String killAllBackgroundProcesses = "killAllBackgroundProcesses";
+    public static final String logFgsApiBegin = "logFgsApiBegin";
+    public static final String provideDataStream = "provideDataStream";
+    public static final String registerKeyboardBacklightListener = "registerKeyboardBacklightListener";
+    public static final String releaseLowPowerStandbyPorts = "releaseLowPowerStandbyPorts";
+    public static final String requestIsSatelliteEnabled = "requestIsSatelliteEnabled";
+    public static final String requestSatelliteEnabled = "requestSatelliteEnabled";
+    public static final String setHdrConversionMode = "setHdrConversionMode";
+    public static final String setOverrideLocaleConfig = "setOverrideLocaleConfig";
+    public static final String setRestrictedMetricsChangedOperation = "setRestrictedMetricsChangedOperation";
+    public static final String setSubscriptionUserHandle = "setSubscriptionUserHandle";
+    public static final String setVolumeGroupVolumeIndex = "setVolumeGroupVolumeIndex";
+    public static final String startMigration = "startMigration";
+    public static final String updateDataDownloadState = "updateDataDownloadState";
+    public static final String getMimeTypeFilterAsync = "getMimeTypeFilterAsync";
+    public static final String startRemoteLockscreenValidation = "startRemoteLockscreenValidation";
+    public static final String getHealthConnectDataState = "getHealthConnectDataState";
+    public static final String setCameraDisabled = "setCameraDisabled";
+    public static final String addCrossProfileWidgetProvider = "addCrossProfileWidgetProvider";
+    public static final String getCrossProfileWidgetProviders = "getCrossProfileWidgetProviders";
+    public static final String hasLockdownAdminConfiguredNetworks = "hasLockdownAdminConfiguredNetworks";
+    public static final String installKeyPair = "installKeyPair";
+    public static final String installUpdateFromFile = "installUpdateFromFile";
+    public static final String isPackageSuspended = "isPackageSuspended";
+    public static final String setAccountManagementDisabled = "setAccountManagementDisabled";
+    public static final String setApplicationExemptions = "setApplicationExemptions";
+    public static final String setApplicationRestrictions = "setApplicationRestrictions";
+    public static final String setCommonCriteriaModeEnabled = "setCommonCriteriaModeEnabled";
+    public static final String setConfiguredNetworksLockdownState = "setConfiguredNetworksLockdownState";
+    public static final String setDefaultSmsApplication = "setDefaultSmsApplication";
+    public static final String setFactoryResetProtectionPolicy = "setFactoryResetProtectionPolicy";
+    public static final String setKeyguardDisabledFeatures = "setKeyguardDisabledFeatures";
+    public static final String setLockTaskPackages = "setLockTaskPackages";
+    public static final String setMaximumFailedPasswordsForWipe = "setMaximumFailedPasswordsForWipe";
+    public static final String setMaximumTimeToLock = "setMaximumTimeToLock";
+    public static final String setMtePolicy = "setMtePolicy";
+    public static final String setOrganizationName = "setOrganizationName";
+    public static final String setPasswordExpirationTimeout = "setPasswordExpirationTimeout";
+    public static final String setPermissionGrantState = "setPermissionGrantState";
+    public static final String setPermittedInputMethods = "setPermittedInputMethods";
+    public static final String setResetPasswordToken = "setResetPasswordToken";
+    public static final String setScreenCaptureDisabled = "setScreenCaptureDisabled";
+    public static final String setSecurityLoggingEnabled = "setSecurityLoggingEnabled";
+    public static final String setShortSupportMessage = "setShortSupportMessage";
+    public static final String setStatusBarDisabled = "setStatusBarDisabled";
+    public static final String setSystemUpdatePolicy = "setSystemUpdatePolicy";
+    public static final String setUsbDataSignalingEnabled = "setUsbDataSignalingEnabled";
+    public static final String setUserControlDisabledPackages = "setUserControlDisabledPackages";
+    public static final String setTrustAgentConfiguration = "setTrustAgentConfiguration";
+    public static final String removeRestrictedMetricsChangedOperation="removeRestrictedMetricsChangedOperation";
+    public static final String requestAppKeyboardShortcuts = "requestAppKeyboardShortcuts";
+    public static final String getSupportedCountries = "getSupportedCountries";
+
+    public static final String openRanging = "openRanging";
+
 
     /**
      * Contains a mapping from the descriptor to a Map of transact names to their IDs on the device
@@ -2360,7 +2437,9 @@ public class Transacts {
             case Build.VERSION_CODES.S_V2:
                 return new S2Transacts();
             case Build.VERSION_CODES.TIRAMISU:
-                return new BarbetApiLevel33Transacts();
+                return new SdkT_Transacts();
+            case Build.VERSION_CODES.UPSIDE_DOWN_CAKE:
+                return new SdkU_Transacts();
             default:
                 throw new IllegalArgumentException(
                         "The provided API level, " + apiLevel + ", is not supported");
@@ -2403,6 +2482,8 @@ public class Transacts {
             Object... parameters) {
         return invokeTransactWithCharSequence(service, descriptor, transactName, false, parameters);
     }
+
+
 
     /**
      * Invokes a direct binder transact using the specified {@code intent} to bind to the service
@@ -2514,6 +2595,11 @@ public class Transacts {
             Parcel data = Parcel.obtain();
             data.writeInterfaceToken(descriptor);
             for (Object parameter : parameters) {
+
+                //if(parameter != null)
+                //mLogger.logDebug(parameter.getClass().toString());
+                //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(parameter,"").toString());
+
                 if (parameter instanceof CharSequence && useCharSequence) {
                     if (parameter == null) {
                         data.writeInt(0);
@@ -2533,6 +2619,8 @@ public class Transacts {
                     data.writeIntArray((int[]) parameter);
                 } else if (parameter instanceof byte[]) {
                     data.writeByteArray((byte[]) parameter);
+                } else if (parameter instanceof Proxy) {
+                    ReflectionUtils.checkDeclaredMethod(parameter,"");
                 } else if (parameter instanceof IInterface) {
                     data.writeStrongBinder(
                             parameter != null ? ((IInterface) parameter).asBinder() : null);
@@ -2580,6 +2668,7 @@ public class Transacts {
                 }
             }
             binder.transact(transactId, data, reply, 0);
+
             reply.readException();
             return reply;
         } catch (RemoteException re) {

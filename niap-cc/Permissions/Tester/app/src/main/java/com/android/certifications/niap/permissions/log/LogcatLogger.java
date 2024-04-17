@@ -53,12 +53,26 @@ public class LogcatLogger implements Logger {
     }
 
     @Override
+    public void logInfo(String message, Throwable throwable) {
+        if (Constants.DEBUG) {
+            Log.i(mTag, message, throwable);
+        }
+    }
+
+
+    @Override
     public void logError(String message) {
         Log.e(mTag, message);
     }
-
+    public void logWarn(String message) { Log.w(mTag,message);}
     @Override
     public void logError(String message, Throwable throwable) {
         Log.e(mTag, message, throwable);
     }
+
+    @Override
+    public void logSystem(String message) {
+        Log.i(mTag, message);
+    }
+
 }

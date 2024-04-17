@@ -24,9 +24,26 @@ import static android.Manifest.permission.BROADCAST_STICKY;
 import static android.Manifest.permission.CHANGE_NETWORK_STATE;
 import static android.Manifest.permission.CHANGE_WIFI_MULTICAST_STATE;
 import static android.Manifest.permission.CHANGE_WIFI_STATE;
+import static android.Manifest.permission.CREDENTIAL_MANAGER_QUERY_CANDIDATE_CREDENTIALS;
+import static android.Manifest.permission.CREDENTIAL_MANAGER_SET_ALLOWED_PROVIDERS;
+import static android.Manifest.permission.CREDENTIAL_MANAGER_SET_ORIGIN;
+import static android.Manifest.permission.DETECT_SCREEN_CAPTURE;
 import static android.Manifest.permission.DISABLE_KEYGUARD;
+import static android.Manifest.permission.ENFORCE_UPDATE_OWNERSHIP;
 import static android.Manifest.permission.EXPAND_STATUS_BAR;
 import static android.Manifest.permission.FOREGROUND_SERVICE;
+import static android.Manifest.permission.FOREGROUND_SERVICE_CAMERA;
+import static android.Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE;
+import static android.Manifest.permission.FOREGROUND_SERVICE_DATA_SYNC;
+import static android.Manifest.permission.FOREGROUND_SERVICE_HEALTH;
+import static android.Manifest.permission.FOREGROUND_SERVICE_LOCATION;
+import static android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK;
+import static android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION;
+import static android.Manifest.permission.FOREGROUND_SERVICE_MICROPHONE;
+import static android.Manifest.permission.FOREGROUND_SERVICE_PHONE_CALL;
+import static android.Manifest.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING;
+import static android.Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE;
+import static android.Manifest.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED;
 import static android.Manifest.permission.HIDE_OVERLAY_WINDOWS;
 import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.KILL_BACKGROUND_PROCESSES;
@@ -40,10 +57,12 @@ import static android.Manifest.permission.READ_NEARBY_STREAMING_POLICY;
 import static android.Manifest.permission.READ_SYNC_SETTINGS;
 import static android.Manifest.permission.READ_SYNC_STATS;
 import static android.Manifest.permission.REORDER_TASKS;
+import static android.Manifest.permission.REQUEST_COMPANION_PROFILE_GLASSES;
 import static android.Manifest.permission.REQUEST_COMPANION_PROFILE_WATCH;
 import static android.Manifest.permission.REQUEST_DELETE_PACKAGES;
 import static android.Manifest.permission.REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE;
 import static android.Manifest.permission.REQUEST_PASSWORD_COMPLEXITY;
+import static android.Manifest.permission.RUN_USER_INITIATED_JOBS;
 import static android.Manifest.permission.SCHEDULE_EXACT_ALARM;
 import static android.Manifest.permission.SET_WALLPAPER;
 import static android.Manifest.permission.SET_WALLPAPER_HINTS;
@@ -54,6 +73,8 @@ import static android.Manifest.permission.USE_FULL_SCREEN_INTENT;
 import static android.Manifest.permission.VIBRATE;
 import static android.Manifest.permission.WAKE_LOCK;
 import static android.Manifest.permission.WRITE_SYNC_SETTINGS;
+import static android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET;
+import static android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED;
 import static com.android.certifications.niap.permissions.Constants.EXTRA_PERMISSION_GRANTED;
 import static com.android.certifications.niap.permissions.Constants.EXTRA_PERMISSION_NAME;
 import static com.android.certifications.niap.permissions.utils.ReflectionUtils.invokeReflectionCall;
@@ -70,6 +91,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.app.admin.DevicePolicyManager;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.app.job.JobService;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.companion.AssociationRequest;
@@ -99,7 +123,9 @@ import android.net.wifi.WifiManager;
 import android.nfc.NfcAdapter;
 import android.nfc.cardemulation.CardEmulation;
 import android.os.Build;
+import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.RemoteException;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.service.notification.StatusBarNotification;
@@ -108,23 +134,69 @@ import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
 import android.telephony.TelephonyManager;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.util.Consumer;
+import androidx.credentials.CreateCredentialRequest;
+import androidx.credentials.CredentialManager;
+import androidx.credentials.CredentialManagerCallback;
+import androidx.credentials.CredentialOption;
+import androidx.credentials.GetCredentialRequest;
+import androidx.credentials.GetCredentialResponse;
+import androidx.credentials.GetPublicKeyCredentialOption;
+import androidx.credentials.PasswordCredential;
+import androidx.credentials.PrepareGetCredentialResponse;
+import androidx.credentials.exceptions.GetCredentialException;
+import androidx.test.runner.screenshot.Screenshot;
 
+import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.activities.TestActivity;
+import com.android.certifications.niap.permissions.companion.services.TestBindService;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
-import com.android.certifications.niap.permissions.log.StatusLogger;
+import com.android.certifications.niap.permissions.services.FgCameraService;
+import com.android.certifications.niap.permissions.services.FgConnectedDeviceService;
+import com.android.certifications.niap.permissions.services.FgDataSyncService;
+import com.android.certifications.niap.permissions.services.FgHealthService;
+import com.android.certifications.niap.permissions.services.FgLocationService;
+import com.android.certifications.niap.permissions.services.FgMediaPlaybackService;
+import com.android.certifications.niap.permissions.services.FgMediaProjectionService;
+import com.android.certifications.niap.permissions.services.FgMicrophoneService;
+import com.android.certifications.niap.permissions.services.FgPhoneCallService;
+import com.android.certifications.niap.permissions.services.FgRemoteMessagingService;
+import com.android.certifications.niap.permissions.services.FgSpecialUseService;
+import com.android.certifications.niap.permissions.services.FgSystemExemptedService;
+import com.android.certifications.niap.permissions.services.TestJobService;
 import com.android.certifications.niap.permissions.services.TestService;
+import com.android.certifications.niap.permissions.utils.TesterUtils;
 import com.android.certifications.niap.permissions.utils.Transacts;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+
+import javax.security.auth.callback.PasswordCallback;
 
 /**
  * Permission tester to verify all install permissions properly guard their API, resource, etc.
@@ -133,7 +205,7 @@ import java.util.Map;
  */
 public class InstallPermissionTester extends BasePermissionTester {
     private static final String TAG = "InstallPermissionTester";
-    private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
+    private final Logger mLogger = LoggerFactory.createActivityLogger(TAG,(LogListAdaptable)mActivity);
 
     protected final ConnectivityManager mConnectivityManager;
     protected final WifiManager mWifiManager;
@@ -149,6 +221,7 @@ public class InstallPermissionTester extends BasePermissionTester {
     protected final Vibrator mVibrator;
     protected final PowerManager mPowerManager;
 
+    private final ExecutorService mExecutorService;
     private final Map<String, PermissionTest> mPermissionTasks;
 
     public InstallPermissionTester(TestConfiguration configuration, Activity activity) {
@@ -170,6 +243,8 @@ public class InstallPermissionTester extends BasePermissionTester {
                 Context.CONSUMER_IR_SERVICE);
         mVibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         mPowerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+
+        mExecutorService = ((TesterApplication)mActivity.getApplication()).executorService;
 
         mPermissionTasks = new HashMap<>();
 
@@ -225,7 +300,7 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(CHANGE_NETWORK_STATE, new PermissionTest(false, () -> {
             NetworkRequest networkRequest = new NetworkRequest.Builder().addCapability(
-                    NetworkCapabilities.NET_CAPABILITY_INTERNET).build();
+                    NET_CAPABILITY_INTERNET).build();
             mConnectivityManager.requestNetwork(networkRequest, new NetworkCallback() {
                 @Override
                 public void onAvailable(Network network) {
@@ -248,14 +323,20 @@ public class InstallPermissionTester extends BasePermissionTester {
             keyguardLock.disableKeyguard();
         }));
 
+        //TODO:This Test Action Hide Screen
         mPermissionTasks.put(EXPAND_STATUS_BAR, new PermissionTest(false, () -> {
+
+            if(Constants.BYPASS_TESTS_AFFECTING_UI)
+                throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
             @SuppressLint("WrongConstant") Object statusBarManager = mContext.getSystemService("statusbar");
+
             invokeReflectionCall(statusBarManager.getClass(), "expandNotificationsPanel",
                     statusBarManager, null);
             // A short sleep is required to allow the notification panel to be expanded before
             // collapsing it to clean up after this test.
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 mLogger.logDebug("Caught an InterruptedException: ", e);
             }
@@ -269,7 +350,9 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         // andorid.permission.FLASHLIGHT has been removed.
 
-        mPermissionTasks.put(FOREGROUND_SERVICE, new PermissionTest(true, () -> {
+        //The test doesn't work after U, because foreground services requests corresponding type permission now.
+        mPermissionTasks.put(FOREGROUND_SERVICE, new PermissionTest(true,Build.VERSION_CODES.P,
+                Build.VERSION_CODES.TIRAMISU, () -> {
             // This test must run as a custom test because it requires a separate service be run in
             // in the foreground that can invoke startForeground.
             String permission = FOREGROUND_SERVICE;
@@ -280,9 +363,132 @@ public class InstallPermissionTester extends BasePermissionTester {
                 serviceIntent.putExtra(EXTRA_PERMISSION_GRANTED, permissionGranted);
                 mContext.startForegroundService(serviceIntent);
             } catch (Throwable t) {
-                StatusLogger.logTestError(permission, t);
+                mLogger.logTestError(permission, t);
             }
         }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_CAMERA,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgCameraService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_CAMERA", t);
+
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_LOCATION,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgLocationService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_LOCATION", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_MICROPHONE,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgMicrophoneService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_MICROPHONE", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_CONNECTED_DEVICE,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgConnectedDeviceService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_CONNECTED_DEVICE", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_DATA_SYNC,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgDataSyncService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_DATA_SYNC", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_HEALTH,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgHealthService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_HEALTH", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PLAYBACK,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgMediaPlaybackService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_MEDIA_PLAYBACK", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PROJECTION,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgMediaProjectionService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_MEDIA_PROJECTION", t);
+            }
+        }));
+
+        mPermissionTasks.put(FOREGROUND_SERVICE_PHONE_CALL,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgPhoneCallService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_PHONE_CALL", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_REMOTE_MESSAGING,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgRemoteMessagingService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_REMOTE_MESSAGING", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_SPECIAL_USE,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgSpecialUseService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_SPECIAL_USE", t);
+            }
+        }));
+        mPermissionTasks.put(FOREGROUND_SERVICE_SYSTEM_EXEMPTED,  new PermissionTest(true,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            Intent serviceIntent = new Intent(mActivity, FgSystemExemptedService.class);
+            try {
+                mActivity.startForegroundService(serviceIntent);
+                tryBindingForegroundService(serviceIntent);
+            } catch(Throwable t){
+                mLogger.logDebug("FOREGROUND_SERVICE_SYSTEM_EXEMPTED", t);
+            }
+        }));
+
 
         // android.permission.GET_PACKAGE_SIZE only guards PackageManager#getPackageSizeInfoAsUser
         // which is hidden and results in an UnsupportedOperationException after O.
@@ -351,7 +557,9 @@ public class InstallPermissionTester extends BasePermissionTester {
             if (adapter == null) {
                 throw new BypassTestException("An NFC adapter is not available to run this test");
             }
-            adapter.setNdefPushMessage(null, mActivity);
+            //:TODO setNdefPushMesssage is obsolated?
+            //adapter.setNdefPushMessage(null, mActivity);
+
             CardEmulation emulation = CardEmulation.getInstance(adapter);
             emulation.isDefaultServiceForCategory(new ComponentName(mContext, TestService.class),
                     CardEmulation.CATEGORY_PAYMENT);
@@ -384,7 +592,7 @@ public class InstallPermissionTester extends BasePermissionTester {
         mPermissionTasks.put(REORDER_TASKS,
                 new PermissionTest(false, () -> mActivityManager.moveTaskToFront(2, 0)));
 
-        // android.permission.REQUEST_COMKPANION_RUN_IN_BACKGROUND requires companion device
+        // android.permission.REQUEST_COMPANION_RUN_IN_BACKGROUND requires companion device
         // with which to associate this app.
 
         // android.permission.REQUEST_COMPANION_USE_DATA_IN_BACKGROUND requires companion device
@@ -418,7 +626,17 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(TRANSMIT_IR, new PermissionTest(false, () -> {
             try {
-                mConsumerIrManager.getCarrierFrequencies();
+                if(mConsumerIrManager == null){
+                    throw new BypassTestException("Can not find consumer_ir service on this device");
+                }
+
+                mLogger.logSystem("mCIR.hasIrEmitter(): " + mConsumerIrManager.hasIrEmitter());
+                if (mConsumerIrManager.hasIrEmitter()) {
+                    mConsumerIrManager.getCarrierFrequencies();
+                } else {
+                    throw new BypassTestException("this device device doesn't have ir emitter");
+                }
+
             } catch (UnsupportedOperationException e) {
                 // This Exception indicates the app has been granted the required permission to
                 // invoke this API but the device does not have the IR feature.
@@ -555,9 +773,20 @@ public class InstallPermissionTester extends BasePermissionTester {
                     }
                 }));
 
+
         mPermissionTasks.put(QUERY_ALL_PACKAGES,
                 new PermissionTest(false, Build.VERSION_CODES.R, () -> {
                     try {
+                        //If the app is running with platform signature the test will be skipped.
+                        // 1. We can test this permission with normal variant.
+                        // 2. There is a test case which fails it it is declared.
+                        if(mPlatformSignatureMatch){
+                            final String msg = "The test for QUERY_ALL_PACKAGES permission is bypassed " +
+                                    "when the app is signing with a platform signature." +
+                                    "(see details in the process document)";
+                            mLogger.logSystem(msg);
+                            throw new BypassTestException(msg);
+                        }
                         // The companion package should be installed to act as a queryable package
                         // for this test; without a <queries> tag in the AndroidManifest and without
                         // this permission granted a query for the companion package should result
@@ -594,36 +823,16 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(REQUEST_COMPANION_PROFILE_WATCH,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
-                    if (!mPackageManager.hasSystemFeature(
-                            PackageManager.FEATURE_COMPANION_DEVICE_SETUP)) {
-                        throw new BypassTestException(
-                                "Device does not have the "
-                                        + "PackageManager#FEATURE_COMPANION_DEVICE_SETUP feature "
-                                        + "for this test");
+                    //commonize the tester routine with exposing the builder of AssociationRequest object
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                        CompletableFuture<AssociationRequest> associationRequest =
+                                new CompletableFuture<AssociationRequest>().completeAsync(() ->
+                                        new AssociationRequest.Builder().setDeviceProfile(
+                                                AssociationRequest.DEVICE_PROFILE_WATCH).build());
+                        TesterUtils.tryBluetoothAssociationRequest
+                                (mPackageManager, activity, associationRequest);
                     }
-                    AssociationRequest request = null;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        request = new AssociationRequest.Builder().setDeviceProfile(
-                                AssociationRequest.DEVICE_PROFILE_WATCH).build();
-                        CompanionDeviceManager.Callback callback =
-                                new CompanionDeviceManager.Callback() {
-                                    @Override
-                                    public void onDeviceFound(IntentSender intentSender) {
-                                        mLogger.logDebug(
-                                                "onDeviceFound: intentSender = " + intentSender);
-                                    }
-
-                                    @Override
-                                    public void onFailure(CharSequence charSequence) {
-                                        mLogger.logDebug("onFailure: charSequence = " + charSequence);
-                                    }
-                                };
-                        CompanionDeviceManager companionDeviceManager = mActivity.getSystemService(
-                                CompanionDeviceManager.class);
-                        companionDeviceManager.associate(request, callback, null);
-                    }
-
-                }));
+            }));
 
         mPermissionTasks.put(REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
@@ -644,7 +853,9 @@ public class InstallPermissionTester extends BasePermissionTester {
         // and only determines whether the user will be prompted to allow the update.
 
         mPermissionTasks.put(SCHEDULE_EXACT_ALARM,
-                new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.S,Build.VERSION_CODES.TIRAMISU, () -> {
+
+
                     Intent intent = new Intent(mContext, MainActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent,
                             PendingIntent.FLAG_IMMUTABLE);
@@ -690,7 +901,186 @@ public class InstallPermissionTester extends BasePermissionTester {
                                 Transacts.getNearbyNotificationStreamingPolicy, 0);
                     }
                 ));
+
+        //Android 14
+        mPermissionTasks.put(REQUEST_COMPANION_PROFILE_GLASSES,  new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            //commonize the tester routine with exposing the builder of AssociationRequest object
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                CompletableFuture<AssociationRequest> associationRequest =
+                    new CompletableFuture<AssociationRequest>().completeAsync(() -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                            return new AssociationRequest.Builder()
+                                    .setDeviceProfile(AssociationRequest.DEVICE_PROFILE_GLASSES).build();
+                        } else {
+                            return null;
+                        }
+                    });
+                TesterUtils.tryBluetoothAssociationRequest
+                        (mPackageManager,activity, associationRequest);
+            }
+        }));
+
+        mPermissionTasks.put(RUN_USER_INITIATED_JOBS,  new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                NetworkRequest nreq = new NetworkRequest.Builder()
+                        .addCapability(NET_CAPABILITY_INTERNET)
+                        .addCapability(NET_CAPABILITY_VALIDATED).build();
+                ComponentName componentName =
+                        new ComponentName(mContext, TestJobService.class);
+                JobInfo jobInfo = new JobInfo.Builder(1001,componentName)
+                        .setUserInitiated(true)
+                        .setRequiredNetwork(nreq)
+                        .setEstimatedNetworkBytes(1024 * 1024,1024 * 1024)
+                        .build();
+                JobScheduler jobScheduler = (JobScheduler)
+                        mContext.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+                jobScheduler.schedule(jobInfo);
+
+            }
+        }));
+
+        mPermissionTasks.put(DETECT_SCREEN_CAPTURE,  new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            if (android.os.Build.VERSION.SDK_INT >= 34) {
+                final Activity.ScreenCaptureCallback cb
+                        = new Activity.ScreenCaptureCallback() {
+                            @Override
+                            public void onScreenCaptured() {
+                                // Add logic to take action in your app.
+                                mLogger.logDebug("screen captured");
+                            }
+                        };
+                try {
+                    mActivity.registerScreenCaptureCallback(mExecutorService, cb);
+                    Screenshot.capture();
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                } catch (Throwable ex){
+                    throw ex;
+                } finally {
+                    mActivity.unregisterScreenCaptureCallback(cb);//close it anyway
+                }
+            }
+        }));
+
+
+        mPermissionTasks.put(CREDENTIAL_MANAGER_SET_ORIGIN,  new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            CredentialManager credentialManager = CredentialManager.create(mContext);
+            //credentialManager.getCredential()
+            List<CredentialOption> options = new ArrayList<>();
+            options.add(new GetPublicKeyCredentialOption("{}"));
+            GetCredentialRequest credentialRequest = new GetCredentialRequest.Builder()
+                    .setCredentialOptions(options)
+                    //Check : use setOrigin method
+                    .setOrigin("hoge")
+                    .build();
+
+            credentialManager.getCredentialAsync(mContext,
+                    credentialRequest,
+                    null,
+                    new LocalDirectExecutor(),
+                    new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                        @Override
+                        public void onResult(GetCredentialResponse getCredentialResponse) {
+                        }
+                        @Override
+                        public void onError(@NonNull GetCredentialException e) {
+                        }
+                    }
+            );
+        }));
+
+        mPermissionTasks.put(CREDENTIAL_MANAGER_SET_ALLOWED_PROVIDERS,  new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            CredentialManager credentialManager = CredentialManager.create(mContext);
+            //credentialManager.getCredential()
+            List<CredentialOption> options = new ArrayList<>();
+            Set<ComponentName> componentNames = new HashSet<>();
+            componentNames.add(new ComponentName("package","cls"));
+            //Check : add allowed provider to the option.
+            options.add(new GetPublicKeyCredentialOption("{}",null, componentNames));
+            GetCredentialRequest credentialRequest = new GetCredentialRequest.Builder()
+                    .setCredentialOptions(options)
+                    .build();
+            credentialManager.getCredentialAsync(mContext,
+                    credentialRequest,
+                    null,
+                    new LocalDirectExecutor(),
+                    new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                        @Override
+                        public void onResult(GetCredentialResponse getCredentialResponse) {
+                        }
+                        @Override
+                        public void onError(@NonNull GetCredentialException e) {
+                        }
+                    }
+            );
+        }));
+
+        //Infeasible to test - can't raise security error as of now.
+        //CREDENTIAL_MANAGER_QUERY_CANDIDATE_CREDENTIALS,
+
+        //Infeasible to test can't raise security error as of now.
+        //ENFORCE_UPDATE_OWNERSHIP
+        /*
+        mPermissionTasks.put(ENFORCE_UPDATE_OWNERSHIP,  new PermissionTest(false,
+                Build.VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
+            PackageInstaller.Session session = null;
+            try {
+                PackageInstaller packageInstaller = mPackageInstaller;
+                PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(
+                        PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+                params.setInstallLocation(PackageInfo.INSTALL_LOCATION_INTERNAL_ONLY);
+                params.setRequestUpdateOwnership(true);//Checking parasms
+                int sessionId = packageInstaller.createSession(params);
+                PackageInstaller.SessionCallback sessionCallback = new
+                        PackageInstaller.SessionCallback() {
+                            @Override
+                            public void onCreated(int i) {
+                              ;
+                            }
+
+                            @Override
+                            public void onBadgingChanged(int i) {
+
+                            }
+
+                            @Override
+                            public void onActiveChanged(int i, boolean b) {
+                            }
+
+                            @Override
+                            public void onProgressChanged(int i, float v) {
+                            }
+                            @Override
+                            public void onFinished(int i, boolean b) {
+                            }
+                        };
+
+                packageInstaller.registerSessionCallback(sessionCallback);
+                PackageInstaller.Session s = packageInstaller.openSession(sessionId);
+            } catch (IOException ex) {
+                throw new SecurityException(ex);
+            }
+        });
+         */
+
     }
+
+
+    class LocalDirectExecutor implements Executor {
+        public void execute(Runnable r) {
+            r.run();
+        }
+    }
+
 
     /**
      * Runs all of the permission tests for install permissions and returns a {@code boolean}
@@ -707,16 +1097,108 @@ public class InstallPermissionTester extends BasePermissionTester {
             }
         }
         if (allTestsPassed) {
-            StatusLogger.logInfo(
+            mLogger.logInfo(
                     "*** PASSED - all install permission tests completed successfully");
         } else {
-            StatusLogger.logInfo("!!! FAILED - one or more install permission tests failed");
+            mLogger.logInfo("!!! FAILED - one or more install permission tests failed");
         }
         return allTestsPassed;
     }
+    public void runPermissionTestsByThreads(Consumer<Result> callback){
+        Result.testerName = this.getClass().getSimpleName();
 
+        //mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
+        List<String> permissions = mConfiguration.getInstallPermissions().orElse(
+                new ArrayList<>(mPermissionTasks.keySet()));
+
+        int no=0;
+        AtomicInteger cnt = new AtomicInteger(0);
+        AtomicInteger err = new AtomicInteger(0);
+
+        final int total = permissions.size();
+           for (String permission : permissions) {
+
+            // If the permission has a corresponding task then run it.
+            // mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
+            //"%d/%d ",no,numperms) + permission);
+            Thread thread = new Thread(() -> {
+                String tester = this.getClass().getSimpleName();
+                if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester));
+                } else {
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
+                }
+            });
+            thread.start();
+            try {
+                thread.join(THREAD_JOIN_DELAY);
+            } catch (InterruptedException e) {
+                mLogger.logError(String.format(Locale.US,"%d %s failed due to the timeout.",no,permission));
+            }
+        }
+    }
     @Override
     public Map<String,PermissionTest> getRegisteredPermissions() {
         return mPermissionTasks;
+    }
+
+    private void tryBindingForegroundService(Intent serviceIntent){
+        FgServiceConnection serviceConnection = new FgServiceConnection();
+        mContext.bindService(serviceIntent,
+                Context.BIND_AUTO_CREATE, mExecutorService,serviceConnection);
+        synchronized (lock) {
+            try {
+                int i=0;
+                while (!serviceConnection.mConnected.get()) {
+                    try {
+                        //wait almost 1 sec along increasing waiting time
+                        lock.wait(10+(i*i));
+                        if(i++>=40){
+                            throw new InterruptedException("Connection Timed Out");
+                        }
+                    } catch (InterruptedException e) {
+                        //throw new RuntimeException(e);
+                        throw new UnexpectedPermissionTestFailureException(e.getMessage());
+                    }
+                }
+                mLogger.logInfo("Connected To Service in the Tester app="+serviceConnection.mComponentName+
+                        ","+serviceConnection.binderSuccess.get());
+                if(!serviceConnection.binderSuccess.get()){
+                    throw new SecurityException("Test for "+serviceConnection.mComponentName+" has been failed.");
+                }
+            } catch (Exception ex){
+                throw new UnexpectedPermissionTestFailureException(ex);
+            } finally {
+                mContext.unbindService(serviceConnection);
+            }
+        }
+    }
+    final Object lock = new Object();
+    private class FgServiceConnection implements android.content.ServiceConnection {
+        public final AtomicBoolean binderSuccess = new AtomicBoolean();
+        private final AtomicBoolean mConnected = new AtomicBoolean(false);
+        public String mComponentName = "";
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            synchronized (lock) {
+                mConnected.set(true);
+                binderSuccess.set(true);
+                mComponentName = name.getShortClassName();
+                //mLogger.logSystem("Hello Unlock!"+name);
+                TestBindService service = TestBindService.Stub.asInterface(binder);
+                try {
+                    service.testMethod();
+                } catch (RemoteException e) {
+                    binderSuccess.set(false);
+                    //e.printStackTrace();
+                    mLogger.logError(name+" failure."+e.getMessage(),e);
+                }
+                lock.notify();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            //Unimplemented
+        }
     }
 }

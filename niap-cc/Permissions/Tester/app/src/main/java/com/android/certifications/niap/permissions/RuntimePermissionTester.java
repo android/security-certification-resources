@@ -59,6 +59,7 @@ import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
+import android.content.AttributionSource;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -85,7 +86,11 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.provider.BaseColumns;
 import android.provider.CalendarContract.CalendarAlerts;
 import android.provider.CalendarContract.Events;
@@ -95,6 +100,7 @@ import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.provider.Telephony;
 import android.provider.VoicemailContract.Voicemails;
 import android.service.notification.StatusBarNotification;
@@ -102,9 +108,11 @@ import android.telecom.TelecomManager;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
+import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.config.TestConfiguration;
 import com.android.certifications.niap.permissions.log.Logger;
@@ -116,10 +124,13 @@ import com.android.certifications.niap.permissions.utils.Transacts;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Permission tester to verify all runtime permissions properly guard their API, resources, etc.
@@ -130,7 +141,7 @@ import java.util.Map;
  */
 public class RuntimePermissionTester extends BasePermissionTester {
     private static final String TAG = "RuntimePermissionTester";
-    private final Logger mLogger = LoggerFactory.createDefaultLogger(TAG);
+    private final Logger mLogger = LoggerFactory.createActivityLogger(TAG, (LogListAdaptable) mActivity);
 
     protected final WallpaperManager mWallpaperManager;
     protected final SensorManager mSensorManager;
@@ -165,6 +176,7 @@ public class RuntimePermissionTester extends BasePermissionTester {
         // to the app.
 
         mPermissionTasks.put(BODY_SENSORS, new PermissionTest(false, () -> {
+
             if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HEART_RATE)) {
                 throw new BypassTestException(
                         "A heard rate monitor is not available to run this test");
@@ -540,6 +552,10 @@ public class RuntimePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(Manifest.permission.UWB_RANGING,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
+                    if (!mPackageManager.hasSystemFeature("android.hardware.uwb")) {
+                        throw new BypassTestException(
+                                "This permission requires the android.hardware.uwb feature");
+                    }
                     // The API guarded by this permission is also guarded by the signature
                     // permission UWB_PRIVILEGED, so if this signature permission is not granted
                     // then skip this test.
@@ -547,10 +563,34 @@ public class RuntimePermissionTester extends BasePermissionTester {
                         throw new BypassTestException(
                                 "The UWB_PRIVILEGED permission must be granted for this test");
                     }
-                    // The UwbManager with the API guarded by this permission is hidden, so a
-                    // direct transact is required.
-                    mTransacts.invokeTransact(Transacts.UWB_SERVICE, Transacts.UWB_DESCRIPTOR,
-                            Transacts.getSpecificationInfo);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+
+                        // The UwbManager with the API guarded by this permission is hidden, so a
+                        // direct transact is required.
+                        final AttributionSource attributionSource = AttributionSource.myAttributionSource();
+                        Parcelable sessionHandle = new Parcelable() {
+                            @Override
+                            public int describeContents() {
+                                return 0;
+                            }
+
+                            @Override
+                            public void writeToParcel(@NonNull Parcel parcel, int i) {
+                                parcel.writeInt(1);
+                                parcel.writeString(attributionSource.getPackageName());
+                                parcel.writeInt(attributionSource.getUid());
+                                parcel.writeInt(attributionSource.getPid());
+
+                            }
+                        };
+                        mTransacts.invokeTransact(Transacts.UWB_SERVICE, Transacts.UWB_DESCRIPTOR,
+                                Transacts.openRanging, attributionSource, sessionHandle,
+                                (IBinder) null,
+                                new PersistableBundle(), "");
+                    } else {
+                        mTransacts.invokeTransact(Transacts.UWB_SERVICE, Transacts.UWB_DESCRIPTOR,
+                                Transacts.getSpecificationInfo);
+                    }
                 }));
 
         //New Runtime Permissions for T
@@ -561,21 +601,58 @@ public class RuntimePermissionTester extends BasePermissionTester {
                 @SuppressLint("Recycle") Cursor cursor = contentResolver.query(
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                         null, null, null, null);
+
                 if (cursor == null) {
                     throw new UnexpectedPermissionTestFailureException(
                             "Unable to obtain an sound to test READ_MEDIA_AUDIO");
                 } else if (!cursor.moveToFirst()) {
                     throw new SecurityException("Failed to load media files:READ_MEDIA_AUDIO." +
                             "Pleaes ensure to execute the companion app before testing.");
+                } else {
+                    int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    //those file can be read after android udc without permissions...
+                    String[] acceptables = new String[]{"default_ringtone",
+                            "default_alarm_alert","default_notification_sound"};
+                    List<String> result = new ArrayList<String>();
+
+                    do{
+                        String fname = cursor.getString(index);
+                        boolean record=true;
+                        for(String a: acceptables){
+                            if(fname.startsWith(a)){
+                                record=false;
+                            }
+                        }
+                        if(record){
+                            result.add(fname);
+                        }
+                    }while(cursor.moveToNext());
+                    if (result.size() == 0){
+                        throw new SecurityException
+                                ("Failed to read any audio medias (they should be setup by the companion app)");
+                    }
                 }
+
             }));
 
             mPermissionTasks.put(READ_MEDIA_IMAGES, new PermissionTest(
                     false, Build.VERSION_CODES.TIRAMISU, () -> {
+
                 ContentResolver contentResolver = mContext.getContentResolver();
-                @SuppressLint("Recycle") Cursor cursor = contentResolver.query(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        null, null, null, null);
+                String[] PROJECTION_BUCKET = new String[] { "bucket_id", "bucket_display_name", "datetaken", "_data" };
+
+                String[] thumbColumns = {MediaStore.Images.Thumbnails.DATA, MediaStore.Images.Thumbnails.IMAGE_ID};
+                String[] columns = {MediaStore.Images.Media._ID, MediaStore.Images.Media.DATA, MediaStore.Images.Media.DATE_TAKEN};
+                String[] whereArgs = {"image/jpeg", "image/jpg"};
+
+                String orderBy = MediaStore.Images.Media.DATE_TAKEN+ " DESC";
+                String  where = MediaStore.Images.Media.MIME_TYPE + "=? or "
+                        + MediaStore.Images.Media.MIME_TYPE + "=?";
+
+
+                @SuppressLint("Recycle") Cursor cursor = contentResolver.query
+                    (MediaStore.Images.Media.EXTERNAL_CONTENT_URI,columns, where, whereArgs, orderBy);
+
                 if (cursor == null) {
                     throw new UnexpectedPermissionTestFailureException(
                             "Unable to obtain an image to test READ_MEDIA_IMAGES");
@@ -628,16 +705,16 @@ public class RuntimePermissionTester extends BasePermissionTester {
                                 .setContentIntent(pendingIntent)
                                 .build();
 
-                notificationManager.notify(1000, notification);
+                notificationManager.notify(1573, notification);
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
                 boolean found = false;
                 for (StatusBarNotification nn : notifications) {
-                    if (nn.getId() == 1000) {
+                    if (nn.getId() == 1573) {
                         mLogger.logInfo("notification found");
                         found = true;
                     }
@@ -709,19 +786,50 @@ public class RuntimePermissionTester extends BasePermissionTester {
         List<String> permissions = mConfiguration.getRuntimePermissions().orElse(
                 new ArrayList<>(mPermissionTasks.keySet()));
         for (String permission : permissions) {
+            mLogger.logDebug("Call Permission->"+permission);
             if (!runPermissionTest(permission, mPermissionTasks.get(permission))) {
                 allTestsPassed = false;
             }
         }
         if (allTestsPassed) {
-            StatusLogger.logInfo(
+            mLogger.logInfo(
                     "*** PASSED - all runtime permission tests completed successfully");
         } else {
-            StatusLogger.logInfo("!!! FAILED - one or more runtime permission tests failed");
+            mLogger.logInfo("!!! FAILED - one or more runtime permission tests failed");
         }
         return allTestsPassed;
     }
+    public void runPermissionTestsByThreads(androidx.core.util.Consumer<Result> callback){
+        Result.testerName = this.getClass().getSimpleName();
 
+        boolean allTestsPassed = true;
+        List<String> permissions = mConfiguration.getRuntimePermissions().orElse(
+                new ArrayList<>(mPermissionTasks.keySet()));
+
+        AtomicInteger cnt = new AtomicInteger(0);
+        AtomicInteger err = new AtomicInteger(0);
+
+        final int total = permissions.size();
+        for (String permission : permissions) {
+            // If the permission has a corresponding task then run it.
+            // mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
+            // "%d/%d ",cnt.get(),total) + permission);
+            Thread thread = new Thread(() -> {
+                String tester = this.getClass().getSimpleName();
+                if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
+                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester));
+                } else {
+                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
+                }
+            });
+            thread.start();
+            try {
+                thread.join(THREAD_JOIN_DELAY);
+            } catch (InterruptedException e) {
+                mLogger.logError(String.format(Locale.US,"%d %s failed due to the timeout.",cnt.get(),permission));
+            }
+        }
+    }
     /**
      * Enables the specified {@code bluetoothAdapter} if the required permission is granted.
      *

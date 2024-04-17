@@ -18,6 +18,7 @@ package com.android.certifications.niap.permissions.config;
 
 import android.app.Activity;
 import android.util.ArraySet;
+import android.util.Log;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.Constants;
@@ -27,6 +28,7 @@ import com.android.certifications.niap.permissions.PrivilegedPermissionTester;
 import com.android.certifications.niap.permissions.R;
 import com.android.certifications.niap.permissions.RuntimePermissionTester;
 import com.android.certifications.niap.permissions.SignaturePermissionTester;
+import com.android.certifications.niap.permissions.utils.PermissionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 
 import java.util.ArrayList;
@@ -58,7 +60,13 @@ public interface TestConfiguration {
             permissionTesters.add(new PrivilegedPermissionTester(this, activity));
         }
         permissionTesters.add(new InternalPermissionTester(this, activity));
-        permissionTesters.add(new InstallPermissionTester(this, activity));
+        if(PermissionUtils.isNoPermissionManifest(activity.getApplicationContext())){
+            //Separate Install permission tester to other configuration to avoid inevitable ANR.
+            Log.i("TAG","No Permission Configuration should not include the Install Permission Tester");
+        } else {
+            permissionTesters.add(new InstallPermissionTester(this, activity));
+        }
+
         return permissionTesters;
     }
 
@@ -91,14 +99,6 @@ public interface TestConfiguration {
      * {@link Optional#empty()} if all signature permissions should be tested.
      */
     default Optional<List<String>> getSignaturePermissions() {
-       //List<String> list = new ArrayList<>();
-       //SignatureDependentPermissionConfiguration.addPermissionsFor28(list);
-       // SignatureDependentPermissionConfiguration.addPermissionsFor29(list);
-       // SignatureDependentPermissionConfiguration.addPermissionsFor30(list);
-       // SignatureDependentPermissionConfiguration.addPermissionsFor31(list);
-        //SignatureDependentPermissionConfiguration.addPermissionsFor32(list);
-        //SignatureDependentPermissionConfiguration.addPermissionsFor33(list);
-        //return Optional.of(list);//list;
         return Optional.empty();
     }
 
@@ -134,9 +134,6 @@ public interface TestConfiguration {
      * or {@link Optional#empty()} if no signature permissions should be skipped.
      */
     default Optional<Set<String>> getSkippedSignaturePermissions() {
-        //Set<String> list = new ArraySet<>();
-        //list.add(SignaturePermissions.permission.RESTART_WIFI_SUBSYSTEM);
-        //return Optional.of(list);
         return Optional.empty();
     }
 
