@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                             boolean.class}, namespace, name, value, makeDefault);
             return (boolean)r;
         } catch (Exception e) {
-            logdebug("DeviceConfig.setProperty failed.(" + a + "," + b + "," + value + ")",e);
+            logdebug("DeviceConfig.setProperty failed.(" + namespace + "," + name + "," + value + ")",e);
             e.printStackTrace();
             return false;
         }
@@ -591,7 +591,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
             int[] grantResults) {
-        //Inspector request below line but in this case we shouldn't call super method.
+        //Inspector requests below line but in this case we shouldn't call super method.
         //    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean permissionGranted = true;
         for (int grantResult : grantResults) {
