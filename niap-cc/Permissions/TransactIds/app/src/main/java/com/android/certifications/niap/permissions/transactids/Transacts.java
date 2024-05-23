@@ -446,6 +446,8 @@ public class Transacts {
     public static final String enableLocationUpdates = "enableLocationUpdates";
     public static final String setAlwaysFinish = "setAlwaysFinish";
     public static final String addKeyboardLayoutForInputDevice = "addKeyboardLayoutForInputDevice";
+    public static final String setKeyboardLayoutForInputDevice = "setKeyboardLayoutForInputDevice";
+
     public static final String setWallpaper = "setWallpaper";
     public static final String setWallpaperComponent = "setWallpaperComponent";
     public static final String setStandbyEnabled = "setStandbyEnabled";

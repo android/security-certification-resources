@@ -573,6 +573,7 @@ public class SdkV_Transacts extends Transacts {
         transactIds.put(isInTabletMode, 26);
         transactIds.put(monitorGestureInput, 41);
         // Failed to obtain transactId of addKeyboardLayoutForInputDevice under android.hardware.input.IInputManager: No field TRANSACTION_addKeyboardLayoutForInputDevice in class Landroid/hardware/input/IInputManager$Stub; (declaration of 'android.hardware.input.IInputManager$Stub' appears in /system/framework/framework.jar!classes2.dex)
+        transactIds.put(setKeyboardLayoutForInputDevice, 20);
         transactIds.put(enableInputDevice, 5);
         transactIds.put(registerKeyboardBacklightListener, 64);
         transactIds.put(getModifierKeyRemapping, 24);

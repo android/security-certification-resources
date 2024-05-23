@@ -306,6 +306,8 @@ public class MainActivity extends AppCompatActivity {
                     descriptorTransacts);
             queryTransactId(Transacts.INPUT_DESCRIPTOR, Transacts.addKeyboardLayoutForInputDevice,
                     descriptorTransacts);
+            queryTransactId(Transacts.INPUT_DESCRIPTOR, Transacts.setKeyboardLayoutForInputDevice,
+                    descriptorTransacts);
             queryTransactId(Transacts.INPUT_DESCRIPTOR, Transacts.enableInputDevice,
                     descriptorTransacts);
             queryTransactId(Transacts.INPUT_DESCRIPTOR, Transacts.isInTabletMode,

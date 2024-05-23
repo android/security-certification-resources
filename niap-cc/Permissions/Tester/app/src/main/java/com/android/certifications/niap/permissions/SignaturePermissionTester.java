@@ -1796,8 +1796,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.SET_KEYBOARD_LAYOUT,
                 new PermissionTest(false, () -> {
-                    mTransacts.invokeTransact(Transacts.INPUT_SERVICE, Transacts.INPUT_DESCRIPTOR,
-                            Transacts.addKeyboardLayoutForInputDevice, 0, "test_descriptor");
+                    if(TesterUtils.isAtLeastV()){
+                        //method name changed
+                        mTransacts.invokeTransact(Transacts.INPUT_SERVICE, Transacts.INPUT_DESCRIPTOR,
+                                Transacts.setKeyboardLayoutForInputDevice, 0, "test_descriptor");
+                    } else {
+                        mTransacts.invokeTransact(Transacts.INPUT_SERVICE, Transacts.INPUT_DESCRIPTOR,
+                                Transacts.addKeyboardLayoutForInputDevice, 0, "test_descriptor");
+                    }
                 }));
 
         mPermissionTasks.put(permission.SET_MEDIA_KEY_LISTENER,

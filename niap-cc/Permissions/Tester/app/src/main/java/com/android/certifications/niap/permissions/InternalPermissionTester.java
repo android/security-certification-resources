@@ -34,6 +34,7 @@ import android.app.admin.DevicePolicyManager;
 import android.app.admin.SystemUpdatePolicy;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
+import android.content.AttributionSource;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -42,6 +43,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.Signature;
 import android.devicelock.IIsDeviceLockedCallback;
+import android.devicelock._IIsDeviceLockedCallback;
+import android.devicelock.ParcelableException;
 import android.health.connect.aidl.IMigrationCallback;
 import android.health.connect.migration.MigrationException;
 import android.net.Uri;
@@ -64,6 +67,7 @@ import com.android.certifications.niap.permissions.log.StatusLogger;
 import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.SignatureUtils;
+import com.android.certifications.niap.permissions.utils.TesterUtils;
 import com.android.certifications.niap.permissions.utils.Transacts;
 
 import java.lang.reflect.Constructor;
@@ -234,10 +238,25 @@ public class InternalPermissionTester extends BasePermissionTester {
 
                         IBinder binder = getActivityToken();
                         //UserHandle uh = Binder.getCallingUserHandle();
-                        mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
-                                Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
-                                Transacts.createVirtualDevice, binder,mContext.getPackageName(),
-                                0, vdpParams,null);
+                        if(TesterUtils.isAtLeastV()){
+                            /*
+                            in IBinder token, in AttributionSource attributionSource, int associationId,
+                            in VirtualDeviceParams params, in IVirtualDeviceActivityListener activityListener,
+                            in IVirtualDeviceSoundEffectListener soundEffectListener
+                            */
+                            AttributionSource ats = new AttributionSource.Builder(0).build();
+                            mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
+                                    Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
+                                    Transacts.createVirtualDevice,
+                                    binder,ats, 0,
+                                    vdpParams,null,null);
+                        } else {
+                            mTransacts.invokeTransact(Transacts.VIRTUAL_DEVICE_MANAGER_SERVICE,
+                                    Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
+                                    Transacts.createVirtualDevice,
+                                    binder,mContext.getPackageName(), 0,
+                                    vdpParams,null);
+                        }
 
                     } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
                         throw new UnexpectedPermissionTestFailureException(e);
@@ -401,16 +420,17 @@ public class InternalPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.MANAGE_DEVICE_LOCK_STATE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                        CountDownLatch latch = new CountDownLatch(1);
-                        AtomicBoolean success = new AtomicBoolean(true);
+                    CountDownLatch latch = new CountDownLatch(1);
+                    AtomicBoolean success = new AtomicBoolean(true);
+                    if(TesterUtils.isAtLeastV()) {
+                        //Interface Change
                         IIsDeviceLockedCallback callback = new IIsDeviceLockedCallback() {
                             @Override
                             public void onIsDeviceLocked(boolean locked) throws RemoteException {
                             }
 
                             @Override
-                            public void onError(int error) throws RemoteException {
+                            public void onError(ParcelableException ex) throws RemoteException {
                             }
 
                             @Override
@@ -423,14 +443,61 @@ public class InternalPermissionTester extends BasePermissionTester {
                                     }
 
                                     @Override
-                                    public void onError(int error) throws RemoteException {
-                                        if (IIsDeviceLockedCallback.ERROR_SECURITY == error) {
+                                    public void onError(ParcelableException ex) throws RemoteException {
+                                        if(ex.getException().toString().equals("java.lang.SecurityException")){
                                             success.set(false);
                                         }
                                         latch.countDown();
                                     }
                                 };
 
+                            }
+                        };
+                        try {
+                            //MANAGE_DEVICE_LOCK_STATE
+                            mTransacts.invokeTransact(
+                                    Context.DEVICE_LOCK_SERVICE,
+                                    Transacts.DEVICELOCK_DESCRIPTOR,
+                                    Transacts.isDeviceLocked,callback);
+
+                            latch.await(2000, TimeUnit.MILLISECONDS);
+                            if(!success.get()){
+                                throw new SecurityException("Found secuirty error in callback interface!");
+                            }
+                        } catch (InterruptedException e) {
+                            mLogger.logError(e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }else if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        // NOTICE:
+                        // We can not use an interface with a same name at once, so if you would like to test it
+                        // with SDK34 kindly change name of these callbacks.
+                        _IIsDeviceLockedCallback callback = new _IIsDeviceLockedCallback() {
+                            @Override
+                            public void onIsDeviceLocked(boolean locked) throws RemoteException {
+                            }
+
+                            @Override
+                            public void onError(int error) throws RemoteException {
+                            }
+
+                            @Override
+                            public IBinder asBinder() {
+                                return new _IIsDeviceLockedCallback.Stub() {
+
+                                    @Override
+                                    public void onIsDeviceLocked(boolean locked) throws RemoteException {
+                                        latch.countDown();
+                                    }
+
+                                    @Override
+                                    public void onError(int error) throws RemoteException {
+                                        if (_IIsDeviceLockedCallback.ERROR_SECURITY == error) {
+                                            success.set(false);
+                                        }
+                                        latch.countDown();
+                                    }
+                                };
                             }
                         };
                         try {
@@ -449,7 +516,6 @@ public class InternalPermissionTester extends BasePermissionTester {
                             mLogger.logError(e.getMessage());
                             e.printStackTrace();
                         }
-
                     }
                 }));
     }
