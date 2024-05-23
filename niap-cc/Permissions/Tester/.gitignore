@@ -18,6 +18,8 @@ gen-external-apklibs
 
 # Gradle
 .gradle
+.gradle/*
+.idea/*
 /build
 /captures
 buildout

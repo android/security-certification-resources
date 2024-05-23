@@ -20,7 +20,9 @@ import android.app.Activity;
 import android.companion.AssociationRequest;
 import android.companion.CompanionDeviceManager;
 import android.content.pm.PackageManager;
+import android.os.Build;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
@@ -28,6 +30,7 @@ import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +39,20 @@ import java.util.concurrent.TimeoutException;
 public class TesterUtils {
 
     private static final Logger mLogger = LoggerFactory.createDefaultLogger("TesterUtils");
+
+    public static boolean isAtLeastV() {
+        return Build.VERSION.SDK_INT >= 34 && isAtLeastPreReleaseCodename("VanillaIceCream", Build.VERSION.CODENAME);
+    }
+
+    protected static boolean isAtLeastPreReleaseCodename(@NonNull String codename, @NonNull String buildCodename) {
+        if ("REL".equals(buildCodename)) {
+            return false;
+        } else {
+            String buildCodenameUpper = buildCodename.toUpperCase(Locale.ROOT);
+            String codenameUpper = codename.toUpperCase(Locale.ROOT);
+            return buildCodenameUpper.compareTo(codenameUpper) >= 0;
+        }
+    }
 
     /**
      * Try to connect the Bluetooth companion device manager service with a certain request.

@@ -337,7 +337,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         if (sp.getBoolean("cb_sig01", false)) prepareTestBlock01();
         if (sp.getBoolean("cb_sig02", false)) prepareTestBlock02();
-        if (sp.getBoolean("cb_sig10", false)) prepareTestBlockForQPRS();
+        if (sp.getBoolean("cb_sig10", false)) prepareTestBlockForQPR();
+        if (sp.getBoolean("cb_sig12", false)) prepareTestBlockForS();
         if (sp.getBoolean("cb_sig13", false)) prepareTestBlockForT();
         if (sp.getBoolean("cb_sig14", false)) prepareTestBlockForU();
         if (sp.getBoolean("cb_sig_bind", false)) prepareTestBlockBind();
@@ -2176,7 +2177,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
     }
 
-    void prepareTestBlockForQPRS()
+    void prepareTestBlockForQPR()
     {
         // new permissions for Q
         mPermissionTasks.put(permission.MANAGE_APPOPS,
@@ -2265,7 +2266,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         //TODO:WE SHOULD NOT LOCK SCREEN WHILE THE TEST....
         mPermissionTasks.put(permission.LOCK_DEVICE,
-                new PermissionTest(false, Build.VERSION_CODES.Q, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.Q,VERSION_CODES.UPSIDE_DOWN_CAKE,() -> {
 
                     if(Constants.BYPASS_TESTS_AFFECTING_UI)
                         throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
@@ -2762,7 +2763,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         //TODO: This Test Hide Activity and Show Home Page
         mPermissionTasks.put(permission.ENTER_CAR_MODE_PRIORITIZED,
-                new PermissionTest(false, VERSION_CODES.R, () -> {
+                new PermissionTest(false, VERSION_CODES.R,VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     if(Constants.BYPASS_TESTS_AFFECTING_UI)
                         throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
 
@@ -3267,8 +3268,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             1 << 10);
                 }));
 
+        //prepareTestBlock12();
+
     }
-    void prepareTestBlock12()
+    void prepareTestBlockForS()
     {
         // The following are the new signature permissions for Android 12.
         mPermissionTasks.put(permission.ASSOCIATE_INPUT_DEVICE_TO_DISPLAY,

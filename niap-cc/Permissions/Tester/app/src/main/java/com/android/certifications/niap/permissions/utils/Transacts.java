@@ -34,6 +34,8 @@ import android.os.Parcelable;
 import android.os.RemoteException;
 import android.text.TextUtils;
 
+import androidx.core.os.BuildCompat;
+
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
@@ -2422,6 +2424,9 @@ public class Transacts {
      * {@code apiLevel} that can be used to invoke direct binder transacts.
      */
     public static Transacts createTransactsForApiLevel(int apiLevel) {
+        if(TesterUtils.isAtLeastV()){
+            apiLevel = 35;
+        }
         switch (apiLevel) {
             // TODO: Replace the appropriate statement below with an instantiation of the java
             // class created by the app under the TransactIds/ directory. This will allow the tester
@@ -2440,6 +2445,8 @@ public class Transacts {
                 return new SdkT_Transacts();
             case Build.VERSION_CODES.UPSIDE_DOWN_CAKE:
                 return new SdkU_Transacts();
+            case 35:
+                return new SdkV_Transacts();
             default:
                 throw new IllegalArgumentException(
                         "The provided API level, " + apiLevel + ", is not supported");

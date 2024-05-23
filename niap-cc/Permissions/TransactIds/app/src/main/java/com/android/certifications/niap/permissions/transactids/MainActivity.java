@@ -42,12 +42,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.os.BuildCompat;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -63,6 +66,20 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "TransactIds";
     private static final String NL = System.lineSeparator();
+
+    public static boolean isAtLeastV() {
+        return Build.VERSION.SDK_INT >= 34 && isAtLeastPreReleaseCodename("VanillaIceCream", Build.VERSION.CODENAME);
+    }
+
+    protected static boolean isAtLeastPreReleaseCodename(@NonNull String codename, @NonNull String buildCodename) {
+        if ("REL".equals(buildCodename)) {
+            return false;
+        } else {
+            String buildCodenameUpper = buildCodename.toUpperCase(Locale.ROOT);
+            String codenameUpper = codename.toUpperCase(Locale.ROOT);
+            return buildCodenameUpper.compareTo(codenameUpper) >= 0;
+        }
+    }
 
     /**
      * Maps the descriptor value to the constant variable name in the Transacts class; this is used
@@ -81,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
      * for use in the Permission Test Tool.
      */
     private static final String sClassName;
-
+    private int ACTUAL_SDK_INT = Build.VERSION.SDK_INT;
     static {
         String deviceName = Build.DEVICE;
         if (TextUtils.isEmpty(deviceName)) {
@@ -90,12 +107,21 @@ public class MainActivity extends AppCompatActivity {
             deviceName = deviceName.substring(0, 1).toUpperCase() + deviceName.substring(
                     1).toLowerCase();
         }
-        sClassName = deviceName + "ApiLevel" + Build.VERSION.SDK_INT + "Transacts";
+
+        if(isAtLeastV()){
+            sClassName = deviceName + "ApiLevel35Transacts";
+        } else {
+            sClassName = deviceName + "ApiLevel" + Build.VERSION.SDK_INT + "Transacts";
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(isAtLeastV()){
+            ACTUAL_SDK_INT = 35;
+        }
+
         setContentView(R.layout.activity_main);
         mContext = getApplicationContext();
         mStatusTextView = findViewById(R.id.statusTextView);
@@ -109,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Transaction APIs as of Android 34
-        ProxyChecker.check(WINDOW_DESCRIPTOR, "requestAppKeyboardShortcuts");
+       // ProxyChecker.check(WINDOW_DESCRIPTOR, "requestAppKeyboardShortcuts");
         //ProxyChecker.check(EUICC_CONTROLLER_DESCRIPTOR,"getSupportedCountries");
     }
 
@@ -765,7 +791,7 @@ public class MainActivity extends AppCompatActivity {
                 writer.write("import java.util.Map;" + NL + NL);
                 writer.write("public class " + sClassName + " extends Transacts {" + NL);
                 writer.write("    public " + sClassName + "() {" + NL);
-                writer.write("        mDeviceApiLevel = " + Build.VERSION.SDK_INT + ";" + NL);
+                writer.write("        mDeviceApiLevel = " + ACTUAL_SDK_INT + ";" + NL);
                 writer.write("        Map<String, Integer> transactIds;" + NL);
 
                 Map<String, String> transactIds;

@@ -140,6 +140,7 @@ public class ConfigurationFactory {
 
         InstallPermissionOnlyConfiguration installPermissionOnlyConfiguration =
                 new  InstallPermissionOnlyConfiguration(activity);
+
         if(installPermissionOnlyConfiguration.enabled()){
             configurations.add(installPermissionOnlyConfiguration);
         }

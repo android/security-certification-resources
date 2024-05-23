@@ -1471,4 +1471,15 @@
     <uses-permission android:name="com.vzw.DEFAULT_APP_CHANGE" />
     <uses-permission android:name="com.vzw.engage.service.myverizon" />
     <uses-permission android:name="com.vzw.hss.myverizon.CountlyPush.BROADCAST_PERMISSION" />
+    <!-- non platform shiba(piexel8) 35 -->
+    <uses-permission android:name="android.permission.health.START_ONBOARDING" />
+    <uses-permission android:name="android.permission.BIND_EXAMPLE_STORE_SERVICE" />
+    <uses-permission android:name="com.android.devicelock.permission.START_KIOSK_SETUP_ACTIVITY" />
+    <uses-permission android:name="android.permission.ACCESS_PRIVILEGED_ADSERVICES_COBALT_UPLOAD" />
+    <uses-permission android:name="android.permission.ondevicepersonalization.ACCESS_SYSTEM_SERVER_SERVICE" />
+    <uses-permission android:name="com.google.android.gms.time.permission.SEND_TRUSTED_TIME_SIGNAL" />
+    <uses-permission android:name="com.android.devicelockcontroller.permission.MANAGE_DEVICE_LOCK_SERVICE_FROM_CONTROLLER" />
+    <uses-permission android:name="com.google.android.devicelockcontroller.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.google.android.calendar.permission.SEND_REMOTE_METRICS" />
+
 </manifest>
