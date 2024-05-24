@@ -239,7 +239,7 @@ public class InternalPermissionTester extends BasePermissionTester {
                         IBinder binder = getActivityToken();
                         //UserHandle uh = Binder.getCallingUserHandle();
                         if(TesterUtils.isAtLeastV()){
-                            /*
+                            /* Parameters from SDK35
                             in IBinder token, in AttributionSource attributionSource, int associationId,
                             in VirtualDeviceParams params, in IVirtualDeviceActivityListener activityListener,
                             in IVirtualDeviceSoundEffectListener soundEffectListener

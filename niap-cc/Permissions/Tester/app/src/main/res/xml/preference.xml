@@ -53,6 +53,10 @@
             android:title="UDC(14)" />
         <CheckBoxPreference
             android:defaultValue="true"
+            android:key="cb_sig15"
+            android:title="VIC(15)" />
+        <CheckBoxPreference
+            android:defaultValue="true"
             android:key="cb_sig_bind"
             android:title="BIND_* Permissions" />
     </PreferenceCategory>

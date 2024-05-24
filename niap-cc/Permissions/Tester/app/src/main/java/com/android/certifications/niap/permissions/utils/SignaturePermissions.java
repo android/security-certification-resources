@@ -1197,6 +1197,127 @@ public class SignaturePermissions {
         public static final String WRITE_ALLOWLISTED_DEVICE_CONFIG =
                 "android.permission.WRITE_ALLOWLISTED_DEVICE_CONFIG";
 
+        // New signature permissions as of Android 15
+        public static final String WRITE_VERIFICATION_STATE_E2EE_CONTACT_KEYS =
+                "android.permission.WRITE_VERIFICATION_STATE_E2EE_CONTACT_KEYS";
+        public static final String CAMERA_HEADLESS_SYSTEM_USER =
+                "android.permission.CAMERA_HEADLESS_SYSTEM_USER";
+        public static final String CAMERA_PRIVACY_ALLOWLIST =
+                "android.permission.CAMERA_PRIVACY_ALLOWLIST";
+        public static final String MANAGE_REMOTE_AUTH =
+                "android.permission.MANAGE_REMOTE_AUTH";
+        public static final String USE_REMOTE_AUTH =
+                "android.permission.USE_REMOTE_AUTH";
+        public static final String THREAD_NETWORK_PRIVILEGED =
+                "android.permission.THREAD_NETWORK_PRIVILEGED";
+        public static final String REGISTER_NSD_OFFLOAD_ENGINE =
+                "android.permission.REGISTER_NSD_OFFLOAD_ENGINE";
+        public static final String QUARANTINE_APPS =
+                "android.permission.QUARANTINE_APPS";
+        public static final String VIBRATE_SYSTEM_CONSTANTS =
+                "android.permission.VIBRATE_SYSTEM_CONSTANTS";
+        public static final String CONFIGURE_FACTORY_RESET_PROTECTION =
+                "android.permission.CONFIGURE_FACTORY_RESET_PROTECTION";
+        public static final String BIND_DOMAIN_SELECTION_SERVICE =
+                "android.permission.BIND_DOMAIN_SELECTION_SERVICE";
+        public static final String ACCESS_LAST_KNOWN_CELL_ID =
+                "android.permission.ACCESS_LAST_KNOWN_CELL_ID";
+        public static final String ACCESS_HIDDEN_PROFILES_FULL =
+                "android.permission.ACCESS_HIDDEN_PROFILES_FULL";
+        public static final String MANAGE_ENHANCED_CONFIRMATION_STATES =
+                "android.permission.MANAGE_ENHANCED_CONFIRMATION_STATES";
+        public static final String READ_DROPBOX_DATA =
+                "android.permission.READ_DROPBOX_DATA";
+        public static final String ACCESSIBILITY_MOTION_EVENT_OBSERVING =
+                "android.permission.ACCESSIBILITY_MOTION_EVENT_OBSERVING";
+        public static final String BIND_TV_AD_SERVICE =
+                "android.permission.BIND_TV_AD_SERVICE";
+        public static final String LAUNCH_PERMISSION_SETTINGS =
+                "android.permission.LAUNCH_PERMISSION_SETTINGS";
+        public static final String REQUEST_OBSERVE_DEVICE_UUID_PRESENCE =
+                "android.permission.REQUEST_OBSERVE_DEVICE_UUID_PRESENCE";
+        public static final String USE_COMPANION_TRANSPORTS =
+                "android.permission.USE_COMPANION_TRANSPORTS";
+        public static final String MEDIA_ROUTING_CONTROL =
+                "android.permission.MEDIA_ROUTING_CONTROL";
+        public static final String REPORT_USAGE_STATS =
+                "android.permission.REPORT_USAGE_STATS";
+        public static final String SET_BIOMETRIC_DIALOG_ADVANCED =
+                "android.permission.SET_BIOMETRIC_DIALOG_ADVANCED";
+        public static final String RECORD_SENSITIVE_CONTENT =
+                "android.permission.RECORD_SENSITIVE_CONTENT";
+        public static final String ACCESS_SMARTSPACE =
+                "android.permission.ACCESS_SMARTSPACE";
+        public static final String ACCESS_CONTEXTUAL_SEARCH =
+                "android.permission.ACCESS_CONTEXTUAL_SEARCH";
+        public static final String RECEIVE_SANDBOX_TRIGGER_AUDIO =
+                "android.permission.RECEIVE_SANDBOX_TRIGGER_AUDIO";
+        public static final String SET_THEME_OVERLAY_CONTROLLER_READY =
+                "android.permission.SET_THEME_OVERLAY_CONTROLLER_READY";
+        public static final String SHOW_CUSTOMIZED_RESOLVER =
+                "android.permission.SHOW_CUSTOMIZED_RESOLVER";
+        public static final String MONITOR_STICKY_MODIFIER_STATE =
+                "android.permission.MONITOR_STICKY_MODIFIER_STATE";
+        public static final String USE_ON_DEVICE_INTELLIGENCE =
+                "android.permission.USE_ON_DEVICE_INTELLIGENCE";
+        public static final String BIND_ON_DEVICE_INTELLIGENCE_SERVICE =
+                "android.permission.BIND_ON_DEVICE_INTELLIGENCE_SERVICE";
+        public static final String BIND_ON_DEVICE_SANDBOXED_INFERENCE_SERVICE =
+                "android.permission.BIND_ON_DEVICE_SANDBOXED_INFERENCE_SERVICE";
+        public static final String START_ACTIVITIES_FROM_SDK_SANDBOX =
+                "android.permission.START_ACTIVITIES_FROM_SDK_SANDBOX";
+        public static final String SYNC_FLAGS =
+                "android.permission.SYNC_FLAGS";
+        public static final String WRITE_FLAGS =
+                "android.permission.WRITE_FLAGS";
+        public static final String GET_BINDING_UID_IMPORTANCE =
+                "android.permission.GET_BINDING_UID_IMPORTANCE";
+        public static final String MANAGE_DISPLAYS =
+                "android.permission.MANAGE_DISPLAYS";
+        public static final String PREPARE_FACTORY_RESET =
+                "android.permission.PREPARE_FACTORY_RESET";
+        public static final String OVERRIDE_SYSTEM_KEY_BEHAVIOR_IN_FOCUSED_WINDOW =
+                "android.permission.OVERRIDE_SYSTEM_KEY_BEHAVIOR_IN_FOCUSED_WINDOW";
+        public static final String RECEIVE_SENSITIVE_NOTIFICATIONS =
+                "android.permission.RECEIVE_SENSITIVE_NOTIFICATIONS";
+        public static final String GET_BACKGROUND_INSTALLED_PACKAGES =
+                "android.permission.GET_BACKGROUND_INSTALLED_PACKAGES";
+        public static final String READ_SYSTEM_GRAMMATICAL_GENDER =
+                "android.permission.READ_SYSTEM_GRAMMATICAL_GENDER";
+        public static final String EMERGENCY_INSTALL_PACKAGES =
+                "android.permission.EMERGENCY_INSTALL_PACKAGES";
+        public static final String RESTRICT_DISPLAY_MODES =
+                "android.permission.RESTRICT_DISPLAY_MODES";
+        public static final String SCREEN_TIMEOUT_OVERRIDE =
+                "android.permission.SCREEN_TIMEOUT_OVERRIDE";
+        public static final String SETUP_FSVERITY =
+                "android.permission.SETUP_FSVERITY";
+        // New internal permissions as of Android 15
+        public static final String MANAGE_DEVICE_POLICY_THREAD_NETWORK =
+                "android.permission.MANAGE_DEVICE_POLICY_THREAD_NETWORK";
+        public static final String MANAGE_DEVICE_POLICY_ASSIST_CONTENT =
+                "android.permission.MANAGE_DEVICE_POLICY_ASSIST_CONTENT";
+        public static final String MANAGE_DEVICE_POLICY_AUDIT_LOGGING =
+                "android.permission.MANAGE_DEVICE_POLICY_AUDIT_LOGGING";
+        public static final String QUERY_DEVICE_STOLEN_STATE =
+                "android.permission.QUERY_DEVICE_STOLEN_STATE";
+        public static final String MANAGE_DEVICE_POLICY_CONTENT_PROTECTION =
+                "android.permission.MANAGE_DEVICE_POLICY_CONTENT_PROTECTION";
+        public static final String MANAGE_DEVICE_POLICY_MANAGED_SUBSCRIPTIONS =
+                "android.permission.MANAGE_DEVICE_POLICY_MANAGED_SUBSCRIPTIONS";
+        public static final String MANAGE_DEVICE_POLICY_BLOCK_UNINSTALL =
+                "android.permission.MANAGE_DEVICE_POLICY_BLOCK_UNINSTALL";
+        public static final String MANAGE_DEVICE_POLICY_CAMERA_TOGGLE =
+                "android.permission.MANAGE_DEVICE_POLICY_CAMERA_TOGGLE";
+        public static final String MANAGE_DEVICE_POLICY_MICROPHONE_TOGGLE =
+                "android.permission.MANAGE_DEVICE_POLICY_MICROPHONE_TOGGLE";
+        public static final String MANAGE_DEVICE_POLICY_STORAGE_LIMIT =
+                "android.permission.MANAGE_DEVICE_POLICY_STORAGE_LIMIT";
+        public static final String EMBED_ANY_APP_IN_UNTRUSTED_MODE =
+                "android.permission.EMBED_ANY_APP_IN_UNTRUSTED_MODE";
+        public static final String ALWAYS_UPDATE_WALLPAPER =
+                "android.permission.ALWAYS_UPDATE_WALLPAPER";
+
     }
 
     /**

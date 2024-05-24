@@ -1024,6 +1024,24 @@ public class InstallPermissionTester extends BasePermissionTester {
             );
         }));
 
+        //"android.permission.DETECT_SCREEN_RECORDING",
+        //"android.permission.ACCESS_HIDDEN_PROFILES",
+        //"android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING"
+
+        //New install permissions for Android 15(VIC)
+        mPermissionTasks.put("android.permission.DETECT_SCREEN_RECORDING",
+                new PermissionTest(false, Build.VERSION_CODES.CUR_DEVELOPMENT, () -> {
+                    //TODO:yet implemented
+                }));
+        mPermissionTasks.put("android.permission.ACCESS_HIDDEN_PROFILES",
+                new PermissionTest(false, Build.VERSION_CODES.CUR_DEVELOPMENT, () -> {
+                    //TODO:yet implemented
+                }));
+        mPermissionTasks.put("android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING",
+                new PermissionTest(false, Build.VERSION_CODES.CUR_DEVELOPMENT, () -> {
+                    ///TODO:yet implemented
+                }));
+
         //Infeasible to test - can't raise security error as of now.
         //CREDENTIAL_MANAGER_QUERY_CANDIDATE_CREDENTIALS,
 
