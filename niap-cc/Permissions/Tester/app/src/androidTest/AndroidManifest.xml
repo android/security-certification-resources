@@ -15,17 +15,17 @@
  limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <!--
     <uses-sdk
         android:minSdkVersion="28"
-        android:targetSdkVersion="34" />
+        android:targetSdkVersion="35" />-->
 
     <instrumentation
         android:name="androidx.test.runner.AndroidJUnitRunner"
         android:functionalTest="false"
         android:handleProfiling="false"
         android:label="Tests for com.android.certifications.niap.permissions"
-        android:targetPackage="com.android.certifications.niap.permissions" />
+        android:targetPackage="com.android.certifications.niap.permissions.ac" />
 
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />

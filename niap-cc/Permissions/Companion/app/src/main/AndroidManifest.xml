@@ -511,6 +511,19 @@
         <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindWearableSensingServiceService"
             android:permission="android.permission.BIND_WEARABLE_SENSING_SERVICE"
             android:enabled="true" android:exported="true" />
+        <!-- Services for android V -->
+        <service android:name=".services.TestBindTvAdServiceService"
+            android:permission="android.permission.BIND_TV_AD_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindDomainSelectionServiceService"
+            android:permission="android.permission.BIND_DOMAIN_SELECTION_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindOnDeviceIntelligenceServiceService"
+            android:permission="android.permission.BIND_ON_DEVICE_INTELLIGENCE_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindOnDeviceSandboxedInferenceServiceService"
+            android:permission="android.permission.BIND_ON_DEVICE_SANDBOXED_INFERENCE_SERVICE"
+            android:enabled="true" android:exported="true" />
 
 
     </application>

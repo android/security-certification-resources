@@ -42,7 +42,7 @@ allprojects {
 // ./gradlew bindServiceCodeGen
 class BindServiceCodeGenPlugin:Plugin<Project> {
 
-    val PERMISSIONS = arrayListOf<String>(
+    val PERMISSIONS34 = arrayListOf<String>(
         "BIND_CALL_STREAMING_SERVICE",
         "BIND_CREDENTIAL_PROVIDER_SERVICE",
         "BIND_FIELD_CLASSIFICATION_SERVICE",
@@ -51,6 +51,12 @@ class BindServiceCodeGenPlugin:Plugin<Project> {
         "BIND_SATELLITE_SERVICE",
         "BIND_VISUAL_QUERY_DETECTION_SERVICE",
         "BIND_WEARABLE_SENSING_SERVICE"
+    )
+    val PERMISSIONS = arrayListOf<String>(
+        "BIND_TV_AD_SERVICE",
+        "BIND_DOMAIN_SELECTION_SERVICE",
+        "BIND_ON_DEVICE_INTELLIGENCE_SERVICE",
+        "BIND_ON_DEVICE_SANDBOXED_INFERENCE_SERVICE",
     )
 
     override fun apply(project:Project){

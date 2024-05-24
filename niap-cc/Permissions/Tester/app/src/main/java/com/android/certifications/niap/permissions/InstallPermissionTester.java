@@ -28,6 +28,7 @@ import static android.Manifest.permission.CREDENTIAL_MANAGER_QUERY_CANDIDATE_CRE
 import static android.Manifest.permission.CREDENTIAL_MANAGER_SET_ALLOWED_PROVIDERS;
 import static android.Manifest.permission.CREDENTIAL_MANAGER_SET_ORIGIN;
 import static android.Manifest.permission.DETECT_SCREEN_CAPTURE;
+import static android.Manifest.permission.DETECT_SCREEN_RECORDING;
 import static android.Manifest.permission.DISABLE_KEYGUARD;
 import static android.Manifest.permission.ENFORCE_UPDATE_OWNERSHIP;
 import static android.Manifest.permission.EXPAND_STATUS_BAR;
@@ -38,6 +39,7 @@ import static android.Manifest.permission.FOREGROUND_SERVICE_DATA_SYNC;
 import static android.Manifest.permission.FOREGROUND_SERVICE_HEALTH;
 import static android.Manifest.permission.FOREGROUND_SERVICE_LOCATION;
 import static android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK;
+import static android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING;
 import static android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION;
 import static android.Manifest.permission.FOREGROUND_SERVICE_MICROPHONE;
 import static android.Manifest.permission.FOREGROUND_SERVICE_PHONE_CALL;
@@ -1029,16 +1031,16 @@ public class InstallPermissionTester extends BasePermissionTester {
         //"android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING"
 
         //New install permissions for Android 15(VIC)
-        mPermissionTasks.put("android.permission.DETECT_SCREEN_RECORDING",
-                new PermissionTest(false, Build.VERSION_CODES.CUR_DEVELOPMENT, () -> {
-                    //TODO:yet implemented
+        mPermissionTasks.put(DETECT_SCREEN_RECORDING,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    //OK
                 }));
         mPermissionTasks.put("android.permission.ACCESS_HIDDEN_PROFILES",
                 new PermissionTest(false, Build.VERSION_CODES.CUR_DEVELOPMENT, () -> {
                     //TODO:yet implemented
                 }));
-        mPermissionTasks.put("android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING",
-                new PermissionTest(false, Build.VERSION_CODES.CUR_DEVELOPMENT, () -> {
+        mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PROCESSING,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     ///TODO:yet implemented
                 }));
 

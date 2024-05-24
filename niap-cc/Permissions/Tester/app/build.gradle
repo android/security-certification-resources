@@ -73,13 +73,17 @@ android {
             publish.dependsOn task
         }
     }
-    compileSdk 34
+    //compileSdk 34
+    compileSdkPreview "VanillaIceCream"
+
     //compileSdkVersion 34
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions"
-        minSdkVersion 29
+        targetSdkPreview "VanillaIceCream"
+        minSdk 21
+        minSdkPreview "21"
         //noinspection EditedTargetSdkVersion
-        targetSdkVersion 34
+        //targetSdkVersion 34
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
