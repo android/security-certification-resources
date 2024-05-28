@@ -35,6 +35,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -43,6 +44,7 @@ import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -57,7 +59,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.preference.PreferenceManager;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
@@ -87,6 +93,7 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -219,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        //WindowCompat.setDecorFitsSystemWindows(window, false)
         mContext = this;
         LinearLayout layout = findViewById(R.id.mainLayout);
         TextView mStatusTextView = new TextView(this);
@@ -354,10 +361,20 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
             });//onClick
             layout.addView(testButton);
             mTestButtons.add(testButton);
+            Window window = getWindow();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                window.setNavigationBarContrastEnforced(false);
+            }
+            WindowInsetsControllerCompat
+                    windowInsetsController = WindowCompat.getInsetsController(window, window.getDecorView());
+            windowInsetsController.setSystemBarsBehavior
+                    (WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);//systemBarsBehavior =
+                    //WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
 
 
-            Toolbar toolBar = findViewById(R.id.toolbar);
-            setSupportActionBar(toolBar);
+            //Toolbar toolBar = findViewById(R.id.toolbar);
+            //setSupportActionBar(toolBar);
             mBottomSheet = BottomSheetBehavior.from(layout);
             mBottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
 

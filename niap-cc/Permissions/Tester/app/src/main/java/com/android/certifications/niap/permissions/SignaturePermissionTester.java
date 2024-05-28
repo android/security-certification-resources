@@ -134,6 +134,7 @@ import android.os.storage.StorageManager;
 import android.print.PrintManager;
 import android.provider.BlockedNumberContract.BlockedNumbers;
 import android.provider.CallLog.Calls;
+import android.provider.E2eeContactKeysManager;
 import android.provider.Settings;
 import android.provider.Telephony;
 import android.provider.Telephony.Carriers;
@@ -5156,10 +5157,28 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // New signature permissions as of Android 15
         mPermissionTasks.put(permission.WRITE_VERIFICATION_STATE_E2EE_CONTACT_KEYS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-            mLogger.logDebug("Test case for android.permission.WRITE_VERIFICATION_STATE_E2EE_CONTACT_KEYS not implemented yet");
-            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-            //       Transacts.unregisterCoexCallback, (Object) null);
-         }));
+                    //mLogger.logDebug("Test case for android.permission.WRITE_VERIFICATION_STATE_E2EE_CONTACT_KEYS not implemented yet");
+                    if (TesterUtils.isAtLeastV()) {
+                        String LOOKUP_KEY = "0r1-423A2E4644502A2E50";
+                        String DEVICE_ID = "device_id_value";
+                        String ACCOUNT_ID = "+1 (555) 555-1234";
+
+                        E2eeContactKeysManager e2m = (E2eeContactKeysManager) mContext.getSystemService
+                                (Context.CONTACT_KEYS_SERVICE);
+                        //Put dummy data for test
+                        e2m.updateOrInsertE2eeContactKey(LOOKUP_KEY,DEVICE_ID,ACCOUNT_ID, new byte[]{0});
+                        //WRITE_CONTACT & this permission
+                        boolean b = e2m.updateE2eeContactKeyLocalVerificationState
+                                (LOOKUP_KEY,DEVICE_ID,ACCOUNT_ID,
+                                        E2eeContactKeysManager.VERIFICATION_STATE_VERIFIED);
+
+                        mLogger.logDebug("updateE2eeContactKeyLocalVerificationState result: " + b);
+                        if(!b){
+                            throw new SecurityException("call updateE2eeContactKeyLocalVerificainoState failed");
+                        }
+                    }
+
+                }));
         mPermissionTasks.put(permission.CAMERA_HEADLESS_SYSTEM_USER,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
         mLogger.logDebug("Test case for android.permission.CAMERA_HEADLESS_SYSTEM_USER not implemented yet");
@@ -5186,9 +5205,19 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
         mPermissionTasks.put(permission.THREAD_NETWORK_PRIVILEGED,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.THREAD_NETWORK_PRIVILEGED not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+                    //ThreadNetworkController is a hidden class.
+                    //mContext.getSystemService(ThreadNetworkManager.class)
+                    //.getAllThreadNetworkControllers().get(0)
+                    Class<?> threadNetworkConClazz = null;
+                    try {
+                        threadNetworkConClazz = Class.forName(
+                                "android.net.thread.ThreadNetworkManager");
+                        Object threadNetworkCon = mContext.
+                                getSystemService(threadNetworkConClazz);
+                        mLogger.logSystem(ReflectionUtils.checkDeclaredMethod(threadNetworkCon,"set").toString());
+                    } catch (Exception ex){
+                        ex.printStackTrace();
+                    }
         }));
         mPermissionTasks.put(permission.REGISTER_NSD_OFFLOAD_ENGINE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {

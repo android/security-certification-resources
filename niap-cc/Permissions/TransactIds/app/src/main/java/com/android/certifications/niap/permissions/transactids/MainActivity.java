@@ -135,8 +135,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Transaction APIs as of Android 34
-       // ProxyChecker.check(WINDOW_DESCRIPTOR, "requestAppKeyboardShortcuts");
+        // ProxyChecker.check(WINDOW_DESCRIPTOR, "requestAppKeyboardShortcuts");
         //ProxyChecker.check(EUICC_CONTROLLER_DESCRIPTOR,"getSupportedCountries");
+
+        ProxyChecker.check(WINDOW_DESCRIPTOR,Transacts.registerScreenRecordingCallback);
     }
 
     /*
@@ -744,6 +746,10 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(Transacts.WINDOW_DESCRIPTOR, Transacts.requestAppKeyboardShortcuts, descriptorTransacts);
             queryTransactId(EUICC_CONTROLLER_DESCRIPTOR, Transacts.getSupportedCountries, descriptorTransacts);
             queryTransactId(Transacts.UWB_DESCRIPTOR, Transacts.openRanging, descriptorTransacts);
+
+            //For Android 15
+            queryTransactId(WINDOW_DESCRIPTOR,Transacts.registerScreenRecordingCallback,descriptorTransacts);
+
 
             return writeTransactsSourceFile(descriptorTransacts);
         }

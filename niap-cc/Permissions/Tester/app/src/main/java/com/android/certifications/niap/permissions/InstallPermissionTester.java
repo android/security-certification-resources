@@ -105,6 +105,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.pm.LauncherApps;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
@@ -128,6 +129,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
+import android.os.UserHandle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.service.notification.StatusBarNotification;
@@ -135,6 +137,7 @@ import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
 import android.telephony.TelephonyManager;
+import android.window.IScreenRecordingCallback;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -165,6 +168,7 @@ import com.android.certifications.niap.permissions.services.FgDataSyncService;
 import com.android.certifications.niap.permissions.services.FgHealthService;
 import com.android.certifications.niap.permissions.services.FgLocationService;
 import com.android.certifications.niap.permissions.services.FgMediaPlaybackService;
+import com.android.certifications.niap.permissions.services.FgMediaProcessingService;
 import com.android.certifications.niap.permissions.services.FgMediaProjectionService;
 import com.android.certifications.niap.permissions.services.FgMicrophoneService;
 import com.android.certifications.niap.permissions.services.FgPhoneCallService;
@@ -173,6 +177,7 @@ import com.android.certifications.niap.permissions.services.FgSpecialUseService;
 import com.android.certifications.niap.permissions.services.FgSystemExemptedService;
 import com.android.certifications.niap.permissions.services.TestJobService;
 import com.android.certifications.niap.permissions.services.TestService;
+import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.TesterUtils;
 import com.android.certifications.niap.permissions.utils.Transacts;
 
@@ -1033,15 +1038,49 @@ public class InstallPermissionTester extends BasePermissionTester {
         //New install permissions for Android 15(VIC)
         mPermissionTasks.put(DETECT_SCREEN_RECORDING,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    //IScreenCallback Constructor might be hidden
+                    //If the error message is shown please execute below command from adb
+                    //adb shell settings put global hidden_api_policy  1
+                    IScreenRecordingCallback callback = new IScreenRecordingCallback() {
+                        @Override
+                        public IBinder asBinder() {
+                            return null;
+                        }
+                        @Override
+                        public void onScreenRecordingStateChanged(boolean visibleInScreenRecording) throws RemoteException {
+                            System.out.println("visibleInScreenRecording:"+visibleInScreenRecording);
+                        }
+                    };
                     //OK
+                    mTransacts.invokeTransact(Transacts.WINDOW_SERVICE,
+                            Transacts.WINDOW_DESCRIPTOR,
+                            Transacts.registerScreenRecordingCallback, callback);
                 }));
         mPermissionTasks.put("android.permission.ACCESS_HIDDEN_PROFILES",
-                new PermissionTest(false, Build.VERSION_CODES.CUR_DEVELOPMENT, () -> {
-                    //TODO:yet implemented
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    LauncherApps launcherApps = (LauncherApps)
+                            mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+                    //If the caller cannot access hidden profiles the method returns null
+                    Object intent = ReflectionUtils.invokeReflectionCall
+                            (launcherApps.getClass(),
+                                    "getPrivateSpaceSettingsIntent",
+                                    launcherApps,new Class[]{},null);
+                    if(intent == null){
+                      throw new SecurityException("Caller cannot access hidden profiles");
+                    }
                 }));
+
         mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PROCESSING,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    ///TODO:yet implemented
+                    ///New Foreground Service Permission
+                    Intent serviceIntent = new Intent(mActivity, FgMediaProcessingService.class);
+                    try {
+                        mActivity.startForegroundService(serviceIntent);
+                        tryBindingForegroundService(serviceIntent);
+                    } catch(Throwable t){
+                        mLogger.logDebug("FOREGROUND_SERVICE_MEDIA_PROCESSING", t);
+
+                    }
                 }));
 
         //Infeasible to test - can't raise security error as of now.

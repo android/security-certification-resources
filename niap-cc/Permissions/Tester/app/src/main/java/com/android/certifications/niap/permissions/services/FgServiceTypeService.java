@@ -54,7 +54,7 @@ abstract class FgServiceTypeService extends Service {
         NotificationManager m = (NotificationManager)
                 getSystemService(Context.NOTIFICATION_SERVICE);
         String channel_id = getClass().getSimpleName()+"_tester";
-        //System.out.println("starting fgservice =>"+channel_id);
+
         if(m.getNotificationChannel(channel_id ) == null){
             NotificationChannel channel  =
                     new NotificationChannel(channel_id , channel_id
@@ -64,7 +64,7 @@ abstract class FgServiceTypeService extends Service {
             m.createNotificationChannel(channel);
         }
         Notification nc = new NotificationCompat.Builder(this,channel_id)
-                .setContentText("content_text")
+                .setContentText("Don't worry. The foreground service for this permission is properly running.")
                 .setContentTitle(channel_id)
                 .setSmallIcon(R.drawable.ic_launcher_background).build();
         //live only 5 second

@@ -703,7 +703,7 @@ public class Transacts {
     public static final String getSupportedCountries = "getSupportedCountries";
 
     public static final String openRanging = "openRanging";
-
+    public static final String registerScreenRecordingCallback = "registerScreenRecordingCallback";
 
     /**
      * Contains a mapping from the descriptor to a Map of transact names to their IDs on the device
