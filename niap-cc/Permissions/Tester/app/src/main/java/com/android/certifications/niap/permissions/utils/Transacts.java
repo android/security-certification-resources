@@ -703,8 +703,16 @@ public class Transacts {
     public static final String getSupportedCountries = "getSupportedCountries";
 
     public static final String openRanging = "openRanging";
-    public static final String registerScreenRecordingCallback = "registerScreenRecordingCallback";
 
+    public static final String registerScreenRecordingCallback = "registerScreenRecordingCallback";
+    public static final String PDB_SERVICE = "persistent_data_block";//PersistentDataBlockService
+    public static final String PDB_DESCRIPTOR = "android.service.persistentdata.IPersistentDataBlockService";
+    public static final String deactivateFactoryResetProtection = "deactivateFactoryResetProtection";
+    public static final String getLastKnownCellIdentity = "getLastKnownCellIdentity";
+    public static final String SYSTEM_CONFIG_SERVICE =  "system_config";;//PersistentDataBlockService
+    public static final String SYSTEM_CONFIG_DESCRIPTOR = "android.os.ISystemConfig";
+    public static final String getEnhancedConfirmationTrustedPackages = "getEnhancedConfirmationTrustedPackages";
+    public static final String startObservingDevicePresence = "startObservingDevicePresence";
     /**
      * Contains a mapping from the descriptor to a Map of transact names to their IDs on the device
      * under test.

@@ -135,6 +135,7 @@ public class SdkV_Transacts extends Transacts {
         // Failed to obtain transactId of getVtDataUsage under com.android.internal.telephony.ITelephony: No field TRANSACTION_getVtDataUsage in class Lcom/android/internal/telephony/ITelephony$Stub; (declaration of 'com.android.internal.telephony.ITelephony$Stub' appears in /system/framework/framework.jar!classes5.dex)
         transactIds.put(enableLocationUpdates, 26);
         transactIds.put(requestIsSatelliteEnabled, 360);
+        transactIds.put(getLastKnownCellIdentity, 341);
         transactIds.put(requestSatelliteEnabled, 359);
         mDescriptorTransacts.put(TELEPHONY_DESCRIPTOR, transactIds);
 
@@ -233,12 +234,17 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(VR_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(getEnhancedConfirmationTrustedPackages, 8);
+        mDescriptorTransacts.put(SYSTEM_CONFIG_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(overridePid, 6);
         mDescriptorTransacts.put(RESOURCE_MANAGER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(createAssociation, 14);
         // Failed to obtain transactId of dispatchMessage under android.companion.ICompanionDeviceManager: No field TRANSACTION_dispatchMessage in class Landroid/companion/ICompanionDeviceManager$Stub; (declaration of 'android.companion.ICompanionDeviceManager$Stub' appears in /system/framework/framework.jar)
+        transactIds.put(startObservingDevicePresence, 11);
         mDescriptorTransacts.put(COMPANION_DEVICE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -265,6 +271,10 @@ public class SdkV_Transacts extends Transacts {
         transactIds = new HashMap<>();
         transactIds.put(isInputMethodPickerShownForTest, 14);
         mDescriptorTransacts.put(INPUTMETHOD_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
+        transactIds.put(deactivateFactoryResetProtection, 12);
+        mDescriptorTransacts.put(PDB_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(setDataSaverModeEnabled, 30);

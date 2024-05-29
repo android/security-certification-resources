@@ -129,6 +129,7 @@ import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.os.VibratorManager;
 import android.os.WorkSource;
 import android.os.storage.StorageManager;
 import android.print.PrintManager;
@@ -5228,45 +5229,91 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.QUARANTINE_APPS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
         mLogger.logDebug("Test case for android.permission.QUARANTINE_APPS not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+        //mLogger.logSystem(ReflectionUtils.checkDeclaredMethod(mPackageManager,"set").toString());
         }));
         mPermissionTasks.put(permission.VIBRATE_SYSTEM_CONSTANTS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
         mLogger.logDebug("Test case for android.permission.VIBRATE_SYSTEM_CONSTANTS not implemented yet");
         //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
         //       Transacts.unregisterCoexCallback, (Object) null);
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU){
+
+                VibratorManager vibratorManager = (VibratorManager)
+                        mContext.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
+
+                //mLogger.logSystem(">"+ReflectionUtils.checkDeclaredMethod(vibratorManager,"per").toString());
+                //ReflectionUtils.invokeReflectionCall(VibratorManager.class,
+                //        "performHapticFeedback",vibratorManager,
+                //        new Class<?>[]{int.class,boolean.class,String.class,boolean.class},0,true,"",true);
+                //Can we get system log here?
+            }
+
         }));
         mPermissionTasks.put(permission.CONFIGURE_FACTORY_RESET_PROTECTION,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.CONFIGURE_FACTORY_RESET_PROTECTION not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+                //mLogger.logSystem("into here");
+                mTransacts.invokeTransact(Transacts.PDB_SERVICE, Transacts.PDB_DESCRIPTOR,
+                       Transacts.deactivateFactoryResetProtection, (Object) "dummy_bytes".getBytes());
+
         }));
 
         mPermissionTasks.put(permission.ACCESS_LAST_KNOWN_CELL_ID,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.ACCESS_LAST_KNOWN_CELL_ID not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
-        }));
+                    mTransacts.invokeTransact(Transacts.TELEPHONY_SERVICE, Transacts.TELEPHONY_DESCRIPTOR,
+                            Transacts.getLastKnownCellIdentity, 0,mPackageName,"callingFeatureId");
+
+            }));
         mPermissionTasks.put(permission.ACCESS_HIDDEN_PROFILES_FULL,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.ACCESS_HIDDEN_PROFILES_FULL not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+                    //same as access_hidden_profiles install permission
+                    //those two permissions are treated as 'either is fine' condition.
+                    LauncherApps launcherApps = (LauncherApps)
+                            mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+                    //If the caller cannot access hidden profiles the method returns null
+                    Object intent = ReflectionUtils.invokeReflectionCall
+                            (launcherApps.getClass(),
+                                    "getPrivateSpaceSettingsIntent",
+                                    launcherApps,new Class[]{},(Object) null);
+                    if(intent == null){
+                        throw new SecurityException("Caller cannot access hidden profiles");
+                    }
+
         }));
         mPermissionTasks.put(permission.MANAGE_ENHANCED_CONFIRMATION_STATES,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
         mLogger.logDebug("Test case for android.permission.MANAGE_ENHANCED_CONFIRMATION_STATES not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+            mTransacts.invokeTransact(Transacts.SYSTEM_CONFIG_SERVICE, Transacts.SYSTEM_CONFIG_DESCRIPTOR,
+                   Transacts.getEnhancedConfirmationTrustedPackages, (Object) null);
         }));
         mPermissionTasks.put(permission.READ_DROPBOX_DATA,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.READ_DROPBOX_DATA not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+                    //Same as PEEK_DROPBOX_DATA
+                    if (mContext.checkSelfPermission(Manifest.permission.READ_LOGS)
+                            == PackageManager.PERMISSION_GRANTED &&
+                            mContext.checkSelfPermission(Manifest.permission.PACKAGE_USAGE_STATS)
+                                    == PackageManager.PERMISSION_GRANTED) {
+                        if(mContext.checkSelfPermission(permission.READ_DROPBOX_DATA)
+                                != PackageManager.PERMISSION_GRANTED)
+                            throw new BypassTestException(
+                                    "Bypass the check due to avoid unexpected behaviour. ");
+                    }
+
+                    long currTimeMs = System.currentTimeMillis();
+
+                    Parcel result= mTransacts.invokeTransact(Transacts.DROPBOX_SERVICE,
+                            Transacts.DROPBOX_DESCRIPTOR,
+                            Transacts.getNextEntry, "test-companion-tag", currTimeMs-(1000*60*60*8), mPackageName);
+
+                    if (result.readInt() == 0) {
+                        throw new SecurityException(
+                                "Received DropBoxManager.Entry is null during PEEK_DROPBOX_DATA "
+                                        + "test. Please check you surely executed companion app before testing.");
+                    }
+                    DropBoxManager.Entry entry = DropBoxManager.Entry.CREATOR.createFromParcel(
+                            result);
+
+                    mLogger.logDebug(
+                            "Successfully parsed entry from parcel: " + entry.getText(100));
         }));
         mPermissionTasks.put(permission.ACCESSIBILITY_MOTION_EVENT_OBSERVING,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
@@ -5277,15 +5324,37 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.LAUNCH_PERMISSION_SETTINGS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.LAUNCH_PERMISSION_SETTINGS not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+                //The action may affect to ui
+                String ACTION_MANAGE_APP_PERMISSIONS = "android.intent.action.MANAGE_APP_PERMISSIONS";
+                Intent intent = new Intent(ACTION_MANAGE_APP_PERMISSIONS);
+                intent.setAction("android.settings.APP_PERMISSIONS_SETTINGS");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(intent);
+
         }));
         mPermissionTasks.put(permission.REQUEST_OBSERVE_DEVICE_UUID_PRESENCE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.REQUEST_OBSERVE_DEVICE_UUID_PRESENCE not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+           //gen ObservingDevicePresenceRequest from Builder
+            try {
+                Class<?> clazzOdprBuilder = null;
+                clazzOdprBuilder = Class.forName("android.companion.ObservingDevicePresenceRequest$Builder");
+                Constructor constructor = clazzOdprBuilder.getConstructor();
+                Object builderObj = constructor.newInstance();
+                ReflectionUtils.invokeReflectionCall(
+                        builderObj.getClass(),
+                        "setUuid",builderObj,new Class[]{ParcelUuid.class},
+                        ParcelUuid.fromString("00000000-0000-1000-8000-00805F9B34FB"));
+
+                Object odprParams =
+                        invokeReflectionCall(clazzOdprBuilder, "build", builderObj, new Class[]{});
+
+                mTransacts.invokeTransact(
+                        Transacts.COMPANION_DEVICE_SERVICE, Transacts.COMPANION_DEVICE_DESCRIPTOR,
+                        Transacts.startObservingDevicePresence, odprParams,mPackageName,mUid);
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+
         }));
         mPermissionTasks.put(permission.USE_COMPANION_TRANSPORTS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
