@@ -711,7 +711,15 @@ public class Transacts {
 
     /* For Android 35*/
     public static final String registerScreenRecordingCallback="registerScreenRecordingCallback";
-
+    public static final String PDB_SERVICE = "persistent_data_block";//PersistentDataBlockService
+    public static final String PDB_DESCRIPTOR = "android.service.persistentdata.IPersistentDataBlockService";
+    public static final String deactivateFactoryResetProtection = "deactivateFactoryResetProtection";
+    //ITelephony.getLastKnownCellIdentity
+    public static final String getLastKnownCellIdentity = "getLastKnownCellIdentity";
+    public static final String SYSTEM_CONFIG_SERVICE =  "system_config";;//PersistentDataBlockService
+    public static final String SYSTEM_CONFIG_DESCRIPTOR = "android.os.ISystemConfig";
+    public static final String getEnhancedConfirmationTrustedPackages = "getEnhancedConfirmationTrustedPackages";
+    public static final String startObservingDevicePresence ="startObservingDevicePresence";
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an
      * extension of the Transacts class for the Permission Test Tool.

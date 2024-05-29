@@ -19,6 +19,7 @@ package com.android.certifications.niap.permissions.transactids;
 import static com.android.certifications.niap.permissions.transactids.Transacts.ACTIVITY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.AUDIO_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.CLIPBOARD_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.COMPANION_DEVICE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.DEVICE_POLICY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.DISPLAY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.EUICC_CONTROLLER_DESCRIPTOR;
@@ -27,6 +28,7 @@ import static com.android.certifications.niap.permissions.transactids.Transacts.
 import static com.android.certifications.niap.permissions.transactids.Transacts.PACKAGE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.POWER_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.ROLE_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.SYSTEM_CONFIG_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.TELEPHONY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.TRANSACT_PREFIX;
 import static com.android.certifications.niap.permissions.transactids.Transacts.WINDOW_DESCRIPTOR;
@@ -109,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(isAtLeastV()){
-            sClassName = deviceName + "ApiLevel35Transacts";
+            sClassName = "SdkV_Transacts";//deviceName + "ApiLevel35Transacts";
         } else {
             sClassName = deviceName + "ApiLevel" + Build.VERSION.SDK_INT + "Transacts";
         }
@@ -749,9 +751,13 @@ public class MainActivity extends AppCompatActivity {
 
             //For Android 15
             queryTransactId(WINDOW_DESCRIPTOR,Transacts.registerScreenRecordingCallback,descriptorTransacts);
-
+            queryTransactId(Transacts.PDB_DESCRIPTOR,Transacts.deactivateFactoryResetProtection,descriptorTransacts);
+            queryTransactId(TELEPHONY_DESCRIPTOR,Transacts.getLastKnownCellIdentity,descriptorTransacts);
+            queryTransactId(SYSTEM_CONFIG_DESCRIPTOR,Transacts.getEnhancedConfirmationTrustedPackages,descriptorTransacts);
+            queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.startObservingDevicePresence,descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
+
         }
 
         /**
