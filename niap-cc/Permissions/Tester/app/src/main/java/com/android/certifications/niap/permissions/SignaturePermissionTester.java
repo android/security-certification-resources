@@ -65,6 +65,7 @@ import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
@@ -82,6 +83,7 @@ import android.content.pm.ResolveInfo;
 import android.content.pm.ShortcutManager;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.hardware.biometrics.BiometricPrompt;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
@@ -92,7 +94,12 @@ import android.health.connect.aidl.IMigrationCallback;
 import android.health.connect.migration.MigrationException;
 import android.location.LocationManager;
 import android.media.AudioManager;
+import android.media.IMediaRouter2Manager;
 import android.media.MediaRecorder;
+import android.media.MediaRoute2Info;
+import android.media.RouteDiscoveryPreference;
+import android.media.RouteListingPreference;
+import android.media.RoutingSessionInfo;
 import android.media.session.MediaSessionManager;
 import android.net.ConnectivityManager;
 import android.net.ConnectivityManager.NetworkCallback;
@@ -109,6 +116,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.os.CancellationSignal;
 import android.os.DropBoxManager;
 import android.os.Environment;
 import android.os.Handler;
@@ -5358,45 +5366,126 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
         mPermissionTasks.put(permission.USE_COMPANION_TRANSPORTS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.USE_COMPANION_TRANSPORTS not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+                final int MESSAGE_REQUEST_PING = 0x63807378;
+                mTransacts.invokeTransact(
+                        Transacts.COMPANION_DEVICE_SERVICE, Transacts.COMPANION_DEVICE_DESCRIPTOR,
+                        Transacts.sendMessage,MESSAGE_REQUEST_PING, new byte[]{0}, new int[]{0});
         }));
         mPermissionTasks.put(permission.MEDIA_ROUTING_CONTROL,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.MEDIA_ROUTING_CONTROL not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+            IMediaRouter2Manager manager = new IMediaRouter2Manager() {
+                @Override
+                public void notifySessionCreated(int requestId, RoutingSessionInfo session) throws RemoteException {
+
+                }
+                @Override
+                public void notifySessionUpdated(RoutingSessionInfo session) throws RemoteException {
+
+                }
+                @Override
+                public void notifySessionReleased(RoutingSessionInfo session) throws RemoteException {
+
+                }
+                @Override
+                public void notifyDiscoveryPreferenceChanged(String packageName, RouteDiscoveryPreference discoveryPreference) throws RemoteException {
+
+                }
+                @Override
+                public void notifyRouteListingPreferenceChange(String packageName, RouteListingPreference routeListingPreference) throws RemoteException {
+
+                }
+                @Override
+                public void notifyRoutesUpdated(List<MediaRoute2Info> routes) throws RemoteException {
+
+                }
+                @Override
+                public void notifyRequestFailed(int requestId, int reason) throws RemoteException {
+
+                }
+                @Override
+                public void invalidateInstance() throws RemoteException {
+
+                }
+                @Override
+                public IBinder asBinder() {
+                    return new Binder();
+                }
+            };
+            mTransacts.invokeTransact(Transacts.MEDIA_ROUTER_SERVICE, Transacts.MEDIA_ROUTER_DESCRIPTOR,
+                Transacts.registerManager,manager,mPackageName);
         }));
         mPermissionTasks.put(permission.REPORT_USAGE_STATS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.REPORT_USAGE_STATS not implemented yet");
-            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-            //       Transacts.unregisterCoexCallback, (Object) null);
+            mTransacts.invokeTransact(Transacts.USAGE_STATS_SERVICE, Transacts.USAGE_STATS_DESCRIPTOR,
+                   Transacts.reportChooserSelection, mPackageName,mUid,"text/html",
+                    new String[]{"annotation-1"},"action");
         }));
         mPermissionTasks.put(permission.SET_BIOMETRIC_DIALOG_ADVANCED,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-            mLogger.logDebug("Test case for android.permission.SET_BIOMETRIC_DIALOG_ADVANCED not implemented yet");
-            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-            //       Transacts.unregisterCoexCallback, (Object) null);
+                //mLogger.logDebug("Test case for android.permission.SET_BIOMETRIC_DIALOG_ADVANCED not implemented yet");
+                //NOTE :
+                //Conflict to USE_BIOMETRIC permission
+                //You should put below in noperm/AndroidManifest.xml to test
+                //<uses-permission android:name="android.permission.USE_BIOMETRIC" />
+                if(Build.VERSION.SDK_INT>28) {
+                    BiometricPrompt.Builder bmBuilder = new BiometricPrompt.Builder(mContext)
+                            .setTitle("a").setNegativeButton("text", mContext.getMainExecutor(), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            });//.setLo
+                    ReflectionUtils.invokeReflectionCall(BiometricPrompt.Builder.class,
+                            "setLogoDescription", bmBuilder, new Class<?>[]{String.class},
+                            "dummy-logo-desription");
+                    BiometricPrompt bmPrompt = bmBuilder.build();
+                    bmPrompt.authenticate(new CancellationSignal(),
+                            mContext.getMainExecutor()
+                            , new BiometricPrompt.AuthenticationCallback() {
+                                @Override
+                                public void onAuthenticationError(int errorCode, CharSequence errString) {
+                                    super.onAuthenticationError(errorCode, errString);
+                                }
+                            }
+                    );
+                    //bmBuilder.get
+                    mLogger.logSystem(
+                            ReflectionUtils.checkDeclaredMethod(bmBuilder, "setLogo").toString());
+                }
         }));
         mPermissionTasks.put(permission.RECORD_SENSITIVE_CONTENT,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
             mLogger.logDebug("Test case for android.permission.RECORD_SENSITIVE_CONTENT not implemented yet");
             //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
             //       Transacts.unregisterCoexCallback, (Object) null);
+
         }));
         mPermissionTasks.put(permission.ACCESS_SMARTSPACE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-            mLogger.logDebug("Test case for android.permission.ACCESS_SMARTSPACE not implemented yet");
-            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-            //       Transacts.unregisterCoexCallback, (Object) null);
+                    // Regard same as MANAGE_SMARTSPACE
+                    // Note this is fragile since the implementation of SmartspaceSessionId can
+                    // change in the future, but since there is no way to construct an instance
+                    // of SmartspaceSessionId this at least allows the test to proceed.
+                    Parcelable smartspaceId = new Parcelable() {
+                        @Override
+                        public int describeContents() {
+                            return 0;
+                        }
+
+                        @Override
+                        public void writeToParcel(Parcel parcel, int i) {
+                            parcel.writeString("test-smartspace-id");
+                            parcel.writeTypedObject(UserHandle.getUserHandleForUid(mUid), 0);
+                        }
+                    };
+                    mTransacts.invokeTransact(Transacts.SMART_SPACE_SERVICE,
+                            Transacts.SMART_SPACE_DESCRIPTOR, Transacts.destroySmartspaceSession, smartspaceId);
         }));
         mPermissionTasks.put(permission.ACCESS_CONTEXTUAL_SEARCH,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-            mLogger.logDebug("Test case for android.permission.ACCESS_CONTEXTUAL_SEARCH not implemented yet");
-            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-            //       Transacts.unregisterCoexCallback, (Object) null);
+            int ENTRYPOINT_LONG_PRESS_HOME = 2;
+            mTransacts.invokeTransact(Transacts.CONTEXTUAL_SEARCH_SERVICE, Transacts.CONTEXTUAL_SEARCH_DESCRIPTOR,
+                   Transacts.startContextualSearch, (Object) ENTRYPOINT_LONG_PRESS_HOME);
         }));
         mPermissionTasks.put(permission.RECEIVE_SANDBOX_TRIGGER_AUDIO,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
@@ -5406,9 +5495,16 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
         mPermissionTasks.put(permission.SET_THEME_OVERLAY_CONTROLLER_READY,
                     new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-            mLogger.logDebug("Test case for android.permission.SET_THEME_OVERLAY_CONTROLLER_READY not implemented yet");
-            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-            //       Transacts.unregisterCoexCallback, (Object) null);
+                    //mLogger.logDebug("Test case for android.permission.SET_THEME_OVERLAY_CONTROLLER_READY not implemented yet");
+                     //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null)
+                    //setThemeOverlayReadymLogger.logSystem(ReflectionUtils.checkDeclaredMethod(mActivityManager,"setTheme").toString());
+                    //mActivityManager.setThemeOverlayControllerReady(true);
+                    //Flags.setHomeDelay should be false to chek it and it is not allowed to automotive
+                    //com.android.systemui.shared.Flags.enableHomeDelay;
+                    ReflectionUtils.invokeReflectionCall(ActivityManager.class,
+                            "setThemeOverlayReady",mActivityManager,
+                            new Class<?>[]{int.class},mUid);
         }));
         mPermissionTasks.put(permission.SHOW_CUSTOMIZED_RESOLVER,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {

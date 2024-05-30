@@ -713,6 +713,26 @@ public class Transacts {
     public static final String SYSTEM_CONFIG_DESCRIPTOR = "android.os.ISystemConfig";
     public static final String getEnhancedConfirmationTrustedPackages = "getEnhancedConfirmationTrustedPackages";
     public static final String startObservingDevicePresence = "startObservingDevicePresence";
+    public static final String getAllAssociationsForUser = "getAllAssociationsForUser";
+    public static final String addOnTransportsChangedListener = "addOnTransportsChangedListener";
+    public static final String removeOnTransportsChangedListener = "removeOnTransportsChangedListener";
+    public static final String sendMessage = "sendMessage";
+    public static final String addOnMessageReceivedListener = "addOnMessageReceivedListener";
+
+    public static final String MEDIA_ROUTER_SERVICE = "media_router";//PersistentDataBlockService
+    public static final String MEDIA_ROUTER_DESCRIPTOR = "android.media.IMediaRouterService";
+    public static final String registerManager = "registerManager";
+    public static final String registerProxyRouter = "registerProxyRouter";
+
+    public static final String USAGE_STATS_SERVICE = "usagestats";//PersistentDataBlockService
+    public static final String USAGE_STATS_DESCRIPTOR = "android.app.usage.IUsageStatsManager";
+    public static final String reportChooserSelection = "reportChooserSelection";
+
+    public static final String CONTEXTUAL_SEARCH_SERVICE = "contextual_search";//PersistentDataBlockService
+    public static final String CONTEXTUAL_SEARCH_DESCRIPTOR = "android.app.contextualsearch.IContextualSearchManager";
+    public static final String startContextualSearch = "startContextualSearch";
+
+
     /**
      * Contains a mapping from the descriptor to a Map of transact names to their IDs on the device
      * under test.

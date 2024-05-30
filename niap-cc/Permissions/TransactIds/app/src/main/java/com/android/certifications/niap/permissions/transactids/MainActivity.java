@@ -20,17 +20,21 @@ import static com.android.certifications.niap.permissions.transactids.Transacts.
 import static com.android.certifications.niap.permissions.transactids.Transacts.AUDIO_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.CLIPBOARD_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.COMPANION_DEVICE_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.CONTEXTUAL_SEARCH_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.DEVICE_POLICY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.DISPLAY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.EUICC_CONTROLLER_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.INPUT_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.LOCK_SETTINGS_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.MEDIA_ROUTER_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.MOUNT_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.PACKAGE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.POWER_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.ROLE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.SYSTEM_CONFIG_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.TELEPHONY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.TRANSACT_PREFIX;
+import static com.android.certifications.niap.permissions.transactids.Transacts.USAGE_STATS_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.WINDOW_DESCRIPTOR;
 
 import android.content.Context;
@@ -755,6 +759,15 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(TELEPHONY_DESCRIPTOR,Transacts.getLastKnownCellIdentity,descriptorTransacts);
             queryTransactId(SYSTEM_CONFIG_DESCRIPTOR,Transacts.getEnhancedConfirmationTrustedPackages,descriptorTransacts);
             queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.startObservingDevicePresence,descriptorTransacts);
+            queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.getAllAssociationsForUser,descriptorTransacts);
+            queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.addOnMessageReceivedListener,descriptorTransacts);
+            queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.removeOnTransportsChangedListener,descriptorTransacts);
+            queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.addOnTransportsChangedListener,descriptorTransacts);
+            queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.sendMessage,descriptorTransacts);
+            queryTransactId(MEDIA_ROUTER_DESCRIPTOR,Transacts.registerManager,descriptorTransacts);
+            queryTransactId(MEDIA_ROUTER_DESCRIPTOR,Transacts.registerProxyRouter,descriptorTransacts);
+            queryTransactId(USAGE_STATS_DESCRIPTOR,Transacts.reportChooserSelection,descriptorTransacts);
+            queryTransactId(CONTEXTUAL_SEARCH_DESCRIPTOR,Transacts.startContextualSearch,descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
 

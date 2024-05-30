@@ -50,6 +50,10 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(GAME_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(reportChooserSelection, 13);
+        mDescriptorTransacts.put(USAGE_STATS_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(reportChangeByUid, 3);
         transactIds.put(removeOverridesOnReleaseBuilds, 14);
         transactIds.put(clearOverridesForTest, 18);
@@ -191,6 +195,10 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(PACKAGE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(startContextualSearch, 1);
+        mDescriptorTransacts.put(CONTEXTUAL_SEARCH_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         transactIds.put(getSubscriptionPlans, 20);
         transactIds.put(isUidNetworkingBlocked, 25);
         transactIds.put(getUidPolicy, 4);
@@ -243,8 +251,13 @@ public class SdkV_Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         transactIds.put(createAssociation, 14);
+        transactIds.put(removeOnTransportsChangedListener, 18);
         // Failed to obtain transactId of dispatchMessage under android.companion.ICompanionDeviceManager: No field TRANSACTION_dispatchMessage in class Landroid/companion/ICompanionDeviceManager$Stub; (declaration of 'android.companion.ICompanionDeviceManager$Stub' appears in /system/framework/framework.jar)
+        transactIds.put(addOnTransportsChangedListener, 17);
+        transactIds.put(sendMessage, 19);
+        transactIds.put(addOnMessageReceivedListener, 20);
         transactIds.put(startObservingDevicePresence, 11);
+        transactIds.put(getAllAssociationsForUser, 3);
         mDescriptorTransacts.put(COMPANION_DEVICE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -467,6 +480,11 @@ public class SdkV_Transacts extends Transacts {
         transactIds.put(addOnPermissionsChangeListener, 10);
         // Failed to obtain transactId of isAutoRevokeWhitelisted under android.permission.IPermissionManager: No field TRANSACTION_isAutoRevokeWhitelisted in class Landroid/permission/IPermissionManager$Stub; (declaration of 'android.permission.IPermissionManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
         mDescriptorTransacts.put(PERMISSION_MANAGER_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
+        transactIds.put(registerProxyRouter, 28);
+        transactIds.put(registerManager, 27);
+        mDescriptorTransacts.put(MEDIA_ROUTER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(getModuleProperties, 13);
