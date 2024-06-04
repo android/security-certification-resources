@@ -703,7 +703,7 @@ public class Transacts {
     public static final String getSupportedCountries = "getSupportedCountries";
 
     public static final String openRanging = "openRanging";
-
+    //Android 15
     public static final String registerScreenRecordingCallback = "registerScreenRecordingCallback";
     public static final String PDB_SERVICE = "persistent_data_block";//PersistentDataBlockService
     public static final String PDB_DESCRIPTOR = "android.service.persistentdata.IPersistentDataBlockService";
@@ -731,7 +731,26 @@ public class Transacts {
     public static final String CONTEXTUAL_SEARCH_SERVICE = "contextual_search";//PersistentDataBlockService
     public static final String CONTEXTUAL_SEARCH_DESCRIPTOR = "android.app.contextualsearch.IContextualSearchManager";
     public static final String startContextualSearch = "startContextualSearch";
+    //IInputManager
+    public static final String registerStickyModifierStateListener = "registerStickyModifierStateListener";
+    public static final String unregisterStickyModifierStateListener = "unregisterStickyModifierStateListener";
 
+    public static final String ON_DEVICE_INTELLIGENCE_SERVICE = "on_device_intelligence";//PersistentDataBlockService
+    public static final String ON_DEVICE_INTELLINGENCE_DESCRIPTOR = "android.app.ondeviceintelligence.IOnDeviceIntelligenceManager";
+    public static final String getVersion = "getVersion";
+    public static final String getFeature = "getFeature";
+    public static final String enableConnectedDisplay = "enableConnectedDisplay";
+    public static final String BACKGROUND_INSTALL_CONTROL_SERVICE = "background_install_control";;//PersistentDataBlockService
+    public static final String BACKGROUND_INSTALL_CONTROL_DESCRIPTOR = "android.content.pm.IBackgroundInstallControlService";
+    public static final String getBackgroundInstalledPackages = "getBackgroundInstalledPackages";
+    public static final String GRAMMATICAL_INFLECTION_SERVICE = "grammatical_inflection";//PersistentDataBlockService
+    public static final String GRAMMATICAL_INFLECTION_DESCRIPTOR = "android.app.IGrammaticalInflectionManager";
+    public static final String getSystemGrammaticalGender= "getSystemGrammaticalGender";
+    public static final String requestDisplayModes = "requestDisplayModes";
+    public static final String FILE_INTEGRITY_SERVICE = "file_integrity";//PersistentDataBlockService
+    public static final String FILE_INTEGRITY_DESCRIPTOR = "android.security.IFileIntegrityService";
+    public static final String setupFsverity= "setupFsverity";
+    public static final String createAuthToken="createAuthToken";
 
     /**
      * Contains a mapping from the descriptor to a Map of transact names to their IDs on the device
@@ -2594,6 +2613,7 @@ public class Transacts {
         } catch (ReflectiveOperationException e) {
             throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
         }
+        mLogger.logDebug("transactNam=>"+transactName);
         return invokeTransactWithCharSequence(binder, descriptor, transactName, useCharSequence,
                 parameters);
     }
@@ -2635,7 +2655,7 @@ public class Transacts {
                 //if(parameter != null)
                 //mLogger.logDebug(parameter.getClass().toString());
                 //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(parameter,"").toString());
-
+                //mLogger.logSystem("into here!!");
                 if (parameter instanceof CharSequence && useCharSequence) {
                     if (parameter == null) {
                         data.writeInt(0);
@@ -2657,7 +2677,7 @@ public class Transacts {
                     data.writeByteArray((byte[]) parameter);
                 } else if (parameter instanceof Proxy) {
                     ReflectionUtils.checkDeclaredMethod(parameter,"");
-                } else if (parameter instanceof IInterface) {
+                } else if (parameter instanceof IInterface ) {
                     data.writeStrongBinder(
                             parameter != null ? ((IInterface) parameter).asBinder() : null);
                 } else if (parameter instanceof IBinder) {

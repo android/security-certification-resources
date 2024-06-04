@@ -1064,7 +1064,7 @@ public class InstallPermissionTester extends BasePermissionTester {
                     Object intent = ReflectionUtils.invokeReflectionCall
                             (launcherApps.getClass(),
                                     "getPrivateSpaceSettingsIntent",
-                                    launcherApps,new Class[]{},null);
+                                    launcherApps,new Class[]{},(Object)null);
                     if(intent == null){
                       throw new SecurityException("Caller cannot access hidden profiles");
                     }

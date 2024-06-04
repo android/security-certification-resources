@@ -18,16 +18,21 @@ package com.android.certifications.niap.permissions.transactids;
 
 import static com.android.certifications.niap.permissions.transactids.Transacts.ACTIVITY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.AUDIO_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.BACKGROUND_INSTALL_CONTROL_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.BACKUP_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.CLIPBOARD_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.COMPANION_DEVICE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.CONTEXTUAL_SEARCH_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.DEVICE_POLICY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.DISPLAY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.EUICC_CONTROLLER_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.FILE_INTEGRITY_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.GRAMMATICAL_INFLECTION_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.INPUT_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.LOCK_SETTINGS_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.MEDIA_ROUTER_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.MOUNT_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.ON_DEVICE_INTELLINGENCE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.PACKAGE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.POWER_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.ROLE_DESCRIPTOR;
@@ -768,6 +773,16 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(MEDIA_ROUTER_DESCRIPTOR,Transacts.registerProxyRouter,descriptorTransacts);
             queryTransactId(USAGE_STATS_DESCRIPTOR,Transacts.reportChooserSelection,descriptorTransacts);
             queryTransactId(CONTEXTUAL_SEARCH_DESCRIPTOR,Transacts.startContextualSearch,descriptorTransacts);
+            queryTransactId(INPUT_DESCRIPTOR,Transacts.registerStickyModifierStateListener,descriptorTransacts);
+            queryTransactId(INPUT_DESCRIPTOR,Transacts.unregisterStickyModifierStateListener,descriptorTransacts);
+            queryTransactId(ON_DEVICE_INTELLINGENCE_DESCRIPTOR,Transacts.getVersion,descriptorTransacts);
+            queryTransactId(ON_DEVICE_INTELLINGENCE_DESCRIPTOR,Transacts.getFeature,descriptorTransacts);
+            queryTransactId(DISPLAY_DESCRIPTOR,Transacts.enableConnectedDisplay,descriptorTransacts);
+            queryTransactId(BACKGROUND_INSTALL_CONTROL_DESCRIPTOR,Transacts.getBackgroundInstalledPackages,descriptorTransacts);
+            queryTransactId(GRAMMATICAL_INFLECTION_DESCRIPTOR,Transacts.getSystemGrammaticalGender,descriptorTransacts);
+            queryTransactId(DISPLAY_DESCRIPTOR,Transacts.requestDisplayModes,descriptorTransacts);
+            queryTransactId(FILE_INTEGRITY_DESCRIPTOR,Transacts.setupFsverity,descriptorTransacts);
+            queryTransactId(FILE_INTEGRITY_DESCRIPTOR,Transacts.createAuthToken,descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
 

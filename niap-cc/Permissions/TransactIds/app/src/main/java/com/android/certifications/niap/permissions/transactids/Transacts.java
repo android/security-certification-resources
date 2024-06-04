@@ -738,8 +738,35 @@ public class Transacts {
     public static final String CONTEXTUAL_SEARCH_SERVICE = "contextual_search";//PersistentDataBlockService
     public static final String CONTEXTUAL_SEARCH_DESCRIPTOR = "android.app.contextualsearch.IContextualSearchManager";
     public static final String startContextualSearch = "startContextualSearch";
+    //IInputManager
+    public static final String registerStickyModifierStateListener = "registerStickyModifierStateListener";
+    public static final String unregisterStickyModifierStateListener = "unregisterStickyModifierStateListener";
+
+    public static final String ON_DEVICE_INTELLIGENCE_SERVICE = "on_device_intelligence";//PersistentDataBlockService
+    public static final String ON_DEVICE_INTELLINGENCE_DESCRIPTOR = "android.app.ondeviceintelligence.IOnDeviceIntelligenceManager";
+    public static final String getVersion = "getVersion";
+    public static final String getFeature = "getFeature";
+    public static final String enableConnectedDisplay = "enableConnectedDisplay";
+
+    public static final String BACKGROUND_INSTALL_CONTROL_SERVICE = "background_install_control";;//PersistentDataBlockService
+    public static final String BACKGROUND_INSTALL_CONTROL_DESCRIPTOR = "android.content.pm.IBackgroundInstallControlService";
+    public static final String getBackgroundInstalledPackages = "getBackgroundInstalledPackages";
+
+    public static final String GRAMMATICAL_INFLECTION_SERVICE = "grammatical_inflection";//PersistentDataBlockService
+    public static final String GRAMMATICAL_INFLECTION_DESCRIPTOR = "android.app.IGrammaticalInflectionManager";
+    public static final String getSystemGrammaticalGender= "getSystemGrammaticalGender";
+    //
+    public static final String requestDisplayModes = "requestDisplayModes";
+    //
+    public static final String FILE_INTEGRITY_SERVICE = "file_integrity";//PersistentDataBlockService
+    public static final String FILE_INTEGRITY_DESCRIPTOR = "android.security.IFileIntegrityService";
+    public static final String setupFsverity= "setupFsverity";
+    public static final String createAuthToken="createAuthToken";
+
+
 
     /**
+     * Mapping from the descriptor class to the constant variable name for use when writing an
      * Mapping from the descriptor class to the constant variable name for use when writing an
      * extension of the Transacts class for the Permission Test Tool.
      */

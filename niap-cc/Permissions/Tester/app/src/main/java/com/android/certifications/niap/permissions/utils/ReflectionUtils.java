@@ -65,6 +65,26 @@ public class ReflectionUtils {
         }
     }
 
+   /* public static Object invokeReflectionCall(Object targetObject, String methodName,
+                                               Class<?>[] parameterClasses, Object... parameters) {
+        invokeReflectionCall(targetObject.getClass(),methodName,targetObject,parameterClasses,parameters);
+    }*/
+
+    public static Object invokeReflectionCall(String className, String methodName,
+                                              Object targetObject, Class<?>[] parameterClasses, Object... parameters) {
+        try {
+            Class<?> targetClass = Class.forName(className);
+            Method method = targetClass.getMethod(methodName, parameterClasses);
+            return method.invoke(targetObject, parameters);
+        } catch (ReflectiveOperationException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof SecurityException) {
+                throw (SecurityException) cause;
+            } else {
+                throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
+            }
+        }
+    }
 
     public static Object stubFromInterface(String className)  {
         try {
