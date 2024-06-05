@@ -5332,9 +5332,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
         mPermissionTasks.put(permission.ACCESSIBILITY_MOTION_EVENT_OBSERVING,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.ACCESSIBILITY_MOTION_EVENT_OBSERVING not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+                //ProxyAccessibilityServiceConnection mProxyConnection;
+                //mProxyConnection.setInstalledAndEnabledServices(List<?> infos)
+                Object mProxyConnextion = ReflectionUtils.stubHiddenObject
+                        ("com.android.server.accessibility.ProxyAccessibilityServiceConnection");
         }));
 
         mPermissionTasks.put(permission.LAUNCH_PERMISSION_SETTINGS,
@@ -5501,7 +5502,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.RECEIVE_SANDBOX_TRIGGER_AUDIO,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
             mLogger.logDebug("Test case for android.permission.RECEIVE_SANDBOX_TRIGGER_AUDIO not implemented yet");
+            String name = AppOpsManager.permissionToOp("android.permission.RECEIVE_SANDBOX_TRIGGER_AUDIO");
+            if(name != null){
 
+            }
+            mLogger.logSystem("appop=>"+name);
+            /*invokeReflectionCall(mAppOpsManager.getClass(), "setMode", mAppOpsManager,
+                    new Class<?>[]{String.class, int.class, String.class, int.class},
+                    AppOpsManager.OPSTR_CAMERA, mAppInfo.uid, mPackageName,
+                    AppOpsManager.MODE_ALLOWED);*/
         }));
         mPermissionTasks.put(permission.SET_THEME_OVERLAY_CONTROLLER_READY,
                     new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
@@ -5614,8 +5623,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.GET_BINDING_UID_IMPORTANCE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
             mLogger.logDebug("Test case for android.permission.GET_BINDING_UID_IMPORTANCE not implemented yet");
-            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-            //       Transacts.unregisterCoexCallback, (Object) null);
+            mTransacts.invokeTransact(Transacts.ACTIVITY_SERVICE, Transacts.ACTIVITY_DESCRIPTOR,
+                   Transacts.getBindingUidProcessState, mUid, mPackageName);
         }));
         mPermissionTasks.put(permission.MANAGE_DISPLAYS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
@@ -5644,9 +5653,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
             }));
         mPermissionTasks.put(permission.OVERRIDE_SYSTEM_KEY_BEHAVIOR_IN_FOCUSED_WINDOW,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.OVERRIDE_SYSTEM_KEY_BEHAVIOR_IN_FOCUSED_WINDOW not implemented yet");
-            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-            //       Transacts.unregisterCoexCallback, (Object) null);
+                    //internal permission is not exposed
         }));
         mPermissionTasks.put(permission.RECEIVE_SENSITIVE_NOTIFICATIONS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
@@ -5674,7 +5681,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
         //       Transacts.unregisterCoexCallback, (Object) null);
          //           PackageInstal
-
+            //PackageInstaller.Session session = mPackageInstaller.createSession(
 
         }));
         mPermissionTasks.put(permission.RESTRICT_DISPLAY_MODES,

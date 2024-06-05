@@ -783,6 +783,8 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(DISPLAY_DESCRIPTOR,Transacts.requestDisplayModes,descriptorTransacts);
             queryTransactId(FILE_INTEGRITY_DESCRIPTOR,Transacts.setupFsverity,descriptorTransacts);
             queryTransactId(FILE_INTEGRITY_DESCRIPTOR,Transacts.createAuthToken,descriptorTransacts);
+            queryTransactId(DEVICE_POLICY_DESCRIPTOR,Transacts.isDevicePotentiallyStolen,descriptorTransacts);
+            queryTransactId(ACTIVITY_DESCRIPTOR,Transacts.getBindingUidProcessState,descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
 

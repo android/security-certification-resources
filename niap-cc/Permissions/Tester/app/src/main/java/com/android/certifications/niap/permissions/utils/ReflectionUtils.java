@@ -23,6 +23,7 @@ import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -142,6 +143,7 @@ public class ReflectionUtils {
         }
     }
 
+
     public static Object stubHiddenObject(String classname)  {
         try {
             Class<?> remoteCallbackClass = Class.forName(classname);
@@ -217,7 +219,19 @@ public class ReflectionUtils {
         }
         return a.stream().filter(str->str.startsWith(filter)).collect(Collectors.toList());
     }
-
+    public static List<String> checkDeclaredProperties(Object target,final String filter){
+        List<String> a = new ArrayList<>();
+        Class<?> clazz = target.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        mLogger.logSystem(fields.toString());
+        for(Field f : fields){
+            StringBuilder method = new StringBuilder(f.getName() + "(");
+            //Class<?>[] types = f.getType();
+            //or(Class<?> t:types) method.append(" ").append(t.);
+            a.add(method+"<"+f.getType()+">");
+        }
+        return a.stream().filter(str->str.startsWith(filter)).collect(Collectors.toList());
+    }
     public static List<String> checkDeclaredMethod(Class<?> clazz,final String f){
         List<String> a = new ArrayList<>();
         Method[] methods = clazz.getDeclaredMethods();

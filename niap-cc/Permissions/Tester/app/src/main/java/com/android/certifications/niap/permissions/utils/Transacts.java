@@ -751,7 +751,8 @@ public class Transacts {
     public static final String FILE_INTEGRITY_DESCRIPTOR = "android.security.IFileIntegrityService";
     public static final String setupFsverity= "setupFsverity";
     public static final String createAuthToken="createAuthToken";
-
+    public static final String isDevicePotentiallyStolen = "isDevicePotentiallyStolen";
+    public static final String getBindingUidProcessState = "getBindingUidProcessState";
     /**
      * Contains a mapping from the descriptor to a Map of transact names to their IDs on the device
      * under test.

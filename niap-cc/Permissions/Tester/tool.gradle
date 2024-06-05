@@ -67,7 +67,7 @@ ext {
         doLast {
             def src = new File("permissions.json").text;
             def json4 = new JsonSlurper().parseText(src)
-            testPlaceHodlers(json4.V, "", "signature")
+            testPlaceHodlers(json4.V, "", "internal")
         }
     }
 

@@ -30,6 +30,7 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.KeyguardManager;
 import android.app.PendingIntent;
+import android.app.WallpaperManager;
 import android.app.admin.DevicePolicyManager;
 import android.app.admin.SystemUpdatePolicy;
 import android.companion.AssociationRequest;
@@ -55,6 +56,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.UserManager;
 import android.provider.ContactsContract;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 
@@ -518,6 +520,49 @@ public class InternalPermissionTester extends BasePermissionTester {
                         }
                     }
                 }));
+
+        // New internal permissions as of Android
+
+        mPermissionTasks.put(permission.QUERY_DEVICE_STOLEN_STATE,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    mLogger.logDebug("Test case for android.permission.QUERY_DEVICE_STOLEN_STATE not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    mTransacts.invokeTransact(
+                            Transacts.DEVICE_POLICY_SERVICE,
+                            Transacts.DEVICE_POLICY_DESCRIPTOR,
+                            Transacts.isDevicePotentiallyStolen,mPackageName);
+
+                }));
+        mPermissionTasks.put(permission.EMBED_ANY_APP_IN_UNTRUSTED_MODE,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    mLogger.logDebug("Test case for android.permission.EMBED_ANY_APP_IN_UNTRUSTED_MODE not implemented yet");
+                   /* ReflectionUtils.
+                    final TaskFragment taskFragment = new TaskFragmentBuilder(mAtm)
+                            .setCreateParentTask()
+                            .createActivityCount(1)
+                            .build();*/
+                    //final ActivityRecord activity = taskFragment.getTopMostActivity();
+                }));
+        mPermissionTasks.put(permission.ALWAYS_UPDATE_WALLPAPER,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    //mLogger.logDebug("Test case for android.permission.ALWAYS_UPDATE_WALLPAPER not implemented yet");
+                     Object windowSession = ReflectionUtils.invokeReflectionCall(
+                            "android.view.WindowManagerGlobal",
+                            "getWindowSession",null,null);
+                     mLogger.logSystem(
+                             ReflectionUtils.checkDeclaredProperties(windowSession,"").toString());
+                     /*ReflectionUtils.invokeReflectionCall(
+                             "android.view.IWindowSession","sendWallpaperCommand",
+                             windowSession,new Class[]{
+                                     IBinder.class,
+                                     String.class, int.class,int.class,int.class,
+                                     Bundle.class,boolean.class},
+                                getActivityToken(), WallpaperManager.COMMAND_TAP,50,50,0,null,false);*/
+
+                }));
+
+
     }
 
     @Override

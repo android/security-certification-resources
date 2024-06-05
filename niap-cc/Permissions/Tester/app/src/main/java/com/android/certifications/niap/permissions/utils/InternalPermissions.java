@@ -235,7 +235,31 @@ public class InternalPermissions {
         public static final String READ_RESTRICTED_STATS =
                 "android.permission.READ_RESTRICTED_STATS";
 
-
+        // New internal permissions as of Android 15
+        public static final String MANAGE_DEVICE_POLICY_THREAD_NETWORK =
+                "android.permission.MANAGE_DEVICE_POLICY_THREAD_NETWORK";
+        public static final String MANAGE_DEVICE_POLICY_ASSIST_CONTENT =
+                "android.permission.MANAGE_DEVICE_POLICY_ASSIST_CONTENT";
+        public static final String MANAGE_DEVICE_POLICY_AUDIT_LOGGING =
+                "android.permission.MANAGE_DEVICE_POLICY_AUDIT_LOGGING";
+        public static final String QUERY_DEVICE_STOLEN_STATE =
+                "android.permission.QUERY_DEVICE_STOLEN_STATE";
+        public static final String MANAGE_DEVICE_POLICY_CONTENT_PROTECTION =
+                "android.permission.MANAGE_DEVICE_POLICY_CONTENT_PROTECTION";
+        public static final String MANAGE_DEVICE_POLICY_MANAGED_SUBSCRIPTIONS =
+                "android.permission.MANAGE_DEVICE_POLICY_MANAGED_SUBSCRIPTIONS";
+        public static final String MANAGE_DEVICE_POLICY_BLOCK_UNINSTALL =
+                "android.permission.MANAGE_DEVICE_POLICY_BLOCK_UNINSTALL";
+        public static final String MANAGE_DEVICE_POLICY_CAMERA_TOGGLE =
+                "android.permission.MANAGE_DEVICE_POLICY_CAMERA_TOGGLE";
+        public static final String MANAGE_DEVICE_POLICY_MICROPHONE_TOGGLE =
+                "android.permission.MANAGE_DEVICE_POLICY_MICROPHONE_TOGGLE";
+        public static final String MANAGE_DEVICE_POLICY_STORAGE_LIMIT =
+                "android.permission.MANAGE_DEVICE_POLICY_STORAGE_LIMIT";
+        public static final String EMBED_ANY_APP_IN_UNTRUSTED_MODE =
+                "android.permission.EMBED_ANY_APP_IN_UNTRUSTED_MODE";
+        public static final String ALWAYS_UPDATE_WALLPAPER =
+                "android.permission.ALWAYS_UPDATE_WALLPAPER";
 
     }
 }

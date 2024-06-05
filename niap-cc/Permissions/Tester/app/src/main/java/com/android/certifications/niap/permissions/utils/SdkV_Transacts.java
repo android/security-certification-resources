@@ -444,6 +444,7 @@ public class SdkV_Transacts extends Transacts {
         transactIds.put(bindBackupAgent, 93);
         transactIds.put(performIdleMaintenance, 170);
         transactIds.put(setDumpHeapDebugLimit, 188);
+        transactIds.put(getBindingUidProcessState, 258);
         transactIds.put(updateLockTaskPackages, 190);
         transactIds.put(stopAppForUser, 81);
         // Failed to obtain transactId of getGrantedUriPermissions under android.app.IActivityManager: No field TRANSACTION_getGrantedUriPermissions in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
@@ -577,6 +578,7 @@ public class SdkV_Transacts extends Transacts {
         transactIds.put(hasLockdownAdminConfiguredNetworks, 186);
         transactIds.put(setLockTaskPackages, 177);
         transactIds.put(setOrganizationName, 259);
+        transactIds.put(isDevicePotentiallyStolen, 369);
         transactIds.put(getPermittedInputMethodsAsUser, 146);
         transactIds.put(setApplicationExemptions, 382);
         transactIds.put(setDefaultSmsApplication, 125);

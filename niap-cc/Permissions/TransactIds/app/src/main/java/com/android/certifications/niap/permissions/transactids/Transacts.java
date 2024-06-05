@@ -763,8 +763,8 @@ public class Transacts {
     public static final String setupFsverity= "setupFsverity";
     public static final String createAuthToken="createAuthToken";
 
-
-
+    public static final String isDevicePotentiallyStolen = "isDevicePotentiallyStolen";
+    public static final String getBindingUidProcessState = "getBindingUidProcessState";
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an
      * Mapping from the descriptor class to the constant variable name for use when writing an
