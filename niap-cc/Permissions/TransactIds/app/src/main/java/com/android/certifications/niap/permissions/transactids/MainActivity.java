@@ -32,6 +32,7 @@ import static com.android.certifications.niap.permissions.transactids.Transacts.
 import static com.android.certifications.niap.permissions.transactids.Transacts.LOCK_SETTINGS_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.MEDIA_ROUTER_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.MOUNT_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.NSD_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.ON_DEVICE_INTELLINGENCE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.PACKAGE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.POWER_DESCRIPTOR;
@@ -785,6 +786,7 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(FILE_INTEGRITY_DESCRIPTOR,Transacts.createAuthToken,descriptorTransacts);
             queryTransactId(DEVICE_POLICY_DESCRIPTOR,Transacts.isDevicePotentiallyStolen,descriptorTransacts);
             queryTransactId(ACTIVITY_DESCRIPTOR,Transacts.getBindingUidProcessState,descriptorTransacts);
+            queryTransactId(NSD_DESCRIPTOR,Transacts.connect,descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
 

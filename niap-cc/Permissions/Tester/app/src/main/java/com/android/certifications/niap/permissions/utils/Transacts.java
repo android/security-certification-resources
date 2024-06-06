@@ -753,6 +753,11 @@ public class Transacts {
     public static final String createAuthToken="createAuthToken";
     public static final String isDevicePotentiallyStolen = "isDevicePotentiallyStolen";
     public static final String getBindingUidProcessState = "getBindingUidProcessState";
+    public static final String NSD_SERVICE = "servicediscovery";
+    public static final String NSD_DESCRIPTOR = "android.net.nsd.INsdManager";
+    public static final String connect = "connect";
+
+
     /**
      * Contains a mapping from the descriptor to a Map of transact names to their IDs on the device
      * under test.
@@ -2614,7 +2619,7 @@ public class Transacts {
         } catch (ReflectiveOperationException e) {
             throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
         }
-        mLogger.logDebug("transactNam=>"+transactName);
+        //mLogger.logDebug("transactNam=>"+transactName);
         return invokeTransactWithCharSequence(binder, descriptor, transactName, useCharSequence,
                 parameters);
     }

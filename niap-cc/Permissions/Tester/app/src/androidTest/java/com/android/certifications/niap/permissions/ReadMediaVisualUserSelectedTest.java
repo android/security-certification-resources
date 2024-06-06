@@ -30,10 +30,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.os.UserHandle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.ImageButton;
 
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;

@@ -13,6 +13,10 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(BACKGROUND_INSTALL_CONTROL_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
+        transactIds.put(connect, 1);
+        mDescriptorTransacts.put(NSD_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
         // Failed to obtain transactId of setTransactionState under android.ui.ISurfaceComposer: android.ui.ISurfaceComposer$Stub
         transactIds.put(bootFinished, 1);
         transactIds.put(showCpu, 1000);

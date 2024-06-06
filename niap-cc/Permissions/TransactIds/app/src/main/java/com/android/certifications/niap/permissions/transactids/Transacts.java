@@ -765,6 +765,12 @@ public class Transacts {
 
     public static final String isDevicePotentiallyStolen = "isDevicePotentiallyStolen";
     public static final String getBindingUidProcessState = "getBindingUidProcessState";
+
+    public static final String NSD_SERVICE = "servicediscovery";
+    public static final String NSD_DESCRIPTOR = "android.net.nsd.INsdManager";
+    public static final String connect = "connect";
+
+
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an
      * Mapping from the descriptor class to the constant variable name for use when writing an

@@ -42,6 +42,7 @@ import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.AppOpsManager;
 import android.app.BroadcastOptions;
+import android.app.Instrumentation;
 import android.app.KeyguardManager;
 import android.app.LocaleConfig;
 import android.app.LocaleManager;
@@ -114,6 +115,11 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.net.Uri;
 import android.net.VpnService;
+import android.net.nsd.DiscoveryRequest;
+import android.net.nsd.INsdManagerCallback;
+import android.net.nsd.INsdServiceConnector;
+import android.net.nsd.NsdManager;
+import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Binder;
@@ -187,6 +193,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.credentials.CreateCredentialRequest;
 import androidx.credentials.provider.ProviderCreateCredentialRequest;
 import androidx.preference.PreferenceManager;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.activities.MainActivity;
@@ -5221,9 +5228,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
         mPermissionTasks.put(permission.THREAD_NETWORK_PRIVILEGED,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    //ThreadNetworkController is a hidden class.
-                    //mContext.getSystemService(ThreadNetworkManager.class)
-                    //.getAllThreadNetworkControllers().get(0)
+
                     Class<?> threadNetworkConClazz = null;
                     try {
                         threadNetworkConClazz = Class.forName(
@@ -5235,12 +5240,121 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         ex.printStackTrace();
                     }
         }));
+
+        INsdManagerCallback nsd_cb = new INsdManagerCallback() {
+            @Override
+            public void onDiscoverServicesStarted(int listenerKey, DiscoveryRequest discoveryRequest) throws RemoteException {
+
+            }
+
+            @Override
+            public void onDiscoverServicesFailed(int listenerKey, int error) throws RemoteException {
+
+            }
+
+            @Override
+            public void onServiceFound(int listenerKey, NsdServiceInfo info) throws RemoteException {
+
+            }
+
+            @Override
+            public void onServiceLost(int listenerKey, NsdServiceInfo info) throws RemoteException {
+
+            }
+
+            @Override
+            public void onStopDiscoveryFailed(int listenerKey, int error) throws RemoteException {
+
+            }
+
+            @Override
+            public void onStopDiscoverySucceeded(int listenerKey) throws RemoteException {
+
+            }
+
+            @Override
+            public void onRegisterServiceFailed(int listenerKey, int error) throws RemoteException {
+
+            }
+
+            @Override
+            public void onRegisterServiceSucceeded(int listenerKey, NsdServiceInfo info) throws RemoteException {
+
+            }
+
+            @Override
+            public void onUnregisterServiceFailed(int listenerKey, int error) throws RemoteException {
+
+            }
+
+            @Override
+            public void onUnregisterServiceSucceeded(int listenerKey) throws RemoteException {
+
+            }
+
+            @Override
+            public void onResolveServiceFailed(int listenerKey, int error) throws RemoteException {
+
+            }
+
+            @Override
+            public void onResolveServiceSucceeded(int listenerKey, NsdServiceInfo info) throws RemoteException {
+
+            }
+
+            @Override
+            public void onStopResolutionFailed(int listenerKey, int error) throws RemoteException {
+
+            }
+
+            @Override
+            public void onStopResolutionSucceeded(int listenerKey) throws RemoteException {
+
+            }
+
+            @Override
+            public void onServiceInfoCallbackRegistrationFailed(int listenerKey, int error) throws RemoteException {
+
+            }
+
+            @Override
+            public void onServiceUpdated(int listenerKey, NsdServiceInfo info) throws RemoteException {
+
+            }
+
+            @Override
+            public void onServiceUpdatedLost(int listenerKey) throws RemoteException {
+
+            }
+
+            @Override
+            public void onServiceInfoCallbackUnregistered(int listenerKey) throws RemoteException {
+
+            }
+
+            @Override
+            public IBinder asBinder() {
+                return getActivityToken();
+            }
+        };
         mPermissionTasks.put(permission.REGISTER_NSD_OFFLOAD_ENGINE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.REGISTER_NSD_OFFLOAD_ENGINE not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
-        }));
+                    //Check Routine as it is like below.
+                    //=>INSDServiceConnector client = INSDManager.connect(INSdMangerCallback cb,booleanuseJava)
+                    //=>client.regsiterOffloadEnginge,unregisterOffloadEngine
+
+                    //The method is dependent on INTERNET permission.
+                    Parcel client_ = mTransacts.invokeTransact(Transacts.NSD_SERVICE, Transacts.NSD_DESCRIPTOR,
+                            Transacts.connect,nsd_cb ,false);
+                    //client_.re
+                    INsdServiceConnector o = client_.readParcelable(
+                            INsdServiceConnector.class.getClassLoader(),
+                            INsdServiceConnector.class
+                    );
+                    //client.readBundle();
+                    mLogger.logSystem("client:"+o);
+
+                }));
         mPermissionTasks.put(permission.QUARANTINE_APPS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
         mLogger.logDebug("Test case for android.permission.QUARANTINE_APPS not implemented yet");
@@ -5577,14 +5691,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
 
 
-        mPermissionTasks.put(permission.START_ACTIVITIES_FROM_SDK_SANDBOX,
-                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-            mLogger.logDebug("Test case for android.permission.START_ACTIVITIES_FROM_SDK_SANDBOX not implemented yet");
-            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-            //       Transacts.unregisterCoexCallback, (Object) null);
-                    //FeatureFlags
+        //permission.START_ACTIVITIES_FROM_SDK_SANDBOX.
+        //Implement this test as an insturmentaion test case.
 
-        }));
         mPermissionTasks.put(permission.SYNC_FLAGS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                   try {
