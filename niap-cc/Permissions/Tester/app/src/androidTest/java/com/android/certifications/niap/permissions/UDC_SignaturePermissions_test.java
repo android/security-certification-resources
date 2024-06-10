@@ -47,7 +47,9 @@ import org.junit.rules.ErrorCollector;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +89,15 @@ public class UDC_SignaturePermissions_test {
 
     int SYSTEM_UID = 1000;
 
+    @Test
+    public void TRIGGER_SHELL_PROFCOLLECT_UPLOAD_Test() {
+        runShellCommandTest(
+                "am broadcast --allow-background-activity-starts " +
+                        "-a com.android.shell.action.PROFCOLLECT_UPLOAD");
 
+    }
+
+    @Test
     public void EMERGENCY_INSTALL_PACKAGE_Test() {
 
         //Development
@@ -159,6 +169,49 @@ public class UDC_SignaturePermissions_test {
             }
         }
      }
+
+    /**
+     * Invokes the provided shell {@code command} as a permission test; a non-zero return code
+     * is treated as a test failure.
+     */
+    protected void runShellCommandTest(String command) {
+        int returnCode = runShellCommand(command);
+        if (returnCode != 0) {
+            throw new SecurityException(command + " failed with return code " + returnCode);
+        }
+    }
+
+    /**
+     * Invokes and logs the stdout / stderr of the provided shell {@code command}, returning the
+     * exit code from the command.
+     */
+    protected int runShellCommand(String command) {
+        try {
+            Log.d("tag","Attempting to run command " + command);
+            java.lang.Process process = Runtime.getRuntime().exec(command);
+            int returnCode = process.waitFor();
+            BufferedReader stdout = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()));
+            BufferedReader stderr = new BufferedReader(
+                    new InputStreamReader(process.getErrorStream()));
+            StringBuilder stdoutBuilder = new StringBuilder();
+            String line;
+            while ((line = stdout.readLine()) != null) {
+                stdoutBuilder.append(line + "\n");
+            }
+
+            StringBuilder stderrBuilder = new StringBuilder();
+            while ((line = stderr.readLine()) != null) {
+                stderrBuilder.append(line + "\n");
+            }
+            Log.d("tag","Process return code: " + returnCode);
+            Log.d("tag","Process stdout: " + stdoutBuilder.toString());
+            Log.d("tag","Process stderr: " + stderrBuilder.toString());
+            return returnCode;
+        } catch (Throwable e) {
+            throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
+        }
+    }
 }
 
 

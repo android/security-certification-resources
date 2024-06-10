@@ -43,6 +43,7 @@ import static com.android.certifications.niap.permissions.transactids.Transacts.
 import static com.android.certifications.niap.permissions.transactids.Transacts.TRANSACT_PREFIX;
 import static com.android.certifications.niap.permissions.transactids.Transacts.USAGE_STATS_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.WINDOW_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.addOnMessageReceivedListener;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
     private int ACTUAL_SDK_INT = Build.VERSION.SDK_INT;
     static {
         String deviceName = Build.DEVICE;
+
         if (TextUtils.isEmpty(deviceName)) {
             deviceName = "Device";
         } else {
@@ -124,7 +126,8 @@ public class MainActivity extends AppCompatActivity {
         if(isAtLeastV()){
             sClassName = "SdkV_Transacts";//deviceName + "ApiLevel35Transacts";
         } else {
-            sClassName = deviceName + "ApiLevel" + Build.VERSION.SDK_INT + "Transacts";
+            sClassName = "SdkV_Transacts";//deviceName + "ApiLevel35Transacts";
+            //sClassName = deviceName + "ApiLevel" + Build.VERSION.SDK_INT + "Transacts";
         }
     }
 
@@ -134,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         if(isAtLeastV()){
             ACTUAL_SDK_INT = 35;
         }
-
+        Log.d("tag","Launch SDK INT>"+ACTUAL_SDK_INT);
         setContentView(R.layout.activity_main);
         mContext = getApplicationContext();
         mStatusTextView = findViewById(R.id.statusTextView);

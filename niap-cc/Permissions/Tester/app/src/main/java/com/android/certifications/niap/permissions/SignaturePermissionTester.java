@@ -3877,6 +3877,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     // restarted.
                     mTransacts.invokeTransact(Transacts.WIFI_SERVICE, Transacts.WIFI_DESCRIPTOR,
                             Transacts.restartWifiSubsystem);
+
                 }));
 
         mPermissionTasks.put(permission.SCHEDULE_PRIORITIZED_ALARM,
@@ -4090,13 +4091,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.TRIGGER_SHELL_PROFCOLLECT_UPLOAD,
                 new PermissionTest(false, Build.VERSION_CODES.S_V2, () -> {
-
-                    //BackgroundThread.get().getThreadHandler().post(() -> {
-//                    Intent intent = new Intent()
-//                            .setPackage("com.android.shell")
-//                            .setAction("com.android.shell.action.PROFCOLLECT_UPLOAD")
-//                            .putExtra("filename", "reportname");
-//                    mContext.sendBroadcast(intent);
 
                     //behaviour changes?
                     runShellCommandTest(
@@ -5843,7 +5837,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     fmg = (FileIntegrityManager) mContext.getSystemService(Context.FILE_INTEGRITY_SERVICE);
                     try {
                         File file = File.createTempFile("authfd", ".tmp",mContext.getFilesDir());
-                        fmg.setupFsVerity(file);
+                        //fmg.setupFsVerity(file);
+                        mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(fmg,"setup").toString());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

@@ -149,7 +149,7 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(MOUNT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(isInputMethodPickerShownForTest, 14);
+        transactIds.put(isInputMethodPickerShownForTest, 16);
         mDescriptorTransacts.put(INPUTMETHOD_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -209,10 +209,10 @@ public class SdkV_Transacts extends Transacts {
         transactIds = new HashMap<>();
         transactIds.put(requestAppKeyboardShortcuts, 80);
         transactIds.put(createInputConsumer, 84);
-        transactIds.put(registerTaskFpsCallback, 135);
+        transactIds.put(registerTaskFpsCallback, 133);
         // Failed to obtain transactId of requestUserActivityNotification under android.view.IWindowManager: No field TRANSACTION_requestUserActivityNotification in class Landroid/view/IWindowManager$Stub; (declaration of 'android.view.IWindowManager$Stub' appears in /system/framework/framework.jar!classes4.dex)
         transactIds.put(clearWindowContentFrameStats, 76);
-        transactIds.put(registerScreenRecordingCallback, 151);
+        transactIds.put(registerScreenRecordingCallback, 149);
         transactIds.put(addKeyguardLockedStateListener, 33);
         transactIds.put(setRecentsVisibility, 70);
         transactIds.put(stopFreezingScreen, 26);
@@ -293,18 +293,18 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(NETWORK_STATS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setTouchCalibrationForInputDevice, 16);
-        transactIds.put(registerStickyModifierStateListener, 67);
-        transactIds.put(setKeyboardLayoutForInputDevice, 20);
-        transactIds.put(isInTabletMode, 26);
-        transactIds.put(monitorGestureInput, 41);
+        transactIds.put(setTouchCalibrationForInputDevice, 15);
+        transactIds.put(registerStickyModifierStateListener, 64);
+        transactIds.put(setKeyboardLayoutForInputDevice, 19);
+        transactIds.put(isInTabletMode, 25);
+        transactIds.put(monitorGestureInput, 38);
         // Failed to obtain transactId of addKeyboardLayoutForInputDevice under android.hardware.input.IInputManager: No field TRANSACTION_addKeyboardLayoutForInputDevice in class Landroid/hardware/input/IInputManager$Stub; (declaration of 'android.hardware.input.IInputManager$Stub' appears in /system/framework/framework.jar!classes2.dex)
-        transactIds.put(enableInputDevice, 5);
-        transactIds.put(registerKeyboardBacklightListener, 64);
-        transactIds.put(getModifierKeyRemapping, 24);
-        transactIds.put(unregisterStickyModifierStateListener, 68);
-        transactIds.put(tryPointerSpeed, 11);
-        transactIds.put(removePortAssociation, 43);
+        transactIds.put(enableInputDevice, 4);
+        transactIds.put(registerKeyboardBacklightListener, 61);
+        transactIds.put(getModifierKeyRemapping, 23);
+        transactIds.put(unregisterStickyModifierStateListener, 65);
+        transactIds.put(tryPointerSpeed, 10);
+        transactIds.put(removePortAssociation, 40);
         mDescriptorTransacts.put(INPUT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -326,8 +326,8 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(PLATFORM_COMPAT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(notifySystemEvent, 21);
-        transactIds.put(injectCamera, 17);
+        transactIds.put(notifySystemEvent, 20);
+        transactIds.put(injectCamera, 16);
         mDescriptorTransacts.put(CAMERA_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -650,7 +650,7 @@ public class SdkV_Transacts extends Transacts {
 
         transactIds = new HashMap<>();
         // Failed to obtain transactId of hideBiometricDialog under com.android.internal.statusbar.IStatusBarService: No field TRANSACTION_hideBiometricDialog in class Lcom/android/internal/statusbar/IStatusBarService$Stub; (declaration of 'com.android.internal.statusbar.IStatusBarService$Stub' appears in /system/framework/framework.jar!classes5.dex)
-        transactIds.put(onBiometricHelp, 48);
+        transactIds.put(onBiometricHelp, 49);
         mDescriptorTransacts.put(STATUS_BAR_DESCRIPTOR, transactIds);
     }
 }
