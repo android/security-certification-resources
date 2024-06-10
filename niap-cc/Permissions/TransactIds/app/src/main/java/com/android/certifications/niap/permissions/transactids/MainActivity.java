@@ -26,6 +26,7 @@ import static com.android.certifications.niap.permissions.transactids.Transacts.
 import static com.android.certifications.niap.permissions.transactids.Transacts.DEVICE_POLICY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.DISPLAY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.EUICC_CONTROLLER_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.FEATURE_FLAGS_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.FILE_INTEGRITY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.GRAMMATICAL_INFLECTION_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.INPUT_DESCRIPTOR;
@@ -787,6 +788,9 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(DEVICE_POLICY_DESCRIPTOR,Transacts.isDevicePotentiallyStolen,descriptorTransacts);
             queryTransactId(ACTIVITY_DESCRIPTOR,Transacts.getBindingUidProcessState,descriptorTransacts);
             queryTransactId(NSD_DESCRIPTOR,Transacts.connect,descriptorTransacts);
+            queryTransactId(FEATURE_FLAGS_DESCRIPTOR,Transacts.resetFlag,descriptorTransacts);
+            queryTransactId(FEATURE_FLAGS_DESCRIPTOR,Transacts.overrideFlag,descriptorTransacts);
+            queryTransactId(POWER_DESCRIPTOR,Transacts.isWakeLockLevelSupported,descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
 

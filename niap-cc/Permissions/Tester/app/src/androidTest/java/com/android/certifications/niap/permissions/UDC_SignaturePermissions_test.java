@@ -23,7 +23,9 @@ import android.app.Instrumentation;
 import android.app.UiAutomation;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
+import android.os.Parcelable;
 import android.os.UserHandle;
 import android.util.Log;
 
@@ -35,6 +37,7 @@ import com.android.certifications.niap.permissions.activities.MainActivity;
 import com.android.certifications.niap.permissions.activities.TestActivity;
 import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
+import com.android.certifications.niap.permissions.utils.Transacts;
 
 import org.junit.After;
 import org.junit.Before;
@@ -44,6 +47,7 @@ import org.junit.rules.ErrorCollector;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +55,7 @@ import java.util.List;
  * Instrumentation test : sandbox purpose
  */
 @RunWith(AndroidJUnit4.class)
-public class START_ACTIVITIES_FROM_SDK_SANDBOX_test {
+public class UDC_SignaturePermissions_test {
 
     @Rule
     public
@@ -83,8 +87,41 @@ public class START_ACTIVITIES_FROM_SDK_SANDBOX_test {
 
     int SYSTEM_UID = 1000;
 
-    @Test
-    public void runPermissionTest() {
+
+    public void EMERGENCY_INSTALL_PACKAGE_Test() {
+
+        //Development
+
+        List<String> not_granted = new ArrayList<String>();
+        if (checkSelfPermission(mContext,
+                SignaturePermissions.permission.EMERGENCY_INSTALL_PACKAGES)
+                != PackageManager.PERMISSION_GRANTED) {
+            not_granted.add(SignaturePermissions.permission.EMERGENCY_INSTALL_PACKAGES);
+        }
+        try {
+            String TEST_APP_PKG = "com.android.certifications.niap.permissions";
+            PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(
+                    PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+            params.setAppPackageName(TEST_APP_PKG);
+            PackageInstaller packageInstaller =
+                    mInstrumentation.getTargetContext().getPackageManager().getPackageInstaller();
+            int sessionId = packageInstaller.createSession(params);
+            //packageInstaller.
+            //Transacts mTransacts = Transacts.createTransactsForApiLevel(35);
+            //read from file
+
+            //Parcelable _packageInstallerSession =
+            //    mTransacts.invokeTransact(Transacts.INST)
+            //PackageInstaller.Session session = packageInstaller.openSession(sessionId);
+
+            //Log.d("tag","Installing " + TEST_APP_PKG);
+        } catch (IOException e) {
+
+        }
+
+    }
+        @Test
+    public void START_ACTIVITIES_FROM_SANDBOX_Test() {
 
         //Eval variant and determine expected result//
         List<String> not_granted = new ArrayList<String>();
@@ -92,7 +129,6 @@ public class START_ACTIVITIES_FROM_SDK_SANDBOX_test {
                 SignaturePermissions.permission.START_ACTIVITIES_FROM_SDK_SANDBOX)
                 != PackageManager.PERMISSION_GRANTED) {
             not_granted.add(SignaturePermissions.permission.START_ACTIVITIES_FROM_SDK_SANDBOX);
-            //not_granted.add(Manifest.permission.READ_MEDIA_IMAGES);
         }
 
         //Here's just a placeeholder to try new implementations.
@@ -105,9 +141,6 @@ public class START_ACTIVITIES_FROM_SDK_SANDBOX_test {
         try {
             mInstrumentation.startActivitySync(intent);
         } catch (RuntimeException ex){
-            //Log.d("Tag","not_granted>"+not_granted.size());
-            //Log.d("Tag",">"+ex.getMessage());
-            //Log.d("Tag",">"+ex.getCause().getMessage());
 
             String firstCause = ex.getMessage();
             String secondCause = ex.getCause().getMessage();

@@ -525,9 +525,10 @@ public class InternalPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.QUERY_DEVICE_STOLEN_STATE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    mLogger.logDebug("Test case for android.permission.QUERY_DEVICE_STOLEN_STATE not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    if(!TesterUtils.getAdminFlagByName("deviceTheftImplEnabled")){
+                        throw new BypassTestException(
+                                "To run this test, deviceTheftImplEnabled system flag should be enabled.Aborted");
+                    }
                     mTransacts.invokeTransact(
                             Transacts.DEVICE_POLICY_SERVICE,
                             Transacts.DEVICE_POLICY_DESCRIPTOR,

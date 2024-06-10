@@ -57,6 +57,7 @@ public class SdkV_Transacts extends Transacts {
         transactIds.put(reboot, 48);
         transactIds.put(isAmbientDisplaySuppressedForTokenByApp, 66);
         transactIds.put(acquireWakeLock, 1);
+        transactIds.put(isWakeLockLevelSupported, 10);
         transactIds.put(releaseLowPowerStandbyPorts, 46);
         // Failed to obtain transactId of setPowerSaveMode under android.os.IPowerManager: No field TRANSACTION_setPowerSaveMode in class Landroid/os/IPowerManager$Stub; (declaration of 'android.os.IPowerManager$Stub' appears in /system/framework/framework.jar!classes3.dex)
         transactIds.put(setDynamicPowerSaveHint, 26);
@@ -243,6 +244,11 @@ public class SdkV_Transacts extends Transacts {
         transactIds = new HashMap<>();
         transactIds.put(setBackupEnabled, 14);
         mDescriptorTransacts.put(BACKUP_DESCRIPTOR, transactIds);
+
+        transactIds = new HashMap<>();
+        transactIds.put(resetFlag, 6);
+        transactIds.put(overrideFlag, 5);
+        mDescriptorTransacts.put(FEATURE_FLAGS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(getFontConfig, 1);

@@ -1166,7 +1166,6 @@ public class InstallPermissionTester extends BasePermissionTester {
     public void runPermissionTestsByThreads(Consumer<Result> callback){
         Result.testerName = this.getClass().getSimpleName();
 
-        //mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
         List<String> permissions = mConfiguration.getInstallPermissions().orElse(
                 new ArrayList<>(mPermissionTasks.keySet()));
 
@@ -1242,7 +1241,6 @@ public class InstallPermissionTester extends BasePermissionTester {
                 mConnected.set(true);
                 binderSuccess.set(true);
                 mComponentName = name.getShortClassName();
-                //mLogger.logSystem("Hello Unlock!"+name);
                 TestBindService service = TestBindService.Stub.asInterface(binder);
                 try {
                     service.testMethod();

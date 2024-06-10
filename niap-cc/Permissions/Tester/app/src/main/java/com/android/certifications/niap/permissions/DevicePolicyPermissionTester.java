@@ -833,28 +833,33 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_AUDIT_LOGGING,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    mLogger.logDebug("Test case for android.permission.MANAGE_DEVICE_POLICY_AUDIT_LOGGING not implemented yet");
+                    //mLogger.logDebug("Test case for android.permission.MANAGE_DEVICE_POLICY_AUDIT_LOGGING not implemented yet");
+                    //Hidden Method
                     //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
                     //       Transacts.unregisterCoexCallback, (Object) null);
+
                 }));
 
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_CONTENT_PROTECTION,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    mLogger.logDebug("Test case for android.permission.MANAGE_DEVICE_POLICY_CONTENT_PROTECTION not implemented yet");
+                    //mLogger.logDebug("Test case for android.permission.MANAGE_DEVICE_POLICY_CONTENT_PROTECTION not implemented yet");
                     //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    //       Transacts.unregisterCoexCallback, (Object) null)
+                    int flag = 1 << 7;//See enterprisepolicy.java
+                    dpm.setContentProtectionPolicy(ADMIN_COMPONENT,flag);
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_MANAGED_SUBSCRIPTIONS,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    mLogger.logDebug("Test case for android.permission.MANAGE_DEVICE_POLICY_MANAGED_SUBSCRIPTIONS not implemented yet");
-                    //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-                    //       Transacts.unregisterCoexCallback, (Object) null);
+                    //mLogger.logDebug("Test case for android.permission.MANAGE_DEVICE_POLICY_MANAGED_SUBSCRIPTIONS not implemented yet");
+                    dpm.setUninstallBlocked(ADMIN_COMPONENT,mPackageName,true);
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_BLOCK_UNINSTALL,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     mLogger.logDebug("Test case for android.permission.MANAGE_DEVICE_POLICY_BLOCK_UNINSTALL not implemented yet");
+                    //Hidden method dpm.forceSetMaxPolicyStorageLimit
                     //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
                     //       Transacts.unregisterCoexCallback, (Object) null);
+
                 }));
         m.put(InternalPermissions.permission.MANAGE_DEVICE_POLICY_CAMERA_TOGGLE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {

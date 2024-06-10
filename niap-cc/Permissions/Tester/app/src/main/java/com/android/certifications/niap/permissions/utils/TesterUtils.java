@@ -29,6 +29,7 @@ import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.activities.LogListAdaptable;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 
 import java.lang.reflect.Constructor;
 import java.util.Locale;
@@ -43,6 +44,18 @@ public class TesterUtils {
 
     public static boolean isAtLeastV() {
         return Build.VERSION.SDK_INT >= 34 && isAtLeastPreReleaseCodename("VanillaIceCream", Build.VERSION.CODENAME);
+    }
+    public static boolean getSystemUiFlagByName(String name){
+        return (boolean) ReflectionUtils.invokeReflectionCall(
+                "com.android.systemui.shared.Flags",name,null,
+                new Class<?>[]{}
+        );
+    }
+    public static boolean getAdminFlagByName(String name){
+        return (boolean) ReflectionUtils.invokeReflectionCall(
+                "android.app.admin.flags.Flags",name,null,
+                new Class<?>[]{}
+        );
     }
 
     protected static boolean isAtLeastPreReleaseCodename(@NonNull String codename, @NonNull String buildCodename) {

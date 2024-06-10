@@ -769,7 +769,17 @@ public class Transacts {
     public static final String NSD_SERVICE = "servicediscovery";
     public static final String NSD_DESCRIPTOR = "android.net.nsd.INsdManager";
     public static final String connect = "connect";
+    //"com.android.packageinstaller"
+    public static final String PACKAGE_INSTALLER_SERVICE = "servicediscovery";
+    public static final String PACKAGE_INSTALLER_DESCRIPTOR = "android.content.pm.IPackageInstaller";
+    public static final String openSession = "openSession";
 
+    public static final String FEATURE_FLAGS_SERVICE = "feature_flags";
+    public static final String FEATURE_FLAGS_DESCRIPTOR = "android.flags.IFeatureFlags";
+    public static final String overrideFlag = "overrideFlag";
+    public static final String resetFlag = "resetFlag";
+
+    public static final String isWakeLockLevelSupported = "isWakeLockLevelSupported";
 
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an

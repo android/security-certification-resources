@@ -756,6 +756,11 @@ public class Transacts {
     public static final String NSD_SERVICE = "servicediscovery";
     public static final String NSD_DESCRIPTOR = "android.net.nsd.INsdManager";
     public static final String connect = "connect";
+    public static final String FEATURE_FLAGS_SERVICE = "feature_flags";
+    public static final String FEATURE_FLAGS_DESCRIPTOR = "android.flags.IFeatureFlags";
+    public static final String overrideFlag = "overrideFlag";
+    public static final String resetFlag = "resetFlag";
+    public static final String isWakeLockLevelSupported = "isWakeLockLevelSupported";
 
 
     /**
