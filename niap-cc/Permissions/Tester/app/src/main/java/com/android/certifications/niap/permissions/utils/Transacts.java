@@ -2483,9 +2483,7 @@ public class Transacts {
      * {@code apiLevel} that can be used to invoke direct binder transacts.
      */
     public static Transacts createTransactsForApiLevel(int apiLevel) {
-        if(TesterUtils.isAtLeastV()){
-            apiLevel = 35;
-        }
+
         switch (apiLevel) {
             // TODO: Replace the appropriate statement below with an instantiation of the java
             // class created by the app under the TransactIds/ directory. This will allow the tester

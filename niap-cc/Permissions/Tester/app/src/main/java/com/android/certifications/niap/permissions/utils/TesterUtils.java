@@ -42,9 +42,9 @@ public class TesterUtils {
 
     private static final Logger mLogger = LoggerFactory.createDefaultLogger("TesterUtils");
 
-    public static boolean isAtLeastV() {
-        return Build.VERSION.SDK_INT >= 34 && isAtLeastPreReleaseCodename("VanillaIceCream", Build.VERSION.CODENAME);
-    }
+//    public static boolean isAtLeastV() {
+//        return Build.VERSION.SDK_INT >= 34 && isAtLeastPreReleaseCodename("VanillaIceCream", Build.VERSION.CODENAME);
+//    }
     public static boolean getSystemUiFlagByName(String name){
         return (boolean) ReflectionUtils.invokeReflectionCall(
                 "com.android.systemui.shared.Flags",name,null,

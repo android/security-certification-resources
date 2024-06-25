@@ -149,7 +149,7 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(MOUNT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(isInputMethodPickerShownForTest, 16);
+        transactIds.put(isInputMethodPickerShownForTest, 14);
         mDescriptorTransacts.put(INPUTMETHOD_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -293,18 +293,18 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(NETWORK_STATS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setTouchCalibrationForInputDevice, 15);
-        transactIds.put(registerStickyModifierStateListener, 64);
-        transactIds.put(setKeyboardLayoutForInputDevice, 19);
-        transactIds.put(isInTabletMode, 25);
-        transactIds.put(monitorGestureInput, 38);
+        transactIds.put(setTouchCalibrationForInputDevice, 16);
+        transactIds.put(registerStickyModifierStateListener, 65);
+        transactIds.put(setKeyboardLayoutForInputDevice, 20);
+        transactIds.put(isInTabletMode, 26);
+        transactIds.put(monitorGestureInput, 39);
         // Failed to obtain transactId of addKeyboardLayoutForInputDevice under android.hardware.input.IInputManager: No field TRANSACTION_addKeyboardLayoutForInputDevice in class Landroid/hardware/input/IInputManager$Stub; (declaration of 'android.hardware.input.IInputManager$Stub' appears in /system/framework/framework.jar!classes2.dex)
-        transactIds.put(enableInputDevice, 4);
-        transactIds.put(registerKeyboardBacklightListener, 61);
-        transactIds.put(getModifierKeyRemapping, 23);
-        transactIds.put(unregisterStickyModifierStateListener, 65);
-        transactIds.put(tryPointerSpeed, 10);
-        transactIds.put(removePortAssociation, 40);
+        transactIds.put(enableInputDevice, 5);
+        transactIds.put(registerKeyboardBacklightListener, 62);
+        transactIds.put(getModifierKeyRemapping, 24);
+        transactIds.put(unregisterStickyModifierStateListener, 66);
+        transactIds.put(tryPointerSpeed, 11);
+        transactIds.put(removePortAssociation, 41);
         mDescriptorTransacts.put(INPUT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();

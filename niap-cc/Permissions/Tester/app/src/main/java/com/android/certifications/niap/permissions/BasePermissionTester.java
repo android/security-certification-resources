@@ -153,7 +153,7 @@ public abstract class BasePermissionTester {
         mUid = mAppInfo.uid;
         mPackageManager = mContext.getPackageManager();
         mLogger = LoggerFactory.createActivityLogger(TAG, (MainActivity) mActivity);
-        mDeviceApiLevel = TesterUtils.isAtLeastV()?35:Build.VERSION.SDK_INT;
+        mDeviceApiLevel = Build.VERSION.SDK_INT;
 
         mTransacts = Transacts.createTransactsForApiLevel(mDeviceApiLevel);
 

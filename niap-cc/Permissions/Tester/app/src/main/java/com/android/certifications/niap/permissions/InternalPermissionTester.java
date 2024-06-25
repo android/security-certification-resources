@@ -239,8 +239,7 @@ public class InternalPermissionTester extends BasePermissionTester {
                                 invokeReflectionCall(clazzVDPBuilder, "build", builderObj, new Class[]{});
 
                         IBinder binder = getActivityToken();
-                        //UserHandle uh = Binder.getCallingUserHandle();
-                        if(TesterUtils.isAtLeastV()){
+                        if(Build.VERSION.SDK_INT >= 35){
                             /* Parameters from SDK35
                             in IBinder token, in AttributionSource attributionSource, int associationId,
                             in VirtualDeviceParams params, in IVirtualDeviceActivityListener activityListener,
@@ -424,15 +423,23 @@ public class InternalPermissionTester extends BasePermissionTester {
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     CountDownLatch latch = new CountDownLatch(1);
                     AtomicBoolean success = new AtomicBoolean(true);
-                    if(TesterUtils.isAtLeastV()) {
+
+                    //need below command to execute this test case
+                    //adb shell settings put global hidden_api_policy  1
+
+                    //mLogger.logSystem("aaa>"+android.os.Build.VERSION.SDK_INT);
+                    if(android.os.Build.VERSION.SDK_INT >= 35) {
+                        //mLogger.logSystem("aaa");
                         //Interface Change
                         IIsDeviceLockedCallback callback = new IIsDeviceLockedCallback() {
                             @Override
                             public void onIsDeviceLocked(boolean locked) throws RemoteException {
+                                //mLogger.logSystem("onError1");
                             }
 
                             @Override
                             public void onError(ParcelableException ex) throws RemoteException {
+                                //mLogger.logSystem("onError");
                             }
 
                             @Override
@@ -441,18 +448,21 @@ public class InternalPermissionTester extends BasePermissionTester {
 
                                     @Override
                                     public void onIsDeviceLocked(boolean locked) throws RemoteException {
+                                        //mLogger.logSystem("-onError2");
+
                                         latch.countDown();
                                     }
 
                                     @Override
                                     public void onError(ParcelableException ex) throws RemoteException {
+                                        //mLogger.logSystem("-onError");
+
                                         if(ex.getException().toString().equals("java.lang.SecurityException")){
                                             success.set(false);
                                         }
                                         latch.countDown();
                                     }
                                 };
-
                             }
                         };
                         try {
@@ -467,8 +477,7 @@ public class InternalPermissionTester extends BasePermissionTester {
                                 throw new SecurityException("Found secuirty error in callback interface!");
                             }
                         } catch (InterruptedException e) {
-                            mLogger.logError(e.getMessage());
-                            e.printStackTrace();
+                            mLogger.logError(e.getMessage(),e);
                         }
                     }else if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                         // NOTICE:
@@ -477,10 +486,12 @@ public class InternalPermissionTester extends BasePermissionTester {
                         _IIsDeviceLockedCallback callback = new _IIsDeviceLockedCallback() {
                             @Override
                             public void onIsDeviceLocked(boolean locked) throws RemoteException {
+
                             }
 
                             @Override
                             public void onError(int error) throws RemoteException {
+
                             }
 
                             @Override
@@ -489,11 +500,13 @@ public class InternalPermissionTester extends BasePermissionTester {
 
                                     @Override
                                     public void onIsDeviceLocked(boolean locked) throws RemoteException {
+
                                         latch.countDown();
                                     }
 
                                     @Override
                                     public void onError(int error) throws RemoteException {
+
                                         if (_IIsDeviceLockedCallback.ERROR_SECURITY == error) {
                                             success.set(false);
                                         }
@@ -535,6 +548,8 @@ public class InternalPermissionTester extends BasePermissionTester {
                             Transacts.isDevicePotentiallyStolen,mPackageName);
 
                 }));
+
+        /*
         mPermissionTasks.put(permission.EMBED_ANY_APP_IN_UNTRUSTED_MODE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     mLogger.logDebug("Test case for android.permission.EMBED_ANY_APP_IN_UNTRUSTED_MODE not implemented yet");
@@ -542,26 +557,13 @@ public class InternalPermissionTester extends BasePermissionTester {
                     final TaskFragment taskFragment = new TaskFragmentBuilder(mAtm)
                             .setCreateParentTask()
                             .createActivityCount(1)
-                            .build();*/
+                            .build();
                     //final ActivityRecord activity = taskFragment.getTopMostActivity();
                 }));
-        mPermissionTasks.put(permission.ALWAYS_UPDATE_WALLPAPER,
-                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    //mLogger.logDebug("Test case for android.permission.ALWAYS_UPDATE_WALLPAPER not implemented yet");
-                     Object windowSession = ReflectionUtils.invokeReflectionCall(
-                            "android.view.WindowManagerGlobal",
-                            "getWindowSession",null,null);
-                     mLogger.logSystem(
-                             ReflectionUtils.checkDeclaredProperties(windowSession,"").toString());
-                     /*ReflectionUtils.invokeReflectionCall(
-                             "android.view.IWindowSession","sendWallpaperCommand",
-                             windowSession,new Class[]{
-                                     IBinder.class,
-                                     String.class, int.class,int.class,int.class,
-                                     Bundle.class,boolean.class},
-                                getActivityToken(), WallpaperManager.COMMAND_TAP,50,50,0,null,false);*/
-
-                }));
+        */
+        /////////////////////////////////////////////////////////////////////
+        //permission.ALWAYS_UPDATE_WALLPAPER is infeasible to test, because the
+        //WindowsSession.mCanAlwaysUpdateWallpaper is not exposed to users
 
 
     }

@@ -1826,7 +1826,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put(permission.SET_KEYBOARD_LAYOUT,
                 new PermissionTest(false, () -> {
-                    if(TesterUtils.isAtLeastV()){
+                    if(mDeviceApiLevel >= 35){
                         //method name changed
                         mTransacts.invokeTransact(Transacts.INPUT_SERVICE, Transacts.INPUT_DESCRIPTOR,
                                 Transacts.setKeyboardLayoutForInputDevice, 0, "test_descriptor");
@@ -5178,7 +5178,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.WRITE_VERIFICATION_STATE_E2EE_CONTACT_KEYS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     //mLogger.logDebug("Test case for android.permission.WRITE_VERIFICATION_STATE_E2EE_CONTACT_KEYS not implemented yet");
-                    if (TesterUtils.isAtLeastV()) {
+                    if (mDeviceApiLevel >= 35) {
                         String LOOKUP_KEY = "0r1-423A2E4644502A2E50";
                         String DEVICE_ID = "device_id_value";
                         String ACCOUNT_ID = "+1 (555) 555-1234";
@@ -5221,15 +5221,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
         mPermissionTasks.put(permission.MANAGE_REMOTE_AUTH,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.MANAGE_REMOTE_AUTH not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+            mLogger.logDebug("Test case for android.permission.MANAGE_REMOTE_AUTH not implemented yet");
+            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+            //       Transacts.unregisterCoexCallback, (Object) null);
         }));
         mPermissionTasks.put(permission.USE_REMOTE_AUTH,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.USE_REMOTE_AUTH not implemented yet");
-        //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-        //       Transacts.unregisterCoexCallback, (Object) null);
+            mLogger.logDebug("Test case for android.permission.USE_REMOTE_AUTH not implemented yet");
+            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+            //       Transacts.unregisterCoexCallback, (Object) null);
         }));
         mPermissionTasks.put(permission.THREAD_NETWORK_PRIVILEGED,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
@@ -5383,21 +5383,22 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
         mLogger.logDebug("Test case for android.permission.QUARANTINE_APPS not implemented yet");
         }));
-        mPermissionTasks.put(permission.VIBRATE_SYSTEM_CONSTANTS,
-                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.VIBRATE_SYSTEM_CONSTANTS not implemented yet");
-            if(Build.VERSION.SDK_INT>= VERSION_CODES.TIRAMISU){
-
-                VibratorManager vibratorManager = (VibratorManager)
-                        mContext.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
-
-                //ReflectionUtils.invokeReflectionCall(VibratorManager.class,
-                //        "performHapticFeedback",vibratorManager,
-                //        new Class<?>[]{int.class,boolean.class,String.class,boolean.class},0,true,"",true);
-                //Can we get system log here?
-            }
-
-        }));
+        //Infeasible to test
+//        mPermissionTasks.put(permission.VIBRATE_SYSTEM_CONSTANTS,
+//                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+//        mLogger.logDebug("Test case for android.permission.VIBRATE_SYSTEM_CONSTANTS not implemented yet");
+//            if(Build.VERSION.SDK_INT>= VERSION_CODES.TIRAMISU){
+//
+//                VibratorManager vibratorManager = (VibratorManager)
+//                        mContext.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
+//
+//                //ReflectionUtils.invokeReflectionCall(VibratorManager.class,
+//                //        "performHapticFeedback",vibratorManager,
+//                //        new Class<?>[]{int.class,boolean.class,String.class,boolean.class},0,true,"",true);
+//                //Can we get system log here?
+//            }
+//
+//        }));
         mPermissionTasks.put(permission.CONFIGURE_FACTORY_RESET_PROTECTION,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                 mTransacts.invokeTransact(Transacts.PDB_SERVICE, Transacts.PDB_DESCRIPTOR,
@@ -5463,13 +5464,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     mLogger.logDebug(
                             "Successfully parsed entry from parcel: " + entry.getText(100));
         }));
-        mPermissionTasks.put(permission.ACCESSIBILITY_MOTION_EVENT_OBSERVING,
-                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                //ProxyAccessibilityServiceConnection mProxyConnection;
-                //mProxyConnection.setInstalledAndEnabledServices(List<?> infos)
-                Object mProxyConnextion = ReflectionUtils.stubHiddenObject
-                        ("com.android.server.accessibility.ProxyAccessibilityServiceConnection");
-        }));
+        //Infeasible to test
+//        mPermissionTasks.put(permission.ACCESSIBILITY_MOTION_EVENT_OBSERVING,
+//                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+//                //ProxyAccessibilityServiceConnection mProxyConnection;
+//                //mProxyConnection.setInstalledAndEnabledServices(List<?> infos)
+//                Object mProxyConnextion = ReflectionUtils.stubHiddenObject
+//                        ("com.android.server.accessibility.ProxyAccessibilityServiceConnection");
+//        }));
 
         mPermissionTasks.put(permission.LAUNCH_PERMISSION_SETTINGS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
@@ -5796,15 +5798,16 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                Transacts.getSystemGrammaticalGender, mContext.getAttributionSource(),mUid);
                     }
                 }));
-        mPermissionTasks.put(permission.EMERGENCY_INSTALL_PACKAGES,
-                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-            //mLogger.logDebug("Test case for android.permission.EMERGENCY_INSTALL_PACKAGES not implemented yet");
-            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
-            //Transacts.unregisterCoexCallback, (Object) null);
-            //PackageInstal
-            //PackageInstaller.Session session = mPackageInstaller.createSession(
-
-        }));
+        //Infeasible to test
+//        mPermissionTasks.put(permission.EMERGENCY_INSTALL_PACKAGES,
+//                new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+//            //mLogger.logDebug("Test case for android.permission.EMERGENCY_INSTALL_PACKAGES not implemented yet");
+//            //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
+//            //Transacts.unregisterCoexCallback, (Object) null);
+//            //PackageInstal
+//            //PackageInstaller.Session session = mPackageInstaller.createSession(
+//
+//        }));
         mPermissionTasks.put(permission.RESTRICT_DISPLAY_MODES,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
             mTransacts.invokeTransact(Transacts.DISPLAY_SERVICE, Transacts.DISPLAY_DESCRIPTOR,
@@ -5832,15 +5835,18 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.SETUP_FSVERITY,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
 
-                FileIntegrityManager fmg = null;
-                if (android.os.Build.VERSION.SDK_INT >= 34) {
-                    fmg = (FileIntegrityManager) mContext.getSystemService(Context.FILE_INTEGRITY_SERVICE);
+                if (android.os.Build.VERSION.SDK_INT >= 35) {
+                    FileIntegrityManager fmg = (FileIntegrityManager) mContext.getSystemService(Context.FILE_INTEGRITY_SERVICE);
                     try {
                         File file = File.createTempFile("authfd", ".tmp",mContext.getFilesDir());
-                        //fmg.setupFsVerity(file);
-                        mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(fmg,"setup").toString());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        ReflectionUtils.invokeReflectionCall
+                                (fmg.getClass(),"setupFsVerity",fmg,
+                                        new Class<?>[]{File.class},file);
+
+                    } catch (SecurityException e) {
+                        throw e;
+                    } catch (Exception e){
+                        //expected (may catch InvocationTargetException for null pointer exception)
                     }
                 }
         }));

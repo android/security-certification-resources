@@ -17,11 +17,13 @@
 package com.android.certifications.niap.permissions.utils;
 
 import android.os.Binder;
+import android.security.FileIntegrityManager;
 import android.util.Log;
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -245,4 +247,6 @@ public class ReflectionUtils {
         }
         return a.stream().filter(str->str.startsWith(f)).collect(Collectors.toList());
     }
+
+
 }
