@@ -75,13 +75,13 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
         final String PACKAGE_NAME = mContext.getPackageName();
         final ComponentName ADMIN_COMPONENT
                 = new ComponentName(PACKAGE_NAME,PACKAGE_NAME+".receivers.Admin");
+
         DevicePolicyManager dpm =
                 (DevicePolicyManager)
                         mActivity.getSystemService(Context.DEVICE_POLICY_SERVICE);
 
         //mContext.getApplicationInfo();
         //int id = mAppInfo.uid;//The kernel user-ID that has been assigned to this application; currently this is not a unique ID
-
 
 
          //Manage Device Policy Group :
@@ -94,6 +94,7 @@ public class DevicePolicyPermissionTester extends BasePermissionTester {
 //                                Transacts.setCameraDisabled,
 //                                ADMIN_COMPONENT,PACKAGE_NAME,false,true
 //                        );
+
                         dpm.setCameraDisabled(ADMIN_COMPONENT,false);
                     }
                 }));

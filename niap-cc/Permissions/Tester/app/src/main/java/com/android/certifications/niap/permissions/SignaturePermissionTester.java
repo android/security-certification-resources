@@ -5753,7 +5753,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
         mPermissionTasks.put(permission.PREPARE_FACTORY_RESET,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    String ACTION_SHOW_NFC_RESOLVER = "android.nfc.action.SHOW_NFC_RESOLVER";
+                    //String ACTION_SHOW_NFC_RESOLVER = "android.nfc.action.SHOW_NFC_RESOLVER";
                     String ACTION_PREPARE_FACTORY_RESET =
                             "com.android.settings.ACTION_PREPARE_FACTORY_RESET";
                     Intent intent = new Intent(ACTION_PREPARE_FACTORY_RESET);
@@ -5762,7 +5762,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     //dintent.setAction("android.settings.APP_PERMISSIONS_SETTINGS");
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     ResolveInfo res = mPackageManager.
-                            resolveActivity(intent, 0);//PackageManager.MATCH_DEFAULT_ONLY);
+                            resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
                     mLogger.logDebug(">"+res);
                     if(res != null && res.activityInfo != null) {
                         mContext.startActivity(intent);
