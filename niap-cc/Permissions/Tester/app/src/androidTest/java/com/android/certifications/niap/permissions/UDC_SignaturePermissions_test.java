@@ -38,6 +38,8 @@ import com.android.certifications.niap.permissions.activities.TestActivity;
 import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.Transacts;
+import com.google.android.gms.threadnetwork.ThreadNetwork;
+import com.google.android.gms.threadnetwork.ThreadNetworkClient;
 
 import org.junit.After;
 import org.junit.Before;
@@ -79,7 +81,7 @@ public class UDC_SignaturePermissions_test {
         mUiAutomation = InstrumentationRegistry.getInstrumentation().getUiAutomation();
         mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         mShellContext = InstrumentationRegistry.getInstrumentation().getContext();
-        //mUiAutomation.adoptShellPermissionIdentity();
+        mUiAutomation.adoptShellPermissionIdentity();
     }
 
     @After
@@ -130,7 +132,26 @@ public class UDC_SignaturePermissions_test {
         }
 
     }
-        @Test
+
+    @Test
+    public void THREAD_Test(){
+        Class<?> threadNetworkConClazz = null;
+        String FEATURE_THREAD_NETWORK = "android.hardware.thread_network";
+        if(mContext.getPackageManager().hasSystemFeature(FEATURE_THREAD_NETWORK)){
+            throw new BasePermissionTester.BypassTestException("thread netrowk manager is not supported.");
+        } else {
+            try {
+                threadNetworkConClazz = Class.forName(
+                        "android.net.thread.ThreadNetworkManager");
+                Object threadNetworkCon = mContext.getSystemService(threadNetworkConClazz);
+                System.out.println(ReflectionUtils.checkDeclaredMethod(threadNetworkCon,"set").toString());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    @Test
     public void START_ACTIVITIES_FROM_SANDBOX_Test() {
 
         //Eval variant and determine expected result//

@@ -236,6 +236,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.spec.ECGenParameterSpec;
+import java.sql.Ref;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -260,8 +261,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import kotlin.jvm.internal.Ref;
 
 /**
  * Permission tester to verify all platform declared signature permissions properly guard their API,
@@ -5221,28 +5220,33 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
         mPermissionTasks.put(permission.MANAGE_REMOTE_AUTH,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-            mLogger.logDebug("Test case for android.permission.MANAGE_REMOTE_AUTH not implemented yet");
+            mLogger.logDebug("MANAGE_REMOTE_AUTH is not implemented yet");
             //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
             //       Transacts.unregisterCoexCallback, (Object) null);
         }));
         mPermissionTasks.put(permission.USE_REMOTE_AUTH,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-            mLogger.logDebug("Test case for android.permission.USE_REMOTE_AUTH not implemented yet");
+            mLogger.logDebug("USE_REMOTE_AUTH is not implemented yet");
             //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
             //       Transacts.unregisterCoexCallback, (Object) null);
         }));
+
         mPermissionTasks.put(permission.THREAD_NETWORK_PRIVILEGED,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-
                     Class<?> threadNetworkConClazz = null;
-                    try {
-                        threadNetworkConClazz = Class.forName(
-                                "android.net.thread.ThreadNetworkManager");
-                        Object threadNetworkCon = mContext.
-                                getSystemService(threadNetworkConClazz);
-                        mLogger.logSystem(ReflectionUtils.checkDeclaredMethod(threadNetworkCon,"set").toString());
-                    } catch (Exception ex){
-                        ex.printStackTrace();
+                    String FEATURE_THREAD_NETWORK = "android.hardware.thread_network";
+                    if(!mContext.getPackageManager().hasSystemFeature(FEATURE_THREAD_NETWORK)){
+                        throw new BypassTestException("thread netrowk manager is not supported.");
+                    } else {
+                        try {
+                            threadNetworkConClazz = Class.forName(
+                                    "android.net.thread.ThreadNetworkManager");
+                            Object threadNetworkCon = mContext.getSystemService(threadNetworkConClazz);
+                            //Yet Implemented Because I couldn't find the system it it enabled.
+                            System.out.println(ReflectionUtils.checkDeclaredMethod(threadNetworkCon,"set").toString());
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
                     }
         }));
 
@@ -5381,7 +5385,39 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
         mPermissionTasks.put(permission.QUARANTINE_APPS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.QUARANTINE_APPS not implemented yet");
+                    if (mDeviceApiLevel >= 35) {
+                        //final boolean quarantined = ((flags & PackageManager.FLAG_SUSPEND_QUARANTINED) != 0)
+                        //        && Flags.quarantinedEnabled();
+                        // Flags.quarantinedEnabled();
+                        try {
+
+                            Class<?> clazzDialogBuilder = null;
+                            clazzDialogBuilder = Class.forName("android.content.pm.SuspendDialogInfo$Builder");
+                            Constructor constructor = clazzDialogBuilder.getConstructor();
+                            Object builderObj = constructor.newInstance();
+
+                            Object dialogInfo =
+                                    invokeReflectionCall(clazzDialogBuilder, "build", builderObj, new Class[]{});
+
+
+                            int FLAG_SUSPEND_QUARANTINED = 0x00000001;
+                            mTransacts.invokeTransact(
+                                    Transacts.PACKAGE_SERVICE,
+                                    Transacts.PACKAGE_DESCRIPTOR,
+                                    Transacts.setPackagesSuspendedAsUser,
+                                    new String[]{"dummy.package.suspending"}, false,
+                                    new PersistableBundle(),new PersistableBundle(),dialogInfo,
+                                    FLAG_SUSPEND_QUARANTINED,"dummy.package.suspending",mUid,mUid);
+
+                        } catch (ClassNotFoundException | NoSuchMethodException ex){
+                            mLogger.logError("class not found exception",ex);
+                        } catch (InvocationTargetException | IllegalAccessException |
+                                 InstantiationException ex) {
+                            mLogger.logError("instance/invocation error",ex);
+                        }
+                    }
+
+
         }));
         //Infeasible to test
 //        mPermissionTasks.put(permission.VIBRATE_SYSTEM_CONSTANTS,
@@ -5430,9 +5466,15 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
         mPermissionTasks.put(permission.MANAGE_ENHANCED_CONFIRMATION_STATES,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-        mLogger.logDebug("Test case for android.permission.MANAGE_ENHANCED_CONFIRMATION_STATES not implemented yet");
-            mTransacts.invokeTransact(Transacts.SYSTEM_CONFIG_SERVICE, Transacts.SYSTEM_CONFIG_DESCRIPTOR,
-                   Transacts.getEnhancedConfirmationTrustedPackages, (Object) null);
+                    //ReflectionUtils.checkDeclaredMethod("android.os.SystemConfigManager")
+                    Object systemConfig = mContext.getSystemService("system_config");
+                    //mLogger.logSystem(">"+ReflectionUtils.checkDeclaredMethod(systemConfig,"get").toString());
+                    ReflectionUtils.invokeReflectionCall(systemConfig.getClass(),
+                            "getEnhancedConfirmationTrustedInstallers",systemConfig,new Class<?>[]{});
+                    //getEnhancedConfirmationTrustedInstallers
+                    //mLogger.logDebug("Test case for android.permission.MANAGE_ENHANCED_CONFIRMATION_STATES not implemented yet");
+                    //mTransacts.invokeTransact(Transacts.SYSTEM_CONFIG_SERVICE, Transacts.SYSTEM_CONFIG_DESCRIPTOR,
+                    //Transacts.getEnhancedConfirmationTrustedPackages, (Object) null);
         }));
         mPermissionTasks.put(permission.READ_DROPBOX_DATA,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
@@ -5502,8 +5544,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 mTransacts.invokeTransact(
                         Transacts.COMPANION_DEVICE_SERVICE, Transacts.COMPANION_DEVICE_DESCRIPTOR,
                         Transacts.startObservingDevicePresence, odprParams,mPackageName,mUid);
+            } catch (SecurityException ex) {
+                throw ex;
             } catch (Exception ex){
-                ex.printStackTrace();
+                throw new UnexpectedPermissionTestFailureException(ex);
             }
 
         }));
@@ -5695,25 +5739,25 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         //You can't enclose this callback into the closure routine.
         //For Transaciton method recgnizing it as IIterface object
-        IInterface ii_callback = new IFeatureCallback(){
-            @Override
-            public IBinder asBinder() {
-                return new Binder();
-            }
-            @Override
-            public void onSuccess(Feature result) throws RemoteException {
 
-            }
-            @Override
-            public void onFailure(int errorCode, String errorMessage, PersistableBundle errorParams) throws RemoteException {
-
-            }
-        };
         mPermissionTasks.put(permission.USE_ON_DEVICE_INTELLIGENCE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    mTransacts.invokeTransactWithCharSequence(Transacts.ON_DEVICE_INTELLIGENCE_SERVICE,
-                            Transacts.ON_DEVICE_INTELLINGENCE_DESCRIPTOR,
-                            Transacts.getFeature,false,ii_callback);
+                    Object ond = mContext.getSystemService("on_device_intelligence");
+                    //mLogger.logSystem(">"+ond.toString());
+                    //public void getFeature(
+                    //            int featureId,
+                    //            @NonNull @CallbackExecutor Executor callbackExecutor,
+                    //            @NonNull OutcomeReceiver<Feature, OnDeviceIntelligenceException> featureReceiver) {
+                    ReflectionUtils.invokeReflectionCall(ond.getClass(),
+                            "getFeature",ond,
+                            new Class<?>[]{int.class,Executor.class, OutcomeReceiver.class},
+                            1,mContext.getMainExecutor(),(OutcomeReceiver) result->{});
+//                    mTransacts.invokeTransact(Transacts.ON_DEVICE_INTELLIGENCE_SERVICE,
+//                            Transacts.ON_DEVICE_INTELLINGENCE_DESCRIPTOR,
+//                            Transacts.getFeature,ii_callback);
+//                            invokeTransactWithCharSequence(Transacts.ON_DEVICE_INTELLIGENCE_SERVICE,
+//                            Transacts.ON_DEVICE_INTELLINGENCE_DESCRIPTOR,
+//                            Transacts.getFeature,false,ii_callback);
         }));
 
 

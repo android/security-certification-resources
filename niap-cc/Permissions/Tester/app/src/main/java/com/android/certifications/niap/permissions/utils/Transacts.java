@@ -761,6 +761,7 @@ public class Transacts {
     public static final String overrideFlag = "overrideFlag";
     public static final String resetFlag = "resetFlag";
     public static final String isWakeLockLevelSupported = "isWakeLockLevelSupported";
+    public static final String setPackagesSuspendedAsUser = "setPackagesSuspendedAsUser";
 
 
     /**

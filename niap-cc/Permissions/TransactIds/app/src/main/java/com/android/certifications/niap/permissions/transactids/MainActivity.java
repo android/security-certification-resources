@@ -794,6 +794,7 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(FEATURE_FLAGS_DESCRIPTOR,Transacts.resetFlag,descriptorTransacts);
             queryTransactId(FEATURE_FLAGS_DESCRIPTOR,Transacts.overrideFlag,descriptorTransacts);
             queryTransactId(POWER_DESCRIPTOR,Transacts.isWakeLockLevelSupported,descriptorTransacts);
+            queryTransactId(PACKAGE_DESCRIPTOR,Transacts.setPackagesSuspendedAsUser,descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
 

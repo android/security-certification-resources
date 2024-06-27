@@ -780,6 +780,7 @@ public class Transacts {
     public static final String resetFlag = "resetFlag";
 
     public static final String isWakeLockLevelSupported = "isWakeLockLevelSupported";
+    public static final String setPackagesSuspendedAsUser = "setPackagesSuspendedAsUser";
 
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an

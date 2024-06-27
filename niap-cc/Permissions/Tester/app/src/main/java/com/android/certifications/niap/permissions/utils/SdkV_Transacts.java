@@ -387,12 +387,13 @@ public class SdkV_Transacts extends Transacts {
         transactIds.put(getAppMetadataFd, 37);
         transactIds.put(movePackage, 117);
         transactIds.put(installExistingPackageAsUser, 121);
-        transactIds.put(makeUidVisible, 205);
         transactIds.put(setKeepUninstalledPackages, 210);
+        transactIds.put(setPackagesSuspendedAsUser, 69);
+        transactIds.put(isPackageDeviceAdminOnAnyUser, 156);
+        transactIds.put(makeUidVisible, 205);
         transactIds.put(getRuntimePermissionsVersion, 184);
         // Failed to obtain transactId of addOnPermissionsChangeListener under android.content.pm.IPackageManager: No field TRANSACTION_addOnPermissionsChangeListener in class Landroid/content/pm/IPackageManager$Stub; (declaration of 'android.content.pm.IPackageManager$Stub' appears in /system/framework/framework.jar)
         transactIds.put(getHarmfulAppWarning, 168);
-        transactIds.put(isPackageDeviceAdminOnAnyUser, 156);
         transactIds.put(isPackageStateProtected, 180);
         transactIds.put(getMoveStatus, 114);
         transactIds.put(resetApplicationPreferences, 55);

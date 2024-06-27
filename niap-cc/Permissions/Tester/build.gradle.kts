@@ -21,7 +21,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.4.1")
+        classpath("com.android.tools.build:gradle:8.4.2")
         classpath("com.google.guava:guava:24.1-jre")
         classpath("org.codehaus.groovy:groovy-json:3.0.9")
         // NOTE: Do not place your application dependencies here; they belong
@@ -41,13 +41,4 @@ apply {
     from("tool.gradle")
 }
 
-tasks.register("exportPackage") {
-    dependsOn("assembleDebug");
-    doLast {
-        mkdir("$buildDir/package")
-        copy {
-            from("$buildDir/app/build/intermediates/noperm/debug/Tester-noperm-debug.apk");
-            into("$buildDir/package")
-        }
-    }
-}
+//To run app:publishAll to export all variants into package direcotory.=>see app: build.gradle
