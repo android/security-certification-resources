@@ -29,6 +29,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Parcel;
+import android.os.ParcelFileDescriptor;
 import android.os.ParcelUuid;
 import android.os.Parcelable;
 import android.os.RemoteException;
@@ -2721,6 +2722,10 @@ public class Transacts {
                 } else if (parameter instanceof NetworkCapabilities) {
                     data.writeInt(1);
                     ((NetworkCapabilities) parameter).writeToParcel(data, 0);
+                } else if (parameter instanceof ParcelFileDescriptor) {
+                   //mLogger.logSystem("here");
+                    data.writeInt(1);
+                    ((ParcelFileDescriptor) parameter).writeToParcel(data, 0);
                 } else if (remoteCallbackClass.isInstance(parameter)) {
 
                     data.writeInt(0);

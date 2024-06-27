@@ -247,6 +247,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -2676,12 +2677,27 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // android.permission.NETWORK_CARRIER_PROVISIONING requires a FQDN of the Passpoint
         // configuration.
 
+
+
         mPermissionTasks.put(permission.READ_DEVICE_CONFIG,
                 new PermissionTest(false, VERSION_CODES.Q, () -> {
+                    if (Build.VERSION.SDK_INT >= 35) {
+                        throw new BypassTestException(
+                                "READ_DEVICE_CONFIG permission check is disabled in SDK35 beta3. " +
+                                        "Wating public release.");
+                    }
                     try {
                         invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
                                 "getProperty", null, new Class[]{String.class, String.class},
+                                //"adservices", "sdksandbox_enforce_restrictions");
                                 "privacy", "device_identifier_access_restrictions_disabled");
+//                        invokeReflectionCall(Class.forName("android.provider.DeviceConfig"),
+//                                "addOnPropertiesChangedListener", null,
+//                                new Class[]{String.class, Executor.class,DeviceConfig.OnPropertiesChangedListener.class},
+//                                //"adservices", "sdksandbox_enforce_restrictions");
+//                                "privacy", "device_identifier_access_restrictions_disabled");
+
+
                     } catch (ReflectiveOperationException e) {
                         throw new UnexpectedPermissionTestFailureException(e);
                     }
@@ -4820,7 +4836,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     try {
                         latch.await(2000, TimeUnit.MILLISECONDS);
                         if(!success.get()){
-                            throw new SecurityException("Found secuirty error in callback interface!");
+                            throw new SecurityException("Found security error in callback interface!");
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -4889,14 +4905,31 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 }));
         mPermissionTasks.put(permission.MANAGE_WEARABLE_SENSING_SERVICE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    Object callback = ReflectionUtils.stubRemoteCallback();
+                    //Object callback = ReflectionUtils.stubRemoteCallback();
                     //ParcelFileDescriptor descriptor = ParcelFileDescriptor//
-                    mTransacts.invokeTransact(
-                            "wearable_sensing",
-                            Transacts.WEARABLES_DESCRIPTOR,
-                            Transacts.provideDataStream,
-                            mUid,null,callback
-                    );
+                    Consumer<Integer> statusCb = new Consumer<Integer>() {
+                        @Override
+                        public void accept(Integer integer) {
+
+                        }
+                    };
+
+
+                    try {
+                        Object wearableSensing
+                                = mContext.getSystemService("wearable_sensing");
+                        ParcelFileDescriptor[] descriptors = ParcelFileDescriptor.createPipe();
+                        //wearableSensing.
+                        ReflectionUtils.invokeReflectionCall(wearableSensing.getClass(),
+                                "provideDataStream", wearableSensing,
+                                new Class[]{ParcelFileDescriptor.class, Executor.class, Consumer.class},
+                                descriptors[0], mContext.getMainExecutor(), statusCb);
+                    } catch (SecurityException e){
+                        throw e;
+                    } catch (Exception e) {
+                        throw new UnexpectedPermissionTestFailureException(e);
+                    }
+
 
                 }));
         mPermissionTasks.put(permission.MODIFY_AUDIO_SETTINGS_PRIVILEGED,

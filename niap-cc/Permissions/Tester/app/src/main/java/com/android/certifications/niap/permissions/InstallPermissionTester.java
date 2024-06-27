@@ -378,6 +378,7 @@ public class InstallPermissionTester extends BasePermissionTester {
             Intent serviceIntent = new Intent(mActivity, FgCameraService.class);
             try {
                 mActivity.startForegroundService(serviceIntent);
+
                 tryBindingForegroundService(serviceIntent);
             } catch(Throwable t){
                 mLogger.logDebug("FOREGROUND_SERVICE_CAMERA", t);
@@ -495,7 +496,17 @@ public class InstallPermissionTester extends BasePermissionTester {
                 mLogger.logDebug("FOREGROUND_SERVICE_SYSTEM_EXEMPTED", t);
             }
         }));
-
+        mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PROCESSING,
+                new PermissionTest(true, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                ///New Foreground Service Permission
+                Intent serviceIntent = new Intent(mActivity, FgMediaProcessingService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logDebug("FOREGROUND_SERVICE_MEDIA_PROCESSING", t);
+                }
+            }));
 
         // android.permission.GET_PACKAGE_SIZE only guards PackageManager#getPackageSizeInfoAsUser
         // which is hidden and results in an UnsupportedOperationException after O.
@@ -1064,24 +1075,13 @@ public class InstallPermissionTester extends BasePermissionTester {
                     Object intent = ReflectionUtils.invokeReflectionCall
                             (launcherApps.getClass(),
                                     "getPrivateSpaceSettingsIntent",
-                                    launcherApps,new Class[]{},(Object)null);
+                                    launcherApps,new Class[]{});
                     if(intent == null){
                       throw new SecurityException("Caller cannot access hidden profiles");
                     }
                 }));
 
-        mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PROCESSING,
-                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    ///New Foreground Service Permission
-                    Intent serviceIntent = new Intent(mActivity, FgMediaProcessingService.class);
-                    try {
-                        mActivity.startForegroundService(serviceIntent);
-                        tryBindingForegroundService(serviceIntent);
-                    } catch(Throwable t){
-                        mLogger.logDebug("FOREGROUND_SERVICE_MEDIA_PROCESSING", t);
 
-                    }
-                }));
 
         //Infeasible to test - can't raise security error as of now.
         //CREDENTIAL_MANAGER_QUERY_CANDIDATE_CREDENTIALS,
@@ -1207,6 +1207,7 @@ public class InstallPermissionTester extends BasePermissionTester {
         synchronized (lock) {
             try {
                 int i=0;
+
                 while (!serviceConnection.mConnected.get()) {
                     try {
                         //wait almost 1 sec along increasing waiting time
@@ -1215,7 +1216,6 @@ public class InstallPermissionTester extends BasePermissionTester {
                             throw new InterruptedException("Connection Timed Out");
                         }
                     } catch (InterruptedException e) {
-                        //throw new RuntimeException(e);
                         throw new UnexpectedPermissionTestFailureException(e.getMessage());
                     }
                 }
@@ -1224,7 +1224,9 @@ public class InstallPermissionTester extends BasePermissionTester {
                 if(!serviceConnection.binderSuccess.get()){
                     throw new SecurityException("Test for "+serviceConnection.mComponentName+" has been failed.");
                 }
+                //mLogger.logSystem("binder success"+serviceConnection.mComponentName);
             } catch (Exception ex){
+                //mLogger.logSystem("binder !exception"+serviceConnection.mComponentName);
                 throw new UnexpectedPermissionTestFailureException(ex);
             } finally {
                 mContext.unbindService(serviceConnection);
@@ -1239,13 +1241,25 @@ public class InstallPermissionTester extends BasePermissionTester {
         public void onServiceConnected(ComponentName name, IBinder binder) {
             synchronized (lock) {
                 mConnected.set(true);
-                binderSuccess.set(true);
+                binderSuccess.set(false);
                 mComponentName = name.getShortClassName();
                 TestBindService service = TestBindService.Stub.asInterface(binder);
+                //service.testMethod();
+                /*
+                try {
+                    s
+                    //mLogger.logSystem(">ok?");
+                } catch (RemoteException e) {
+                    //mLogger.logSystem(">rte");
+                    //throw new RuntimeException(e);
+                }*/
                 try {
                     service.testMethod();
+                    binderSuccess.set(true);
+                    //mLogger.logSystem("here1");
                 } catch (RemoteException e) {
                     binderSuccess.set(false);
+                    //mLogger.logSystem("here2");
                     //e.printStackTrace();
                     mLogger.logError(name+" failure."+e.getMessage(),e);
                 }

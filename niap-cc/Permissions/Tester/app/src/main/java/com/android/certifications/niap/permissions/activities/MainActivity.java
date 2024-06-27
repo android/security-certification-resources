@@ -309,10 +309,11 @@ public class MainActivity extends AppCompatActivity implements LogListAdaptable 
 
                             permissionTester.runPermissionTestsByThreads((result) -> {
                                 runOnUiThread(() -> {
+
                                     if (result.getResult()) {
                                         if (!m_reduce_logs) sLogger.logInfo("Passed:" + result);
                                     } else {
-                                        sLogger.logError("Failure:" + result.getName());
+                                        sLogger.logError("Failure:" + result);
                                         errorPermissions.add(result.getName());
                                         errorCnt.incrementAndGet();
 

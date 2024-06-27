@@ -85,9 +85,12 @@ abstract class FgServiceTypeService extends Service {
         try {
             startForeground(mId, nc, mServiceType);
         } catch (Exception ex){
-            ex.printStackTrace();
-            //call main thread?
             mRunning.set(false);
+            //stopSelf();
+            //ex.printStackTrace();
+            //throw ex;
+            //call main thread?
+
         }
         return Service.START_NOT_STICKY;
     }
@@ -95,6 +98,12 @@ abstract class FgServiceTypeService extends Service {
 
     public IBinder onBind(Intent intent) {
         return mBinder;
+        /*
+        if(mRunning.get()) {
+            return mBinder;
+        } else {
+            return null;
+        }*/
     }
 
     public class LocalBinder extends Binder {
