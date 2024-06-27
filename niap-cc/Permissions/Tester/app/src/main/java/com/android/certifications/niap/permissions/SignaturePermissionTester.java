@@ -5458,7 +5458,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     Object intent = invokeReflectionCall
                             (launcherApps.getClass(),
                                     "getPrivateSpaceSettingsIntent",
-                                    launcherApps,new Class[]{},(Object) null);
+                                    launcherApps,new Class[]{});
                     if(intent == null){
                         throw new SecurityException("Caller cannot access hidden profiles");
                     }
@@ -5871,7 +5871,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
                     mTransacts.invokeTransact(Transacts.POWER_SERVICE, Transacts.POWER_DESCRIPTOR,
                     Transacts.acquireWakeLock,
-                    getActivityToken(),SCREEN_DIM_WAKE_LOCK|SCREEN_TIMEOUT_OVERRIDE_WAKE_LOCK,
+                    getActivityToken(),SCREEN_TIMEOUT_OVERRIDE_WAKE_LOCK,
                     "tag",mContext.getPackageName(),
                     new WorkSource(),"historyTag",0,null);
         }));
