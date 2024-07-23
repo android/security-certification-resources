@@ -1067,15 +1067,20 @@ public class InstallPermissionTester extends BasePermissionTester {
                             Transacts.WINDOW_DESCRIPTOR,
                             Transacts.registerScreenRecordingCallback, callback);
                 }));
+
         mPermissionTasks.put("android.permission.ACCESS_HIDDEN_PROFILES",
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     LauncherApps launcherApps = (LauncherApps)
                             mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
                     //If the caller cannot access hidden profiles the method returns null
+                    // see also. areHiddenApisChecksEnabled() in LauncherAppService
                     Object intent = ReflectionUtils.invokeReflectionCall
                             (launcherApps.getClass(),
                                     "getPrivateSpaceSettingsIntent",
                                     launcherApps,new Class[]{});
+                    String a = ReflectionUtils.checkDeclaredMethod(launcherApps,"get").toString();
+                    //mLogger.logSystem(a);
+                    //mLogger.logSystem(intent.toString());
                     if(intent == null){
                       throw new SecurityException("Caller cannot access hidden profiles");
                     }

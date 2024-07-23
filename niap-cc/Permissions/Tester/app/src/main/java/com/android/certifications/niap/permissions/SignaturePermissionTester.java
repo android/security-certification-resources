@@ -5254,12 +5254,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.MANAGE_REMOTE_AUTH,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
             mLogger.logDebug("MANAGE_REMOTE_AUTH is not implemented yet");
+            throw new BypassTestException("MANAGE_REMOTE_AUTH permission is not implemented yet");
             //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
             //       Transacts.unregisterCoexCallback, (Object) null);
         }));
         mPermissionTasks.put(permission.USE_REMOTE_AUTH,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
             mLogger.logDebug("USE_REMOTE_AUTH is not implemented yet");
+            throw new BypassTestException("USE_REMOTE_AUTH permission is not implemented yet");
             //mTransacts.invokeTransact(Transacts.SERVICE, Transacts.DESCRIPTOR,
             //       Transacts.unregisterCoexCallback, (Object) null);
         }));
@@ -6586,7 +6588,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }
         //mLogger.logInfo(test.mIsCustom+"<=handler?");
         if (test.mIsCustom) {
-            test.runTest();;
+            test.runTest();
         } else {
             boolean permissionGranted = isPermissionGranted(permission);
             try {

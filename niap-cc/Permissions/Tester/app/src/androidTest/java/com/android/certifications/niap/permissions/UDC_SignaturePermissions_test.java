@@ -38,8 +38,6 @@ import com.android.certifications.niap.permissions.activities.TestActivity;
 import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.Transacts;
-import com.google.android.gms.threadnetwork.ThreadNetwork;
-import com.google.android.gms.threadnetwork.ThreadNetworkClient;
 
 import org.junit.After;
 import org.junit.Before;

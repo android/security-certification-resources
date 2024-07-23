@@ -105,11 +105,11 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(CROSS_PROFILE_APPS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(getActiveNotifications, 63);
-        transactIds.put(getZenRules, 131);
-        transactIds.put(isNotificationPolicyAccessGrantedForPackage, 125);
-        transactIds.put(getEnabledNotificationListeners, 111);
-        transactIds.put(setToastRateLimitingEnabled, 152);
+        transactIds.put(getActiveNotifications, 64);
+        transactIds.put(getZenRules, 132);
+        transactIds.put(isNotificationPolicyAccessGrantedForPackage, 126);
+        transactIds.put(getEnabledNotificationListeners, 112);
+        transactIds.put(setToastRateLimitingEnabled, 154);
         mDescriptorTransacts.put(NOTIFICATION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -149,7 +149,7 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(MOUNT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(isInputMethodPickerShownForTest, 14);
+        transactIds.put(isInputMethodPickerShownForTest, 16);
         mDescriptorTransacts.put(INPUTMETHOD_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -195,15 +195,15 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(DREAMS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setRefreshRateSwitchingType, 51);
-        transactIds.put(setHdrConversionMode, 45);
-        transactIds.put(setTemporaryAutoBrightnessAdjustment, 38);
+        transactIds.put(setRefreshRateSwitchingType, 52);
+        transactIds.put(setHdrConversionMode, 46);
+        transactIds.put(setTemporaryAutoBrightnessAdjustment, 39);
         transactIds.put(startWifiDisplayScan, 6);
-        transactIds.put(setUserPreferredDisplayMode, 42);
-        transactIds.put(shouldAlwaysRespectAppRequestedMode, 50);
-        transactIds.put(requestDisplayModes, 58);
+        transactIds.put(setUserPreferredDisplayMode, 43);
+        transactIds.put(shouldAlwaysRespectAppRequestedMode, 51);
+        transactIds.put(requestDisplayModes, 60);
         transactIds.put(requestColorMode, 20);
-        transactIds.put(enableConnectedDisplay, 56);
+        transactIds.put(enableConnectedDisplay, 57);
         mDescriptorTransacts.put(DISPLAY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -293,18 +293,18 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(NETWORK_STATS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setTouchCalibrationForInputDevice, 16);
-        transactIds.put(registerStickyModifierStateListener, 65);
-        transactIds.put(setKeyboardLayoutForInputDevice, 20);
-        transactIds.put(isInTabletMode, 26);
-        transactIds.put(monitorGestureInput, 39);
+        transactIds.put(setTouchCalibrationForInputDevice, 15);
+        transactIds.put(registerStickyModifierStateListener, 64);
+        transactIds.put(setKeyboardLayoutForInputDevice, 19);
+        transactIds.put(isInTabletMode, 25);
+        transactIds.put(monitorGestureInput, 38);
         // Failed to obtain transactId of addKeyboardLayoutForInputDevice under android.hardware.input.IInputManager: No field TRANSACTION_addKeyboardLayoutForInputDevice in class Landroid/hardware/input/IInputManager$Stub; (declaration of 'android.hardware.input.IInputManager$Stub' appears in /system/framework/framework.jar!classes2.dex)
-        transactIds.put(enableInputDevice, 5);
-        transactIds.put(registerKeyboardBacklightListener, 62);
-        transactIds.put(getModifierKeyRemapping, 24);
-        transactIds.put(unregisterStickyModifierStateListener, 66);
-        transactIds.put(tryPointerSpeed, 11);
-        transactIds.put(removePortAssociation, 41);
+        transactIds.put(enableInputDevice, 4);
+        transactIds.put(registerKeyboardBacklightListener, 61);
+        transactIds.put(getModifierKeyRemapping, 23);
+        transactIds.put(unregisterStickyModifierStateListener, 65);
+        transactIds.put(tryPointerSpeed, 10);
+        transactIds.put(removePortAssociation, 40);
         mDescriptorTransacts.put(INPUT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -351,10 +351,10 @@ public class SdkV_Transacts extends Transacts {
         transactIds = new HashMap<>();
         transactIds.put(setRingtonePlayer, 78);
         transactIds.put(getRingtonePlayer, 79);
-        transactIds.put(isAudioServerRunning, 137);
+        transactIds.put(isAudioServerRunning, 139);
         transactIds.put(forceRemoteSubmixFullVolume, 18);
         transactIds.put(setVolumeGroupVolumeIndex, 25);
-        transactIds.put(getDeviceVolumeBehavior, 162);
+        transactIds.put(getDeviceVolumeBehavior, 164);
         mDescriptorTransacts.put(AUDIO_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -451,11 +451,11 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(DEVICE_STATE_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(resetAppErrors, 234);
+        transactIds.put(resetAppErrors, 235);
         transactIds.put(bindBackupAgent, 93);
         transactIds.put(performIdleMaintenance, 170);
         transactIds.put(setDumpHeapDebugLimit, 188);
-        transactIds.put(getBindingUidProcessState, 258);
+        transactIds.put(getBindingUidProcessState, 259);
         transactIds.put(updateLockTaskPackages, 190);
         transactIds.put(stopAppForUser, 81);
         // Failed to obtain transactId of getGrantedUriPermissions under android.app.IActivityManager: No field TRANSACTION_getGrantedUriPermissions in class Landroid/app/IActivityManager$Stub; (declaration of 'android.app.IActivityManager$Stub' appears in /system/framework/framework.jar)
@@ -534,13 +534,13 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(ATTESTATION_VERIFICATION_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(getWifiApConfiguration, 84);
-        transactIds.put(stopSoftAp, 75);
-        transactIds.put(setCoexUnsafeChannels, 69);
-        transactIds.put(setOverrideCountryCode, 49);
-        transactIds.put(unregisterCoexCallback, 71);
-        transactIds.put(setWifiEnabled, 42);
-        transactIds.put(restartWifiSubsystem, 158);
+        transactIds.put(getWifiApConfiguration, 85);
+        transactIds.put(stopSoftAp, 76);
+        transactIds.put(setCoexUnsafeChannels, 70);
+        transactIds.put(setOverrideCountryCode, 50);
+        transactIds.put(unregisterCoexCallback, 72);
+        transactIds.put(setWifiEnabled, 43);
+        transactIds.put(restartWifiSubsystem, 159);
         mDescriptorTransacts.put(WIFI_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -554,8 +554,8 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(PERMISSION_MANAGER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(registerProxyRouter, 28);
-        transactIds.put(registerManager, 27);
+        transactIds.put(registerProxyRouter, 29);
+        transactIds.put(registerManager, 28);
         mDescriptorTransacts.put(MEDIA_ROUTER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
