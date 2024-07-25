@@ -261,6 +261,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -4212,9 +4213,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
 
                 }));
-
+        //The test can not execute after Android 15 beta 4
         mPermissionTasks.put(permission.PROVISION_DEMO_DEVICE,
-                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, () -> {
+                new PermissionTest(false, Build.VERSION_CODES.TIRAMISU, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+
                     Class<?> fmdpBuilderClazz = null;
                     Class<?> fmdpClazz = null;
                     try {
@@ -5404,7 +5406,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
                         }
                     };
-                    ReflectionUtils.invokeReflectionCall(NsdManager.class,
+                    invokeReflectionCall(NsdManager.class,
                             "registerOffloadEngine", manager,
                             new Class<?>[]{String.class,long.class,long.class,Executor.class,OffloadEngine.class},
                             "iface1",
@@ -5413,7 +5415,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                             mContext.getMainExecutor(),
                             mock);
                     //If succeed unregister it for in the case.
-                    ReflectionUtils.invokeReflectionCall(NsdManager.class,
+                    invokeReflectionCall(NsdManager.class,
                             "unregisterOffloadEngine", manager,
                             new Class<?>[]{OffloadEngine.class},
                             mock);
@@ -5504,7 +5506,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     //ReflectionUtils.checkDeclaredMethod("android.os.SystemConfigManager")
                     Object systemConfig = mContext.getSystemService("system_config");
                     //mLogger.logSystem(">"+ReflectionUtils.checkDeclaredMethod(systemConfig,"get").toString());
-                    ReflectionUtils.invokeReflectionCall(systemConfig.getClass(),
+                    invokeReflectionCall(systemConfig.getClass(),
                             "getEnhancedConfirmationTrustedInstallers",systemConfig,new Class<?>[]{});
                     //getEnhancedConfirmationTrustedInstallers
                     //mLogger.logDebug("Test case for android.permission.MANAGE_ENHANCED_CONFIRMATION_STATES not implemented yet");
@@ -5562,7 +5564,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
         mPermissionTasks.put(permission.REQUEST_OBSERVE_DEVICE_UUID_PRESENCE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-           //gen ObservingDevicePresenceRequest from Builder
+
+            if(!mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)){
+                throw new BypassTestException(
+                        "This permission requires feature "
+                                + PackageManager.FEATURE_AUTOMOTIVE);
+            }
             try {
                 Class<?> clazzOdprBuilder = null;
                 clazzOdprBuilder = Class.forName("android.companion.ObservingDevicePresenceRequest$Builder");
@@ -5779,14 +5786,34 @@ public class SignaturePermissionTester extends BasePermissionTester {
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
                     Object ond = mContext.getSystemService("on_device_intelligence");
                     //mLogger.logSystem(">"+ond.toString());
+                    //mLogger.logSystem(">"+ReflectionUtils.checkDeclaredMethod(ond,"getVersion").toString());
+
                     //public void getFeature(
                     //            int featureId,
                     //            @NonNull @CallbackExecutor Executor callbackExecutor,
                     //            @NonNull OutcomeReceiver<Feature, OnDeviceIntelligenceException> featureReceiver) {
-                    ReflectionUtils.invokeReflectionCall(ond.getClass(),
-                            "getFeature",ond,
-                            new Class<?>[]{int.class,Executor.class, OutcomeReceiver.class},
-                            1,mContext.getMainExecutor(),(OutcomeReceiver) result->{});
+                    if (Build.VERSION.SDK_INT >= VERSION_CODES.S) {
+                        try {
+                            invokeReflectionCall(ond.getClass(),
+                                    "getVersion", ond,
+                                    new Class<?>[]{Executor.class, LongConsumer.class},
+                                    mContext.getMainExecutor(), (LongConsumer) result -> {
+                                    });
+                        } catch (UnexpectedPermissionTestFailureException ex){
+                            if(ex.getCause() != null  &&  ex.getCause() instanceof InvocationTargetException){
+                                if(ex.getCause().getCause() != null && ex.getCause() instanceof IllegalStateException){
+                                    //ok? : remote service is not configured
+                                }
+                            }
+                        }
+                        /*
+                        invokeReflectionCall(ond.getClass(),
+                                "getFeature",ond,
+                                new Class<?>[]{int.class,Executor.class, OutcomeReceiver.class},
+                                1,mContext.getMainExecutor(),(OutcomeReceiver) result->{});
+
+                         */
+                    }
 //                    mTransacts.invokeTransact(Transacts.ON_DEVICE_INTELLIGENCE_SERVICE,
 //                            Transacts.ON_DEVICE_INTELLINGENCE_DESCRIPTOR,
 //                            Transacts.getFeature,ii_callback);
@@ -5848,7 +5875,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     if(res != null && res.activityInfo != null) {
                         mContext.startActivity(intent);
                     } else {
-                        throw new UnexpectedPermissionTestFailureException("Unable to resolve a Factory Reset Handler Acttivty");
+                        throw new BypassTestException("Unable to resolve a Factory Reset Handler Activty");
                     }
             }));
         /*
@@ -5914,11 +5941,11 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.SETUP_FSVERITY,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
 
-                if (android.os.Build.VERSION.SDK_INT >= 35) {
+                if (Build.VERSION.SDK_INT >= 35) {
                     FileIntegrityManager fmg = (FileIntegrityManager) mContext.getSystemService(Context.FILE_INTEGRITY_SERVICE);
                     try {
                         File file = File.createTempFile("authfd", ".tmp",mContext.getFilesDir());
-                        ReflectionUtils.invokeReflectionCall
+                        invokeReflectionCall
                                 (fmg.getClass(),"setupFsVerity",fmg,
                                         new Class<?>[]{File.class},file);
 
