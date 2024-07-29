@@ -209,6 +209,7 @@ import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.UiLogger;
 import com.android.certifications.niap.permissions.services.TestService;
 import com.android.certifications.niap.permissions.utils.InternalPermissions;
+import com.android.certifications.niap.permissions.utils.PermissionUtils;
 import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.SignaturePermissions;
 import com.android.certifications.niap.permissions.utils.TesterUtils;
@@ -5211,8 +5212,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         // New signature permissions as of Android 15
         mPermissionTasks.put(permission.WRITE_VERIFICATION_STATE_E2EE_CONTACT_KEYS,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-                    //mLogger.logDebug("Test case for android.permission.WRITE_VERIFICATION_STATE_E2EE_CONTACT_KEYS not implemented yet");
-                    if (mDeviceApiLevel >= 35) {
+                    if (Build.VERSION.SDK_INT >= 35) {
                         String LOOKUP_KEY = "0r1-423A2E4644502A2E50";
                         String DEVICE_ID = "device_id_value";
                         String ACCOUNT_ID = "+1 (555) 555-1234";
@@ -5849,7 +5849,9 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
         mPermissionTasks.put(permission.GET_BINDING_UID_IMPORTANCE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-            mLogger.logDebug("Test case for android.permission.GET_BINDING_UID_IMPORTANCE not implemented yet");
+            //        mLogger.logSystem("PackageUsageStats?"+
+            //                PermissionUtils.getAllDeclaredPermissions(mContext).toString().contains("PACKAGE_USAGE_STATS"));
+            //mLogger.logDebug("Test case for android.permission.GET_BINDING_UID_IMPORTANCE not implemented yet");
             mTransacts.invokeTransact(Transacts.ACTIVITY_SERVICE, Transacts.ACTIVITY_DESCRIPTOR,
                    Transacts.getBindingUidProcessState, mUid, mPackageName);
         }));
@@ -5956,7 +5958,24 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     }
                 }
         }));
+        //Port from Install Permission Tester
+        mPermissionTasks.put("android.permission.ACCESS_HIDDEN_PROFILES",
+                new PermissionTest(false, 35 , () -> {
 
+                    LauncherApps launcherApps = (LauncherApps)
+                            mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+                    //If the caller cannot access hidden profiles the method returns null
+                    // see also. areHiddenApisChecksEnabled() in LauncherAppService
+                    Object intent = ReflectionUtils.invokeReflectionCall
+                            (launcherApps.getClass(),
+                                    "getPrivateSpaceSettingsIntent",
+                                    launcherApps,new Class[]{});
+                    String a = ReflectionUtils.checkDeclaredMethod(launcherApps,"get").toString();
+                    if(intent == null){
+
+                        throw new SecurityException("Caller cannot access hidden profiles");
+                    }
+                }));
 
     }
     

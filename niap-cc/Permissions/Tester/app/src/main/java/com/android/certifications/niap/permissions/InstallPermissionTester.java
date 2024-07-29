@@ -1070,6 +1070,12 @@ public class InstallPermissionTester extends BasePermissionTester {
 
         mPermissionTasks.put("android.permission.ACCESS_HIDDEN_PROFILES",
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if(Build.VERSION.SDK_INT>=35){
+                        throw new BypassTestException(
+                                "We can't access space setting intent by normal signature as of sdk35. " +
+                                "So we exec same test on siganature permission tester. Ignore this result.");
+                    }
+
                     LauncherApps launcherApps = (LauncherApps)
                             mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
                     //If the caller cannot access hidden profiles the method returns null
@@ -1079,9 +1085,8 @@ public class InstallPermissionTester extends BasePermissionTester {
                                     "getPrivateSpaceSettingsIntent",
                                     launcherApps,new Class[]{});
                     String a = ReflectionUtils.checkDeclaredMethod(launcherApps,"get").toString();
-                    //mLogger.logSystem(a);
-                    //mLogger.logSystem(intent.toString());
                     if(intent == null){
+
                       throw new SecurityException("Caller cannot access hidden profiles");
                     }
                 }));
