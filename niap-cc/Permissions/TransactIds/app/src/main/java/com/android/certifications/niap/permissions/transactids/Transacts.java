@@ -335,7 +335,7 @@ public class Transacts {
     public static final String search="search";
     //WallPaperEffectsGenerationManager
     public static final String WALLPAPER_EFFECTS_GENERATION_SERVICE =
-            "wallpaper_effects_generation";;
+            "wallpaper_effects_generation";
     public static final String WALLPAPER_EFFECTS_GENERATION_DESCRIPTOR
             = "android.app.wallpapereffectsgeneration.IWallpaperEffectsGenerationManager";
     //generateCinematicEffect(in CinematicEffectRequest request,in ICinematicEffectListener listener);
@@ -716,7 +716,7 @@ public class Transacts {
     public static final String deactivateFactoryResetProtection = "deactivateFactoryResetProtection";
     //ITelephony.getLastKnownCellIdentity
     public static final String getLastKnownCellIdentity = "getLastKnownCellIdentity";
-    public static final String SYSTEM_CONFIG_SERVICE =  "system_config";;//PersistentDataBlockService
+    public static final String SYSTEM_CONFIG_SERVICE =  "system_config";//PersistentDataBlockService
     public static final String SYSTEM_CONFIG_DESCRIPTOR = "android.os.ISystemConfig";
     public static final String getEnhancedConfirmationTrustedPackages = "getEnhancedConfirmationTrustedPackages";
     public static final String startObservingDevicePresence ="startObservingDevicePresence";
@@ -748,7 +748,7 @@ public class Transacts {
     public static final String getFeature = "getFeature";
     public static final String enableConnectedDisplay = "enableConnectedDisplay";
 
-    public static final String BACKGROUND_INSTALL_CONTROL_SERVICE = "background_install_control";;//PersistentDataBlockService
+    public static final String BACKGROUND_INSTALL_CONTROL_SERVICE = "background_install_control";//PersistentDataBlockService
     public static final String BACKGROUND_INSTALL_CONTROL_DESCRIPTOR = "android.content.pm.IBackgroundInstallControlService";
     public static final String getBackgroundInstalledPackages = "getBackgroundInstalledPackages";
 

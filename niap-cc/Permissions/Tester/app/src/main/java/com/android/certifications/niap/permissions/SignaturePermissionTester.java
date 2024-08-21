@@ -3514,6 +3514,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     // Note this is fragile since the implementation of SmartspaceSessionId can
                     // change in the future, but since there is no way to construct an instance
                     // of SmartspaceSessionId this at least allows the test to proceed.
+
                     Parcelable smartspaceId = new Parcelable() {
                         @Override
                         public int describeContents() {
@@ -5221,14 +5222,19 @@ public class SignaturePermissionTester extends BasePermissionTester {
                                 (Context.CONTACT_KEYS_SERVICE);
                         //Put dummy data for test
                         e2m.updateOrInsertE2eeContactKey(LOOKUP_KEY,DEVICE_ID,ACCOUNT_ID, new byte[]{0});
-                        //WRITE_CONTACT & this permission
-                        boolean b = e2m.updateE2eeContactKeyLocalVerificationState
-                                (LOOKUP_KEY,DEVICE_ID,ACCOUNT_ID,
-                                        E2eeContactKeysManager.VERIFICATION_STATE_VERIFIED);
-
+// Call hidden method to enable check for this permission.
+//                        boolean b = e2m.updateE2eeContactKeyLocalVerificationState
+//                                (LOOKUP_KEY,DEVICE_ID,ACCOUNT_ID,mContext.getPackageName(),
+//                                        E2eeContactKeysManager.VERIFICATION_STATE_VERIFIED);
+                        boolean b = (boolean)ReflectionUtils.invokeReflectionCall(E2eeContactKeysManager.class,
+                                "updateE2eeContactKeyLocalVerificationState",e2m,
+                                new Class<?>[]{String.class,String.class,String.class,String.class,int.class},
+                                LOOKUP_KEY,DEVICE_ID,ACCOUNT_ID,mContext.getPackageName(),
+                                E2eeContactKeysManager.VERIFICATION_STATE_VERIFIED
+                                );
                         mLogger.logDebug("updateE2eeContactKeyLocalVerificationState result: " + b);
                         if(!b){
-                            throw new SecurityException("call updateE2eeContactKeyLocalVerificainoState failed");
+                            throw new SecurityException("call updateE2eeContactKeyLocalVerificaionState failed");
                         }
                     }
 
@@ -5849,10 +5855,12 @@ public class SignaturePermissionTester extends BasePermissionTester {
         }));
         mPermissionTasks.put(permission.GET_BINDING_UID_IMPORTANCE,
                 new PermissionTest(false, VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
-            //        mLogger.logSystem("PackageUsageStats?"+
-            //                PermissionUtils.getAllDeclaredPermissions(mContext).toString().contains("PACKAGE_USAGE_STATS"));
-            //mLogger.logDebug("Test case for android.permission.GET_BINDING_UID_IMPORTANCE not implemented yet");
-            mTransacts.invokeTransact(Transacts.ACTIVITY_SERVICE, Transacts.ACTIVITY_DESCRIPTOR,
+                if(ActivityCompat.checkSelfPermission(mContext, permission.PACKAGE_USAGE_STATS)
+                    == PackageManager.PERMISSION_GRANTED) {
+                    throw new BypassTestException(
+                            "This permission is not evlauated when PACKAGE_USAGE_STATS is allowed");
+                }
+                mTransacts.invokeTransact(Transacts.ACTIVITY_SERVICE, Transacts.ACTIVITY_DESCRIPTOR,
                    Transacts.getBindingUidProcessState, mUid, mPackageName);
         }));
         mPermissionTasks.put(permission.MANAGE_DISPLAYS,

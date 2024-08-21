@@ -17,10 +17,7 @@
 package com.android.certifications.niap.permissions.transactids;
 
 import static com.android.certifications.niap.permissions.transactids.Transacts.ACTIVITY_DESCRIPTOR;
-import static com.android.certifications.niap.permissions.transactids.Transacts.AUDIO_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.BACKGROUND_INSTALL_CONTROL_DESCRIPTOR;
-import static com.android.certifications.niap.permissions.transactids.Transacts.BACKUP_DESCRIPTOR;
-import static com.android.certifications.niap.permissions.transactids.Transacts.CLIPBOARD_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.COMPANION_DEVICE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.CONTEXTUAL_SEARCH_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.DEVICE_POLICY_DESCRIPTOR;
@@ -30,26 +27,21 @@ import static com.android.certifications.niap.permissions.transactids.Transacts.
 import static com.android.certifications.niap.permissions.transactids.Transacts.FILE_INTEGRITY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.GRAMMATICAL_INFLECTION_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.INPUT_DESCRIPTOR;
-import static com.android.certifications.niap.permissions.transactids.Transacts.LOCK_SETTINGS_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.MEDIA_ROUTER_DESCRIPTOR;
-import static com.android.certifications.niap.permissions.transactids.Transacts.MOUNT_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.NSD_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.ON_DEVICE_INTELLINGENCE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.PACKAGE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.POWER_DESCRIPTOR;
-import static com.android.certifications.niap.permissions.transactids.Transacts.ROLE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.SYSTEM_CONFIG_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.TELEPHONY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.TRANSACT_PREFIX;
 import static com.android.certifications.niap.permissions.transactids.Transacts.USAGE_STATS_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.WINDOW_DESCRIPTOR;
-import static com.android.certifications.niap.permissions.transactids.Transacts.addOnMessageReceivedListener;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.service.credentials.CredentialProviderService;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -58,14 +50,19 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.os.BuildCompat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Activity to drive querying for the direct binder transact IDs for the device under test. These
@@ -796,6 +793,8 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(POWER_DESCRIPTOR,Transacts.isWakeLockLevelSupported,descriptorTransacts);
             queryTransactId(PACKAGE_DESCRIPTOR,Transacts.setPackagesSuspendedAsUser,descriptorTransacts);
 
+            writeTransactsJsonFile(descriptorTransacts);
+
             return writeTransactsSourceFile(descriptorTransacts);
 
         }
@@ -826,6 +825,65 @@ public class MainActivity extends AppCompatActivity {
                 transactIds.put(transactName, e.getMessage());
             }
             descriptorTransacts.put(descriptor, transactIds);
+        }
+
+
+        private String writeTransactsJsonFile(Map<String, Map<String, String>> descriptorTransact){
+
+            Map<String,Object> source = new HashMap<>();
+
+            try {
+                OutputStreamWriter writer = new OutputStreamWriter(mContext.openFileOutput(
+                        sClassName + ".json", Context.MODE_PRIVATE));
+
+                Map<String, String> serviceNameMap = new HashMap<>();
+                descriptorTransact.keySet().forEach(descriptor -> {
+                    String serviceNameSynonym = sDescriptorNames.get(descriptor);
+                    Log.d(TAG,">"+serviceNameSynonym+":"+descriptor);
+                    Field f = null;
+                    try {
+                        f = Transacts.class.getField(serviceNameSynonym);
+                    } catch (NoSuchFieldException ignored) {}
+                    if(!Objects.isNull(f)){
+                        try {
+                            String item = (String)f.get(null);//static
+                            serviceNameMap.put(item,item);
+                            serviceNameMap.put(serviceNameSynonym,item);
+                        } catch (IllegalAccessException e) {}
+                    }
+                });
+                source.put("services",serviceNameMap);
+                //construct method maps
+                Map<String, Map<String,Integer>> methodMap = new HashMap<>();
+                descriptorTransact.keySet().forEach(descriptor -> {
+                    Map<String,Integer> mInner = new HashMap<>();
+                    descriptorTransact.get(descriptor).keySet().forEach(key -> {
+                        String id = descriptorTransact.get(descriptor).get(key);
+                        try {
+                            Integer integer = Integer.valueOf(id);
+                            mInner.put(key,integer);
+                        } catch (NumberFormatException ex){
+                            Log.d("TAG","NumberFormatException:"+key+"+"+id);
+                        }
+                    });
+                    methodMap.put(descriptor,mInner);
+                });
+                source.put("methods",methodMap);
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.writerWithDefaultPrettyPrinter();
+                mapper.writeValue(writer,source);
+                //jacksonObjectMapper.writeValue(writer,source);
+                //use jacksonObjectMapper to change the map to json
+
+
+                //writer.write();
+                writer.close();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return "";
         }
 
         /**

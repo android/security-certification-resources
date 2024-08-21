@@ -195,15 +195,15 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(DREAMS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setRefreshRateSwitchingType, 52);
-        transactIds.put(setHdrConversionMode, 46);
-        transactIds.put(setTemporaryAutoBrightnessAdjustment, 39);
+        transactIds.put(setRefreshRateSwitchingType, 51);
+        transactIds.put(setHdrConversionMode, 45);
+        transactIds.put(setTemporaryAutoBrightnessAdjustment, 38);
         transactIds.put(startWifiDisplayScan, 6);
-        transactIds.put(setUserPreferredDisplayMode, 43);
-        transactIds.put(shouldAlwaysRespectAppRequestedMode, 51);
-        transactIds.put(requestDisplayModes, 60);
+        transactIds.put(setUserPreferredDisplayMode, 42);
+        transactIds.put(shouldAlwaysRespectAppRequestedMode, 50);
+        transactIds.put(requestDisplayModes, 59);
         transactIds.put(requestColorMode, 20);
-        transactIds.put(enableConnectedDisplay, 57);
+        transactIds.put(enableConnectedDisplay, 56);
         mDescriptorTransacts.put(DISPLAY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -351,10 +351,10 @@ public class SdkV_Transacts extends Transacts {
         transactIds = new HashMap<>();
         transactIds.put(setRingtonePlayer, 78);
         transactIds.put(getRingtonePlayer, 79);
-        transactIds.put(isAudioServerRunning, 139);
+        transactIds.put(isAudioServerRunning, 138);
         transactIds.put(forceRemoteSubmixFullVolume, 18);
         transactIds.put(setVolumeGroupVolumeIndex, 25);
-        transactIds.put(getDeviceVolumeBehavior, 164);
+        transactIds.put(getDeviceVolumeBehavior, 163);
         mDescriptorTransacts.put(AUDIO_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();

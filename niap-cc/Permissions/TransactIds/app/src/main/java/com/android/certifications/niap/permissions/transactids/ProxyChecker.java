@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ProxyChecker {
-    private static String TAG="tag";
-    private static Map<String,String> alt_descriptor= new HashMap<String,String>();
+    private static final String TAG="tag";
+    private static final Map<String,String> alt_descriptor= new HashMap<String,String>();
 
 
     static  {
@@ -45,10 +45,9 @@ public class ProxyChecker {
 
         //alt_descriptor.put("com.android.internal.widget.ILockSettings","LOCK_SETTINGS_DESCRIPTOR");
         for(String k:alt_descriptor.keySet()){
-            System.out.println(
-                    String.format("public static final String %s = \"%s\";",
-                            alt_descriptor.get(k),
-                            k));
+            System.out.printf("public static final String %s = \"%s\";%n",
+                    alt_descriptor.get(k),
+                    k);
         }
     }
     private static Class descriptor(String desc){
@@ -114,13 +113,11 @@ public class ProxyChecker {
             System.out.println(fields);
             System.out.println(methods);*/
             int transactId = (int) transactField.get(null);
-            System.out.println(
-                    String.format("public static final String %s = \"%s\";",
-                            transactName,transactName));
-            System.out.println(
-                    String.format("queryTransactId(Transacts.%s, Transacts.%s, descriptorTransacts);",
-                            alt_descriptor.get(descriptor),
-                            transactName));
+            System.out.printf("public static final String %s = \"%s\";%n",
+                    transactName,transactName);
+            System.out.printf("queryTransactId(Transacts.%s, Transacts.%s, descriptorTransacts);%n",
+                    alt_descriptor.get(descriptor),
+                    transactName);
 
             //Log.d(TAG,"Found " + transactName + "=" + transactId);
         } catch (ReflectiveOperationException e) {

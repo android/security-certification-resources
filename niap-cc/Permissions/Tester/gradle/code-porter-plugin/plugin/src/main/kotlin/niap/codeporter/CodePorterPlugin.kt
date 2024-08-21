@@ -35,11 +35,6 @@ class CodePorterPlugin:Plugin<Project> {
         project.configurations.getByName("implementation").setCanBeResolved(true)
         project.configurations.getByName("api").setCanBeResolved(true)
 
-        /*val ccp = project.configurations;//etByName("implementation")
-        ccp.forEach{
-            println(it.name)
-        }*/
-
         project.tasks.register("codeporter",CodePorterTask::class.java) { task ->
             task.description = "run code porter"
             task.group = "from code-porter plugin"
@@ -60,6 +55,9 @@ abstract class CodePorterTask : DefaultTask(){
     var classpath: Iterable<File>? = null
     @InputFiles
     val src_main_java =project.project.projectDir.toString()+"/src/main/java"
+    @InputFiles
+    val gen_out_java =project.project.rootDir.toString()+"/package/gen/java"
+
     data class TestCaseSource (
         val permissionLabel:String="",
         val permissionLabelCamel:String="",
@@ -76,7 +74,7 @@ abstract class CodePorterTask : DefaultTask(){
             return context.start.getInputStream()
                 .getText(Interval.of(context.start.getStartIndex(), context.stop.getStopIndex()))
         }
-        val testCases = mutableListOf<TestCaseSource>()
+        var testCases = mutableListOf<TestCaseSource>()
     }
 
     class AstListener : JavaParserBaseListener() {
@@ -99,7 +97,7 @@ abstract class CodePorterTask : DefaultTask(){
                         .replace("Manifest.permission.","")
                         .replace("android.permission.","")
                         .replace("permission.","")
-                    val camel_ = permission_.caseFormat(UPPER_UNDERSCORE, LOWER_CAMEL)
+                    val camel_ = permission_.caseFormat(UPPER_UNDERSCORE, UPPER_CAMEL)
                     val impl = args[clsExpressions.size-1]
                     val isCustom = if(args[0].equals("true")) true else false
                     fun fromCodeToInt(code:String):Int {
@@ -147,24 +145,10 @@ abstract class CodePorterTask : DefaultTask(){
                         permission_,
                         camel_,sdkMin,sdkMax,isCustom,impl
                         )
-                    testCases.add(testCS)
                     //println(testCS)
+                    testCases.add(testCS)
                 }
             }
-            /*
-            override fun enterArguments(ctx: JavaParser.ArgumentsContext?) {
-                super.enterArguments(ctx)
-                val exprList = ctx?.expressionList()
-                if(exprList != null){
-                    println("parent:"+ctx.parent.text)
-                    var i=0
-                    exprList.expression()?.forEach {
-                        val expr:String = getFullText(it)
-                        println("\tinner expr($i)=>" + expr)
-                        i++
-                    }
-                }
-            }*/
         }
 
         override fun enterMethodCall(ctx: JavaParser.MethodCallContext?) {
@@ -199,11 +183,15 @@ abstract class CodePorterTask : DefaultTask(){
     @TaskAction
     fun action(){
 
+        if(!File(gen_out_java).exists()){
+            File(gen_out_java).mkdirs()
+        }
+
         File(src_main_java).walk().forEach {
             if (it.extension == "java" &&
                 it.nameWithoutExtension.endsWith("PermissionTester")) {
                 println(it.nameWithoutExtension)
-
+                val typeSignature = it.nameWithoutExtension.replace("PermissionTester","");
                 val ins: InputStream = it.inputStream()
                 val content = ins.readBytes().toString(Charset.defaultCharset())
 
@@ -212,7 +200,102 @@ abstract class CodePorterTask : DefaultTask(){
                 val walker = ParseTreeWalker()
                 walker.walk(AstListener(),parser.compilationUnit())
 
-                println("All Test Cases=>"+ testCases.size)
+                if(testCases.size > 0){
+                    println("testCases no=${testCases.size}")
+                    val clsName = typeSignature+"PermissionTestModule";
+                    val fout = File(gen_out_java+"//$clsName.java")
+                    //fout.createNewFile()
+                    fout.writeText(
+"""//Auto generated file ${clsName}.java by CoderPorterPlugin
+/*
+ * Copyright 2024 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.android.certification.niap.permission.dpctester.test;
+
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
+
+import androidx.annotation.NonNull;
+import com.android.certification.niap.permission.dpctester.test.runner.PermissionTestModuleBase;
+import com.android.certification.niap.permission.dpctester.test.runner.PermissionTestRunner;
+import com.android.certification.niap.permission.dpctester.test.tool.PermissionTest;
+import com.android.certification.niap.permission.dpctester.test.tool.PermissionTestModule;
+import com.android.certification.niap.permission.dpctester.test.exception.BypassTestException;
+import com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTesFailureException;
+import static android.Manifest.permission.*;
+import java.util.function.Consumer;
+     
+@PermissionTestModule(name="${typeSignature} Test Cases")    
+public class ${clsName} extends PermissionTestModuleBase {
+    public $clsName(@NonNull Activity activity){ super(activity);}
+    @Override
+    public void start(Consumer<PermissionTestRunner.Result> callback){
+        super.start(callback);
+        logger.debug("Hello $typeSignature test case!");
+    }
+    private <T> T systemService(Class<T> clazz){
+		return Objects.requireNonNull(getService(clazz),"[npe_system_service]"+clazz.getSimpleName());
+	}
+""".trimIndent())
+                    testCases.forEach {
+                    val params = mutableListOf<String>()
+                    params.add("permission=${it.permissionLabel}")
+                    if(it.sdkMin>0){
+                        params.add("sdkMin=${it.sdkMin}")
+                    }
+                    if(it.sdkMax<100){
+                        params.add("sdkMax=${it.sdkMax}")
+                    }
+                    if(it.isCustom){
+                        params.add("customCase=true")
+                    }
+                    val params_ = params.joinToString()
+                    var impl = it.impl.trimIndent()
+                    //println(impl)
+                    if(impl.startsWith("() -> {") && impl.endsWith("}")){
+                        impl = impl.removePrefix("() -> {").removeSuffix("}")
+                        impl = impl.trimIndent()
+                        impl = impl.prependIndent("\t\t")
+                        //println("here")
+                    }
+                    if(impl.startsWith("() -> ") && !impl.endsWith("}") && impl.endsWith(")")) {
+                        impl = impl.removePrefix("() -> ")
+                        impl = impl + ";"
+                        impl = impl.trimIndent()
+                        impl = impl.prependIndent("\t\t")
+                        //println("here2")
+                    }
+                        fout.appendText(""" 
+    @PermissionTest(${params_})
+    public void test${it.permissionLabelCamel}(){
+${impl}
+    }
+""")
+                    }
+                    fout.appendText("}\r\n")//Close class declarations
+                    testCases.clear()
+                    testCases = mutableListOf<TestCaseSource>()
+                }
+
+
+                //println("All Test Cases=>"+ testCases.size)
+
                 // Read the source code
                 /*
                 val formatted = Roaster.format(content)
