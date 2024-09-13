@@ -311,7 +311,6 @@ public class SignaturePermissionTester extends BasePermissionTester {
     protected final Set<String> mDevelopmentPermissions;
 
 
-
     /**
      * Map of permissions that can only be held by platform signed apps to their corresponding
      * PermissionTesters.
@@ -536,12 +535,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
         /*OK1*/
 
+
         mPermissionTasks.put(permission.CAPTURE_AUDIO_OUTPUT, new PermissionTest(false, () -> {
 
             MediaRecorder recorder;
             try {
                 recorder = new MediaRecorder();
-                recorder.setAudioSource(MediaRecorder.AudioSource.REMOTE_SUBMIX);
+                recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_UPLINK);
                 String fileName = mContext.getFilesDir() + "/test_capture_audio_output.3gpp";
                 recorder.setOutputFile(new File(fileName));
                 recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -3477,7 +3477,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
                         Thread thread = new Thread(() -> {
                             boolean permissionGranted =
                                     isPermissionGranted(permission.MANAGE_CREDENTIAL_MANAGEMENT_APP);
-                            mLogger.logSystem("Running MANAGE_CREDENTIAL_MANAGEMENT_APP test case.");
+                            mLogger.logDebug("Running MANAGE_CREDENTIAL_MANAGEMENT_APP test case.");
                             try {
                                 KeyChain.removeCredentialManagementApp(mContext);
                                 getAndLogTestStatus(permission.MANAGE_CREDENTIAL_MANAGEMENT_APP,
@@ -3514,7 +3514,10 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     // Note this is fragile since the implementation of SmartspaceSessionId can
                     // change in the future, but since there is no way to construct an instance
                     // of SmartspaceSessionId this at least allows the test to proceed.
-
+                    if(isPermissionGranted(permission.ACCESS_SMARTSPACE) && !mPlatformSignatureMatch){
+                        //when access smart space permission is granted this test would be passed with ordinal signature
+                        throw new BypassTestException("Cannot test this case when ACCESS_SMARTSPACE is granted.");
+                    }
                     Parcelable smartspaceId = new Parcelable() {
                         @Override
                         public int describeContents() {

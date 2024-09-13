@@ -271,6 +271,8 @@ public class MainActivity extends AppCompatActivity {
                     descriptorTransacts);
             queryTransactId(Transacts.AUDIO_DESCRIPTOR, Transacts.setRingtonePlayer,
                     descriptorTransacts);
+            queryTransactId(Transacts.AUDIO_DESCRIPTOR, Transacts.forceRemoteSubmixFullVolume,
+                    descriptorTransacts);
             queryTransactId(Transacts.BACKUP_DESCRIPTOR, Transacts.setBackupEnabled,
                     descriptorTransacts);
             queryTransactId(Transacts.BATTERY_STATS_DESCRIPTOR, Transacts.getAwakeTimeBattery,
@@ -670,9 +672,6 @@ public class MainActivity extends AppCompatActivity {
 
             queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,
                     Transacts.getWifiSsidPolicy,descriptorTransacts);
-
-            queryTransactId(Transacts.AUDIO_DESCRIPTOR,
-                    Transacts.forceRemoteSubmixFullVolume,descriptorTransacts);
 
             queryTransactId(Transacts.MOUNT_DESCRIPTOR,
                     Transacts.isConvertibleToFBE,descriptorTransacts);

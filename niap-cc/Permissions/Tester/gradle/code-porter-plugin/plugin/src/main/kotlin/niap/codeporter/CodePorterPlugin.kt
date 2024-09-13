@@ -253,6 +253,7 @@ public class ${clsName} extends PermissionTestModuleBase {
 		return Objects.requireNonNull(getService(clazz),"[npe_system_service]"+clazz.getSimpleName());
 	}
 """.trimIndent())
+                    testCases.sortBy { it.sdkMin }
                     testCases.forEach {
                     val params = mutableListOf<String>()
                     params.add("permission=${it.permissionLabel}")

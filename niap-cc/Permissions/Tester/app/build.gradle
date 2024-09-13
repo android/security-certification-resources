@@ -111,11 +111,11 @@ android {
     productFlavors {
         normal {
             dimension "settings"
-            signingConfig signingConfigs.norm
+            signingConfig signingConfigs.debug
         }
         noperm {
             dimension "settings"
-            signingConfig signingConfigs.norm
+            signingConfig signingConfigs.debug
         }
         platform {
             dimension "settings"
