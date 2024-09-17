@@ -61,6 +61,8 @@ import java.util.List;
  * Instrumentation test to verify READ_MEDIA_VISUAL_USER_SELECTED permission.
  * 1. To run this test you should put at least one media image to the ContentResolver.
  * 2. Try this test against both normal and no-perm variant apk files.
+ * The script is written for the latest version of the android os,
+ * If you'd like to run with former versions please try previous versions.
  */
 @RunWith(AndroidJUnit4.class)
 public class ReadMediaVisualUserSelectedTest {
@@ -81,7 +83,6 @@ public class ReadMediaVisualUserSelectedTest {
     @Rule
     public ActivityTestRule<MainActivity> rule = new ActivityTestRule<>(MainActivity.class, false,
             true);
-
     @Before
     public void setUp() {
         mInstrumentation = InstrumentationRegistry.getInstrumentation();
@@ -89,6 +90,7 @@ public class ReadMediaVisualUserSelectedTest {
         mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         mDevice = UiDevice.getInstance(mInstrumentation);
     }
+
 
     @After
     public void tearDown() {
@@ -152,11 +154,24 @@ public class ReadMediaVisualUserSelectedTest {
             else
                 Log.d("tag","the permission is already granted.");
             mDevice.waitForIdle();
-            //Find a button with text (the line expects language setting as 'English')
+            //mDevice.wait(10000);
+            //Find a button with text (the line expects language setting as 'English')w(5000);
 
-
-            UiObject2 btnUserSelected = mDevice.findObject(By.text("Select photos and videos"));
+            //Fix the test case for Android 15. Showing Approval Dialog for READ_MEDIA_VISUAL_USER_SELECTED
+            //Plus Media ADialogue
+            mDevice.wait(Until.findObject(By.textStartsWith("Allow limited")),1000);
+            UiObject2 btnUserSelected = mDevice.findObject(By.textStartsWith("Allow limited"));
+            Log.d("ui",btnUserSelected.toString());
             if(btnUserSelected==null || !btnUserSelected.isClickable()){
+                throw new RuntimeException("Can not find expected ui (Allow limited access)");
+            }
+
+            btnUserSelected.clickAndWait(Until.newWindow(),500);
+            mDevice.waitForIdle();
+            //Change for Android 15 : The text line 'Select photos and videos ...' is now unclickable
+            mDevice.wait(Until.findObject(By.textStartsWith("Select photos and videos")),5000);
+            btnUserSelected = mDevice.findObject(By.textStartsWith("Select photos and videos"));
+            if(btnUserSelected==null){
                 throw new RuntimeException("Can not find expected ui");
             }
             activity.addLogLine(btnUserSelected.toString());
@@ -203,6 +218,9 @@ public class ReadMediaVisualUserSelectedTest {
 
         } catch (RuntimeException ex){
             ok = false;
+            //Log.d("tag", ex.getMessage());
+            errs.checkThat(a.Msg("grant: "+ex.getMessage()),
+                    false,org.hamcrest.CoreMatchers.is(true));
             ex.printStackTrace();
         }
 
