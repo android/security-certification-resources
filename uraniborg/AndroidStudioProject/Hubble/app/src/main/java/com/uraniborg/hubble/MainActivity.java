@@ -28,6 +28,7 @@ import android.os.SystemClock;
 import android.util.Base64;
 import android.util.Log;
 
+import java.util.TreeMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import org.jetbrains.annotations.NotNull;
@@ -46,10 +47,13 @@ public class MainActivity extends AppCompatActivity {
   final String TAG = "HUBBLE";
 
   // semantically tie the notion of app version to versionName, which we will update for every
-  // major and minor release, instead of independently and separately update these values everytime.
-  private final String VERSION = BuildConfig.VERSION_NAME;
+  // major and minor release. Unfortunately, for now, we have to independently and separately
+  // update these values everytime we do any revisions because BuildConfig is phased out.
+  private final String VERSION = "2.0.0";
 
-  private HashMap<String, PackageMetadata> mAllPackages;
+  // We're changing to TreeMap so that package names are sorted. This would ease output comparison.
+  private TreeMap<String, PackageMetadata> mAllPackages;
+  private TreeMap<String, PackageMetadata> mPreinstalledPackages;
   private HashMap<String, byte[]> mAllCertificates;
   private HashMap<String, BinaryInfo> mAllBinaries;
   private HashMap<String, LibraryInfo> mAllLibraries;
@@ -65,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
 
   private boolean initialize() {
     final String tag = TAG + "-INIT";
-    mAllPackages = new HashMap<>();
+    mAllPackages = new TreeMap<>();
+    mPreinstalledPackages = new TreeMap<>();
     mAllCertificates = new HashMap<>();
     mAllBinaries = new HashMap<>();
     mAllLibraries = new HashMap<>();
@@ -115,6 +120,9 @@ public class MainActivity extends AppCompatActivity {
     for (PackageInfo pkg : installedPackagesAndApexes) {
       PackageMetadata pkgMetadata = PackageMetadata.parse(this, pkg, mPackageManager);
       mAllPackages.put(pkg.packageName, pkgMetadata);
+      if (pkgMetadata.isPreinstalled) {
+        mPreinstalledPackages.put(pkg.packageName, pkgMetadata);
+      }
     }
     Log.d(tag, String.format("There are %d packages (including APEX)", mAllPackages.size()));
   }
@@ -166,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
     // first get the system path
     String binPaths = System.getenv("PATH");
     if (binPaths == null) {
-      Log.e(tag, String.format("Error getting system PATH environment value."));
+      Log.e(tag, "Error getting system PATH environment value.");
       return;
     }
     Log.d(tag, String.format("binPaths: %s", binPaths));
@@ -284,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
   private void writePackagesToFile() {
     final String tag = TAG + "-W_PKG";
     final String PKG_FILENAME = "packages.txt";
+    final String PREINSTALL_FILENAME = "preinstalled_packages.txt";
 
     String header = String.format(HEADER_FMT, VERSION, "totalPackages", mAllPackages.size(),
         "packages");
@@ -299,6 +308,22 @@ public class MainActivity extends AppCompatActivity {
       i++;
     }
     Utilities.writeToFile(this, PKG_FILENAME, FOOTER_STR, true);
+
+    // write preload info to preload file.
+    header = String.format(HEADER_FMT, VERSION, "totalPreinstalledPackages",
+            mPreinstalledPackages.size(), "preinstalledPackages");
+    Utilities.writeToFile(this, PREINSTALL_FILENAME, header, false);
+    int j = 0;
+    for (PackageMetadata preinstalledMetadata : mPreinstalledPackages.values()) {
+      Utilities.writeToFile(this, PREINSTALL_FILENAME,
+              preinstalledMetadata.getJSONString(skip), true);
+      if (j == mPreinstalledPackages.size() - 1) {
+        continue;
+      }
+      Utilities.writeToFile(this, PREINSTALL_FILENAME, ",\n", true);
+      j++;
+    }
+    Utilities.writeToFile(this, PREINSTALL_FILENAME, FOOTER_STR, true);
   }
 
   private void writeCertsToFile() {
