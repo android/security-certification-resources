@@ -55,6 +55,7 @@ public class PackageMetadata extends BaseInfo {
   protected boolean isFactoryTest = false;
   protected boolean isSuspended = false;
   protected boolean isApex = false;
+  protected boolean isPreinstalled = false;
   protected boolean isHidden = false;
   protected boolean hasCode = true;
   protected boolean usesCleartextTraffic = true;
@@ -101,6 +102,9 @@ public class PackageMetadata extends BaseInfo {
       result.isTestOnly = ((appInfo.flags & ApplicationInfo.FLAG_TEST_ONLY) != 0);
       result.isFactoryTest = ((appInfo.flags & ApplicationInfo.FLAG_FACTORY_TEST) != 0);
       result.isSuspended = ((appInfo.flags & ApplicationInfo.FLAG_SUSPENDED) != 0);
+
+      result.isPreinstalled = (((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) ||
+                                ((appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0));
 
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         result.usesCleartextTraffic =

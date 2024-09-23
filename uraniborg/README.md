@@ -40,5 +40,9 @@ Below are links to more specific documentations.
 - [Scoring device preload risks](docs/device_scoring.md)
 - [Adding new baseline for new OS release](docs/adding_new_baseline.md)
 
+## Version
+The current version info can be found within the VERSION file, and in the
+build.gradle file of the Hubble app.
+
 ## Disclaimer
 This is not an officially supported Google product.

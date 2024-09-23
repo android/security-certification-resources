@@ -187,6 +187,8 @@ class PlatformSignature(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger):
+    if api_level == 35:
+      return VPlatformSignature(logger)
     if api_level == 34:
       logger.debug("Returning UPlatformSignature")
       return UPlatformSignature(logger)
@@ -327,6 +329,11 @@ class UPlatformSignature(PlatformSignature):
   BASE_SCORE = 50
 
 
+class VPlatformSignature(PlatformSignature):
+  API_LEVEL = 35
+  BASE_SCORE = 51
+
+
 class SystemUid(RiskAnalyzer):
   """Analyzer for system uid risks.
   """
@@ -340,6 +347,9 @@ class SystemUid(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger):
+    if api_level == 35:
+      logger.debug("returning VSystemUid")
+      return VSystemUid(logger)
     if api_level == 34:
       logger.debug("Returning USystemUid")
       return USystemUid(logger)
@@ -439,6 +449,11 @@ class USystemUid(SystemUid):
   BASE_SCORE = 33
 
 
+class VSystemUid(SystemUid):
+  API_LEVEL = 35
+  BASE_SCORE = 35
+
+
 class RiskyPermissions(RiskAnalyzer):
   """The risky permission risk analyzer.
 
@@ -462,12 +477,17 @@ class RiskyPermissions(RiskAnalyzer):
     The permissions are evaluated from the Android framework, and stack ranked
     according to the severity of the impact/risk of the permissions. This was
     done based on inputs from security experts.
+
+    This list is currently in sync with permissions weighted in
+    https://github.com/DEKRA-Cybersecurity/MAS-Preloaded-Apps-Scripts/blob/main/config/methods_config.yml
+    up till Android 14.
     """
     RISK_ASTRONOMICAL = {
         "android.permission.INSTALL_PACKAGES"
     }
 
     RISK_CRITICAL = {
+        "android.permission.PROVIDE_REMOTE_CREDENTIALS",
         "android.permission.COPY_PROTECTED_DATA",
         "android.permission.WRITE_SECURE_SETTINGS",
         "android.permission.READ_FRAME_BUFFER",
@@ -479,6 +499,7 @@ class RiskyPermissions(RiskAnalyzer):
         "android.permission.SYSTEM_CAMERA",
         "android.permission.MANAGE_PROFILE_AND_DEVICE_OWNERS",
         "android.permission.MOUNT_UNMOUNT_FILESYSTEMS",
+        "android.permission.PROVIDE_DEFAULT_ENABLED_CREDENTIAL_SERVICE",
     }
 
     RISK_HIGH = {
@@ -503,6 +524,9 @@ class RiskyPermissions(RiskAnalyzer):
         "android.permission.BLUETOOTH_PRIVILEGED",
         "android.permission.GET_PASSWORD",
         "android.permission.INTERNAL_SYSTEM_WINDOW",
+        "android.permission.MANAGE_ONGOING_CALLS",
+        "android.permission.READ_RESTRICTED_STATS",
+        "android.permission.BIND_AUTOFILL_SERVICE",
     }
 
     RISK_MEDIUM = {
@@ -522,7 +546,12 @@ class RiskyPermissions(RiskAnalyzer):
         "android.permission.READ_CALENDAR",
         "android.permission.BLUETOOTH_ADMIN",
         "android.permission.BODY_SENSORS",
-
+        "android.permission.MANAGE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_BLOBS_ACROSS_USERS",
+        "android.permission.BLUETOOTH_ADVERTISE",
+        "android.permission.READ_MEDIA_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
     }
 
     RISK_LOW = {
@@ -533,10 +562,16 @@ class RiskyPermissions(RiskAnalyzer):
         "android.permission.GET_PACKAGE_SIZE",
         "android.permission.BLUETOOTH",
         "android.permission.DEVICE_POWER",
+        "android.permission.READ_PRECISE_PHONE_STATE",
+        "android.permission.LOG_FOREGROUND_RESOURCE_USE",
+        "android.permission.MANAGE_DEFAULT_APPLICATIONS",
+        "android.permission.MANAGE_FACE",
     }
 
   @staticmethod
   def get_scorer(api_level, logger, google_discount=False):
+    if api_level == 35:
+      return VRiskyPermissions(logger, google_discount)
     if api_level == 34:
       return URiskyPermissions(logger, google_discount)
     if api_level == 33:
@@ -775,6 +810,13 @@ class URiskyPermissions(RiskyPermissions):
   BASE_SCORE = 542.50
   UNGRANTED_SCORE = 162.50
 
+
+class VRiskyPermissions(RiskyPermissions):
+  API_LEVEL = 35
+  BASE_SCORE = 735
+  UNGRANTED_SCORE = 290
+
+
 class CleartextTraffic(RiskAnalyzer):
   """Cleartext traffic risk analyzer.
 
@@ -786,6 +828,8 @@ class CleartextTraffic(RiskAnalyzer):
 
   @staticmethod
   def get_scorer(api_level, logger, google_discount=False):
+    if api_level == 35:
+      return VCleartextTraffic(logger, google_discount)
     if api_level == 34:
       return UCleartextTraffic(logger, google_discount)
     if api_level == 33:
@@ -915,6 +959,10 @@ class TCleartextTraffic(CleartextTraffic):
 
 class UCleartextTraffic(CleartextTraffic):
   BASE_SCORE = 8
+
+
+class VCleartextTraffic(CleartextTraffic):
+  BASE_SCORE = 2
 
 
 class HostileDownloader(RiskAnalyzer):

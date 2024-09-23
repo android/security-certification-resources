@@ -28,6 +28,7 @@ import os
 import shutil  # to help move files
 import sys
 import tarfile  # to untar decompressed adb backup file
+from typing import Optional  # runtime support for type hints.
 import zlib  # to decompress adb backup
 
 import syscall_wrapper
@@ -40,7 +41,7 @@ HUBBLE_LOGCAT_TAG = "HUBBLE"
 HUBBLE_RESULT_STRING = "Results are available at:"
 
 
-def parse_arguments():
+def parse_arguments() -> argparse.Namespace:
   """Parses cmdline arguments.
 
   Returns:
@@ -69,11 +70,17 @@ def parse_arguments():
                       action="count",
                       help="If specified, results will be classified using "
                            "old classification using ADB convention.")
+  parser.add_argument("--pull-all-apks", required=False,
+                      action="count",
+                      help="If specified, the script will attempt to download "
+                           "APKs from the device. The resulting APKs will be "
+                           "stored in an \"apks\" directory within the "
+                           "specific numbered results directory.")
   args = parser.parse_args()
   return args
 
 
-def set_up_logging(args):
+def set_up_logging(args: argparse.Namespace) -> logging.Logger:
   """Sets up various logging parameters.
 
   Args:
@@ -98,7 +105,7 @@ def set_up_logging(args):
   return logger
 
 
-def supported_platform(logger):
+def supported_platform(logger: logging.Logger) -> bool:
   """Checks if this script is running on supported platform.
 
   Args:
@@ -121,7 +128,7 @@ def supported_platform(logger):
   return True
 
 
-def verify_hubble(args, logger):
+def verify_hubble(args: argparse.Namespace, logger: logging.Logger) -> bool:
   # First, resolve the path if it's a symlink
   args.hubble = os.path.realpath(args.hubble)
   logger.debug("Hubble's realpath: %s", args.hubble)
@@ -133,7 +140,7 @@ def verify_hubble(args, logger):
   return True
 
 
-def adb_installed(logger):
+def adb_installed(logger: logging.Logger) -> bool:
   cmd = ["which", "adb"]
   sw = SyscallWrapper(logger)
   sw.call_returnable_command(cmd)
@@ -149,7 +156,8 @@ def clear_logcat(adb_wrapper):
   adb_wrapper.logcat_clear()
 
 
-def is_hubble_installed(adb_wrapper, logger):
+def is_hubble_installed(adb_wrapper: syscall_wrapper.AdbWrapper,
+                        logger: logging.Logger) -> bool:
   """Checks if Hubble is already installed on device.
 
   Args:
@@ -177,7 +185,8 @@ def is_hubble_installed(adb_wrapper, logger):
   return False
 
 
-def is_xiaomi_phone(adb_wrapper, logger):
+def is_xiaomi_phone(adb_wrapper: syscall_wrapper.AdbWrapper,
+                    logger: logging.Logger) -> bool:
   """Checks if the connected device is a Xiami device.
 
   We do this by checking various strings within the device property for any
@@ -209,13 +218,15 @@ def is_xiaomi_phone(adb_wrapper, logger):
   return False
 
 
-def launch_xiaomi_file_explorer(adb_wrapper):
+def launch_xiaomi_file_explorer(
+    adb_wrapper: syscall_wrapper.AdbWrapper) -> bool:
   return adb_wrapper.am_start(
       "com.mi.android.globalFileexplorer",
       "com.android.fileexplorer.FileExplorerTabActivity")
 
 
-def adb_push_hubble(adb_wrapper, hubble_path):
+def adb_push_hubble(adb_wrapper: syscall_wrapper.AdbWrapper,
+                    hubble_path: str):
   """Drops the Hubble APK onto device (used when direct installation fails).
 
   Args:
@@ -242,7 +253,9 @@ def adb_push_hubble(adb_wrapper, hubble_path):
       break
 
 
-def install_hubble(adb_wrapper, args, logger):
+def install_hubble(adb_wrapper: syscall_wrapper.AdbWrapper,
+                   args: argparse.Namespace,
+                   logger: logging.Logger) -> bool:
   """Performs installation of Hubble via "adb install".
 
   Args:
@@ -308,11 +321,11 @@ def wait_for_results(adb_wrapper, logger):
   return adb_wrapper.logcat_find(patterns, terminate_logcat)
 
 
-def classify_directory_using_adb_format(adb_wrapper,
-                                        source,
-                                        results_dir,
-                                        device,
-                                        logger):
+def classify_dir_using_adb_format(adb_wrapper: syscall_wrapper.AdbWrapper,
+                                  source: str,
+                                  results_dir: str,
+                                  device: syscall_wrapper.DeviceInfo,
+                                  logger: logging.Logger)-> Optional[str]:
   """Decides which directory in results/ to dump new result to.
 
   This method is grandfathered as it was the original way of classification,
@@ -349,10 +362,150 @@ def classify_directory_using_adb_format(adb_wrapper,
   return None
 
 
-def classify_directory_using_build_fingerprint(adb_wrapper,
-                                               source,
-                                               results_dir,
-                                               logger):
+def _retry_apk_extraction(adb_wrapper: syscall_wrapper.AdbWrapper,
+                          retry_packages_dict: dict[str, str],
+                          apks_dir: str,
+                          logger: logging.Logger) -> dict[str, str]:
+  """Retries APK extraction using some hacks.
+
+  The strategy here is to try to copy the APK to a different location
+  such as /data/local/tmp and then copying from the new location
+  instead.
+
+  Args:
+    adb_wrapper: An AdbWrapper instance.
+    retry_packages_dict: A dictionary mapping package name to install
+                         location on device to be retried.
+    apks_dir: A string representing the umbrella apks/ directory where
+              apks will be extracted into.
+    logger: A logger object to log debug or error messages.
+
+  Returns:
+    A dictionary listing APKs that failed to be extracted.
+  """
+  failed_packages_dict = dict()
+  for pkg_name in retry_packages_dict:
+    target_dir = os.path.abspath(os.path.join(apks_dir, pkg_name))
+    os.makedirs(target_dir, exist_ok=True)
+
+    # first, copy the APK to a "safe" location on device
+    tmp_dir = "/data/local/tmp"
+    install_location = retry_packages_dict[pkg_name]
+    cp_cmd = ["cp", install_location, tmp_dir]
+    if not adb_wrapper.shell(cp_cmd):
+      logger.warning("Failed to copy %s into %s.", install_location,
+                     tmp_dir)
+      failed_packages_dict[pkg_name] = install_location
+      os.rmdir(target_dir)
+      continue
+
+    # then, pull the APK from the "safe" location
+    apk_filename = os.path.basename(install_location)
+    new_apk_filepath = os.path.join(tmp_dir, apk_filename)
+    if not adb_wrapper.pull(new_apk_filepath, target_dir):
+      logger.debug("Failed to pull %s from %s", pkg_name, new_apk_filepath)
+      os.rmdir(target_dir)
+      failed_packages_dict[pkg_name] = install_location
+      continue
+
+    # after successful extraction, delete the tmp copy of the file.
+    rm_cmd = ["rm", new_apk_filepath]
+    adb_wrapper.shell(rm_cmd)
+
+  return failed_packages_dict
+
+
+def extract_apks_from_device(adb_wrapper: syscall_wrapper.AdbWrapper,
+                             packages_file_path: str,
+                             apks_dir: str,
+                             logger: logging.Logger) -> dict[str, str]:
+  """Extracts APKs from device according to a list.
+
+  APKs that are enumerated in a config (JSON) file are extracted
+  to a local directory.
+  Note that this excludes the Hubble APK itself.
+
+  Args:
+    adb_wrapper: An AdbWrapper instance.
+    packages_file_path: A string pointing to the location of a packages.txt
+                        file containing a list of packages to be extracted.
+    apks_dir: The umbrella apks/ directory where apps will be
+              extracted into.
+    logger: A logger object to log debug or error messages.
+
+  Returns:
+    A dictionary listing APKs that failed to be extracted. An empty dict is
+    return if there is no errors, or that there is nothing to be extracted.
+  """
+  if not apks_dir:
+    logger.info("APKs dir is empty.")
+    return dict()
+  logger.debug("apks_dir: {}".format(apks_dir))
+
+  if not packages_file_path:
+    logger.error("packages_file_path is empty.")
+    return dict()
+
+  if not os.path.isfile(packages_file_path):
+    logger.error("{} is an invalid file path.".format(packages_file_path))
+    return dict()
+
+  # Read in the file and convert the content into a JSON object
+  packages_buff = ""
+  with open(packages_file_path, "r") as f_in:
+    packages_buff = f_in.read()
+  packages_json = json.loads(packages_buff)
+
+  failed_packages_dict = dict()
+  extracted_count = 0
+  for package_json in packages_json["packages"]:
+    package_name = package_json["name"]
+
+    package_install_location = package_json["installLocation"]
+    target_dir = os.path.abspath(os.path.join(apks_dir, package_name))
+    os.makedirs(target_dir, exist_ok=True)
+    extracted_count += 1
+    if not adb_wrapper.pull(package_install_location, target_dir):
+      logger.debug("Failed to pull %s from %s", package_name,
+                   package_install_location)
+      # delete newly created empty directory
+      os.rmdir(target_dir)
+      extracted_count -= 1
+      failed_packages_dict[package_name] = package_install_location
+
+  failed_retry_packages_dict = _retry_apk_extraction(adb_wrapper,
+                                                     failed_packages_dict,
+                                                     apks_dir,
+                                                     logger)
+  retry_success_count = (len(failed_packages_dict) -
+                         len(failed_retry_packages_dict))
+  extracted_count += retry_success_count
+
+  logger.info("Successfully extracted %d packages (excluding Hubble).",
+              extracted_count)
+  logger.info("%d packages failed to be extracted.",
+              len(failed_retry_packages_dict))
+
+  return failed_retry_packages_dict
+
+
+def write_dict_as_json_to_file(in_dict, file_path: str):
+  """Writes a dict as JSON string to file.
+
+  Args:
+    in_dict: A dictionary containing (key, pair) values to be written.
+    file_path: A string representing a valid path to a file to be written.
+  """
+  with open(file_path, "w") as f_out:
+    f_out.write(json.dumps(in_dict, indent=2))
+
+
+def classify_dir_using_build_fingerprint(
+    adb_wrapper: syscall_wrapper.AdbWrapper,
+    source: str,
+    results_dir: str,
+    extract_apks: bool,
+    logger: logging.Logger) -> Optional[str]:
   """Decides which directory in results/ to dump new result to.
 
   This is a renewed method that makes use of build fingerprint to do
@@ -363,6 +516,8 @@ def classify_directory_using_build_fingerprint(adb_wrapper,
     adb_wrapper: An AdbWrapper instance.
     source: the source directory (on target device) containing new results.
     results_dir: the umbrella results/ directory.
+    extract_apks: A boolean indicating whether or not to also extract the APKs
+                  from the target device.
     logger: A logger object to log debug or error messages.
 
   Returns:
@@ -429,22 +584,47 @@ def classify_directory_using_build_fingerprint(adb_wrapper,
       logger.debug("{} does not exist yet! Using it!".format(target_dir))
       break
 
+  apks_dir = ""
+  if extract_apks:
+    apks_dir = os.path.abspath(os.path.join(target_dir, "apks"))
+    os.makedirs(apks_dir)
+
   if adb_pull_failed:
     source_dir = os.path.join("/tmp/untarred_hubble_results/apps",
                               HUBBLE_PACKAGE_NAME,
                               "ef",
                               "results")
     shutil.move(source_dir, target_dir)
+    failed_extraction_dict = extract_apks_from_device(
+        adb_wrapper, os.path.join(target_dir, "results", "packages.txt"),
+        apks_dir, logger)
+    if failed_extraction_dict:
+      write_dict_as_json_to_file(failed_extraction_dict,
+                                 os.path.join(apks_dir,
+                                              "failed_extraction.txt"))
     return target_dir
   else:
     if adb_wrapper.pull(source, target_dir):
+      failed_extraction_dict = extract_apks_from_device(
+          adb_wrapper, os.path.join(target_dir, "results", "packages.txt"),
+          apks_dir,
+          logger)
+      if failed_extraction_dict:
+        write_dict_as_json_to_file(failed_extraction_dict,
+                                   os.path.join(apks_dir,
+                                                "failed_extraction.txt"))
       return target_dir
   return None
 
 
-def extract_results(adb_wrapper, source, destination,
-                    device, logger, use_old_classification=False):
-  """Extracts results from Hubble's execution.
+def extract_results_and_apks(adb_wrapper: syscall_wrapper.AdbWrapper,
+                             source: str,
+                             destination: str,
+                             device: syscall_wrapper.DeviceInfo,
+                             logger: logging.Logger,
+                             use_old_classification=False,
+                             extract_apks=False) -> Optional[str]:
+  """Extracts results (and optionally APKs) from Hubble's execution.
 
   Args:
     adb_wrapper: An AdbWrapper object that is used to issue ADB commands.
@@ -456,6 +636,8 @@ def extract_results(adb_wrapper, source, destination,
                             classification of result, i.e. based on how ADB
                             displays device information. This is defaulted to
                             False.
+    extract_apks: A boolean indicating whether to also extract APKs from the
+                  device or not. This is defaulted to False.
 
   Returns:
     A string representing the final directory (on host) where results are copied
@@ -484,16 +666,23 @@ def extract_results(adb_wrapper, source, destination,
     os.makedirs(results_dir, exist_ok=True)
 
   if use_old_classification:
-    return classify_directory_using_adb_format(adb_wrapper, source, results_dir,
-                                               device, logger)
+    # Note that this method will not support pulling APKs from device.
+    return classify_dir_using_adb_format(adb_wrapper,
+                                         source,
+                                         results_dir,
+                                         device,
+                                         logger)
 
-  return classify_directory_using_build_fingerprint(adb_wrapper,
-                                                    source,
-                                                    results_dir,
-                                                    logger)
+  return classify_dir_using_build_fingerprint(adb_wrapper,
+                                              source,
+                                              results_dir,
+                                              extract_apks,
+                                              logger)
 
 
-def extract_selinux_policies(adb_wrapper, target_dir, logger):
+def extract_selinux_policies(adb_wrapper: syscall_wrapper.AdbWrapper,
+                             target_dir: str,
+                             logger: logging.Logger):
   """Extracts SELinux policies from the device.
 
   Args:
@@ -589,7 +778,7 @@ def main():
     else:
       logger.info("This is not a Xiaomi phone. Regular workflow continues...")
       if not install_hubble(adb_wrapper, args, logger):
-        logger.error("Error installing Hubble: %s", args.error_message)
+        logger.error("Error installing Hubble: %s", adb_wrapper.error_message)
         continue
     clear_logcat(adb_wrapper)
 
@@ -602,8 +791,14 @@ def main():
       logger.error("Failed to obtain results from Hubble execution.")
       continue
     use_old_classification = args.use_old_results_classification is not None
-    results_dir = extract_results(adb_wrapper, results_source, args.output,
-                                  target_device, logger, use_old_classification)
+    extract_apks = args.pull_all_apks is not None
+    results_dir = extract_results_and_apks(adb_wrapper,
+                                           results_source,
+                                           args.output,
+                                           target_device,
+                                           logger,
+                                           use_old_classification,
+                                           extract_apks)
 
     if not results_dir:
       logger.error("Failed to extract results from target device (%s).",

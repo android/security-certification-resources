@@ -93,6 +93,8 @@ indicating app developer's declaration of whether this package contains code or
 is purely data/resource APK.
 - hash: The SHA256 digest of the package/APK.
 - installLocation: The location where the APK is installed on the system.
+- isPreinstalled: A boolean flag indicating whether the APK is preinstalled or
+installed post setup.
 - isApex: A boolean flag indicating if this package is an [APEX](https://source.android.com/devices/tech/ota/apex) or not.
 - isEnabled: A boolean [flag](https://developer.android.com/reference/android/content/pm/ApplicationInfo.html#enabled)
 telling whether at the time of observation, this package is "active" or in the
