@@ -1229,8 +1229,8 @@ public class InstallPermissionTester extends BasePermissionTester {
                         throw new UnexpectedPermissionTestFailureException(e.getMessage());
                     }
                 }
-                mLogger.logInfo("Connected To Service in the Tester app="+serviceConnection.mComponentName+
-                        ","+serviceConnection.binderSuccess.get());
+                //mLogger.logInfo("Connected To Service in the Tester app="+serviceConnection.mComponentName+
+                //        ","+serviceConnection.binderSuccess.get());
                 if(!serviceConnection.binderSuccess.get()){
                     throw new SecurityException("Test for "+serviceConnection.mComponentName+" has been failed.");
                 }

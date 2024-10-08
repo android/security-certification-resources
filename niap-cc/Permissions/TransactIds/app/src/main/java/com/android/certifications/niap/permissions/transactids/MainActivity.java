@@ -684,6 +684,8 @@ public class MainActivity extends AppCompatActivity {
 
             queryTransactId(Transacts.DISPLAY_DESCRIPTOR,
                     Transacts.setUserPreferredDisplayMode,descriptorTransacts);
+            queryTransactId(Transacts.DISPLAY_DESCRIPTOR,
+                    Transacts.getUserPreferredDisplayMode,descriptorTransacts);
             queryTransactId(Transacts.ACTIVITY_DESCRIPTOR,
                     Transacts.stopAppForUser,descriptorTransacts);
 

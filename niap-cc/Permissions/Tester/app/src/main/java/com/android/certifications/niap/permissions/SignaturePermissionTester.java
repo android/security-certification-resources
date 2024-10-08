@@ -4050,9 +4050,11 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.GET_PEOPLE_TILE_PREVIEW,
                 new PermissionTest(false, Build.VERSION_CODES.S, () -> {
                     Bundle param = new Bundle();
+
                     mContentResolver.call(
                             Uri.parse("content://com.android.systemui.people.PeopleProvider"),
                             "get_people_tile_preview", null, param);
+
                 }));
 
         mPermissionTasks.put(permission.MANAGE_ACTIVITY_TASKS,
@@ -5539,7 +5541,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
                     Parcel result= mTransacts.invokeTransact(Transacts.DROPBOX_SERVICE,
                             Transacts.DROPBOX_DESCRIPTOR,
-                            Transacts.getNextEntry, "test-companion-tag", currTimeMs-(1000*60*60*8), mPackageName);
+                            Transacts.getNextEntry, "test-companion-tag", currTimeMs-(1000*60*60*24), mContext.getPackageName());
 
                     if (result.readInt() == 0) {
                         throw new SecurityException(
@@ -6441,8 +6443,8 @@ public class SignaturePermissionTester extends BasePermissionTester {
                            throw new RuntimeException(e);
                        }
                    }
-                   mLogger.logInfo("Connected To Service in the Companion app="+serviceConnection.mComponentName+
-                           ","+serviceConnection.binderSuccess.get());
+                   //mLogger.logInfo("Connected To Service in the Companion app="+serviceConnection.mComponentName+
+                   //        ","+serviceConnection.binderSuccess.get());
                    if(!serviceConnection.binderSuccess.get()){
                        throw new SecurityException("Test for "+serviceConnection.mComponentName+" has been failed.");
                    }

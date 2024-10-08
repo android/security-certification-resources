@@ -369,6 +369,7 @@ public class Transacts {
     public static final String setProfileOwnerOnOrganizationOwnedDevice="setProfileOwnerOnOrganizationOwnedDevice";
     public static final String cancelStateRequest="cancelStateRequest";
     public static final String setUserPreferredDisplayMode="setUserPreferredDisplayMode";
+    public static final String getUserPreferredDisplayMode="getUserPreferredDisplayMode";
     public static final String stopAppForUser="stopAppForUser";
 
     public static final String ETHERNET_MANAGER_SERVICE = "ethernet";

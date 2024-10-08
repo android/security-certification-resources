@@ -157,7 +157,7 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(PDB_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setDataSaverModeEnabled, 30);
+        transactIds.put(setDataSaverModeEnabled, 20);
         mDescriptorTransacts.put(NETWORK_MANAGEMENT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -195,15 +195,16 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(DREAMS_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setRefreshRateSwitchingType, 51);
-        transactIds.put(setHdrConversionMode, 45);
-        transactIds.put(setTemporaryAutoBrightnessAdjustment, 38);
+        transactIds.put(setRefreshRateSwitchingType, 52);
+        transactIds.put(setHdrConversionMode, 46);
+        transactIds.put(setTemporaryAutoBrightnessAdjustment, 39);
         transactIds.put(startWifiDisplayScan, 6);
-        transactIds.put(setUserPreferredDisplayMode, 42);
-        transactIds.put(shouldAlwaysRespectAppRequestedMode, 50);
-        transactIds.put(requestDisplayModes, 59);
+        transactIds.put(setUserPreferredDisplayMode, 43);
+        transactIds.put(shouldAlwaysRespectAppRequestedMode, 51);
+        transactIds.put(requestDisplayModes, 60);
         transactIds.put(requestColorMode, 20);
-        transactIds.put(enableConnectedDisplay, 56);
+        transactIds.put(enableConnectedDisplay, 57);
+        transactIds.put(getUserPreferredDisplayMode, 44);
         mDescriptorTransacts.put(DISPLAY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -351,10 +352,10 @@ public class SdkV_Transacts extends Transacts {
         transactIds = new HashMap<>();
         transactIds.put(setRingtonePlayer, 78);
         transactIds.put(getRingtonePlayer, 79);
-        transactIds.put(isAudioServerRunning, 138);
+        transactIds.put(isAudioServerRunning, 139);
         transactIds.put(forceRemoteSubmixFullVolume, 18);
         transactIds.put(setVolumeGroupVolumeIndex, 25);
-        transactIds.put(getDeviceVolumeBehavior, 163);
+        transactIds.put(getDeviceVolumeBehavior, 164);
         mDescriptorTransacts.put(AUDIO_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
@@ -423,11 +424,11 @@ public class SdkV_Transacts extends Transacts {
         transactIds = new HashMap<>();
         transactIds.put(getFrontActivityScreenCompatMode, 18);
         // Failed to obtain transactId of getTaskDescription under android.app.IActivityTaskManager: No field TRANSACTION_getTaskDescription in class Landroid/app/IActivityTaskManager$Stub; (declaration of 'android.app.IActivityTaskManager$Stub' appears in /system/framework/framework.jar)
-        transactIds.put(getAssistContextExtras, 57);
+        transactIds.put(getAssistContextExtras, 56);
         transactIds.put(setFrontActivityScreenCompatMode, 19);
-        transactIds.put(getWindowOrganizerController, 64);
+        transactIds.put(getWindowOrganizerController, 63);
         transactIds.put(startActivityFromGameSession, 11);
-        transactIds.put(startActivityAsCaller, 14);
+        transactIds.put(startActivityAsCaller, 13);
         // Failed to obtain transactId of dismissKeyguard under android.app.IActivityTaskManager: No field TRANSACTION_dismissKeyguard in class Landroid/app/IActivityTaskManager$Stub; (declaration of 'android.app.IActivityTaskManager$Stub' appears in /system/framework/framework.jar)
         transactIds.put(getActivityClientController, 17);
         mDescriptorTransacts.put(ACTIVITY_TASK_DESCRIPTOR, transactIds);
@@ -559,57 +560,57 @@ public class SdkV_Transacts extends Transacts {
         mDescriptorTransacts.put(MEDIA_ROUTER_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
-        transactIds.put(setUserControlDisabledPackages, 340);
+        transactIds.put(setUserControlDisabledPackages, 341);
         transactIds.put(setKeyguardDisabledFeatures, 61);
-        transactIds.put(getDoNotAskCredentialsOnBoot, 234);
-        transactIds.put(setShortSupportMessage, 248);
+        transactIds.put(getDoNotAskCredentialsOnBoot, 235);
+        transactIds.put(setShortSupportMessage, 249);
         transactIds.put(getNearbyNotificationStreamingPolicy, 58);
-        transactIds.put(setPermittedInputMethods, 144);
-        transactIds.put(setStrings, 376);
+        transactIds.put(setPermittedInputMethods, 145);
+        transactIds.put(setStrings, 377);
         transactIds.put(setApplicationRestrictions, 127);
-        transactIds.put(getWifiSsidPolicy, 368);
-        transactIds.put(setPermissionGrantState, 239);
-        transactIds.put(setUsbDataSignalingEnabled, 362);
-        transactIds.put(forceSecurityLogs, 274);
-        transactIds.put(setResetPasswordToken, 295);
+        transactIds.put(getWifiSsidPolicy, 369);
+        transactIds.put(setPermissionGrantState, 240);
+        transactIds.put(setUsbDataSignalingEnabled, 363);
+        transactIds.put(forceSecurityLogs, 275);
+        transactIds.put(setResetPasswordToken, 296);
         transactIds.put(setFactoryResetProtectionPolicy, 42);
-        transactIds.put(addCrossProfileWidgetProvider, 215);
-        transactIds.put(setConfiguredNetworksLockdownState, 185);
-        transactIds.put(setCommonCriteriaModeEnabled, 342);
-        transactIds.put(getCrossProfileWidgetProviders, 217);
-        transactIds.put(setAccountManagementDisabled, 170);
-        transactIds.put(setStatusBarDisabled, 232);
-        transactIds.put(setSystemUpdatePolicy, 228);
+        transactIds.put(addCrossProfileWidgetProvider, 216);
+        transactIds.put(setConfiguredNetworksLockdownState, 186);
+        transactIds.put(setCommonCriteriaModeEnabled, 343);
+        transactIds.put(getCrossProfileWidgetProviders, 218);
+        transactIds.put(setAccountManagementDisabled, 171);
+        transactIds.put(setStatusBarDisabled, 233);
+        transactIds.put(setSystemUpdatePolicy, 229);
         transactIds.put(setDeviceOwner, 78);
         // Failed to obtain transactId of markProfileOwnerOnOrganizationOwnedDevice under android.app.admin.IDevicePolicyManager: No field TRANSACTION_markProfileOwnerOnOrganizationOwnedDevice in class Landroid/app/admin/IDevicePolicyManager$Stub; (declaration of 'android.app.admin.IDevicePolicyManager$Stub' appears in /system/framework/framework.jar)
         transactIds.put(isPackageSuspended, 99);
-        transactIds.put(setProfileOwnerOnOrganizationOwnedDevice, 323);
-        transactIds.put(setTrustAgentConfiguration, 213);
-        transactIds.put(getString, 378);
-        transactIds.put(hasLockdownAdminConfiguredNetworks, 186);
-        transactIds.put(setLockTaskPackages, 177);
-        transactIds.put(setOrganizationName, 259);
-        transactIds.put(isDevicePotentiallyStolen, 369);
-        transactIds.put(getPermittedInputMethodsAsUser, 146);
-        transactIds.put(setApplicationExemptions, 382);
+        transactIds.put(setProfileOwnerOnOrganizationOwnedDevice, 324);
+        transactIds.put(setTrustAgentConfiguration, 214);
+        transactIds.put(getString, 379);
+        transactIds.put(hasLockdownAdminConfiguredNetworks, 187);
+        transactIds.put(setLockTaskPackages, 178);
+        transactIds.put(setOrganizationName, 260);
+        transactIds.put(isDevicePotentiallyStolen, 370);
+        transactIds.put(getPermittedInputMethodsAsUser, 147);
+        transactIds.put(setApplicationExemptions, 383);
         transactIds.put(setDefaultSmsApplication, 125);
         transactIds.put(setPasswordExpirationTimeout, 20);
         transactIds.put(installCaCert, 101);
         transactIds.put(setUserRestriction, 134);
-        transactIds.put(setSecurityLoggingEnabled, 269);
+        transactIds.put(setSecurityLoggingEnabled, 270);
         transactIds.put(setMaximumTimeToLock, 36);
         transactIds.put(setScreenCaptureDisabled, 55);
-        transactIds.put(clearSystemUpdatePolicyFreezePeriodRecord, 230);
+        transactIds.put(clearSystemUpdatePolicyFreezePeriodRecord, 231);
         transactIds.put(setCameraDisabled, 53);
-        transactIds.put(installUpdateFromFile, 324);
-        transactIds.put(setMtePolicy, 384);
+        transactIds.put(installUpdateFromFile, 325);
+        transactIds.put(setMtePolicy, 385);
         transactIds.put(setMaximumFailedPasswordsForWipe, 33);
         transactIds.put(installKeyPair, 106);
         mDescriptorTransacts.put(DEVICE_POLICY_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();
         transactIds.put(getAvailableExtensionInterfaceNames, 5);
-        transactIds.put(getCurrentTunedInfos, 41);
+        transactIds.put(getCurrentTunedInfos, 42);
         mDescriptorTransacts.put(TV_INPUT_DESCRIPTOR, transactIds);
 
         transactIds = new HashMap<>();

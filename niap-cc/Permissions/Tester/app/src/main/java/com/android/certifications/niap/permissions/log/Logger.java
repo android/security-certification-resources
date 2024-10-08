@@ -122,7 +122,8 @@ public interface Logger {
         }
 
         String msg = permission + ": " + (testPassed ? PASSED : "FAILED") + " (granted = "
-                + permissionGranted + ", signature match = " + signatureMatch
+                + permissionGranted + ", " +
+                "signature match = " + signatureMatch
                 + ", platform signature match = " + platformSignatureMatch + ")";
 
         if(testPassed){
