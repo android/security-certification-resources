@@ -1254,23 +1254,11 @@ public class InstallPermissionTester extends BasePermissionTester {
                 binderSuccess.set(false);
                 mComponentName = name.getShortClassName();
                 TestBindService service = TestBindService.Stub.asInterface(binder);
-                //service.testMethod();
-                /*
-                try {
-                    s
-                    //mLogger.logSystem(">ok?");
-                } catch (RemoteException e) {
-                    //mLogger.logSystem(">rte");
-                    //throw new RuntimeException(e);
-                }*/
                 try {
                     service.testMethod();
                     binderSuccess.set(true);
-                    //mLogger.logSystem("here1");
                 } catch (RemoteException e) {
                     binderSuccess.set(false);
-                    //mLogger.logSystem("here2");
-                    //e.printStackTrace();
                     mLogger.logError(name+" failure."+e.getMessage(),e);
                 }
                 lock.notify();

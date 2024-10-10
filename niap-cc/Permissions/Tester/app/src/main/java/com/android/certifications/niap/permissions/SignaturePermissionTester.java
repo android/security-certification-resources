@@ -194,6 +194,7 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.AppOpsManagerCompat;
 import androidx.credentials.CreateCredentialRequest;
 import androidx.credentials.provider.ProviderCreateCredentialRequest;
 import androidx.preference.PreferenceManager;
@@ -2750,8 +2751,11 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.ACCESS_MESSAGES_ON_ICC,
                 new PermissionTest(false, VERSION_CODES.R, () -> {
                     SmsManager smsManager = SmsManager.getSmsManagerForSubscriptionId(0);
-                    invokeReflectionCall(smsManager.getClass(), "getAllMessagesFromIcc", smsManager,
-                            null);
+//                    invokeReflectionCall(smsManager.getClass(), "getAllMessagesFromIcc", smsManager,
+//                            null);
+                    invokeReflectionCall(smsManager.getClass(), "copyMessageToIcc", smsManager
+                            ,new Class[]{byte[].class,byte[].class,int.class},
+                            "smsmessage".getBytes(),"dummypdu".getBytes(),0);
                 }));
 
         mPermissionTasks.put(permission.ACCESS_VIBRATOR_STATE,
@@ -2840,7 +2844,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.LISTEN_ALWAYS_REPORTED_SIGNAL_STRENGTH,
                 new PermissionTest(false, VERSION_CODES.R, () -> {
                     if (Build.VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
-                        //The way to using the listner was obsolated after android T, so let me choose using this option instead
+                        //The way to using the listener was obsoleted after android T, so let me choose using this option instead
                         //https://cs.android.com/android/platform/superproject/+/master:cts/tests/tests/telephony/current/src/android/telephony/cts/PhoneStateListenerTest.java;l=328;drc=e64188140ba71c7b7424b044119b37af1dde6609?=4186
                         //problem : if the signature does not match it always fail,because the method also checks MODIFY_PHONE_STATE permission
 
@@ -5541,7 +5545,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
 
                     Parcel result= mTransacts.invokeTransact(Transacts.DROPBOX_SERVICE,
                             Transacts.DROPBOX_DESCRIPTOR,
-                            Transacts.getNextEntry, "test-companion-tag", currTimeMs-(1000*60*60*24), mContext.getPackageName());
+                            Transacts.getNextEntry, "test-companion-tag", currTimeMs-(1000*60*60*24), mPackageName);
 
                     if (result.readInt() == 0) {
                         throw new SecurityException(
@@ -6650,7 +6654,13 @@ public class SignaturePermissionTester extends BasePermissionTester {
             test.runTest();
         } else {
             boolean permissionGranted = isPermissionGranted(permission);
+            //if(!mPlatformSignatureMatch) permissionGranted = false;
             try {
+                //Parcel op = mTransacts.invokeTransact(Transacts.APP_OPS_SERVICE,
+                //        Transacts.APP_OPS_DESCRIPTOR,Transacts.permissionToOpCode,permission);
+                //AppOpsManagerCompat.
+                //mLogger.logDebug(permission+" opecode="+op.readInt());
+
                 test.runTest();
                 // If the permission was granted then a SecurityException should not have been
                 // thrown so the result of the test should match whether the permission was granted.

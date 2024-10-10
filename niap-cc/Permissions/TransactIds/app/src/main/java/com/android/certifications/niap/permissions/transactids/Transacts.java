@@ -454,6 +454,8 @@ public class Transacts {
     public static final String setStandbyEnabled = "setStandbyEnabled";
     public static final String getCacheSizeBytes = "getCacheSizeBytes";
     public static final String setUserRestriction = "setUserRestriction";
+    public static final String permissionToOpCode = "permissionToOpCode";
+
     public static final String monitorGestureInput = "monitorGestureInput";
     public static final String moveActivityTaskToBack = "moveActivityTaskToBack";
     public static final String getRuntimePermissionsVersion = "getRuntimePermissionsVersion";

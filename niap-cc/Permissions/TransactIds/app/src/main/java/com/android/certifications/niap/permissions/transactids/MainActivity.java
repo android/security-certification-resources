@@ -265,6 +265,9 @@ public class MainActivity extends AppCompatActivity {
                     descriptorTransacts);
             queryTransactId(Transacts.APP_OPS_DESCRIPTOR, Transacts.setUserRestriction,
                     descriptorTransacts);
+            queryTransactId(Transacts.APP_OPS_DESCRIPTOR, Transacts.permissionToOpCode,
+                    descriptorTransacts);
+
             queryTransactId(Transacts.AUDIO_DESCRIPTOR, Transacts.getRingtonePlayer,
                     descriptorTransacts);
             queryTransactId(Transacts.AUDIO_DESCRIPTOR, Transacts.isAudioServerRunning,
