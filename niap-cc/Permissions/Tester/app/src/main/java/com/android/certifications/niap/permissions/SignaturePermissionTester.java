@@ -1571,7 +1571,7 @@ public class SignaturePermissionTester extends BasePermissionTester {
         mPermissionTasks.put(permission.READ_PRIVILEGED_PHONE_STATE,
                 new PermissionTest(false, () -> {
                     invokeReflectionCall(mTelephonyManager.getClass(), "getUiccSlotsInfo",
-                            mTelephonyManager, null);
+                            mTelephonyManager, new Class<?>[]{},null);
                 }));
 
         mPermissionTasks.put(permission.READ_SEARCH_INDEXABLES, new PermissionTest(false,
