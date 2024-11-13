@@ -785,6 +785,10 @@ public class Transacts {
     public static final String isWakeLockLevelSupported = "isWakeLockLevelSupported";
     public static final String setPackagesSuspendedAsUser = "setPackagesSuspendedAsUser";
 
+    public static final String getActiveNetwork = "getActiveNetwork";
+    public static final String getActiveNetworkInfo = "getActiveNetworkInfo";
+
+
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an
      * Mapping from the descriptor class to the constant variable name for use when writing an

@@ -294,6 +294,11 @@ public class MainActivity extends AppCompatActivity {
                     descriptorTransacts);
             queryTransactId(Transacts.CONNECTIVITY_DESCRIPTOR, Transacts.tether,
                     descriptorTransacts);
+            queryTransactId(Transacts.CONNECTIVITY_DESCRIPTOR, Transacts.getActiveNetwork,
+                    descriptorTransacts);
+            queryTransactId(Transacts.CONNECTIVITY_DESCRIPTOR, Transacts.getActiveNetworkInfo,
+                    descriptorTransacts);
+
             queryTransactId(Transacts.CROSS_PROFILE_APPS_DESCRIPTOR,
                     Transacts.clearInteractAcrossProfilesAppOps, descriptorTransacts);
             queryTransactId(Transacts.DEVICE_POLICY_DESCRIPTOR,

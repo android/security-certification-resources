@@ -69,11 +69,11 @@ public class InternalPermissionsJUnitTest {
     private static final List<String> mPermissions;
     static {
         mPermissions = new ArrayList<>();
-        /*
+
         //12
         mPermissions.add(permission.MANAGE_HOTWORD_DETECTION);
         mPermissions.add(permission.OBSERVE_SENSOR_PRIVACY);
-        mPermissions.add(permission.DOMAIN_VERIFICATION_AGENT);
+        //mPermissions.add(permission.DOMAIN_VERIFICATION_AGENT);
         mPermissions.add(permission.ACCESS_RCS_USER_CAPABILITY_EXCHANGE);
         mPermissions.add(permission.ASSOCIATE_COMPANION_DEVICES);
         mPermissions.add(permission.BYPASS_ROLE_QUALIFICATION);
@@ -81,7 +81,7 @@ public class InternalPermissionsJUnitTest {
         //13
         mPermissions.add(permission.SET_DEFAULT_ACCOUNT_FOR_CONTACTS);
         mPermissions.add(permission.SUBSCRIBE_TO_KEYGUARD_LOCKED_STATE);
-        mPermissions.add(permission.CREATE_VIRTUAL_DEVICE);
+        //mPermissions.add(permission.CREATE_VIRTUAL_DEVICE);
 
         //Regression//mPermissions.add(permission.SEND_SAFETY_CENTER_UPDATE);
         mPermissions.add(permission.ACCESS_AMBIENT_CONTEXT_EVENT);
@@ -94,7 +94,7 @@ public class InternalPermissionsJUnitTest {
         mPermissions.add(permission.LAUNCH_CAPTURE_CONTENT_ACTIVITY_FOR_NOTE);
         mPermissions.add(permission.MANAGE_DEVICE_LOCK_STATE);
         //mPermissions.add(permission.MANAGE_DEVICE_POLICY_ACCOUNT_MANAGEMENT);
-        */
+
         //15
         mPermissions.add(permission.QUERY_DEVICE_STOLEN_STATE);
         mPermissions.add(permission.ALWAYS_UPDATE_WALLPAPER);
