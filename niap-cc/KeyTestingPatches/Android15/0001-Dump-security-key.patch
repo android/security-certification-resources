@@ -1,0 +1,29 @@
+From 5bfeb985b2eacef0e37f4d6286ede353d9f4fb30 Mon Sep 17 00:00:00 2001
+From: Sunil Ravi <sunilravi@google.com>
+Date: Sun, 10 Mar 2019 12:49:53 -0700
+Subject: [PATCH] Dump security key
+
+Dump security keys from supplicant
+
+Bug: 123907624
+Test: Regression test
+Change-Id: I77254d92077d20d6a9520d7cf9f55eecbb2853f6
+---
+ src/utils/wpa_debug.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/utils/wpa_debug.c b/src/utils/wpa_debug.c
+index a338a20..919dc8a 100644
+--- a/src/utils/wpa_debug.c
++++ b/src/utils/wpa_debug.c
+@@ -390,7 +390,7 @@ void wpa_hexdump(int level, const char *title, const void *buf, size_t len)
+ 
+ void wpa_hexdump_key(int level, const char *title, const void *buf, size_t len)
+ {
+-       _wpa_hexdump(level, title, buf, len, wpa_debug_show_keys, 0);
++       _wpa_hexdump(level, title, buf, len, 1/* wpa_debug_show_keys */, 0);
+ }
+ 
+ 
+-- 
+2.28.0.236.gb10cc79966-goog
