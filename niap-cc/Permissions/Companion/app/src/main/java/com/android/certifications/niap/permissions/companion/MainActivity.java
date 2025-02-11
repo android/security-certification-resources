@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                             boolean.class}, namespace, name, value, makeDefault);
             return (boolean)r;
         } catch (Exception e) {
-            logdebug("DeviceConfig.setProperty failed.(" + a + "," + b + "," + value + ")",e);
+            logdebug("DeviceConfig.setProperty failed.(" + namespace + "," + name + "," + value + ")",e);
             e.printStackTrace();
             return false;
         }
