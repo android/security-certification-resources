@@ -18,7 +18,8 @@ apply plugin: 'com.android.application'
 def applicationName = 'Companion'
 android {
     //compileSdkPreview "VanillaIceCream"
-    compileSdk 35
+    compileSdkPreview "Baklava"
+    //compileSdk 35
     signingConfigs {
         // TODO :
         // Prepare your own companion.jks and put it into
@@ -40,8 +41,9 @@ android {
     }
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions.companion"
-        //targetSdkPreview "VanillaIceCream"
-        targetSdkVersion 35
+        targetSdkPreview "Baklava"
+        //targetSdkVersion 35
+
         minSdk 28
         //minSdkPreview "28"
         versionCode 1

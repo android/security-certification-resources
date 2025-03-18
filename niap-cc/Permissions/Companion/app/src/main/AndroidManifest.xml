@@ -524,7 +524,22 @@
         <service android:name=".services.TestBindOnDeviceSandboxedInferenceServiceService"
             android:permission="android.permission.BIND_ON_DEVICE_SANDBOXED_INFERENCE_SERVICE"
             android:enabled="true" android:exported="true" />
-
+        <!-- for api 36 -->
+        <service android:name=".services.TestBindPopulationDensityProviderServiceService"
+            android:permission="android.permission.BIND_POPULATION_DENSITY_PROVIDER_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindIntrusionDetectionEventTransportServiceService"
+            android:permission="android.permission.BIND_INTRUSION_DETECTION_EVENT_TRANSPORT_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindRkpServiceService"
+            android:permission="android.permission.BIND_RKP_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindAppFunctionServiceService"
+            android:permission="android.permission.BIND_APP_FUNCTION_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindDependencyInstallerService"
+            android:permission="android.permission.BIND_DEPENDENCY_INSTALLER"
+            android:enabled="true" android:exported="true" />
 
     </application>
 

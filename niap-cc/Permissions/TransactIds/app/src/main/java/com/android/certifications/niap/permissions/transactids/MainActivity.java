@@ -81,6 +81,10 @@ public class MainActivity extends AppCompatActivity {
     public static boolean isAtLeastV() {
         return Build.VERSION.SDK_INT >= 34 && isAtLeastPreReleaseCodename("VanillaIceCream", Build.VERSION.CODENAME);
     }
+    public static boolean isAtLeastBaklava() {
+        return Build.VERSION.SDK_INT >= 35 && isAtLeastPreReleaseCodename("Baklava", Build.VERSION.CODENAME);
+    }
+
 
     protected static boolean isAtLeastPreReleaseCodename(@NonNull String codename, @NonNull String buildCodename) {
         if ("REL".equals(buildCodename)) {
@@ -119,11 +123,12 @@ public class MainActivity extends AppCompatActivity {
             deviceName = deviceName.substring(0, 1).toUpperCase() + deviceName.substring(
                     1).toLowerCase();
         }
-
-        if(isAtLeastV()){
+        if(isAtLeastBaklava()) {
+            sClassName = "SdkBaklava_Transacts";
+        }else if(isAtLeastV()){
             sClassName = "SdkV_Transacts";//deviceName + "ApiLevel35Transacts";
         } else {
-            sClassName = "SdkV_Transacts";//deviceName + "ApiLevel35Transacts";
+            sClassName = "SdkU_Transacts";//deviceName + "ApiLevel35Transacts";
             //sClassName = deviceName + "ApiLevel" + Build.VERSION.SDK_INT + "Transacts";
         }
     }
@@ -131,7 +136,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(isAtLeastV()){
+        if(isAtLeastBaklava()){
+            ACTUAL_SDK_INT = 36;
+        } else if(isAtLeastV()){
             ACTUAL_SDK_INT = 35;
         }
         Log.d("tag","Launch SDK INT>"+ACTUAL_SDK_INT);
