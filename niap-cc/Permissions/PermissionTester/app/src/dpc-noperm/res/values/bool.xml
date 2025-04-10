@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="inverse_test_result">true</bool>
+    <bool name="debug_mode">false</bool>
+    <bool name="dpc_mode">true</bool>
+</resources>

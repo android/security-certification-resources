@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.android.certification.niap.permission.dpctester"
+    >
+    <!-- DPC app base application components -->
+    <application
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name">
+        <activity android:name="android.app.Activity" android:exported="true" android:permission="android.permission.LAUNCH_DEVICE_MANAGER_SETUP">
+            <intent-filter>
+                <action android:name="android.app.action.ROLE_HOLDER_PROVISION_MANAGED_DEVICE_FROM_TRUSTED_SOURCE" />
+                <action android:name="android.app.action.ROLE_HOLDER_PROVISION_MANAGED_PROFILE" />
+                <action android:name="android.app.action.ROLE_HOLDER_PROVISION_FINALIZATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".receiver.DeviceAdminReceiver"
+            android:exported="true"
+            android:description="@string/app_name"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin_receiver_enable"/>
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/>
+                <action android:name="android.app.action.PROFILE_PROVISIONING_COMPLETE"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.app.action.PROFILE_OWNER_CHANGED"/>
+                <action android:name="android.app.action.DEVICE_OWNER_CHANGED"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receiver.DelegatedAdminReceiver"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <intent-filter>
+                <action android:name="android.app.action.CHOOSE_PRIVATE_KEY_ALIAS"/>
+                <action android:name="android.app.action.NETWORK_LOGS_AVAILABLE"/>
+                <action android:name="android.app.action.SECURITY_LOGS_AVAILABLE"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".receiver.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".comp.ProfileOwnerService"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN"/>
+
+        <service
+            android:name=".comp.DeviceOwnerService"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN"/>
+
+        <service
+            android:name=".service.DeviceAdminService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_SERVICE" />
+            </intent-filter>
+        </service>
+    </application>
+    <!-- DPC app base permissions -->
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_MANAGED_SUBSCRIPTIONS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_DEVICE_CONFIG" />
+    <uses-permission android:name="android.permission.WRITE_DEVICE_CONFIG" />
+
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.REQUEST_PASSWORD_COMPLEXITY"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+    <uses-permission android:name="com.google.android.setupwizard.SETUP_COMPAT_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.UPDATE_DEVICE_MANAGEMENT_RESOURCES"/>
+
+    <!-- DPC Permissions ** Should be blank-->
+
+</manifest>

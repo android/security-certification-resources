@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.android.certification.niap.permission.dpctester">
+    <uses-permission android:name="android.permission.RADIO_SCAN_WITHOUT_LOCATION"
+        tools:ignore="ProtectedPermissions"/>
+    <!--RADIO_SCAN_WITHOUT_LOCATION request CHANGE_WIFI_STATE permission-->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
+    <uses-permission android:name="android.permission.UWB_PRIVILEGED"
+        tools:ignore="ProtectedPermissions"/>
+    <!--UWB_PRIVILEGED request UWB_RANGING permission-->
+    <uses-permission android:name="android.permission.UWB_RANGING"
+        tools:ignore="ProtectedPermissions"/>
+
+    <uses-permission android:name="android.permission.NETWORK_SCAN"
+        tools:ignore="ProtectedPermissions" />
+    <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    -->
+    <uses-permission android:name="android.permission.MANAGE_SMARTSPACE"
+        tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.GET_BINDING_UID_IMPORTANCE" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!--To test below permission you shouldn't declare query_all_packages in manifest -->
+    <uses-permission android:name="android.permission.LIST_ENABLED_CREDENTIAL_PROVIDERS" />
+    <!--LIST_ENABLED_CREDENTIAL_PROVIDERS request INTERACT_ACROSS_USERS permission-->
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS"
+        tools:ignore="ProtectedPermissions" />
+
+    <!--Below permission require query_all_packages declaration for testing -->
+    <!--<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />-->
+    <uses-permission android:name="android.permission.SET_APP_SPECIFIC_LOCALECONFIG" />
+</manifest>

@@ -321,6 +321,10 @@ public class Transacts {
     public static final String ATTESTATION_VERIFICATION_DESCRIPTOR =
             "android.security.attestationverification.IAttestationVerificationManagerService";
 
+
+
+
+
     public static final String verifyAttestation = "verifyAttestation";
     public static final String verifyToken = "verifyToken";
 
@@ -788,7 +792,46 @@ public class Transacts {
     public static final String getActiveNetwork = "getActiveNetwork";
     public static final String getActiveNetworkInfo = "getActiveNetworkInfo";
 
+    /* For Android 36*/
+    public static final String INTRUSION_DETECTION_DESCRIPTOR =
+            "android.security.intrusiondetection.IIntrusionDetectionService";
+    public static final String INTRUSION_DETECTION_SERVICE = "intrusion_detection";
+    public static final String enable = "enable";
+    public static final String disable  = "disable";
+    public static final String addStateCallback  = "addStateCallback";
 
+    /* For IInputManger */
+
+    public static final String registerKeyGestureEventListener  = "registerKeyGestureEventListener";
+    public static final String registerKeyEventActivityListener = "registerKeyEventActivityListener";
+    public static final String unregisterKeyEventActivityListener = "unregisterKeyEventActivityListener";
+    /*For IHealthConnectService */
+    public static final String getChangesForBackup  = "getChangesForBackup";
+    public static final String canRestore  = "canRestore";
+    public static final String restoreChanges  = "restoreChanges";
+
+    /*For IHealthConnectService */
+    public static final String TRADE_IN_MODE_DESCRIPTOR = "android.os.ITradeInMode";
+    public static final String TRADE_IN_MODE_SERVICE = "tradeinmode";
+    public static final String start = "start";
+    public static final String enterEvaluationMode = "enterEvaluationMode";
+
+    public static final String VIBRATOR_MANAGER_SERVICE = Context.VIBRATOR_MANAGER_SERVICE;
+    public static final String VIBRATOR_MANAGER_DESCRIPTOR = "android.os.IVibratorManagerService";
+    public static final String startVendorVibrationSession="startVendorVibrationSession";
+
+    public static final String DYNAMIC_INSTRUMENTATION_MANAGER_DESCRIPTOR = "";
+
+    public static final String AUDIO_POLICY_SERVICE_DESCRIPTOR = "android.media.IAudioPolicyService";
+    public static final String AUDIO_POLICY_SERVICE  = "audio_policy";
+    public static final String getInputForAttr = "getInputForAttr";
+
+    public static final String AUTHENTICATION_POLICY_SERVICE = "authentication_policy";
+    public static final String AUTHENTICATION_POLICY_SERVICE_DESCRIPTOR
+            = "android.security.authenticationpolicy.IAuthenticationPolicyService";
+
+    public static final String enableSecureLockDevice = "enableSecureLockDevice";//
+    public static final String disableSecureLockDevice = "disableSecureLockDevice";//
     /**
      * Mapping from the descriptor class to the constant variable name for use when writing an
      * Mapping from the descriptor class to the constant variable name for use when writing an

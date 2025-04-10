@@ -1,0 +1,57 @@
+@Grab( 'com.google.guava:guava:32.1.2-jre' )
+
+import com.google.common.base.CaseFormat
+import groovy.json.JsonSlurper
+
+ext {
+    // # Command Snippets
+    // ./gradlew genManifestTags
+    // ./gradlew genSignatureConstants
+    // ./gradlew genTestPlaceHolders
+
+    String.metaClass.caseFormat = { from, to ->
+        from.to(to, delegate)
+    }
+
+
+    task genSignatureConstants() {
+        doLast {
+            def src = new File("permissions.json").text;
+            def json2 = new JsonSlurper().parseText(src)
+            signatureConstants(json2.V, "15")
+        }
+    }
+
+
+    testPlaceHolders = { json3 , target->
+        json3.each { category, list ->
+            println(category)
+            if (category.equals(target)) {
+                println "//$category permissions as of Android 15"
+                list.each { item ->
+                    println item
+                    item2 = item.replace("MANAGE_DEVICE_POLICY_","")
+                    println item2
+                    var funName = item.caseFormat(CaseFormat.UPPER_UNDERSCORE,CaseFormat.UPPER_CAMEL)
+                    println funName
+                    /*
+                    println """\t@PermissionTest($item,34,35)
+\tfun test${funName}(){
+\t
+\t}
+"""*/
+                }
+            }
+        }
+    }
+
+
+    task genTestPlaceHolders() {
+        doLast {
+            def src = new File("codegen-permissions.json").text;
+            def json4 = new JsonSlurper().parseText(src)
+            testPlaceHolders(json4.U,"internal");
+        }
+    }
+
+}

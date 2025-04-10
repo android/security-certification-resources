@@ -1,0 +1,67 @@
+{
+  "36": {
+    "install": [
+      "android.permission.APPLY_PICTURE_PROFILE",
+      "android.permission.READ_COLOR_ZONES",
+      "android.permission.QUERY_ADVANCED_PROTECTION_MODE",
+      "android.permission.TV_IMPLICIT_ENTER_PIP",
+      "android.permission.XR_TRACKING_IN_BACKGROUND"
+    ],
+    "signature": [
+      "android.permission.OBSERVE_PICTURE_PROFILES",
+      "android.permission.MANAGE_GLOBAL_PICTURE_QUALITY_SERVICE",
+      "android.permission.MANAGE_GLOBAL_SOUND_QUALITY_SERVICE",
+      "android.permission.BIND_POPULATION_DENSITY_PROVIDER_SERVICE",
+      "android.permission.THREAD_NETWORK_TESTING",
+      "android.permission.REMOVE_ACCOUNTS",
+      "android.permission.COPY_ACCOUNTS",
+      "android.permission.VIBRATE_VENDOR_EFFECTS",
+      "android.permission.START_VIBRATION_SESSIONS",
+      "android.permission.MANAGE_ADVANCED_PROTECTION_MODE",
+      "android.permission.READ_INTRUSION_DETECTION_STATE",
+      "android.permission.MANAGE_INTRUSION_DETECTION_STATE",
+      "android.permission.BIND_INTRUSION_DETECTION_EVENT_TRANSPORT_SERVICE",
+      "android.permission.REQUEST_COMPANION_PROFILE_SENSOR_DEVICE_STREAMING",
+      "android.permission.BIND_RKP_SERVICE",
+      "android.permission.READ_SYSTEM_PREFERENCES",
+      "android.permission.WRITE_SYSTEM_PREFERENCES",
+      "android.permission.EYE_CALIBRATION",
+      "android.permission.FACE_TRACKING_CALIBRATION",
+      "android.permission.IMPORT_XR_ANCHOR",
+      "android.permission.ALWAYS_BOUND_TV_INPUT",
+      "android.permission.BYPASS_CONCURRENT_RECORD_AUDIO_RESTRICTION",
+      "android.permission.ACCESS_FINE_POWER_MONITORS",
+      "android.permission.READ_SUBSCRIPTION_PLANS",
+      "android.permission.BIND_DEPENDENCY_INSTALLER",
+      "android.permission.INSTALL_DEPENDENCY_SHARED_LIBRARIES",
+      "android.permission.BIND_APP_FUNCTION_SERVICE",
+      "android.permission.MANAGE_KEY_GESTURES",
+      "android.permission.LISTEN_FOR_KEY_ACTIVITY",
+      "android.permission.BACKUP_HEALTH_CONNECT_DATA_AND_SETTINGS",
+      "android.permission.RESTORE_HEALTH_CONNECT_DATA_AND_SETTINGS",
+      "android.permission.CAPTURE_CONSENTLESS_BUGREPORT_DELEGATED_CONSENT",
+      "android.permission.MANAGE_SECURE_LOCK_DEVICE",
+      "android.permission.ENTER_TRADE_IN_MODE",
+      "android.permission.DYNAMIC_INSTRUMENTATION",
+      "android.permission.RESOLVE_COMPONENT_FOR_UID",
+      "android.permission.RESERVED_FOR_TESTING_SIGNATURE",
+      "android.permission.SINGLE_USER_TIS_ACCESS",
+      "android.permission.ACCESS_TEXT_CLASSIFIER_BY_TYPE"
+    ],
+    "runtime": [
+      "android.permission.RANGING",
+      "android.permission.EYE_TRACKING_COARSE",
+      "android.permission.FACE_TRACKING",
+      "android.permission.HAND_TRACKING",
+      "android.permission.SCENE_UNDERSTANDING_COARSE",
+      "android.permission.EYE_TRACKING_FINE",
+      "android.permission.HEAD_TRACKING",
+      "android.permission.SCENE_UNDERSTANDING_FINE"
+    ],
+    "internal": [
+      "android.permission.MANAGE_DEVICE_POLICY_APP_FUNCTIONS",
+      "android.permission.ADD_MIRROR_DISPLAY",
+      "android.permission.EXECUTE_APP_FUNCTIONS"
+    ]
+  }
+}

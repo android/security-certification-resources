@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2024 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    android:minHeight="30dp"
+    android:orientation="horizontal"
+    android:gravity="top">
+    <TextView
+        android:id="@+id/logrowIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:textColor="@color/text_black"
+        android:text="⚫︎"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="vertical"
+        android:gravity="top">
+    <TextView
+        android:id="@+id/logrowLabel"
+        android:textColor="@color/text_black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="11sp"
+        android:textFontWeight="800"
+        android:text="normal log"/>
+    <TextView
+        android:id="@+id/logrowText"
+        android:textColor="@color/text_black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:text="blankaaaa"/>
+    </LinearLayout>
+</LinearLayout>
+<TextView
+    android:id="@+id/logrowNextArrow"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:gravity="end|center_vertical"
+    android:layout_gravity="end|center_vertical"
+    android:textColor="@color/text_black"
+    android:text="▶︎"
+    />
+</FrameLayout>

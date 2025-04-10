@@ -17,6 +17,8 @@
 package com.android.certifications.niap.permissions.transactids;
 
 import static com.android.certifications.niap.permissions.transactids.Transacts.ACTIVITY_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.AUDIO_POLICY_SERVICE_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.AUTHENTICATION_POLICY_SERVICE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.BACKGROUND_INSTALL_CONTROL_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.COMPANION_DEVICE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.CONTEXTUAL_SEARCH_DESCRIPTOR;
@@ -26,7 +28,9 @@ import static com.android.certifications.niap.permissions.transactids.Transacts.
 import static com.android.certifications.niap.permissions.transactids.Transacts.FEATURE_FLAGS_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.FILE_INTEGRITY_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.GRAMMATICAL_INFLECTION_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.HEALTH_CONNECT_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.INPUT_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.INTRUSION_DETECTION_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.MEDIA_ROUTER_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.NSD_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.ON_DEVICE_INTELLINGENCE_DESCRIPTOR;
@@ -34,8 +38,10 @@ import static com.android.certifications.niap.permissions.transactids.Transacts.
 import static com.android.certifications.niap.permissions.transactids.Transacts.POWER_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.SYSTEM_CONFIG_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.TELEPHONY_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.TRADE_IN_MODE_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.TRANSACT_PREFIX;
 import static com.android.certifications.niap.permissions.transactids.Transacts.USAGE_STATS_DESCRIPTOR;
+import static com.android.certifications.niap.permissions.transactids.Transacts.VIBRATOR_MANAGER_DESCRIPTOR;
 import static com.android.certifications.niap.permissions.transactids.Transacts.WINDOW_DESCRIPTOR;
 
 import android.content.Context;
@@ -79,15 +85,17 @@ public class MainActivity extends AppCompatActivity {
     private static final String NL = System.lineSeparator();
 
     public static boolean isAtLeastV() {
-        return Build.VERSION.SDK_INT >= 34 && isAtLeastPreReleaseCodename("VanillaIceCream", Build.VERSION.CODENAME);
+        return Build.VERSION.SDK_INT >= 34 && !isAtLeastPreReleaseCodename("VanillaIceCream", Build.VERSION.CODENAME);
     }
     public static boolean isAtLeastBaklava() {
-        return Build.VERSION.SDK_INT >= 35 && isAtLeastPreReleaseCodename("Baklava", Build.VERSION.CODENAME);
+        //Log.d(TAG,"isat"+Build.VERSION.SDK_INT+","+Build.VERSION.CODENAME);
+        return Build.VERSION.SDK_INT >= 35 && !isAtLeastPreReleaseCodename("Baklava", Build.VERSION.CODENAME);
     }
 
 
     protected static boolean isAtLeastPreReleaseCodename(@NonNull String codename, @NonNull String buildCodename) {
         if ("REL".equals(buildCodename)) {
+            //means it's a release version sdk
             return false;
         } else {
             String buildCodenameUpper = buildCodename.toUpperCase(Locale.ROOT);
@@ -809,6 +817,32 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(POWER_DESCRIPTOR,Transacts.isWakeLockLevelSupported,descriptorTransacts);
             queryTransactId(PACKAGE_DESCRIPTOR,Transacts.setPackagesSuspendedAsUser,descriptorTransacts);
 
+            queryTransactId(INTRUSION_DETECTION_DESCRIPTOR,Transacts.enable,descriptorTransacts);
+            queryTransactId(INTRUSION_DETECTION_DESCRIPTOR,Transacts.disable,descriptorTransacts);
+            queryTransactId(INTRUSION_DETECTION_DESCRIPTOR,Transacts.addStateCallback,descriptorTransacts);
+
+            queryTransactId(INPUT_DESCRIPTOR,Transacts.registerKeyGestureEventListener,descriptorTransacts);
+            queryTransactId(INPUT_DESCRIPTOR,Transacts.unregisterKeyEventActivityListener,descriptorTransacts);
+            queryTransactId(INPUT_DESCRIPTOR,Transacts.registerKeyEventActivityListener,descriptorTransacts);
+
+            queryTransactId(HEALTH_CONNECT_DESCRIPTOR,Transacts.getChangesForBackup,descriptorTransacts);
+            queryTransactId(HEALTH_CONNECT_DESCRIPTOR,Transacts.canRestore,descriptorTransacts);
+            queryTransactId(HEALTH_CONNECT_DESCRIPTOR,Transacts.restoreChanges,descriptorTransacts);
+
+            queryTransactId(TRADE_IN_MODE_DESCRIPTOR,Transacts.start,descriptorTransacts);
+            queryTransactId(TRADE_IN_MODE_DESCRIPTOR,Transacts.enterEvaluationMode,descriptorTransacts);
+
+            queryTransactId(VIBRATOR_MANAGER_DESCRIPTOR,Transacts.startVendorVibrationSession,descriptorTransacts);
+
+            queryTransactId(AUTHENTICATION_POLICY_SERVICE_DESCRIPTOR,Transacts.enableSecureLockDevice,descriptorTransacts);
+            queryTransactId(AUTHENTICATION_POLICY_SERVICE_DESCRIPTOR,Transacts.disableSecureLockDevice,descriptorTransacts);
+
+            queryTransactId(AUDIO_POLICY_SERVICE_DESCRIPTOR,Transacts.getInputForAttr,descriptorTransacts);
+
+
+            //queryTransactId(VIBRATOR_MANAGER_DESCRIPTOR,Transacts.startVendorVibrationSession,descriptorTransacts);
+
+
             writeTransactsJsonFile(descriptorTransacts);
 
             return writeTransactsSourceFile(descriptorTransacts);
@@ -833,6 +867,7 @@ public class MainActivity extends AppCompatActivity {
                 int transactId = (int) transactField.get(null);
                 transactIds.put(transactName, String.valueOf(transactId));
             } catch (ReflectiveOperationException e) {
+
                 // Exceptions can be expected when this tool is run on a device at an API level that
                 // does not support a service / transact method being queried; the Permission Test
                 // Tool will use the appropriate transact based on the API level. However the
@@ -840,6 +875,7 @@ public class MainActivity extends AppCompatActivity {
                 // below for debugging purposes.
                 transactIds.put(transactName, e.getMessage());
             }
+            //Log.d(TAG,"descriptor:"+descriptor+"transactName/"+transactIds);
             descriptorTransacts.put(descriptor, transactIds);
         }
 
