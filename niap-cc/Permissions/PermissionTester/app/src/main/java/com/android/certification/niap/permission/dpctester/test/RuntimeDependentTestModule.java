@@ -50,7 +50,7 @@ public class RuntimeDependentTestModule extends PermissionTestModuleBase {
         baseModule = new RuntimeTestModule(activity);
     }
     @PermissionTest(permission=ACCESS_MEDIA_LOCATION, sdkMin=29,
-            requestedPermissions = {"android.permission.READ_MEDIA_IMAGES"})
+            requestedPermissions = {"android.permission.READ_MEDIA_IMAGES",READ_EXTERNAL_STORAGE})
     public void testAccessMediaLocation(){
         baseModule.testAccessMediaLocation();
     }
@@ -64,7 +64,7 @@ public class RuntimeDependentTestModule extends PermissionTestModuleBase {
     //maybe we can take these information from annotation, and it's a reasonable thoughts,
     //but currently the module is enough small
     String [] REQUIRED_PERMISSIONS = {"android.permission.READ_PHONE_NUMBERS",
-            "android.permission.READ_MEDIA_IMAGES"};
+            "android.permission.READ_MEDIA_IMAGES",ACCESS_MEDIA_LOCATION,SEND_SMS};
     String [] PERMISSIONS_UNDER_TEST = {ACCESS_MEDIA_LOCATION,SEND_SMS};
     CountDownLatch mCountDownLatch  = null;
     @NonNull
@@ -122,6 +122,8 @@ public class RuntimeDependentTestModule extends PermissionTestModuleBase {
                     logger.system("Runtime Dependent Permission : The required permissions are not granted.");
                     throw new RuntimeException("The required permissions (" + String.join(", ", permissions)
                             + ") were not granted");
+                } else {
+                    logger.system("all runtime permissions are granted now.");
                 }
                 break;
             default:
@@ -151,7 +153,7 @@ public class RuntimeDependentTestModule extends PermissionTestModuleBase {
             if (mActivity.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
                 logger.system(
                         "RuntimeDependentPermission test is bypassed: "+permission+" is already granted." +
-                                "If you want to run this test configuration please revoke all runtime permissions at first.");
+                                "If you want to run this test configuration please revoke all runtime permissions at first.(adb shell pm reset-permissions)");
                 return false;
             }
         }

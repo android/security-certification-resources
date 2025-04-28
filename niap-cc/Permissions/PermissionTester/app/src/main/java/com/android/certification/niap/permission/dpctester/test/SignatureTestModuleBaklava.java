@@ -111,14 +111,15 @@ public class SignatureTestModuleBaklava extends SignaturePermissionTestModuleBas
 		return Objects.requireNonNull(getService(clazz), "[npe_system_service]" + clazz.getSimpleName());
 	}
 
-//	@PermissionTest(permission="OBSERVE_PICTURE_PROFILES",sdkMin=36)
-//	public void testObservePictureProfiles(){
-//
-//		//Can not instantiate this object.
-//		//Object listener = ReflectionToolJava.stubHiddenObjectSub
-//		//		("android.view.SurfaceControlActivePictureListener");
-//		//listener.startListening();
-//	}
+	@PermissionTest(permission="OBSERVE_PICTURE_PROFILES",sdkMin=36)
+	public void testObservePictureProfiles(){
+
+		//Can not instantiate this object.
+		Object listener = ReflectionToolJava.stubHiddenObjectSub
+				("android.view.SurfaceControlActivePictureListener");
+		logger.system("aaa:"+listener);
+		//listener.startListening();
+	}
 
 //    @RequiresApi(api = 36)
 //    @PermissionTest(permission="MANAGE_GLOBAL_PICTURE_QUALITY_SERVICE",sdkMin=36)
@@ -134,6 +135,10 @@ public class SignatureTestModuleBaklava extends SignaturePermissionTestModuleBas
 	@RequiresApi(36)
 	@PermissionTest(permission = "MANAGE_GLOBAL_SOUND_QUALITY_SERVICE", sdkMin = 36)
 	public void testManageGlobalSoundQualityService() {
+
+
+
+
 		//MediaQualityManager.getSoundProfilePackageNames()
 		MediaQualityManager manager = systemService(MediaQualityManager.class);
 		//but we can not find corresponding service as of now

@@ -440,9 +440,9 @@ public class RuntimeTestModule extends PermissionTestModuleBase {
 			try (InputStream inputStream = mContentResolver.openInputStream(
 					elementUri)) {
 				ExifInterface exif = new ExifInterface(inputStream);
-				float[] latLong = new float[2];
+				float[] latLong = new float[2];//{0.0f,0.0f};
 				exif.getLatLong(latLong);
-
+				//logger.system(">"+latLong[0]+":"+latLong[1]);
 				// Not all images will have location data, ensure all images are
 				// tested before reporting an error.
 				if (!(latLong[0] == 0.0f && latLong[1] == 0.0f)) {

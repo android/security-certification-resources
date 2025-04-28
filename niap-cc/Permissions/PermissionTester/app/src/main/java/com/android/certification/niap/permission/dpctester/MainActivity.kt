@@ -115,7 +115,7 @@ class MainViewAdapter(private val list: List<LogBox>,
 }
 
 class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
-    val TAG: String = MainActivity::class.java.simpleName
+    val TAG: String = "PermissionTester";//MainActivity::class.java.simpleName
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding

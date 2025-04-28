@@ -436,10 +436,17 @@ public class SignatureTestModuleU extends SignaturePermissionTestModuleBase {
 
 	@PermissionTest(permission="CHECK_REMOTE_LOCKSCREEN", sdkMin=34)
 	public void testCheckRemoteLockscreen(){
-		BinderTransaction.getInstance().invoke(
-				Transacts.LOCK_SETTINGS_SERVICE,
-				Transacts.LOCK_SETTINGS_DESCRIPTOR,
-				"startRemoteLockscreenValidation");
+		KeyguardManager manager = (KeyguardManager)
+				mContext.getSystemService(Context.KEYGUARD_SERVICE);
+		if(manager.isDeviceSecure()) {
+
+			BinderTransaction.getInstance().invoke(
+					Transacts.LOCK_SETTINGS_SERVICE,
+					Transacts.LOCK_SETTINGS_DESCRIPTOR,
+					"startRemoteLockscreenValidation");
+		} else {
+			throw new BypassTestException("The test is working when device is secured.");
+		}
 	}
 
 	@RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)

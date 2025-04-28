@@ -259,7 +259,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 			if(Build.VERSION.SDK_INT < Build.VERSION_CODES.S){
 				ReflectionUtil.invoke(statusBarManager, "collapsePanels");
 			}
-
+			//ReflectionUtil.invoke(statusBarManager, "expandNotificationsPanel");
 
 		} catch (ReflectionUtil.ReflectionIsTemporaryException e) {
 			throw new RuntimeException(e);
