@@ -160,7 +160,7 @@ public class InternalPermissionBaklavaTest {
     private void logline(String message){
 
         //mainActivity.addLogLine(message);
-        Log.d("TAG",message);
+        Log.d("InternalPermissionBaklava",message);
     }
    static  protected MainActivity mainActivity;
     static protected ContentResolver mContentResolver;
@@ -244,7 +244,6 @@ public class InternalPermissionBaklavaTest {
         Log.d("Instrumentation Setup","Permission=>"+targetPermission+":"+permissionGranted);
     }
 
-    //https://source.corp.google.com/h/googleplex-android/platform/superproject/main/+/main:frameworks/base/services/tests/displayservicetests/src/com/android/server/display/DisplayManagerServiceTest.java;l=1488?q=ADD_MIRROR_DISPLAY&sq=repo:googleplex-android%2Fplatform%2Fsuperproject%2Fmain%20branch:main
     @Test
     @PermissionTest(permission="ADD_MIRROR_DISPLAY",sdkMin=35,sdkMax = 36)
     public void testAddMirrorDisplay(){
@@ -256,7 +255,6 @@ public class InternalPermissionBaklavaTest {
         //Log.d("Add Mirror Display","The test for android.permission.ADD_MIRROR_DISPLAY is not implemented yet");
     }
 
-    //https://source.corp.google.com/h/googleplex-android/platform/superproject/main/+/main:cts/tests/appfunctions/src/android/app/appfunctions/cts/AppFunctionManagerTest.kt;drc=16d8f3866cf056e4d872920466193bc61888a9e4;l=1200?q=EXECUTE_APP_FUNCTIONS&sq=repo:googleplex-android%2Fplatform%2Fsuperproject%2Fmain%20branch:main
 
     @Test
     @PermissionTest(permission="EXECUTE_APP_FUNCTIONS",sdkMin=35,sdkMax = 36)
@@ -291,7 +289,6 @@ public class InternalPermissionBaklavaTest {
     @Test
     @PermissionTest(permission="THREAD_NETWORK_TESTING",sdkMin=35)
     public void testThreadNetworkTesting(){
-        //https://source.corp.google.com/h/googleplex-android/platform/superproject/main/+/main:packages/modules/Connectivity/thread/tests/unit/src/com/android/server/thread/ThreadNetworkShellCommandTest.java;l=103?q=THREAD_NETWORK_TESTING&sq=repo:googleplex-android%2Fplatform%2Fsuperproject%2Fmain%20branch:main
         //  runShellCommand("force-country-code", "enabled", "US");?
         //The command related to network requires root access , so we can't test it on normal app
         int shellRet  = runShellCommand("cmd wifi help");//wifi get-country-code");

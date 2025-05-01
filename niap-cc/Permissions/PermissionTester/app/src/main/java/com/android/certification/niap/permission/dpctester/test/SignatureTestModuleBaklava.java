@@ -124,7 +124,6 @@ public class SignatureTestModuleBaklava extends SignaturePermissionTestModuleBas
 //    @RequiresApi(api = 36)
 //    @PermissionTest(permission="MANAGE_GLOBAL_PICTURE_QUALITY_SERVICE",sdkMin=36)
 //	public void testManageGlobalPictureQualityService(){
-//		//https://source.corp.google.com/h/googleplex-android/platform/superproject/main/+/main:cts/tests/tests/mediaquality/src/android/media/mediaquality/cts/MediaQualityTest.java;l=97?q=getPictureProfilesByPackage&sq=repo:googleplex-android%2Fplatform%2Fsuperproject%2Fmain%20branch:main
 //		//MediaQualityManager is not implemented yet?
 //		//MediaQUalityManger.getPictureProfilesByPackage may work for the test
 //		//MediaQualityManager manager = systemService(MediaQualityManager.class);
@@ -153,7 +152,6 @@ public class SignatureTestModuleBaklava extends SignaturePermissionTestModuleBas
 		//*** REASON FOR IGNORE ***
 		//*** Below shell command can be only executed by the rooted system
 
-		//https://source.corp.google.com/h/googleplex-android/platform/superproject/main/+/main:packages/modules/Connectivity/thread/tests/unit/src/com/android/server/thread/ThreadNetworkShellCommandTest.java;l=103?q=THREAD_NETWORK_TESTING&sq=repo:googleplex-android%2Fplatform%2Fsuperproject%2Fmain%20branch:main
 		//  runShellCommand("force-country-code", "enabled", "US");?
 		//  It doesn't work work except the system app
 		int shellRet = runShellCommand("cmd thread_network get-country-code");
@@ -212,7 +210,6 @@ public class SignatureTestModuleBaklava extends SignaturePermissionTestModuleBas
 	@RequiresApi(34)
 	@PermissionTest(permission = "VIBRATE_VENDOR_EFFECTS", sdkMin = 36)
 	public void testVibrateVendorEffects() {
-		//https://source.corp.google.com/h/googleplex-android/platform/superproject/main/+/main:frameworks/base/tests/permission/src/com/android/framework/permission/tests/VibratorManagerServicePermissionTest.java;l=147?q=VIBRATE_VENDOR_EFFECTS&sq=repo:googleplex-android%2Fplatform%2Fsuperproject%2Fmain%20branch:main
 
 		VibrationAttributes ATTRS = new VibrationAttributes.Builder()
 				.setUsage(VibrationAttributes.USAGE_ALARM)

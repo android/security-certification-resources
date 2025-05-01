@@ -148,7 +148,7 @@ public class InternalPermissionJUnitTest {
     private void logline(String message){
 
         //mainActivity.addLogLine(message);
-        Log.d("TAG",message);
+        Log.d("InternalPermissionJUnit",message);
     }
    static  protected MainActivity mainActivity;
     static protected ContentResolver mContentResolver;
@@ -252,7 +252,7 @@ public class InternalPermissionJUnitTest {
                 throw e;
             } else {
                 Log.d(
-                        "TAG","MANAGE_HOTWORD_DETECTION passed permission check, caught the"
+                        "InternalPermissionJUnit","MANAGE_HOTWORD_DETECTION passed permission check, caught the"
                                 + " following exception: ");
             }
         }
@@ -264,7 +264,7 @@ public class InternalPermissionJUnitTest {
                 Transacts.SENSOR_PRIVACY_DESCRIPTOR, "isSensorPrivacyEnabled");
     }
     @Test
-    @Ignore("Construction")
+    @Ignore("Ignored. Due to still not finished")
     @PermissionTest(permission="DOMAIN_VERIFICATION_AGENT", sdkMin=31)
     public void testDomainVerificationAgent(){
         try {
@@ -483,9 +483,8 @@ public class InternalPermissionJUnitTest {
 
         @SuppressLint("WrongConstant") Object ambientContextManager
                 = mContext.getSystemService("ambient_context");
-        //Context.AMBIENT_CONTEXT_SERVICE);
 
-        int[] eventsArray = new int[] {-1};//AmbientContextEvent.EVENT_COUGH
+        int[] eventsArray = new int[] {1};//AmbientContextEvent.EVENT_COUGH
         Set<Integer> eventTypes = Arrays.stream(eventsArray).boxed().collect(
                 Collectors.toSet());
 

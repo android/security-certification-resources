@@ -196,7 +196,6 @@ public class SpecificDependentTestModule extends SignaturePermissionTestModuleBa
                         logger.debug("onError: " + error);
                     }
                 };
-        //need SIM? https://b.corp.google.com/issues/77976208 check <= false
         //SecurityException due to uncertain reason
         //Can be test with shell identity?
         systemService(TelephonyManager.class).requestNetworkScan(request,

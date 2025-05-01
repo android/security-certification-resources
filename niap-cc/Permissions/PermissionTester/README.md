@@ -57,7 +57,7 @@ Can be setup as Device Management Role Holder.
 
 ## How to Uninstall Debug-Mode Device Owner app
 
-If you once uninstall the app with release mode and set it to device owner there's no way.
+If you once install the app with release mode and set it to device owner there's no way.
 Only if we install it as debug app
 
 ```console
@@ -66,7 +66,7 @@ adb shell dpm remove-active-admin com.android.certification.niap.permission.dpct
 Go settings -> Secuirty -> More Secuirty & Privacy -> Device Admin apps -> Open app
 
 Then uninstall it. If you can't uninstall it with some notifications. 
-You should reboot the device and try unistall from shell.
+You should reboot the device and try uninstall from shell.
 
 ```console
 adb uninstall com.android.certification.niap.permission.dpctester

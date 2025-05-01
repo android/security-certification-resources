@@ -64,10 +64,7 @@ import java.util.List;
  */
 @RunWith(AndroidJUnit4.class)
 public class ReadMediaVisualUserSelectedTest {
-    /**
-     *
-     * A list of permissions that can be granted to the shell identity.
-     */
+
     @Rule
     public
     ErrorCollector errs = new ErrorCollector();
@@ -141,16 +138,16 @@ public class ReadMediaVisualUserSelectedTest {
 
             //* Set System Language Setting as 'English (United States)' to find
             //* an ui object.
-            //Wait dialogue shown and click "Select phtos and videos"
+            //Wait dialogue shown and click "Select photos and videos"
             //1-1.Wait chooser dialogue and then choose first one
-            //1-2.Wait chooser dialgoue and then choose nothing
+            //1-2.Wait chooser dialogue and then choose nothing
             //2. close chooser
             String[] perms = not_granted.toArray(new String[0]);
             if(perms.length>0)
                 ActivityCompat.requestPermissions(activity, perms,
                         Constants.PERMISSION_CODE_RUNTIME_DEPENDENT_PERMISSIONS);
             else
-                Log.d("tag","the permission is already granted.");
+                Log.d("ReadMediaVisualUserSelectedTest","the permission is already granted.");
             mDevice.waitForIdle();
             //mDevice.wait(10000);
             //Find a button with text (the line expects language setting as 'English')w(5000);

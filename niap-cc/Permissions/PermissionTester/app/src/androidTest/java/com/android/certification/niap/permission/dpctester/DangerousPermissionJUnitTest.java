@@ -49,12 +49,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
- * Instrumentation test to verify internal protection level permissions properly grant access to
- * their API, resources, etc., when the corresponding permission is granted. Internal
- * permissions are not granted to apps signed with the platform's signing key, but many are granted
- * to the shell user. Since instrumentation tests allow adopting the shell permission identity,
- * this test class can adopt this identity to be granted these permissions and verify the platform
- * behavior.
+ * The test cases for checking 'dangerous' test cases which affect user interface severely.
+ * At the end of the test cases, it executes a test case for the 'REBOOT' permission.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4.class)
