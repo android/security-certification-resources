@@ -576,7 +576,6 @@ public interface DevicePolicyManagerGateway {
      */
     int getPersonalAppsSuspendedReasons();
 
-    // TODO(b/171350084): use on CosuConfig
     /** See {@link android.app.admin.DevicePolicyManager#enableSystemApp(ComponentName, String)}. */
     void enableSystemApp(
             String packageName, @NonNull Consumer<Void> onSuccess, @NonNull Consumer<Exception> onError);
@@ -589,7 +588,6 @@ public interface DevicePolicyManagerGateway {
     @NonNull
     List<String> getDisabledSystemApps();
 
-    // TODO(b/171350084): use in other places
     /**
      * See {@link android.app.admin.DevicePolicyManager#setLockTaskPackages(ComponentName, String[])}.
      */

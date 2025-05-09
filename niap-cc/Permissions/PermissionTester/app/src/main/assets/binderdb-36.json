@@ -120,12 +120,13 @@
       "isDeviceLocked": 3
     },
     "android.health.connect.aidl.IHealthConnectService": {
-      "updateDataDownloadState": 32,
-      "deleteAllStagedRemoteData": 31,
-      "canRestore": 57,
-      "startMigration": 24,
-      "getHealthConnectDataState": 33,
-      "getChangesForBackup": 54
+      "updateDataDownloadState": 31,
+      "deleteAllStagedRemoteData": 30,
+      "canRestore": 56,
+      "restoreChanges": 57,
+      "startMigration": 23,
+      "getHealthConnectDataState": 32,
+      "getChangesForBackup": 53
     },
     "android.app.cloudsearch.ICloudSearchManager": {},
     "android.companion.virtual.IVirtualDeviceManager": {
@@ -156,21 +157,21 @@
       "getUserPreferredDisplayMode": 43
     },
     "android.view.IWindowManager": {
-      "requestAppKeyboardShortcuts": 79,
-      "createInputConsumer": 83,
-      "registerTaskFpsCallback": 134,
-      "clearWindowContentFrameStats": 75,
-      "registerScreenRecordingCallback": 150,
-      "addKeyguardLockedStateListener": 32,
-      "setRecentsVisibility": 69,
-      "setInTouchMode": 41,
-      "dismissKeyguard": 31,
-      "screenshotWallpaper": 61,
-      "setAnimationScale": 38,
-      "removeWindowToken": 19,
-      "thawRotation": 54,
-      "registerShortcutKey": 82,
-      "overridePendingAppTransitionRemote": 24
+      "requestAppKeyboardShortcuts": 80,
+      "createInputConsumer": 84,
+      "registerTaskFpsCallback": 137,
+      "clearWindowContentFrameStats": 76,
+      "registerScreenRecordingCallback": 153,
+      "addKeyguardLockedStateListener": 33,
+      "setRecentsVisibility": 70,
+      "setInTouchMode": 42,
+      "dismissKeyguard": 32,
+      "screenshotWallpaper": 62,
+      "setAnimationScale": 39,
+      "removeWindowToken": 20,
+      "thawRotation": 55,
+      "registerShortcutKey": 83,
+      "overridePendingAppTransitionRemote": 25
     },
     "android.safetycenter.ISafetyCenterManager": {
       "getSafetyCenterConfig": 7,
@@ -284,7 +285,7 @@
       "isAudioServerRunning": 145,
       "forceRemoteSubmixFullVolume": 20,
       "setVolumeGroupVolumeIndex": 27,
-      "getDeviceVolumeBehavior": 170
+      "getDeviceVolumeBehavior": 172
     },
     "com.android.internal.app.IBatteryStats": {
       "noteStartAudio": 5,
@@ -351,7 +352,7 @@
       "getActivityClientController": 17
     },
     "android.media.IResourceManagerService": {
-      "overridePid": 6
+      "overridePid": 7
     },
     "android.app.timedetector.ITimeDetectorService": {
       "suggestExternalTime": 8,
@@ -445,8 +446,8 @@
       "addOnPermissionsChangeListener": 10
     },
     "android.media.IMediaRouterService": {
-      "registerProxyRouter": 29,
-      "registerManager": 28
+      "registerProxyRouter": 31,
+      "registerManager": 30
     },
     "android.app.admin.IDevicePolicyManager": {
       "setUserControlDisabledPackages": 347,

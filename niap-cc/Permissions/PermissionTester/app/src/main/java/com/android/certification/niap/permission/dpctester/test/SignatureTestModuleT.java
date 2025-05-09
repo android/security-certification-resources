@@ -48,6 +48,7 @@ import android.net.IpConfiguration;
 import android.net.NetworkCapabilities;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.ConditionVariable;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.OutcomeReceiver;
@@ -588,13 +589,17 @@ public class SignatureTestModuleT extends SignaturePermissionTestModuleBase {
 
 	@PermissionTest(permission="ACCESS_FPS_COUNTER", sdkMin=33)
 	public void testAccessFpsCounter(){
+		//ConditionVariable done = new ConditionVariable();
 		BinderTransaction.getInstance().invoke(
 				Transacts.WINDOW_SERVICE, Transacts.WINDOW_DESCRIPTOR,
 				"registerTaskFpsCallback", 1, new ITaskFpsCallback.Stub() {
 					@Override
 					public void onFpsReported(float fps) throws RemoteException {
+						//logger.system("fps reported=>"+fps);
+						//done.open();
 					}
 				});
+		//done.block(5000);
 	}
 
 	@PermissionTest(permission="MANAGE_GAME_ACTIVITY", sdkMin=33)
