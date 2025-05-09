@@ -413,6 +413,7 @@ public class CoreTestModule extends SignaturePermissionTestModuleBase {
 
     @PermissionTest(permission="com.android.voicemail.permission.READ_VOICEMAIL",requestedPermissions = "android.permission.READ_CALL_LOG")
     public void testReadVoicemail(){
+        //The test case try to read call log regarding voice mail.
         signatureTestModule.testReadVoicemail();
     }
 
