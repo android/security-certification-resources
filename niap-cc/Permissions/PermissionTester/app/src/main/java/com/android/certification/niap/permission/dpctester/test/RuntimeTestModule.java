@@ -1,4 +1,3 @@
-//Auto generated file RuntimeTestModule.java by CoderPorterPlugin
 /*
  * Copyright 2024 The Android Open Source Project
  *

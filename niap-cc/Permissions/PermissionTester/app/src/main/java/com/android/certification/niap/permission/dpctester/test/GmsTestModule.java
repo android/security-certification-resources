@@ -1,4 +1,3 @@
-//Auto generated file InstallPermissionTestModule.java by CoderPorterPlugin
 /*
  * Copyright 2024 The Android Open Source Project
  *
@@ -207,8 +206,8 @@ public class GmsTestModule extends PermissionTestModuleBase {
 						new Result(false,null,
 								new PermissionTestRunner.Data(gmsp),false,
 								false,
-								gmsSignatureMatch,
 								true,
+								gmsSignatureMatch,
 								isPlatformSignatureMatch,false,false,"not granted"));
 				qs.setCount_errors(qs.getCount_errors()+1);
 			} else {
@@ -216,8 +215,8 @@ public class GmsTestModule extends PermissionTestModuleBase {
 						new Result(true,null,
 								new PermissionTestRunner.Data(gmsp),false,
 								true,
-								gmsSignatureMatch,
 								true,
+								gmsSignatureMatch,
 								isPlatformSignatureMatch,false,false,"granted"));
 				qs.setCount_passed(qs.getCount_passed()+1);
 			}

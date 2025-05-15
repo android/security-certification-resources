@@ -108,10 +108,7 @@ public class ProxyChecker {
             Field transactField = clazz.getDeclaredField(TRANSACT_PREFIX + transactName);
             //Log.d(TAG,"Found " + transactField);
             transactField.setAccessible(true);
-            /*Field[] fields = clazz.getDeclaredFields();
-            Method[] methods = clazz.getDeclaredMethods();
-            System.out.println(fields);
-            System.out.println(methods);*/
+
             int transactId = (int) transactField.get(null);
             System.out.printf("public static final String %s = \"%s\";%n",
                     transactName,transactName);

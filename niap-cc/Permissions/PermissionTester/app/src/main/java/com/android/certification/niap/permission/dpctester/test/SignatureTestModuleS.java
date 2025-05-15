@@ -1,4 +1,3 @@
-//Auto generated file InstallPermissionTestModule.java by CoderPorterPlugin
 /*
  * Copyright 2024 The Android Open Source Project
  *

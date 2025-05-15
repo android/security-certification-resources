@@ -18,7 +18,7 @@ apply plugin: 'com.android.application'
 
 android {
     namespace 'com.android.certifications.niap.permissions.transactids'
-    compileSdk 36
+    compileSdk 35
     //compileSdkPreview "VanillaIceCream"
     //compileSdkPreview "Baklava"
     signingConfigs {
@@ -33,7 +33,7 @@ android {
     defaultConfig {
         applicationId "com.android.certifications.niap.permissions.transactids"
         minSdkVersion 28
-        targetSdkVersion 36
+        targetSdkVersion 35
         //targetSdkPreview "VanillaIceCream"
         //targetSdkVersion "Baklava"
         versionCode 1
