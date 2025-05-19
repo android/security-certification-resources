@@ -136,13 +136,13 @@ public class UDC_SignaturePermissions_test {
         Class<?> threadNetworkConClazz = null;
         String FEATURE_THREAD_NETWORK = "android.hardware.thread_network";
         if(mContext.getPackageManager().hasSystemFeature(FEATURE_THREAD_NETWORK)){
-            throw new BasePermissionTester.BypassTestException("thread netrowk manager is not supported.");
+            throw new BasePermissionTester.BypassTestException("thread network manager is not supported.");
         } else {
             try {
                 threadNetworkConClazz = Class.forName(
                         "android.net.thread.ThreadNetworkManager");
                 Object threadNetworkCon = mContext.getSystemService(threadNetworkConClazz);
-                System.out.println(ReflectionUtils.checkDeclaredMethod(threadNetworkCon,"set").toString());
+                Log.d("UDC_PERMISSION_TEST",ReflectionUtils.checkDeclaredMethod(threadNetworkCon,"set").toString());
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -223,38 +223,12 @@ public class UDC_SignaturePermissions_test {
             while ((line = stderr.readLine()) != null) {
                 stderrBuilder.append(line + "\n");
             }
-            Log.d("tag","Process return code: " + returnCode);
-            Log.d("tag","Process stdout: " + stdoutBuilder.toString());
-            Log.d("tag","Process stderr: " + stderrBuilder.toString());
+            Log.d("UDC_PERMISSION_TEST","Process return code: " + returnCode);
+            Log.d("UDC_PERMISSION_TEST","Process stdout: " + stdoutBuilder.toString());
+            Log.d("UDC_PERMISSION_TEST","Process stderr: " + stderrBuilder.toString());
             return returnCode;
         } catch (Throwable e) {
             throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
         }
     }
 }
-
-
-/*
-[addCoverageListener( androidx.test.internal.runner.RunnerArgs androidx.test.internal.runner.TestExecutor$Builder)
- addDelayListener( androidx.test.internal.runner.RunnerArgs androidx.test.internal.runner.TestExecutor$Builder)
- addListenersFromArg( androidx.test.internal.runner.RunnerArgs androidx.test.internal.runner.TestExecutor$Builder)
- addListenersFromClasspath( androidx.test.internal.runner.TestExecutor$Builder)
- addListenersLegacyOrder( androidx.test.internal.runner.RunnerArgs androidx.test.internal.runner.TestExecutor$Builder)
- addListenersNewOrder( androidx.test.internal.runner.RunnerArgs androidx.test.internal.runner.TestExecutor$Builder)
- addScreenCaptureProcessors( androidx.test.internal.runner.RunnerArgs)
- getArguments()
- parseRunnerArgs( android.os.Bundle)
- registerTestStorage( androidx.test.internal.runner.RunnerArgs)
- shouldWaitForOrchestratorService()
- waitForDebugger( androidx.test.internal.runner.RunnerArgs)
- addListeners( androidx.test.internal.runner.RunnerArgs androidx.test.internal.runner.TestExecutor$Builder)
- buildRequest( androidx.test.internal.runner.RunnerArgs android.os.Bundle)
- createTestRequestBuilder( android.app.Instrumentation android.os.Bundle)
- getInstrumentationResultPrinter()
- onCreate( android.os.Bundle)
- onException( java.lang.Object java.lang.Throwable)
- onOrchestratorConnect()
- onStart()
- onTestEventClientConnect()
- sendStatus( int android.os.Bundle)]
-*/

@@ -96,11 +96,11 @@ public class SignatureTestModuleQ extends SignaturePermissionTestModuleBase {
 		ReflectionUtil.invoke(systemService(AppOpsManager.class), "clearHistory");
 	}
 
-	@PermissionTest(permission="MANAGE_TEST_NETWORKS", sdkMin=29)
-	public void testManageTestNetworks(){
-		@SuppressLint("WrongConstant") Object test_network = mContext.getSystemService("test_network");
-		//ToDO:it is not working test
-	}
+//	@PermissionTest(permission="MANAGE_TEST_NETWORKS", sdkMin=29)
+//	public void testManageTestNetworks(){
+//		@SuppressLint("WrongConstant") Object test_network = mContext.getSystemService("test_network");
+//		//ToDO:it is not working test
+//	}
 
 	@PermissionTest(permission="GRANT_PROFILE_OWNER_DEVICE_IDS_ACCESS", sdkMin=29, sdkMax=29)
 	public void testGrantProfileOwnerDeviceIdsAccess(){

@@ -5288,14 +5288,14 @@ public class SignaturePermissionTester extends BasePermissionTester {
                     Class<?> threadNetworkConClazz = null;
                     String FEATURE_THREAD_NETWORK = "android.hardware.thread_network";
                     if(!mContext.getPackageManager().hasSystemFeature(FEATURE_THREAD_NETWORK)){
-                        throw new BypassTestException("thread netrowk manager is not supported.");
+                        throw new BypassTestException("thread network manager is not supported.");
                     } else {
                         try {
                             threadNetworkConClazz = Class.forName(
                                     "android.net.thread.ThreadNetworkManager");
                             Object threadNetworkCon = mContext.getSystemService(threadNetworkConClazz);
                             //Yet Implemented Because I couldn't find the system it it enabled.
-                            System.out.println(ReflectionUtils.checkDeclaredMethod(threadNetworkCon,"set").toString());
+                            mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(threadNetworkCon,"set").toString());
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }

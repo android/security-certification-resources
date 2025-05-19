@@ -134,7 +134,7 @@ public class SignatureTestModuleS extends SignaturePermissionTestModuleBase {
 					"test-internal-cam",
 					"test-external-cam", injectionCallback, injectionSession);
 
-			/* TODO: Change the parameter depends on the version 31-32,33,34-
+			/* Change the parameter depends on the version 31-32,33,34-
 			if(mDeviceApiLevel >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE){
 				BinderTransaction.getInstance().invoke(Context.CAMERA_SERVICE,
 						Transacts.CAMERA_DESCRIPTOR,

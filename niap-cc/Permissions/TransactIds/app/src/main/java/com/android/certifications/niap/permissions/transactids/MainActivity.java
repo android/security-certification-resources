@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
         } else if(isAtLeastV()){
             ACTUAL_SDK_INT = 35;
         }
-        Log.d("tag","Launch SDK INT>"+ACTUAL_SDK_INT);
         setContentView(R.layout.activity_main);
         mContext = getApplicationContext();
         mStatusTextView = findViewById(R.id.statusTextView);
@@ -915,7 +914,7 @@ public class MainActivity extends AppCompatActivity {
                             Integer integer = Integer.valueOf(id);
                             mInner.put(key,integer);
                         } catch (NumberFormatException ex){
-                            Log.d("TAG","NumberFormatException:"+key+"+"+id);
+                            Log.d("TransactIds","NumberFormatException:"+key+"+"+id);
                         }
                     });
                     methodMap.put(descriptor,mInner);

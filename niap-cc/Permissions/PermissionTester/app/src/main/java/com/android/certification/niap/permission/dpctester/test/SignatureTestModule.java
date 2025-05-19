@@ -565,7 +565,6 @@ public class SignatureTestModule extends SignaturePermissionTestModuleBase {
 		}
 	}
 
-	//TODO:delete Package failed?
 	@SuppressLint("PrivateApi")
     @PermissionTest(permission = "DELETE_PACKAGES")
 	public void testDeletePackages() {
@@ -897,11 +896,7 @@ public class SignatureTestModule extends SignaturePermissionTestModuleBase {
 	public void testManageDocuments() {
 		// Without this permission this query fails with a SecurityException, but with it it
 		// fails with an Unsupported Uri exception.
-
-
-		//TODO: CHAnage Test Routine as of Android Q
 		//Because SAF(Storage Access Framework installed)
-		//oogleplex-android/platform/superproject/main/+/main:vendor/xts/gts-tests/tests/permission/src/com/google/android/permission/gts/ManageDocumentsPermissionTest.java;l=42?q=MANAGE_DOCUMENTS&sq=repo:googleplex-android%2Fplatform%2Fsuperproject%2Fmain%20branch:main
 		mContentResolver.query(Uri.parse("content://com.android.externalstorage.documents/"),
 				null, null, null, null);
 	}
@@ -1502,8 +1497,6 @@ public class SignatureTestModule extends SignaturePermissionTestModuleBase {
 
 	@PermissionTest(permission = "SET_HARMFUL_APP_WARNINGS")
 	public void testSetHarmfulAppWarnings() {
-		// This test can potentially interrupt the test app; if so the test may need to
-		// be bypassed when the permission is granted.
 		BinderTransaction.getInstance().invoke(Transacts.PACKAGE_SERVICE, Transacts.PACKAGE_DESCRIPTOR,
 				"getHarmfulAppWarning",
 				Constants.COMPANION_PACKAGE, appUid);

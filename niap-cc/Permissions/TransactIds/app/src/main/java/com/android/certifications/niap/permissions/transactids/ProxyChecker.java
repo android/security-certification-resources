@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ProxyChecker {
-    private static final String TAG="tag";
+    private static final String TAG="ProxyChecker";
     private static final Map<String,String> alt_descriptor= new HashMap<String,String>();
 
 

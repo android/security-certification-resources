@@ -534,7 +534,7 @@ public class InternalPermissionTester extends BasePermissionTester {
                     }
                 }));
 
-        // New internal permissions as of Android
+        // New internal permissions as of Android 15
 
         mPermissionTasks.put(permission.QUERY_DEVICE_STOLEN_STATE,
                 new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
