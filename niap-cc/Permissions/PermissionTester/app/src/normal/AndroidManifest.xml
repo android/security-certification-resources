@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2025 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.android.certification.niap.permission.dpctester"
@@ -1619,7 +1634,7 @@
     <uses-permission android:name="com.google.android.apps.gsa.nga.engine.stash.BROADCAST" />
     <uses-permission android:name="com.google.android.gms.smartdevice.permission.NOTIFY_QUICK_START_STATUS" />
 
-    <!-- non new platform permissions from barbet34 device-->
+    <!-- non new platform permissions from Pixel 5a(SDK34) device-->
     <uses-permission android:name="com.google.sensor.private.permission.USE_RAW_SENSOR" />
     <uses-permission android:name="com.google.android.apps.scone.connectivitymonitor.permission.WRITE_NIMBUS_DATA" />
     <uses-permission android:name="android.permission.health.READ_EXERCISE_ROUTE" />
@@ -1636,10 +1651,10 @@
     <uses-permission android:name="android.permission.ACCESS_PRIVILEGED_APP_SET_ID" />
     <uses-permission android:name="com.google.android.apps.search.assistant.verticals.snapshot.widgets.weather.permission.WEATHER_WIDGET_UPDATE" />
     <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.reader" />
-    <!-- non platform oriole(pixel6) 33-->
+    <!-- non platform Pixel6 33-->
     <uses-permission android:name="com.google.android.finsky.permission.PLAY_BILLING_LIBRARY_BROADCAST" />
     <uses-permission android:name="com.google.android.gms.permission.ACCESS_NEARBY_SHARE_API" />
-    <!-- non platform husky(pixel8pro) 34-->
+    <!-- non platform pixel8pro 34-->
     <uses-permission android:name="com.fitbit.FitbitMobile.permission.SSO" />
     <uses-permission android:name="com.google.android.wildlife.permission.ADVANCED_VPN_CONFIG" />
     <uses-permission android:name="com.google.android.wildlife.permission.UPDATE_NETWORK_MONITOR" />
@@ -1651,7 +1666,7 @@
     <uses-permission android:name="com.vzw.DEFAULT_APP_CHANGE" />
     <uses-permission android:name="com.vzw.engage.service.myverizon" />
     <uses-permission android:name="com.vzw.hss.myverizon.CountlyPush.BROADCAST_PERMISSION" />
-    <!-- non platform shiba(piexel8) 35 -->
+    <!-- non platform pixel8 35 -->
     <uses-permission android:name="android.permission.health.START_ONBOARDING" />
     <uses-permission android:name="android.permission.BIND_EXAMPLE_STORE_SERVICE" />
     <uses-permission android:name="com.android.devicelock.permission.START_KIOSK_SETUP_ACTIVITY" />

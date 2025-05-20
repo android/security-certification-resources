@@ -14,6 +14,8 @@ package com.android.certification.niap.permission.dpctester.test.tool;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import android.util.Log;
+
 import com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException;
 
 import java.lang.reflect.Constructor;
@@ -46,7 +48,8 @@ public class ReflectionToolJava {
             return remoteCallbackConstructor.newInstance();
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
                  InstantiationException | InvocationTargetException e){
-            e.printStackTrace();
+            Log.e("ReflectionTool", "StubHiddenObject Error:"+e.getMessage());
+
             return null;
         }
     }
@@ -60,7 +63,8 @@ public class ReflectionToolJava {
             //remoteCallbackConstructor.newInstance();
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
                  InstantiationException e){
-            e.printStackTrace();
+            //e.printStackTrace();
+            Log.e("ReflectionTool", "StubHiddenObject Error:"+e.getMessage());
             return null;
         }
     }
@@ -72,7 +76,8 @@ public class ReflectionToolJava {
             return remoteCallbackConstructor.newInstance(args);
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
                  InstantiationException | InvocationTargetException e){
-            e.printStackTrace();
+            Log.e("ReflectionTool", "StubHiddenObject Error:"+e.getMessage());
+
             return null;
         }
     }

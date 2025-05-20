@@ -46,6 +46,7 @@ import android.media.AudioManager;
 import android.net.IpConfiguration;
 import android.net.NetworkCapabilities;
 import android.net.wifi.WifiManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.ConditionVariable;
 import android.os.Handler;
@@ -87,7 +88,10 @@ import com.android.certification.niap.permission.dpctester.test.tool.TesterUtils
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -613,6 +617,9 @@ public class SignatureTestModuleT extends SignaturePermissionTestModuleBase {
 	@PermissionTest(permission="LAUNCH_DEVICE_MANAGER_SETUP", sdkMin=33)
 	public void testLaunchDeviceManagerSetup(){
 
+		if (Constants.BYPASS_TESTS_AFFECTING_UI)
+			throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
 		//DeviceManger#ACTION_ROLE_HOLDER_PROVISION_FINALIZATION
 		//DeviceManger#ACTION_ROLE_HOLDER_PROVISION_MANAGED_DEVICE_FROM_TRUSTED_SOURCE"
 		//DeviceManger#ACTION_ROLE_HOLDER_PROVISION_MANAGED_PROFILE
@@ -644,7 +651,7 @@ public class SignatureTestModuleT extends SignaturePermissionTestModuleBase {
 		// We obsolate it because the test requires user interactions.
 		//
 
-		//Obsoleted Test Cade
+		//Obsoleted Test Code
 	}
 
 	@PermissionTest(permission="UPDATE_DEVICE_MANAGEMENT_RESOURCES", sdkMin=33)
@@ -773,6 +780,70 @@ public class SignatureTestModuleT extends SignaturePermissionTestModuleBase {
 		BinderTransaction.getInstance().invoke(Transacts.STATUS_BAR_SERVICE,
 				Transacts.STATUS_BAR_DESCRIPTOR,
 				"onBiometricHelp", 0, "test");
+	}
+
+
+	@SuppressLint("PrivateApi")
+	@PermissionTest(permission="CAMERA_INJECT_EXTERNAL_CAMERA", sdkMin=33,sdkMax = 33)
+	public void testCameraInjectExternalCamera(){
+		Object injectionCallback;
+		Object injectionSession;
+		try {
+			Class<?> injectionCallbackClass = Class.forName(
+					"android.hardware.camera2.ICameraInjectionCallback");
+			injectionCallback = Proxy.newProxyInstance(
+					injectionCallbackClass.getClassLoader(),
+					new Class[]{injectionCallbackClass}, new InvocationHandler() {
+						@Override
+						public Object invoke(Object o, Method method, Object[] objects)
+								throws Throwable {
+							logger.debug("injectionCallback#invoke: " + method);
+							if (method.toString().contains("asBinder")) {
+								return new Binder();
+							} else if (method.toString().contains("onInjectionError")) {
+								return null;
+							}
+							return null;
+						}
+					});
+			Class<?> injectionSessionClass = Class.forName(
+					"android.hardware.camera2.ICameraInjectionSession");
+			injectionSession = Proxy.newProxyInstance(
+					injectionSessionClass.getClassLoader(),
+					new Class[]{injectionSessionClass}, new InvocationHandler() {
+						@Override
+						public Object invoke(Object o, Method method, Object[] objects)
+								throws Throwable {
+							logger.debug("injectionSession#invoke: " + method);
+							if (method.toString().contains("asBinder")) {
+								return new Binder();
+							}
+							return null;
+						}
+					});
+		} catch (ClassNotFoundException e) {
+			throw new UnexpectedTestFailureException(e);
+		}
+		try {
+			BinderTransaction.getInstance().invoke(Transacts.CAMERA_SERVICE,
+					Transacts.CAMERA_DESCRIPTOR,
+					"injectCamera", mContext.getPackageName(),
+					"test-internal-cam",
+					"test-internal-cam", injectionCallback);
+
+		} catch (SecurityException e) {
+			throw e;
+		} catch (Exception e) {
+			// If the test fails due to this package not holding the required permission
+			// a ServiceSpecificException is thrown with the text "Permission Denial"
+			String e_message = e.getMessage();
+			if(e_message != null && e_message.contains("Permission Denial")){
+				//e_message);
+				throw new SecurityException(e);
+			} else {
+				throw e;
+			}
+		}
 	}
 }
 

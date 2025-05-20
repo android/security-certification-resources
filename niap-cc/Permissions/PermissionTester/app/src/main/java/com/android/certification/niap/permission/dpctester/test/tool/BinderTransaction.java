@@ -32,6 +32,7 @@ import android.os.ParcelUuid;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.certification.niap.permission.dpctester.common.ReflectionUtil;
 import com.android.certification.niap.permission.dpctester.test.exception.BypassTestException;
@@ -143,7 +144,10 @@ public class BinderTransaction  {
         } else if (parameter instanceof Parcelable) {
             data.writeInt(1);
             ((Parcelable) parameter).writeToParcel(data, 0);
+        } else {
+            Log.d("BinderTransaction","unknown parameter:"+parameter);
         }
+
         return data;
     }
 

@@ -226,7 +226,8 @@ public abstract class SignaturePermissionTestModuleBase extends PermissionTestMo
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 				mContext.bindService(intent, Context.BIND_AUTO_CREATE, executorService, serviceConnection);
 			} else {
-				throw new BypassTestException("Can not use bind service before SDK Q");
+				mContext.bindService(intent,serviceConnection,Context.BIND_AUTO_CREATE);
+				//throw new BypassTestException("Can not use bind service before SDK Q");
 			}
 			synchronized (lock) {
 				try {

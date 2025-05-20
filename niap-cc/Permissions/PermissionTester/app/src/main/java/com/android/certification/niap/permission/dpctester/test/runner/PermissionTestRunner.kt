@@ -127,7 +127,7 @@ class PermissionTestRunner {
 
 
                 } catch (ex: ReflectionUtil.ReflectionIsTemporaryException) {
-                    ex.printStackTrace();
+                    //ex.printStackTrace();
 
                     if (ex.cause is InvocationTargetException) {
                         val exi = ex.cause
@@ -247,7 +247,8 @@ class PermissionTestRunner {
                 root.info.moduleLog.add(
                     LogBox(type = "error", name =testCase.permission, description = message));
                 if(throwable != null){
-                    throwable.printStackTrace()
+                    //throwable.printStackTrace()
+                    StaticLogger.error("Throwable message : ${throwable.message}")
                 }
             }
             //safe call

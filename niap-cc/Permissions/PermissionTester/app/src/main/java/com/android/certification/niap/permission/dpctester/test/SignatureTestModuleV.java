@@ -58,6 +58,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
+import com.android.certification.niap.permission.dpctester.common.Constants;
 import com.android.certification.niap.permission.dpctester.common.ReflectionUtil;
 import com.android.certification.niap.permission.dpctester.test.exception.BypassTestException;
 import com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException;
@@ -140,21 +141,21 @@ public class SignatureTestModuleV extends SignaturePermissionTestModuleBase {
 		//no implementation here
 	}
 
-	@PermissionTest(permission="MANAGE_REMOTE_AUTH", sdkMin=35)
-	public void testManageRemoteAuth(){
-		logger.debug("MANAGE_REMOTE_AUTH is not implemented yet");
-		throw new BypassTestException("MANAGE_REMOTE_AUTH permission is not implemented yet");
-		//BinderTransaction.getInstance().invoke(Transacts.SERVICE, Transacts.DESCRIPTOR,
-		//       Transacts.unregisterCoexCallback, (Object) null);
-	}
-
-	@PermissionTest(permission="USE_REMOTE_AUTH", sdkMin=35)
-	public void testUseRemoteAuth(){
-		logger.debug("USE_REMOTE_AUTH is not implemented yet");
-		throw new BypassTestException("USE_REMOTE_AUTH permission is not implemented yet");
-		//BinderTransaction.getInstance().invoke(Transacts.SERVICE, Transacts.DESCRIPTOR,
-		//       Transacts.unregisterCoexCallback, (Object) null);
-	}
+//	@PermissionTest(permission="MANAGE_REMOTE_AUTH", sdkMin=35)
+//	public void testManageRemoteAuth(){
+//		logger.debug("MANAGE_REMOTE_AUTH is not implemented yet");
+//		throw new BypassTestException("MANAGE_REMOTE_AUTH permission is not implemented yet");
+//		//BinderTransaction.getInstance().invoke(Transacts.SERVICE, Transacts.DESCRIPTOR,
+//		//       Transacts.unregisterCoexCallback, (Object) null);
+//	}
+//
+//	@PermissionTest(permission="USE_REMOTE_AUTH", sdkMin=35)
+//	public void testUseRemoteAuth(){
+//		logger.debug("USE_REMOTE_AUTH is not implemented yet");
+//		throw new BypassTestException("USE_REMOTE_AUTH permission is not implemented yet");
+//		//BinderTransaction.getInstance().invoke(Transacts.SERVICE, Transacts.DESCRIPTOR,
+//		//       Transacts.unregisterCoexCallback, (Object) null);
+//	}
 
 	@PermissionTest(permission="THREAD_NETWORK_PRIVILEGED", sdkMin=35)
 	public void testThreadNetworkPrivileged(){
@@ -323,6 +324,11 @@ public class SignatureTestModuleV extends SignaturePermissionTestModuleBase {
 
 	@PermissionTest(permission="LAUNCH_PERMISSION_SETTINGS", sdkMin=35)
 	public void testLaunchPermissionSettings(){
+
+		if (Constants.BYPASS_TESTS_AFFECTING_UI)
+			throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
+
 		//The action may affect to ui
 		String ACTION_MANAGE_APP_PERMISSIONS = "android.intent.action.MANAGE_APP_PERMISSIONS";
 		Intent intent = new Intent(ACTION_MANAGE_APP_PERMISSIONS);
@@ -429,18 +435,19 @@ public class SignatureTestModuleV extends SignaturePermissionTestModuleBase {
 
 	@PermissionTest(permission="SET_BIOMETRIC_DIALOG_ADVANCED", sdkMin=35)
 	public void testSetBiometricDialogAdvanced(){
-		//logger.debug("Test case for android.permission.SET_BIOMETRIC_DIALOG_ADVANCED not implemented yet");
+
 		//NOTE :
 		//Conflict to USE_BIOMETRIC permission
 		//You should put below in noperm/AndroidManifest.xml to test
 		//<uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
 		BiometricPrompt.Builder bmBuilder = new BiometricPrompt.Builder(mContext)
 				.setTitle("a").setNegativeButton("text", mContext.getMainExecutor(), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialogInterface, int i) {
 
 					}
-				});//.setLo
+				});
 		ReflectionUtil.invoke(bmBuilder,
 				"setLogoDescription",  new Class<?>[]{String.class},
 				"dummy-logo-desription");
@@ -518,6 +525,10 @@ public class SignatureTestModuleV extends SignaturePermissionTestModuleBase {
 
 	@PermissionTest(permission="SHOW_CUSTOMIZED_RESOLVER", sdkMin=35)
 	public void testShowCustomizedResolver(){
+
+		if (Constants.BYPASS_TESTS_AFFECTING_UI)
+			throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
 		String ACTION_SHOW_NFC_RESOLVER = "android.nfc.action.SHOW_NFC_RESOLVER";
 		Intent intent = new Intent(ACTION_SHOW_NFC_RESOLVER);
 		intent.putExtra(Intent.EXTRA_INTENT,new Intent());
@@ -619,6 +630,11 @@ public class SignatureTestModuleV extends SignaturePermissionTestModuleBase {
 
 	@PermissionTest(permission="PREPARE_FACTORY_RESET", sdkMin=35)
 	public void testPrepareFactoryReset(){
+
+		if (Constants.BYPASS_TESTS_AFFECTING_UI)
+			throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
+
 		//String ACTION_SHOW_NFC_RESOLVER = "android.nfc.action.SHOW_NFC_RESOLVER";
 		String ACTION_PREPARE_FACTORY_RESET =
 				"com.android.settings.ACTION_PREPARE_FACTORY_RESET";
@@ -691,7 +707,7 @@ public class SignatureTestModuleV extends SignaturePermissionTestModuleBase {
 			//Thread.sleep(250);
 			logger.debug("testEnableAndMeasureFsVerityByFile: "+file.getAbsolutePath());
         } catch (IOException e) {
-            throw new RuntimeException("Failed to generate a temporary file.");
+            throw new UnexpectedTestFailureException("Failed to generate a temporary file.");
         }
 		//logger.system("fmg="+fmg.isApkVeritySupported());
 		//"android.security.fsverity_api";

@@ -90,7 +90,7 @@ public class SpecificDependentTestModule extends SignaturePermissionTestModuleBa
     }
 
     //The test requires UWB_PRIVILEGED permission for running,
-    //Also the test only runs only on high-end (uwb supported) devices.
+    //Also the test only runs only on uwb supported devices.
     @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     @PermissionTest(permission=UWB_RANGING, sdkMin=31)
     public void testUwbRanging(){
@@ -297,12 +297,5 @@ public class SpecificDependentTestModule extends SignaturePermissionTestModuleBa
         alarmManager.cancel(pendingIntent);
     }
 
-    @PermissionTest(permission="SATELLITE_COMMUNICATION", sdkMin=36)
-    public void testSatelliteCommunication(){
-        BinderTransaction.getInstance().invoke(
-                Context.TELEPHONY_SERVICE,
-                Transacts.TELEPHONY_DESCRIPTOR,
-                "requestIsSatelliteEnabled",0
-                ,new android.os.ResultReceiver(new Handler(Looper.getMainLooper())));
-    }
+
 }

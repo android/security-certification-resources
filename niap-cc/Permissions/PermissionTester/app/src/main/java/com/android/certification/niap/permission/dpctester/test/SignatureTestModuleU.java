@@ -71,7 +71,9 @@ import com.android.certification.niap.permission.dpctester.test.tool.TesterUtils
 
 import org.robolectric.RuntimeEnvironment;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
@@ -463,6 +465,9 @@ public class SignatureTestModuleU extends SignaturePermissionTestModuleBase {
 
 	@PermissionTest(permission="LAUNCH_CREDENTIAL_SELECTOR", sdkMin=34)
 	public void testLaunchCredentialSelector(){
+		if (Constants.BYPASS_TESTS_AFFECTING_UI)
+			throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
+
 		Intent featuresIntent = new Intent().addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		featuresIntent.setComponent(new
 				ComponentName("com.android.credentialmanager",
@@ -654,6 +659,71 @@ public class SignatureTestModuleU extends SignaturePermissionTestModuleBase {
 		}
 
 	}
+
+	@SuppressLint("PrivateApi")
+	@PermissionTest(permission="CAMERA_INJECT_EXTERNAL_CAMERA", sdkMin=34)
+	public void testCameraInjectExternalCamera(){
+		Object injectionCallback;
+		Object injectionSession;
+		try {
+			Class<?> injectionCallbackClass = Class.forName(
+					"android.hardware.camera2.ICameraInjectionCallback");
+			injectionCallback = Proxy.newProxyInstance(
+					injectionCallbackClass.getClassLoader(),
+					new Class[]{injectionCallbackClass}, new InvocationHandler() {
+						@Override
+						public Object invoke(Object o, Method method, Object[] objects)
+								throws Throwable {
+							logger.debug("injectionCallback#invoke: " + method);
+							if (method.toString().contains("asBinder")) {
+								return new Binder();
+							} else if (method.toString().contains("onInjectionError")) {
+								return null;
+							}
+							return null;
+						}
+					});
+			Class<?> injectionSessionClass = Class.forName(
+					"android.hardware.camera2.ICameraInjectionSession");
+			injectionSession = Proxy.newProxyInstance(
+					injectionSessionClass.getClassLoader(),
+					new Class[]{injectionSessionClass}, new InvocationHandler() {
+						@Override
+						public Object invoke(Object o, Method method, Object[] objects)
+								throws Throwable {
+							logger.debug("injectionSession#invoke: " + method);
+							if (method.toString().contains("asBinder")) {
+								return new Binder();
+							}
+							return null;
+						}
+					});
+		} catch (ClassNotFoundException e) {
+			throw new UnexpectedTestFailureException(e);
+		}
+		try {
+			BinderTransaction.getInstance().invoke(Transacts.CAMERA_SERVICE,
+					Transacts.CAMERA_DESCRIPTOR,
+					"injectCamera", mContext.getPackageName(),
+					"",
+					"", injectionCallback);
+
+		} catch (SecurityException e) {
+			throw e;
+		} catch (Exception e) {
+			// If the test fails due to this package not holding the required permission
+			// a ServiceSpecificException is thrown with the text "Permission Denial"
+			String e_message = e.getMessage();
+			if(e_message != null && e_message.contains("Permission Denial")){
+				//e_message);
+				throw new SecurityException(e);
+			} else {
+				throw e;
+			}
+		}
+	}
+
+
 }
 
 

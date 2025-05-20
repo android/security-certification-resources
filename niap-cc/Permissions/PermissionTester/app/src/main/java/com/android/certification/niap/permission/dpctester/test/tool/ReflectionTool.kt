@@ -67,7 +67,7 @@ class ReflectionTool {
                 val method = targetClass.getMethod(methodName, *parameterClasses)
                 return method.invoke(targetObject, *parameters)
             } catch (e: ReflectiveOperationException) {
-                Log.e("TAG", "Reflection failed.")
+                Log.e("ReflectionTool", "Reflection failed.")
                 e.printStackTrace()
                 val cause = e.cause
                 if (cause is SecurityException) {
@@ -76,7 +76,7 @@ class ReflectionTool {
                     throw cause!!//UnexpectedPermissionTestFailureException(e)
                 }
             } catch (e:SecurityException){
-                Log.e("TAG", "Other error")
+                Log.e("ReflectionTool", "Other error")
                 throw e
             }
         }

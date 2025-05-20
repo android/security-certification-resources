@@ -79,10 +79,6 @@ class ActivityLogger(override val tag: String, val adaptable:LogListAdaptable):L
             adaptable.addLogLine(message)
         }
     }
-    fun logbox(box: LogBox) {
-
-
-    }
 
 
     interface LogListAdaptable {
