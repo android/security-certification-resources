@@ -45,9 +45,10 @@ public class ProxyChecker {
 
         //alt_descriptor.put("com.android.internal.widget.ILockSettings","LOCK_SETTINGS_DESCRIPTOR");
         for(String k:alt_descriptor.keySet()){
-            System.out.printf("public static final String %s = \"%s\";%n",
+            Log.d("ProxyChecker",String.format("public static final String %s = \"%s\";%n",
                     alt_descriptor.get(k),
-                    k);
+                    k));
+
         }
     }
     private static Class descriptor(String desc){
@@ -110,11 +111,11 @@ public class ProxyChecker {
             transactField.setAccessible(true);
 
             int transactId = (int) transactField.get(null);
-            System.out.printf("public static final String %s = \"%s\";%n",
-                    transactName,transactName);
-            System.out.printf("queryTransactId(Transacts.%s, Transacts.%s, descriptorTransacts);%n",
+            Log.d("ProxyChecker",String.format("public static final String %s = \"%s\";%n",
+                    transactName,transactName));
+            Log.d("ProxyChecker",String.format("queryTransactId(Transacts.%s, Transacts.%s, descriptorTransacts);%n",
                     alt_descriptor.get(descriptor),
-                    transactName);
+                    transactName));
 
             //Log.d(TAG,"Found " + transactName + "=" + transactId);
         } catch (ReflectiveOperationException e) {

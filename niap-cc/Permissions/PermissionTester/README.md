@@ -13,11 +13,13 @@ The tool still keep that feature, and also able to run thousands of test cases f
 The tool is for checking android's dpc related permission which has 'MANAGE_DEVICE_POLICY_' prefixes.
 These permissions are related to DPC app, so this test apk is working as a Device policy controller.
 
- - Run 'automate-install.sh to install' an apk file into the connected device.
+ - Run 'automate-install-normal.sh to install' the normal apk file into the connected device.
+ - -  Run 'automate-install-noperm.sh to install' the no-perm apk file into the connected device.
+ - -  Run 'automate-install-owner.sh to install' the normal apk file into the connected device.also add device owner privilege to app
  - And then you can execute the test cases from application.
  - If you want to disable permission remove corresponding permissions from Manifests.
  - if you want to run permissions which are disabled in active admin level, set application's privilege as the profile owner level.
- - If you'd like to uninstall app use 'remove-app.sh'
+ - If you'd like to uninstall app use 'automate-uninstall.sh'
 
 ### Device Owner
 ```console
