@@ -248,7 +248,7 @@ class PermissionTestRunner {
                     LogBox(type = "error", name =testCase.permission, description = message));
                 if(throwable != null){
                     //throwable.printStackTrace()
-                    StaticLogger.error("Throwable message : ${throwable.message}")
+                    StaticLogger.info("Failed:${testCase.permission} Throwable message : ${throwable.message}")
                 }
             }
             //safe call

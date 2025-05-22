@@ -23,6 +23,7 @@ import static android.Manifest.permission.BLUETOOTH;
 import static android.Manifest.permission.BLUETOOTH_ADVERTISE;
 import static android.Manifest.permission.BLUETOOTH_CONNECT;
 import static android.Manifest.permission.BLUETOOTH_PRIVILEGED;
+import static android.Manifest.permission.BODY_SENSORS;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.MANAGE_OWN_CALLS;
@@ -510,9 +511,13 @@ public class CoreTestModule extends SignaturePermissionTestModuleBase {
 
 
     //16. Body Sensors
-    //	Normal: Android does not provide any authorization at this level to access the Body Sensors system service
+    //	Normal: BODY_SENSORS
     //	Dangerous: Android does not provide any authorization at this level to access the Body Sensors system service
     //	Platform: android.permission.MANAGE_SENSORS or android.permission.MANAGE_SENSOR_PRIVACY
+    @PermissionTest(permission = BODY_SENSORS)
+    public void testBodySensors() {
+        runtimeTestModule.testBodySensors();
+    }
     @PermissionTest(permission = "MANAGE_SENSORS")
     public void testManageSensors() {
         signatureTestModule.testManageSensors();

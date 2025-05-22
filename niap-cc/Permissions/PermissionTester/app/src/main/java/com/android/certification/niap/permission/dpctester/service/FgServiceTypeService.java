@@ -72,9 +72,9 @@ abstract class FgServiceTypeService extends Service {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                stopForeground(Service.STOP_FOREGROUND_DETACH);
-                mRunning.set(false);
             }
+            stopForeground(Service.STOP_FOREGROUND_DETACH);
+            mRunning.set(false);
         });
         th.start();
         //System.out.println("started fgservice =>"+channel_id);

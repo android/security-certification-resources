@@ -67,6 +67,7 @@ import com.android.certification.niap.permission.dpctester.test.tool.BinderTrans
 import com.android.certification.niap.permission.dpctester.test.tool.PermissionTest;
 import com.android.certification.niap.permission.dpctester.test.tool.PermissionTestModule;
 import com.android.certification.niap.permission.dpctester.test.tool.ReflectionTool;
+import com.android.certification.niap.permission.dpctester.test.tool.ReflectionToolJava;
 import com.android.certification.niap.permission.dpctester.test.tool.TesterUtils;
 
 import org.robolectric.RuntimeEnvironment;
@@ -659,17 +660,20 @@ public class SignatureTestModuleU extends SignaturePermissionTestModuleBase {
 		}
 
 	}
+	//public class c extends Camera
 
 	@SuppressLint("PrivateApi")
-	@PermissionTest(permission="CAMERA_INJECT_EXTERNAL_CAMERA", sdkMin=34)
+	@PermissionTest(permission="CAMERA_INJECT_EXTERNAL_CAMERA", sdkMin=34,sdkMax = 35)
 	public void testCameraInjectExternalCamera(){
 		Object injectionCallback;
 		Object injectionSession;
 		try {
 			Class<?> injectionCallbackClass = Class.forName(
 					"android.hardware.camera2.ICameraInjectionCallback");
+
+			//can not instantiate interface after sdk36
 			injectionCallback = Proxy.newProxyInstance(
-					injectionCallbackClass.getClassLoader(),
+					mContext.getClassLoader(),
 					new Class[]{injectionCallbackClass}, new InvocationHandler() {
 						@Override
 						public Object invoke(Object o, Method method, Object[] objects)
@@ -679,10 +683,13 @@ public class SignatureTestModuleU extends SignaturePermissionTestModuleBase {
 								return new Binder();
 							} else if (method.toString().contains("onInjectionError")) {
 								return null;
+							}  else if(method.toString().contains("equals")){
+								return true;
 							}
 							return null;
 						}
 					});
+			//logger.system("Proxy.newProxyInstance>"+injectionCallback.toString());
 			Class<?> injectionSessionClass = Class.forName(
 					"android.hardware.camera2.ICameraInjectionSession");
 			injectionSession = Proxy.newProxyInstance(
@@ -702,11 +709,13 @@ public class SignatureTestModuleU extends SignaturePermissionTestModuleBase {
 			throw new UnexpectedTestFailureException(e);
 		}
 		try {
+			logger.system(">"+injectionCallback.toString());
 			BinderTransaction.getInstance().invoke(Transacts.CAMERA_SERVICE,
 					Transacts.CAMERA_DESCRIPTOR,
 					"injectCamera", mContext.getPackageName(),
-					"",
-					"", injectionCallback);
+					"test-internal-cam",
+					"test-external-cam", injectionCallback);
+
 
 		} catch (SecurityException e) {
 			throw e;
