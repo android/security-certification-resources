@@ -28,7 +28,7 @@ public class TestAssertLogger {
     public String Msg(String desc){
         inc++;
         String line = name.getMethodName() + "(" + String.format("%03d",inc) +"):"+ desc;
-        Log.d("tag",line);
+        Log.d("TestAssertLogger",line);
 
         return line;
     }

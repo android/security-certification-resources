@@ -122,7 +122,6 @@ public interface DevicePolicyManagerGateway {
         private final int value;
     }
 
-    // TODO(b/171350084): use in other places
 
     boolean isAdminActive();
 

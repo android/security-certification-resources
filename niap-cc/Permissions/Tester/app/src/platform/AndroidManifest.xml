@@ -1504,7 +1504,7 @@
     <uses-permission android:name="com.google.android.apps.gsa.nga.engine.stash.BROADCAST" />
     <uses-permission android:name="com.google.android.gms.smartdevice.permission.NOTIFY_QUICK_START_STATUS" />
 
-    <!-- non new platform permissions from barbet34 device-->
+    <!-- non new platform permissions from pixel5a device-->
     <uses-permission android:name="com.google.sensor.private.permission.USE_RAW_SENSOR" />
     <uses-permission android:name="com.google.android.apps.scone.connectivitymonitor.permission.WRITE_NIMBUS_DATA" />
     <uses-permission android:name="android.permission.health.READ_EXERCISE_ROUTE" />
@@ -1521,10 +1521,10 @@
     <uses-permission android:name="android.permission.ACCESS_PRIVILEGED_APP_SET_ID" />
     <uses-permission android:name="com.google.android.apps.search.assistant.verticals.snapshot.widgets.weather.permission.WEATHER_WIDGET_UPDATE" />
     <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.reader" />
-    <!-- non platform oriole(pixel6) 33-->
+    <!-- non platform pixel6 33-->
     <uses-permission android:name="com.google.android.finsky.permission.PLAY_BILLING_LIBRARY_BROADCAST" />
     <uses-permission android:name="com.google.android.gms.permission.ACCESS_NEARBY_SHARE_API" />
-    <!-- non platform husky(pixel8pro) 34-->
+    <!-- non platform pixel8pro 34-->
     <uses-permission android:name="com.fitbit.FitbitMobile.permission.SSO" />
     <uses-permission android:name="com.google.android.wildlife.permission.ADVANCED_VPN_CONFIG" />
     <uses-permission android:name="com.google.android.wildlife.permission.UPDATE_NETWORK_MONITOR" />
@@ -1536,7 +1536,7 @@
     <uses-permission android:name="com.vzw.DEFAULT_APP_CHANGE" />
     <uses-permission android:name="com.vzw.engage.service.myverizon" />
     <uses-permission android:name="com.vzw.hss.myverizon.CountlyPush.BROADCAST_PERMISSION" />
-    <!-- non platform shiba(piexel8) 35 -->
+    <!-- non platform pixel8 -->
     <uses-permission android:name="android.permission.health.START_ONBOARDING" />
     <uses-permission android:name="android.permission.BIND_EXAMPLE_STORE_SERVICE" />
     <uses-permission android:name="com.android.devicelock.permission.START_KIOSK_SETUP_ACTIVITY" />

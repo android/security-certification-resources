@@ -125,8 +125,6 @@ public class DangerousPermissionJUnitTest {
         //Adopt the permission identity of the shell UID for all permissions.
         //This allows you to call APIs protected permissions which normal apps cannot hold but are granted to the shell UID.
         mUiAutomation.adoptShellPermissionIdentity();
-        //For SET_PREFERRED_APPLICATIONS test case
-        mUiAutomation.grantRuntimePermission(null,"android.permission.QUERY_ALL_PACKAGES");
 
         signatureTestModule = new SignatureTestModule(mActivity);
         signatureTestModuleR = new SignatureTestModuleR(mActivity);
