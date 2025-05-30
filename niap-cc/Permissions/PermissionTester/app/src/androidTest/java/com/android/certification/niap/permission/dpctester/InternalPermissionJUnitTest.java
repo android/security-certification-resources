@@ -632,6 +632,9 @@ public class InternalPermissionJUnitTest {
                 // NOTICE:
                 // We can not use an interface with a same name at once, so if you would like to test it
                 // with SDK34 kindly change name of these callbacks.
+
+
+
                 _IIsDeviceLockedCallback callback = new _IIsDeviceLockedCallback() {
                     @Override
                     public void onIsDeviceLocked(boolean locked) throws RemoteException {
@@ -674,7 +677,8 @@ public class InternalPermissionJUnitTest {
 
                     latch.await(2000, TimeUnit.MILLISECONDS);
                     if (!success.get()) {
-                        throw new SecurityException("Found secuirty error in callback interface!");
+                        throw new SecurityException(
+                                "Found secuirty error in callback interface!");
                     }
                 } catch (InterruptedException e) {
                     logline(e.getMessage());
@@ -682,9 +686,9 @@ public class InternalPermissionJUnitTest {
                 }
             }
         } catch(SecurityException ex){
-            //if(permissionGranted){
+
             throw ex;
-            //}
+
         }
     }
     @Test

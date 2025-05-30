@@ -166,7 +166,7 @@ public class ConfigurationFactory {
         DevicePolicyConfiguration devicePolicyConfiguration =
                 new DevicePolicyConfiguration(activity);
         if(devicePolicyConfiguration.enabled()){
-            additionalConfigurations.add(devicePolicyConfiguration);
+            //additionalConfigurations.add(devicePolicyConfiguration);
         }
 
 

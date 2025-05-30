@@ -67,8 +67,8 @@ class ReflectionTool {
                 val method = targetClass.getMethod(methodName, *parameterClasses)
                 return method.invoke(targetObject, *parameters)
             } catch (e: ReflectiveOperationException) {
-                Log.e("ReflectionTool", "Reflection failed.")
-                e.printStackTrace()
+                Log.e("ReflectionTool", "Reflection failed.",e)
+                //e.printStackTrace()
                 val cause = e.cause
                 if (cause is SecurityException) {
                     throw (cause as SecurityException?)!!
@@ -146,7 +146,6 @@ class ReflectionTool {
                 val container:Pair<String,String> = Pair("bool", ann.label+":"+ann.prflabel);
                  //   PermissionTestRunner.Data(ann.permission, ann.sdkMin, ann.sdkMax,
                  //  m.name,ann.requiredPermissions,ann.requestedPermissions,ann.developmentProtection);//ann.requiredPermissions,ann.requiredServices)
-                 //Log.d("TAG",container.toString())
                 a.add(container)
             }
             return a;

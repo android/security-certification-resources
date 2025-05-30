@@ -446,6 +446,10 @@ public class InternalTestModule extends PermissionTestModuleBase {
 		    // NOTICE:
 		    // We can not use an interface with a same name at once, so if you would like to test it
 		    // with SDK34 kindly change name of these callbacks.
+
+			logger.warn("We can not use an interface with a same name at once, " +
+							"so if you would like to test it with SDK34, kindly change name of _IIsDeviceLockedCallback callbacks.");
+
 		    _IIsDeviceLockedCallback callback = new _IIsDeviceLockedCallback() {
 		        @Override
 		        public void onIsDeviceLocked(boolean locked) throws RemoteException {
