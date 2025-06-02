@@ -23,6 +23,7 @@ import android.os.IBinder
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.android.certification.niap.permission.dpctester.DpcApplication
+import com.android.certification.niap.permission.dpctester.R
 import com.android.certification.niap.permission.dpctester.common.Constants
 import com.android.certification.niap.permission.dpctester.common.SignatureUtils
 import com.android.certification.niap.permission.dpctester.data.LogBox
@@ -45,6 +46,8 @@ open class PermissionTestModuleBase(activity: Activity) {
 
     @JvmField
     var acceptDangerousApi = false
+
+
 
     @JvmField
     protected var logger: ActivityLogger
@@ -84,6 +87,9 @@ open class PermissionTestModuleBase(activity: Activity) {
     val gmsSignatureMatch:Boolean =
         mPackageManager.hasSigningCertificate(Constants.GMS_PACKAGE_NAME,
         mAppSignature.toByteArray(), PackageManager.CERT_INPUT_RAW_X509)
+
+    @JvmField
+    var mNopermMode:Boolean  = mContext.resources.getBoolean(R.bool.inverse_test_result);
 
     @JvmField
     val info = Info();

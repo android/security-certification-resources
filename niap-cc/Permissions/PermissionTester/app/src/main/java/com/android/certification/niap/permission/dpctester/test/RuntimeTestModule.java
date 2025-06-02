@@ -343,10 +343,12 @@ public class RuntimeTestModule extends PermissionTestModuleBase {
 
 	@PermissionTest(permission=READ_PHONE_NUMBERS)
 	public void testReadPhoneNumbers(){
-		if (ActivityCompat.checkSelfPermission(mContext, READ_SMS) != PackageManager.PERMISSION_GRANTED &&
-				ActivityCompat.checkSelfPermission(mContext, READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-			throw new BypassTestException(
-					"READ_SMS & READ_PHONE_STATE permission is required for this test case as prerequisite");
+		if(!mNopermMode) {
+			if (ActivityCompat.checkSelfPermission(mContext, READ_SMS) != PackageManager.PERMISSION_GRANTED &&
+					ActivityCompat.checkSelfPermission(mContext, READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+				throw new BypassTestException(
+						"READ_SMS & READ_PHONE_STATE permission is required for this test case as prerequisite");
+			}
 		}
 		systemService(TelephonyManager.class).getLine1Number();
 	}
@@ -492,9 +494,11 @@ public class RuntimeTestModule extends PermissionTestModuleBase {
 
 	@PermissionTest(permission=BLUETOOTH_CONNECT, sdkMin=31)
 	public void testBluetoothConnect(){
-		if (ActivityCompat.checkSelfPermission(mContext, BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-			throw new BypassTestException(
-					"BLUETOOTH_SCAN permission is required for this test case");
+		if(!mNopermMode) {
+			if (ActivityCompat.checkSelfPermission(mContext, BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+				throw new BypassTestException(
+						"BLUETOOTH_SCAN permission is required for this test case");
+			}
 		}
 		BluetoothAdapter.getDefaultAdapter().getName();
 	}
@@ -520,9 +524,11 @@ public class RuntimeTestModule extends PermissionTestModuleBase {
 		// The API guarded by this permission is also guarded by the signature
 		// permission UWB_PRIVILEGED, so if this signature permission is not granted
 		// then skip this test. UWB_PRIVILEGED is a signature level
-		if (mContext.checkSelfPermission("android.permission.UWB_PRIVILEGED") != PackageManager.PERMISSION_GRANTED) {
-			throw new BypassTestException(
-					"The UWB_PRIVILEGED permission must be granted for this test");
+		if(!mNopermMode) {
+			if (mContext.checkSelfPermission("android.permission.UWB_PRIVILEGED") != PackageManager.PERMISSION_GRANTED) {
+				throw new BypassTestException(
+						"The UWB_PRIVILEGED permission must be granted for this test");
+			}
 		}
 		// The UwbManager with the API guarded by this permission is hidden, so a
 		// direct transact is required.
