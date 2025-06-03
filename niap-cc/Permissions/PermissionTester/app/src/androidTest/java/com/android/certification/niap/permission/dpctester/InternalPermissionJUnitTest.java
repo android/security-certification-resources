@@ -263,6 +263,7 @@ public class InternalPermissionJUnitTest {
         BinderTransaction.getInstance().invoke(Transacts.SENSOR_PRIVACY_SERVICE,
                 Transacts.SENSOR_PRIVACY_DESCRIPTOR, "isSensorPrivacyEnabled");
     }
+
     @Test
     @Ignore("Ignored. Due to still not finished")
     @PermissionTest(permission="DOMAIN_VERIFICATION_AGENT", sdkMin=31)
@@ -278,6 +279,7 @@ public class InternalPermissionJUnitTest {
             }
         }
     }
+
     @Test
     @PermissionTest(permission="ACCESS_RCS_USER_CAPABILITY_EXCHANGE", sdkMin=31)
     public void testAccessRcsUserCapabilityExchange(){

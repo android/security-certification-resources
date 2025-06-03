@@ -208,7 +208,7 @@ public class GmsTestModule extends PermissionTestModuleBase {
 								false,
 								true,
 								gmsSignatureMatch,
-								isPlatformSignatureMatch,false,false,"not granted"));
+								isPlatformSignatureMatch,false,false, permissionGranted ? "granted" : "not granted"));
 				qs.setCount_errors(qs.getCount_errors()+1);
 			} else {
 				callback.accept(
@@ -217,7 +217,7 @@ public class GmsTestModule extends PermissionTestModuleBase {
 								true,
 								true,
 								gmsSignatureMatch,
-								isPlatformSignatureMatch,false,false,"granted"));
+								isPlatformSignatureMatch,false,false, permissionGranted ? "granted" : "not granted"));
 				qs.setCount_passed(qs.getCount_passed()+1);
 			}
 		});

@@ -525,7 +525,7 @@ public class SignatureTestModule extends SignaturePermissionTestModuleBase {
 				"enableLocationUpdates");
 	}
 
-	@PermissionTest(permission = "CONTROL_REMOTE_APP_TRANSITION_ANIMATIONS")
+	@PermissionTest(permission = "CONTROL_REMOTE_APP_TRANSITION_ANIMATIONS",sdkMax = 35)
 	public void testControlRemoteAppTransitionAnimations() {
 
 		if (Constants.BYPASS_TESTS_AFFECTING_UI)
