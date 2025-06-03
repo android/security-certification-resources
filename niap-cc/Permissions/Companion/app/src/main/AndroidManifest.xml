@@ -511,7 +511,35 @@
         <service android:name="com.android.certifications.niap.permissions.companion.services.TestBindWearableSensingServiceService"
             android:permission="android.permission.BIND_WEARABLE_SENSING_SERVICE"
             android:enabled="true" android:exported="true" />
-
+        <!-- Services for android V -->
+        <service android:name=".services.TestBindTvAdServiceService"
+            android:permission="android.permission.BIND_TV_AD_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindDomainSelectionServiceService"
+            android:permission="android.permission.BIND_DOMAIN_SELECTION_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindOnDeviceIntelligenceServiceService"
+            android:permission="android.permission.BIND_ON_DEVICE_INTELLIGENCE_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindOnDeviceSandboxedInferenceServiceService"
+            android:permission="android.permission.BIND_ON_DEVICE_SANDBOXED_INFERENCE_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <!-- for api 36 -->
+        <service android:name=".services.TestBindPopulationDensityProviderServiceService"
+            android:permission="android.permission.BIND_POPULATION_DENSITY_PROVIDER_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindIntrusionDetectionEventTransportServiceService"
+            android:permission="android.permission.BIND_INTRUSION_DETECTION_EVENT_TRANSPORT_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindRkpServiceService"
+            android:permission="android.permission.BIND_RKP_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindAppFunctionServiceService"
+            android:permission="android.permission.BIND_APP_FUNCTION_SERVICE"
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindDependencyInstallerService"
+            android:permission="android.permission.BIND_DEPENDENCY_INSTALLER"
+            android:enabled="true" android:exported="true" />
 
     </application>
 

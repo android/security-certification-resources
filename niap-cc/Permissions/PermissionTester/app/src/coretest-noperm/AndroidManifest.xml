@@ -1,0 +1,82 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.android.certification.niap.permission.dpctester"
+    >
+
+    <application
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        >
+
+        <!-- This service is also used to test REGISTER_SIM_SUBSCRIPTION; the API for this test
+           verifies that the specified services requires BIND_TELECOM_CONNECTION_SERVICE. -->
+        <service
+            android:name=".service.TestService"
+            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE" />
+        <service
+            android:name=".service.TestJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".service.FgCameraService"
+            android:foregroundServiceType="camera"
+            android:exported="false" />
+        <service
+            android:name=".service.FgLocationService"
+            android:foregroundServiceType="location"
+            android:exported="false" />
+        <service
+            android:name=".service.FgMicrophoneService"
+            android:foregroundServiceType="microphone"
+            android:exported="false" />
+        <service
+            android:name=".service.FgConnectedDeviceService"
+            android:foregroundServiceType="connectedDevice"
+            android:exported="false" />
+        <service
+            android:name=".service.FgDataSyncService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+        <service
+            android:name=".service.FgHealthService"
+            android:foregroundServiceType="health"
+            android:exported="false" />
+        <service
+            android:name=".service.FgMediaPlaybackService"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false" />
+        <service
+            android:name=".service.FgMediaProjectionService"
+            android:foregroundServiceType="mediaProjection"
+            android:exported="false" />
+        <service
+            android:name=".service.FgPhoneCallService"
+            android:foregroundServiceType="phoneCall"
+            android:exported="false" />
+        <service
+            android:name=".service.FgRemoteMessagingService"
+            android:foregroundServiceType="remoteMessaging"
+            android:exported="false" />
+        <service
+            android:name=".service.FgShortService"
+            android:foregroundServiceType="shortService"
+            android:exported="false" />
+        <service
+            android:name=".service.FgSpecialUseService"
+            android:foregroundServiceType="specialUse"
+            android:exported="false" />
+        <service
+            android:name=".service.FgSystemExemptedService"
+            android:foregroundServiceType="systemExempted"
+            android:exported="false" />
+        <service
+            android:name=".service.FgMediaProcessingService"
+            android:foregroundServiceType="mediaProcessing"
+            android:exported="false" />
+
+    </application>
+
+    <uses-feature android:name="android.software.companion_device_setup"
+        android:required="false" />
+
+
+</manifest>

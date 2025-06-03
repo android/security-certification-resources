@@ -55,4 +55,5 @@
     <string name="run_dpm_test">Run DevicePolicyManagerTest(Experimental)</string>
     <string name="run_permission_dependent_tests2">RUN PERMISSION DEPENDENT TEST(PLAT)</string>
     <string name="run_install_permission_tests">Run Install Permission Test</string>
+    <string name="read_media_user_selected">Read media user selected</string>
 </resources>

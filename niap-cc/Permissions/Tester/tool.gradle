@@ -22,7 +22,7 @@ ext {
         doLast {
             def src = new File("permissions.json").text;
             def json = new JsonSlurper().parseText(src)
-            manifestTags(json.T, "13")
+            manifestTags(json.V, "15")
         }
     }
 
@@ -43,7 +43,7 @@ ext {
         doLast {
             def src = new File("permissions.json").text;
             def json2 = new JsonSlurper().parseText(src)
-            signatureConstants(json2.U, "14")
+            signatureConstants(json2.V, "15")
         }
     }
 
@@ -67,7 +67,7 @@ ext {
         doLast {
             def src = new File("permissions.json").text;
             def json4 = new JsonSlurper().parseText(src)
-            testPlaceHodlers(json4.U, "UDC", "Signature")
+            testPlaceHodlers(json4.V, "", "internal")
         }
     }
 

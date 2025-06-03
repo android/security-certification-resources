@@ -24,7 +24,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.1.0")
+        classpath("com.android.tools.build:gradle:8.4.2")
         classpath("com.google.guava:guava:24.1-jre")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle.kts files
@@ -42,7 +42,7 @@ allprojects {
 // ./gradlew bindServiceCodeGen
 class BindServiceCodeGenPlugin:Plugin<Project> {
 
-    val PERMISSIONS = arrayListOf<String>(
+    val PERMISSIONS34 = arrayListOf<String>(
         "BIND_CALL_STREAMING_SERVICE",
         "BIND_CREDENTIAL_PROVIDER_SERVICE",
         "BIND_FIELD_CLASSIFICATION_SERVICE",
@@ -52,7 +52,19 @@ class BindServiceCodeGenPlugin:Plugin<Project> {
         "BIND_VISUAL_QUERY_DETECTION_SERVICE",
         "BIND_WEARABLE_SENSING_SERVICE"
     )
-
+    val PERMISSIONS35 = arrayListOf<String>(
+        "BIND_TV_AD_SERVICE",
+        "BIND_DOMAIN_SELECTION_SERVICE",
+        "BIND_ON_DEVICE_INTELLIGENCE_SERVICE",
+        "BIND_ON_DEVICE_SANDBOXED_INFERENCE_SERVICE",
+    )
+    val PERMISSIONS = arrayListOf<String>(
+        "BIND_POPULATION_DENSITY_PROVIDER_SERVICE",
+        "BIND_INTRUSION_DETECTION_EVENT_TRANSPORT_SERVICE",
+        "BIND_RKP_SERVICE",
+        "BIND_APP_FUNCTION_SERVICE",
+        "BIND_DEPENDENCY_INSTALLER"
+    )
     override fun apply(project:Project){
         project.task("bindServiceCodeGen"){
             doLast {
@@ -67,7 +79,7 @@ class BindServiceCodeGenPlugin:Plugin<Project> {
                     if(f.exists()) Files.delete(f.toPath())
                     val generatedCode = """
 /*
- * Copyright 2023 The Android Open Source Project
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

@@ -29,10 +29,13 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Parcel;
+import android.os.ParcelFileDescriptor;
 import android.os.ParcelUuid;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.text.TextUtils;
+
+import androidx.core.os.BuildCompat;
 
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.log.Logger;
@@ -382,8 +385,9 @@ public class Transacts {
     public static final String setProfileOwnerOnOrganizationOwnedDevice="setProfileOwnerOnOrganizationOwnedDevice";
     public static final String cancelStateRequest="cancelStateRequest";
     public static final String setUserPreferredDisplayMode="setUserPreferredDisplayMode";
+    public static final String getUserPreferredDisplayMode="getUserPreferredDisplayMode";
     public static final String stopAppForUser="stopAppForUser";
-
+    public static final String permissionToOpCode="permissionToOpCode";
     // Following are constants for transact methods that are invoked as part of permission tests.
     public static final String getVtDataUsage = "getVtDataUsage";
     public static final String getNextEntry = "getNextEntry";
@@ -453,6 +457,7 @@ public class Transacts {
     public static final String enableLocationUpdates = "enableLocationUpdates";
     public static final String setAlwaysFinish = "setAlwaysFinish";
     public static final String addKeyboardLayoutForInputDevice = "addKeyboardLayoutForInputDevice";
+    public static final String setKeyboardLayoutForInputDevice = "setKeyboardLayoutForInputDevice";
     public static final String setWallpaper = "setWallpaper";
     public static final String setWallpaperComponent = "setWallpaperComponent";
     public static final String setStandbyEnabled = "setStandbyEnabled";
@@ -700,6 +705,65 @@ public class Transacts {
     public static final String getSupportedCountries = "getSupportedCountries";
 
     public static final String openRanging = "openRanging";
+    //Android 15
+    public static final String registerScreenRecordingCallback = "registerScreenRecordingCallback";
+    public static final String PDB_SERVICE = "persistent_data_block";//PersistentDataBlockService
+    public static final String PDB_DESCRIPTOR = "android.service.persistentdata.IPersistentDataBlockService";
+    public static final String deactivateFactoryResetProtection = "deactivateFactoryResetProtection";
+    public static final String getLastKnownCellIdentity = "getLastKnownCellIdentity";
+    public static final String SYSTEM_CONFIG_SERVICE =  "system_config";;//PersistentDataBlockService
+    public static final String SYSTEM_CONFIG_DESCRIPTOR = "android.os.ISystemConfig";
+    public static final String getEnhancedConfirmationTrustedPackages = "getEnhancedConfirmationTrustedPackages";
+    public static final String startObservingDevicePresence = "startObservingDevicePresence";
+    public static final String getAllAssociationsForUser = "getAllAssociationsForUser";
+    public static final String addOnTransportsChangedListener = "addOnTransportsChangedListener";
+    public static final String removeOnTransportsChangedListener = "removeOnTransportsChangedListener";
+    public static final String sendMessage = "sendMessage";
+    public static final String addOnMessageReceivedListener = "addOnMessageReceivedListener";
+
+    public static final String MEDIA_ROUTER_SERVICE = "media_router";//PersistentDataBlockService
+    public static final String MEDIA_ROUTER_DESCRIPTOR = "android.media.IMediaRouterService";
+    public static final String registerManager = "registerManager";
+    public static final String registerProxyRouter = "registerProxyRouter";
+
+    public static final String USAGE_STATS_SERVICE = "usagestats";//PersistentDataBlockService
+    public static final String USAGE_STATS_DESCRIPTOR = "android.app.usage.IUsageStatsManager";
+    public static final String reportChooserSelection = "reportChooserSelection";
+
+    public static final String CONTEXTUAL_SEARCH_SERVICE = "contextual_search";//PersistentDataBlockService
+    public static final String CONTEXTUAL_SEARCH_DESCRIPTOR = "android.app.contextualsearch.IContextualSearchManager";
+    public static final String startContextualSearch = "startContextualSearch";
+    //IInputManager
+    public static final String registerStickyModifierStateListener = "registerStickyModifierStateListener";
+    public static final String unregisterStickyModifierStateListener = "unregisterStickyModifierStateListener";
+
+    public static final String ON_DEVICE_INTELLIGENCE_SERVICE = "on_device_intelligence";//PersistentDataBlockService
+    public static final String ON_DEVICE_INTELLINGENCE_DESCRIPTOR = "android.app.ondeviceintelligence.IOnDeviceIntelligenceManager";
+    public static final String getVersion = "getVersion";
+    public static final String getFeature = "getFeature";
+    public static final String enableConnectedDisplay = "enableConnectedDisplay";
+    public static final String BACKGROUND_INSTALL_CONTROL_SERVICE = "background_install_control";;//PersistentDataBlockService
+    public static final String BACKGROUND_INSTALL_CONTROL_DESCRIPTOR = "android.content.pm.IBackgroundInstallControlService";
+    public static final String getBackgroundInstalledPackages = "getBackgroundInstalledPackages";
+    public static final String GRAMMATICAL_INFLECTION_SERVICE = "grammatical_inflection";//PersistentDataBlockService
+    public static final String GRAMMATICAL_INFLECTION_DESCRIPTOR = "android.app.IGrammaticalInflectionManager";
+    public static final String getSystemGrammaticalGender= "getSystemGrammaticalGender";
+    public static final String requestDisplayModes = "requestDisplayModes";
+    public static final String FILE_INTEGRITY_SERVICE = "file_integrity";//PersistentDataBlockService
+    public static final String FILE_INTEGRITY_DESCRIPTOR = "android.security.IFileIntegrityService";
+    public static final String setupFsverity= "setupFsverity";
+    public static final String createAuthToken="createAuthToken";
+    public static final String isDevicePotentiallyStolen = "isDevicePotentiallyStolen";
+    public static final String getBindingUidProcessState = "getBindingUidProcessState";
+    public static final String NSD_SERVICE = "servicediscovery";
+    public static final String NSD_DESCRIPTOR = "android.net.nsd.INsdManager";
+    public static final String connect = "connect";
+    public static final String FEATURE_FLAGS_SERVICE = "feature_flags";
+    public static final String FEATURE_FLAGS_DESCRIPTOR = "android.flags.IFeatureFlags";
+    public static final String overrideFlag = "overrideFlag";
+    public static final String resetFlag = "resetFlag";
+    public static final String isWakeLockLevelSupported = "isWakeLockLevelSupported";
+    public static final String setPackagesSuspendedAsUser = "setPackagesSuspendedAsUser";
 
 
     /**
@@ -2422,6 +2486,7 @@ public class Transacts {
      * {@code apiLevel} that can be used to invoke direct binder transacts.
      */
     public static Transacts createTransactsForApiLevel(int apiLevel) {
+
         switch (apiLevel) {
             // TODO: Replace the appropriate statement below with an instantiation of the java
             // class created by the app under the TransactIds/ directory. This will allow the tester
@@ -2440,6 +2505,8 @@ public class Transacts {
                 return new SdkT_Transacts();
             case Build.VERSION_CODES.UPSIDE_DOWN_CAKE:
                 return new SdkU_Transacts();
+            case 35:
+                return new SdkV_Transacts();
             default:
                 throw new IllegalArgumentException(
                         "The provided API level, " + apiLevel + ", is not supported");
@@ -2558,6 +2625,7 @@ public class Transacts {
         } catch (ReflectiveOperationException e) {
             throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
         }
+        //mLogger.logDebug("transactNam=>"+transactName);
         return invokeTransactWithCharSequence(binder, descriptor, transactName, useCharSequence,
                 parameters);
     }
@@ -2599,7 +2667,7 @@ public class Transacts {
                 //if(parameter != null)
                 //mLogger.logDebug(parameter.getClass().toString());
                 //mLogger.logDebug(ReflectionUtils.checkDeclaredMethod(parameter,"").toString());
-
+                //mLogger.logSystem("into here!!");
                 if (parameter instanceof CharSequence && useCharSequence) {
                     if (parameter == null) {
                         data.writeInt(0);
@@ -2621,7 +2689,7 @@ public class Transacts {
                     data.writeByteArray((byte[]) parameter);
                 } else if (parameter instanceof Proxy) {
                     ReflectionUtils.checkDeclaredMethod(parameter,"");
-                } else if (parameter instanceof IInterface) {
+                } else if (parameter instanceof IInterface ) {
                     data.writeStrongBinder(
                             parameter != null ? ((IInterface) parameter).asBinder() : null);
                 } else if (parameter instanceof IBinder) {
@@ -2655,6 +2723,10 @@ public class Transacts {
                 } else if (parameter instanceof NetworkCapabilities) {
                     data.writeInt(1);
                     ((NetworkCapabilities) parameter).writeToParcel(data, 0);
+                } else if (parameter instanceof ParcelFileDescriptor) {
+                   //mLogger.logSystem("here");
+                    data.writeInt(1);
+                    ((ParcelFileDescriptor) parameter).writeToParcel(data, 0);
                 } else if (remoteCallbackClass.isInstance(parameter)) {
 
                     data.writeInt(0);

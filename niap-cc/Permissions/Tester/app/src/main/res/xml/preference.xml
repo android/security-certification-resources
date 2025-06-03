@@ -37,7 +37,11 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="cb_sig10"
-            android:title="Q/P/R/S" />
+            android:title="Q/P/R" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cb_sig12"
+            android:title="Snow Cone(12)" />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="cb_sig13"
@@ -47,6 +51,10 @@
             android:defaultValue="true"
             android:key="cb_sig14"
             android:title="UDC(14)" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cb_sig15"
+            android:title="VIC(15)" />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="cb_sig_bind"

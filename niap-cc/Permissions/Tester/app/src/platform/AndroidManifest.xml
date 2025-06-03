@@ -1028,6 +1028,71 @@
     <uses-permission android:name="android.permission.TURN_SCREEN_ON" />
     <uses-permission android:name="android.permission.WAKEUP_SURFACE_FLINGER" />
     <uses-permission android:name="android.permission.WRITE_ALLOWLISTED_DEVICE_CONFIG" />
+    <!-- New signature permissions as of Android 15 -->
+    <uses-permission android:name="android.permission.WRITE_VERIFICATION_STATE_E2EE_CONTACT_KEYS" />
+    <uses-permission android:name="android.permission.CAMERA_HEADLESS_SYSTEM_USER" />
+    <uses-permission android:name="android.permission.CAMERA_PRIVACY_ALLOWLIST" />
+    <uses-permission android:name="android.permission.MANAGE_REMOTE_AUTH" />
+    <uses-permission android:name="android.permission.USE_REMOTE_AUTH" />
+    <uses-permission android:name="android.permission.THREAD_NETWORK_PRIVILEGED" />
+    <uses-permission android:name="android.permission.REGISTER_NSD_OFFLOAD_ENGINE" />
+    <uses-permission android:name="android.permission.QUARANTINE_APPS" />
+    <uses-permission android:name="android.permission.VIBRATE_SYSTEM_CONSTANTS" />
+    <uses-permission android:name="android.permission.CONFIGURE_FACTORY_RESET_PROTECTION" />
+    <uses-permission android:name="android.permission.BIND_DOMAIN_SELECTION_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_LAST_KNOWN_CELL_ID" />
+    <uses-permission android:name="android.permission.ACCESS_HIDDEN_PROFILES_FULL" />
+    <uses-permission android:name="android.permission.MANAGE_ENHANCED_CONFIRMATION_STATES" />
+    <uses-permission android:name="android.permission.READ_DROPBOX_DATA" />
+    <uses-permission android:name="android.permission.ACCESSIBILITY_MOTION_EVENT_OBSERVING" />
+    <uses-permission android:name="android.permission.BIND_TV_AD_SERVICE" />
+    <uses-permission android:name="android.permission.LAUNCH_PERMISSION_SETTINGS" />
+    <uses-permission android:name="android.permission.REQUEST_OBSERVE_DEVICE_UUID_PRESENCE" />
+    <uses-permission android:name="android.permission.USE_COMPANION_TRANSPORTS" />
+    <uses-permission android:name="android.permission.MEDIA_ROUTING_CONTROL" />
+    <uses-permission android:name="android.permission.REPORT_USAGE_STATS" />
+    <uses-permission android:name="android.permission.SET_BIOMETRIC_DIALOG_ADVANCED" />
+    <uses-permission android:name="android.permission.RECORD_SENSITIVE_CONTENT" />
+    <uses-permission android:name="android.permission.ACCESS_SMARTSPACE" />
+    <uses-permission android:name="android.permission.ACCESS_CONTEXTUAL_SEARCH" />
+    <uses-permission android:name="android.permission.RECEIVE_SANDBOX_TRIGGER_AUDIO" />
+    <uses-permission android:name="android.permission.SET_THEME_OVERLAY_CONTROLLER_READY" />
+    <uses-permission android:name="android.permission.SHOW_CUSTOMIZED_RESOLVER" />
+    <uses-permission android:name="android.permission.MONITOR_STICKY_MODIFIER_STATE" />
+    <uses-permission android:name="android.permission.USE_ON_DEVICE_INTELLIGENCE" />
+    <uses-permission android:name="android.permission.BIND_ON_DEVICE_INTELLIGENCE_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_ON_DEVICE_SANDBOXED_INFERENCE_SERVICE" />
+    <uses-permission android:name="android.permission.START_ACTIVITIES_FROM_SDK_SANDBOX" />
+    <uses-permission android:name="android.permission.SYNC_FLAGS" />
+    <uses-permission android:name="android.permission.WRITE_FLAGS" />
+    <uses-permission android:name="android.permission.GET_BINDING_UID_IMPORTANCE" />
+    <uses-permission android:name="android.permission.MANAGE_DISPLAYS" />
+    <uses-permission android:name="android.permission.PREPARE_FACTORY_RESET" />
+    <uses-permission android:name="android.permission.OVERRIDE_SYSTEM_KEY_BEHAVIOR_IN_FOCUSED_WINDOW" />
+    <uses-permission android:name="android.permission.RECEIVE_SENSITIVE_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.GET_BACKGROUND_INSTALLED_PACKAGES" />
+    <uses-permission android:name="android.permission.READ_SYSTEM_GRAMMATICAL_GENDER" />
+    <uses-permission android:name="android.permission.EMERGENCY_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.RESTRICT_DISPLAY_MODES" />
+    <uses-permission android:name="android.permission.SCREEN_TIMEOUT_OVERRIDE" />
+    <uses-permission android:name="android.permission.SETUP_FSVERITY" />
+    <!-- New install permissions as of Android 15 -->
+    <uses-permission android:name="android.permission.DETECT_SCREEN_RECORDING" />
+    <uses-permission android:name="android.permission.ACCESS_HIDDEN_PROFILES" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING" />
+    <!-- New internal permissions as of Android 15 -->
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_THREAD_NETWORK" />
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_ASSIST_CONTENT" />
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_AUDIT_LOGGING" />
+    <uses-permission android:name="android.permission.QUERY_DEVICE_STOLEN_STATE" />
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_CONTENT_PROTECTION" />
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_MANAGED_SUBSCRIPTIONS" />
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_BLOCK_UNINSTALL" />
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_CAMERA_TOGGLE" />
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_MICROPHONE_TOGGLE" />
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_STORAGE_LIMIT" />
+    <uses-permission android:name="android.permission.EMBED_ANY_APP_IN_UNTRUSTED_MODE" />
+    <uses-permission android:name="android.permission.ALWAYS_UPDATE_WALLPAPER" />
 
     <!-- TODO: Additional signature permissions that are declared by the packages preinstalled on
          the device under test should be added here. -->
@@ -1439,7 +1504,7 @@
     <uses-permission android:name="com.google.android.apps.gsa.nga.engine.stash.BROADCAST" />
     <uses-permission android:name="com.google.android.gms.smartdevice.permission.NOTIFY_QUICK_START_STATUS" />
 
-    <!-- non new platform permissions from barbet34 device-->
+    <!-- non new platform permissions from pixel5a device-->
     <uses-permission android:name="com.google.sensor.private.permission.USE_RAW_SENSOR" />
     <uses-permission android:name="com.google.android.apps.scone.connectivitymonitor.permission.WRITE_NIMBUS_DATA" />
     <uses-permission android:name="android.permission.health.READ_EXERCISE_ROUTE" />
@@ -1456,10 +1521,10 @@
     <uses-permission android:name="android.permission.ACCESS_PRIVILEGED_APP_SET_ID" />
     <uses-permission android:name="com.google.android.apps.search.assistant.verticals.snapshot.widgets.weather.permission.WEATHER_WIDGET_UPDATE" />
     <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.reader" />
-    <!-- non platform oriole(pixel6) 33-->
+    <!-- non platform pixel6 33-->
     <uses-permission android:name="com.google.android.finsky.permission.PLAY_BILLING_LIBRARY_BROADCAST" />
     <uses-permission android:name="com.google.android.gms.permission.ACCESS_NEARBY_SHARE_API" />
-    <!-- non platform husky(pixel8pro) 34-->
+    <!-- non platform pixel8pro 34-->
     <uses-permission android:name="com.fitbit.FitbitMobile.permission.SSO" />
     <uses-permission android:name="com.google.android.wildlife.permission.ADVANCED_VPN_CONFIG" />
     <uses-permission android:name="com.google.android.wildlife.permission.UPDATE_NETWORK_MONITOR" />
@@ -1471,4 +1536,25 @@
     <uses-permission android:name="com.vzw.DEFAULT_APP_CHANGE" />
     <uses-permission android:name="com.vzw.engage.service.myverizon" />
     <uses-permission android:name="com.vzw.hss.myverizon.CountlyPush.BROADCAST_PERMISSION" />
+    <!-- non platform pixel8 -->
+    <uses-permission android:name="android.permission.health.START_ONBOARDING" />
+    <uses-permission android:name="android.permission.BIND_EXAMPLE_STORE_SERVICE" />
+    <uses-permission android:name="com.android.devicelock.permission.START_KIOSK_SETUP_ACTIVITY" />
+    <uses-permission android:name="android.permission.ACCESS_PRIVILEGED_ADSERVICES_COBALT_UPLOAD" />
+    <uses-permission android:name="android.permission.ondevicepersonalization.ACCESS_SYSTEM_SERVER_SERVICE" />
+    <uses-permission android:name="com.google.android.gms.time.permission.SEND_TRUSTED_TIME_SIGNAL" />
+    <uses-permission android:name="com.android.devicelockcontroller.permission.MANAGE_DEVICE_LOCK_SERVICE_FROM_CONTROLLER" />
+    <uses-permission android:name="com.google.android.devicelockcontroller.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.google.android.calendar.permission.SEND_REMOTE_METRICS" />
+
+    <uses-permission android:name="com.android.vending.BIOAUTH_CONSENT" />
+    <uses-permission android:name="android.permission.ACCESS_PRIVILEGED_AD_ID_COMPAT" />
+    <uses-permission android:name="android.permission.ACCESS_PRIVILEGED_APP_SET_ID_COMPAT" />
+    <uses-permission android:name="android.permission.ACCESS_PRIVILEGED_ADSERVICES_COBALT_UPLOAD_COMPAT" />
+
+    <uses-permission android:name="com.google.android.gms.permission.BIOAUTH_CONSENT" />
+    <uses-permission android:name="com.android.providers.media.permission.BIND_MEDIA_COGNITION_SERVICE" />
+    <uses-permission android:name="com.google.android.settings.intelligence.hats" />
+    <uses-permission android:name="com.google.android.engage.REQUEST_ENGAGE_DATA" />
+
 </manifest>

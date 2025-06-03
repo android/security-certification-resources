@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ProxyChecker {
-    private static String TAG="tag";
-    private static Map<String,String> alt_descriptor= new HashMap<String,String>();
+    private static final String TAG="ProxyChecker";
+    private static final Map<String,String> alt_descriptor= new HashMap<String,String>();
 
 
     static  {
@@ -40,12 +40,15 @@ public class ProxyChecker {
         alt_descriptor.put("android.graphicsenv.IGpuService","GPU_DESCRIPTOR");
         alt_descriptor.put(WINDOW_DESCRIPTOR,"WINDOW_DESCRIPTOR");
         alt_descriptor.put(EUICC_CONTROLLER_DESCRIPTOR,"EUICC_CONTROLLER_DESCRIPTOR");
+        alt_descriptor.put(PDB_DESCRIPTOR,"PDB_DESCRIPTOR");
+        alt_descriptor.put(SYSTEM_CONFIG_DESCRIPTOR,"SYSTEM_CONFIG_DESCRIPTOR");
+
         //alt_descriptor.put("com.android.internal.widget.ILockSettings","LOCK_SETTINGS_DESCRIPTOR");
         for(String k:alt_descriptor.keySet()){
-            System.out.println(
-                    String.format("public static final String %s = \"%s\";",
-                            alt_descriptor.get(k),
-                            k));
+            Log.d("ProxyChecker",String.format("public static final String %s = \"%s\";%n",
+                    alt_descriptor.get(k),
+                    k));
+
         }
     }
     private static Class descriptor(String desc){
@@ -106,18 +109,13 @@ public class ProxyChecker {
             Field transactField = clazz.getDeclaredField(TRANSACT_PREFIX + transactName);
             //Log.d(TAG,"Found " + transactField);
             transactField.setAccessible(true);
-            /*Field[] fields = clazz.getDeclaredFields();
-            Method[] methods = clazz.getDeclaredMethods();
-            System.out.println(fields);
-            System.out.println(methods);*/
+
             int transactId = (int) transactField.get(null);
-            System.out.println(
-                    String.format("public static final String %s = \"%s\";",
-                            transactName,transactName));
-            System.out.println(
-                    String.format("queryTransactId(Transacts.%s, Transacts.%s, descriptorTransacts);",
-                            alt_descriptor.get(descriptor),
-                            transactName));
+            Log.d("ProxyChecker",String.format("public static final String %s = \"%s\";%n",
+                    transactName,transactName));
+            Log.d("ProxyChecker",String.format("queryTransactId(Transacts.%s, Transacts.%s, descriptorTransacts);%n",
+                    alt_descriptor.get(descriptor),
+                    transactName));
 
             //Log.d(TAG,"Found " + transactName + "=" + transactId);
         } catch (ReflectiveOperationException e) {

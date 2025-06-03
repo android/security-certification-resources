@@ -1,0 +1,755 @@
+{
+  "methods": {
+    "android.content.pm.IBackgroundInstallControlService": {
+      "getBackgroundInstalledPackages": 1
+    },
+    "android.net.nsd.INsdManager": {
+      "connect": 1
+    },
+    "android.ui.ISurfaceComposer": {
+      "bootFinished": 1,
+      "showCpu": 1000
+    },
+    "android.hardware.fingerprint.IFingerprintService": {
+      "resetLockout": 27,
+      "cancelAuthenticationFromService": 11,
+      "cancelEnrollment": 13
+    },
+    "android.app.IUriGrantsManager": {
+      "takePersistableUriPermission": 1,
+      "getGrantedUriPermissions": 4
+    },
+    "com.android.internal.widget.ILockSettings": {
+      "verifyCredential": 10,
+      "startRemoteLockscreenValidation": 46
+    },
+    "android.app.IGameManagerService": {
+      "getAvailableGameModes": 3,
+      "setGameServiceProvider": 8
+    },
+    "android.app.usage.IUsageStatsManager": {
+      "reportChooserSelection": 13
+    },
+    "android.media.musicrecognition.IMusicRecognitionManager": {
+      "beginRecognition": 1
+    },
+    "android.security.intrusiondetection.IIntrusionDetectionService": {
+      "enable": 3,
+      "disable": 4,
+      "addStateCallback": 1
+    },
+    "android.os.IPowerManager": {
+      "reboot": 52,
+      "isAmbientDisplaySuppressedForTokenByApp": 71,
+      "acquireWakeLock": 1,
+      "isWakeLockLevelSupported": 10,
+      "releaseLowPowerStandbyPorts": 50,
+      "setDynamicPowerSaveHint": 30,
+      "setBatteryDischargePrediction": 34
+    },
+    "android.nfc.INfcAdapter": {
+      "isControllerAlwaysOnSupported": 25
+    },
+    "android.app.ILocaleManager": {
+      "setOverrideLocaleConfig": 4
+    },
+    "android.media.IResourceObserverService": {
+      "unregisterObserver": 2
+    },
+    "android.app.wallpapereffectsgeneration.IWallpaperEffectsGenerationManager": {
+      "generateCinematicEffect": 1
+    },
+    "android.app.IWallpaperManager": {
+      "setWallpaper": 1,
+      "setWallpaperComponent": 3
+    },
+    "android.app.smartspace.ISmartspaceManager": {
+      "destroySmartspaceSession": 6
+    },
+    "android.content.IClipboard": {
+      "getPrimaryClipSource": 10,
+      "areClipboardAccessNotificationsEnabledForUser": 11
+    },
+    "android.os.IVibratorService": {},
+    "android.content.pm.ICrossProfileApps": {
+      "clearInteractAcrossProfilesAppOps": 10
+    },
+    "android.app.INotificationManager": {
+      "getActiveNotifications": 69,
+      "isNotificationPolicyAccessGrantedForPackage": 132,
+      "getEnabledNotificationListeners": 118,
+      "setToastRateLimitingEnabled": 159
+    },
+    "android.media.projection.IMediaProjectionManager": {
+      "getActiveProjectionInfo": 6
+    },
+    "android.app.IActivityClientController": {
+      "dismissKeyguard": 65
+    },
+    "android.service.vr.IVrManager": {
+      "setPersistentVrModeEnabled": 7,
+      "getVrModeState": 5,
+      "setStandbyEnabled": 11
+    },
+    "android.os.ISystemConfig": {
+      "getEnhancedConfirmationTrustedPackages": 8
+    },
+    "android.companion.ICompanionDeviceManager": {
+      "createAssociation": 14,
+      "removeOnTransportsChangedListener": 18,
+      "addOnTransportsChangedListener": 17,
+      "sendMessage": 19,
+      "addOnMessageReceivedListener": 20,
+      "startObservingDevicePresence": 11,
+      "getAllAssociationsForUser": 3
+    },
+    "android.os.storage.IStorageManager": {
+      "getCacheSizeBytes": 77,
+      "benchmark": 60
+    },
+    "com.android.internal.view.IInputMethodManager": {
+      "isInputMethodPickerShownForTest": 16
+    },
+    "android.service.persistentdata.IPersistentDataBlockService": {
+      "deactivateFactoryResetProtection": 12
+    },
+    "android.os.INetworkManagementService": {
+      "setDataSaverModeEnabled": 20
+    },
+    "android.devicelock.IDeviceLockService": {
+      "isDeviceLocked": 3
+    },
+    "android.health.connect.aidl.IHealthConnectService": {
+      "updateDataDownloadState": 31,
+      "deleteAllStagedRemoteData": 30,
+      "canRestore": 56,
+      "restoreChanges": 57,
+      "startMigration": 23,
+      "getHealthConnectDataState": 32,
+      "getChangesForBackup": 53
+    },
+    "android.app.cloudsearch.ICloudSearchManager": {},
+    "android.companion.virtual.IVirtualDeviceManager": {
+      "createVirtualDevice": 1
+    },
+    "android.security.IFileIntegrityService": {
+      "setupFsverity": 2,
+      "createAuthToken": 1
+    },
+    "android.os.IStatsManagerService": {
+      "removeRestrictedMetricsChangedOperation": 16,
+      "setRestrictedMetricsChangedOperation": 15
+    },
+    "android.service.dreams.IDreamManager": {
+      "awaken": 2,
+      "isDreaming": 7
+    },
+    "android.hardware.display.IDisplayManager": {
+      "setRefreshRateSwitchingType": 51,
+      "setHdrConversionMode": 45,
+      "setTemporaryAutoBrightnessAdjustment": 38,
+      "startWifiDisplayScan": 6,
+      "setUserPreferredDisplayMode": 42,
+      "shouldAlwaysRespectAppRequestedMode": 50,
+      "requestDisplayModes": 59,
+      "requestColorMode": 20,
+      "enableConnectedDisplay": 56,
+      "getUserPreferredDisplayMode": 43
+    },
+    "android.view.IWindowManager": {
+      "requestAppKeyboardShortcuts": 82,
+      "createInputConsumer": 86,
+      "registerTaskFpsCallback": 139,
+      "clearWindowContentFrameStats": 78,
+      "registerScreenRecordingCallback": 155,
+      "addKeyguardLockedStateListener": 33,
+      "setRecentsVisibility": 72,
+      "setInTouchMode": 42,
+      "dismissKeyguard": 32,
+      "screenshotWallpaper": 64,
+      "setAnimationScale": 39,
+      "removeWindowToken": 20,
+      "thawRotation": 56,
+      "registerShortcutKey": 85,
+      "overridePendingAppTransitionRemote": 25
+    },
+    "android.safetycenter.ISafetyCenterManager": {
+      "getSafetyCenterConfig": 7,
+      "getSafetySourceData": 3,
+      "isSafetyCenterEnabled": 1
+    },
+    "android.security.IKeyChainService": {
+      "removeCredentialManagementApp": 25
+    },
+    "android.view.translation.ITranslationManager": {
+      "updateUiTranslationState": 5
+    },
+    "android.app.backup.IBackupManager": {
+      "setBackupEnabled": 10
+    },
+    "android.flags.IFeatureFlags": {
+      "resetFlag": 6,
+      "overrideFlag": 5
+    },
+    "com.android.internal.graphics.fonts.IFontManager": {
+      "getFontConfig": 1
+    },
+    "android.hardware.ISensorPrivacyManager": {
+      "setSensorPrivacy": 9,
+      "isSensorPrivacyEnabled": 6
+    },
+    "android.speech.IRecognitionServiceManager": {
+      "setTemporaryComponent": 2
+    },
+    "com.android.internal.app.ISoundTriggerSession": {
+      "getModuleProperties": 13
+    },
+    "com.android.internal.os.IDropBoxManagerService": {
+      "getNextEntry": 4
+    },
+    "android.net.IConnectivityManager": {
+      "pendingRequestForNetwork": 43,
+      "getActiveNetworkInfo": 3,
+      "getActiveNetwork": 1,
+      "getActiveNetworkForUid": 2,
+      "startNattKeepalive": 58
+    },
+    "android.permission.IPermissionChecker": {
+      "checkPermission": 1
+    },
+    "android.security.authenticationpolicy.IAuthenticationPolicyService": {
+      "enableSecureLockDevice": 1,
+      "disableSecureLockDevice": 2
+    },
+    "android.hardware.biometrics.IBiometricService": {
+      "hasEnrolledBiometrics": 8
+    },
+    "android.net.INetworkStatsService": {
+      "registerNetworkStatsProvider": 14,
+      "forceUpdate": 8
+    },
+    "android.hardware.input.IInputManager": {
+      "isInTabletMode": 26,
+      "enableInputDevice": 4,
+      "registerKeyEventActivityListener": 60,
+      "setTouchCalibrationForInputDevice": 15,
+      "registerStickyModifierStateListener": 67,
+      "setKeyboardLayoutForInputDevice": 20,
+      "monitorGestureInput": 39,
+      "registerKeyboardBacklightListener": 64,
+      "getModifierKeyRemapping": 24,
+      "registerKeyGestureEventListener": 70,
+      "unregisterStickyModifierStateListener": 68,
+      "unregisterKeyEventActivityListener": 61,
+      "tryPointerSpeed": 10,
+      "removePortAssociation": 41
+    },
+    "android.media.IAudioPolicyService": {
+      "getInputForAttr": 13
+    },
+    "com.android.internal.app.IVoiceInteractionManagerService": {
+      "updateState": 35,
+      "getActiveServiceComponentName": 19,
+      "updateKeyphraseSoundModel": 14,
+      "isSessionRunning": 23
+    },
+    "com.android.internal.telephony.euicc.IEuiccController": {
+      "retainSubscriptionsForFactoryReset": 14,
+      "getSupportedCountries": 16
+    },
+    "com.android.internal.compat.IPlatformCompat": {
+      "reportChangeByUid": 3,
+      "removeOverridesOnReleaseBuilds": 14,
+      "clearOverridesForTest": 18
+    },
+    "android.hardware.ICameraService": {
+      "notifySystemEvent": 19,
+      "injectCamera": 15
+    },
+    "android.credentials.ICredentialManager": {
+      "getCredentialProviderServices": 10
+    },
+    "com.android.internal.app.ISoundTriggerService": {
+      "attachAsOriginator": 1,
+      "attachAsMiddleman": 2
+    },
+    "android.app.slice.ISliceManager": {
+      "grantPermissionFromUser": 11
+    },
+    "android.hardware.biometrics.IAuthService": {
+      "getUiPackage": 4
+    },
+    "android.media.IAudioService": {
+      "setRingtonePlayer": 86,
+      "getRingtonePlayer": 87,
+      "isAudioServerRunning": 146,
+      "forceRemoteSubmixFullVolume": 21,
+      "setVolumeGroupVolumeIndex": 28,
+      "getDeviceVolumeBehavior": 173
+    },
+    "com.android.internal.app.IBatteryStats": {
+      "noteStartAudio": 5,
+      "getAwakeTimeBattery": 77
+    },
+    "android.os.ITradeInMode": {
+      "start": 1,
+      "enterEvaluationMode": 3
+    },
+    "android.content.pm.IShortcutService": {
+      "onApplicationActive": 16
+    },
+    "com.android.internal.telephony.ITelephony": {
+      "enableLocationUpdates": 26,
+      "requestIsSatelliteEnabled": 360,
+      "getLastKnownCellIdentity": 341,
+      "requestSatelliteEnabled": 359
+    },
+    "com.android.internal.telephony.ISub": {
+      "requestEmbeddedSubscriptionInfoListRefresh": 10,
+      "setSubscriptionUserHandle": 54
+    },
+    "android.app.people.IPeopleManager": {
+      "isConversation": 5
+    },
+    "android.content.pm.IPackageManager": {
+      "getAppMetadataFd": 37,
+      "movePackage": 118,
+      "installExistingPackageAsUser": 122,
+      "makeUidVisible": 206,
+      "setKeepUninstalledPackages": 211,
+      "getRuntimePermissionsVersion": 185,
+      "getHarmfulAppWarning": 169,
+      "setPackagesSuspendedAsUser": 70,
+      "isPackageDeviceAdminOnAnyUser": 157,
+      "isPackageStateProtected": 181,
+      "getMoveStatus": 115,
+      "resetApplicationPreferences": 56
+    },
+    "android.app.contextualsearch.IContextualSearchManager": {
+      "startContextualSearch": 2
+    },
+    "android.net.INetworkPolicyManager": {
+      "getSubscriptionPlans": 20,
+      "isUidNetworkingBlocked": 25,
+      "getUidPolicy": 4,
+      "registerListener": 6
+    },
+    "android.app.ambientcontext.IAmbientContextManager": {
+      "queryServiceStatus": 4
+    },
+    "android.app.IAlarmManager": {
+      "set": 1,
+      "setTimeZone": 3,
+      "setTime": 2
+    },
+    "android.app.IActivityTaskManager": {
+      "getFrontActivityScreenCompatMode": 18,
+      "getAssistContextExtras": 58,
+      "setFrontActivityScreenCompatMode": 19,
+      "getWindowOrganizerController": 65,
+      "startActivityFromGameSession": 11,
+      "startActivityAsCaller": 13,
+      "getActivityClientController": 17
+    },
+    "android.media.IResourceManagerService": {
+      "overridePid": 7
+    },
+    "android.app.timedetector.ITimeDetectorService": {
+      "suggestExternalTime": 8,
+      "getCapabilitiesAndConfig": 1
+    },
+    "android.scheduling.IRebootReadinessManager": {
+      "removeRequestRebootReadinessStatusListener": 5
+    },
+    "android.hardware.devicestate.IDeviceStateManager": {
+      "cancelStateRequest": 4
+    },
+    "android.app.IActivityManager": {
+      "resetAppErrors": 238,
+      "unhandledBack": 19,
+      "bindBackupAgent": 96,
+      "getMimeTypeFilterAsync": 115,
+      "setAlwaysFinish": 47,
+      "performIdleMaintenance": 173,
+      "startActivityFromRecents": 180,
+      "killAllBackgroundProcesses": 131,
+      "setDumpHeapDebugLimit": 191,
+      "getBindingUidProcessState": 262,
+      "updateLockTaskPackages": 193,
+      "stopAppForUser": 85,
+      "setHasTopUi": 213,
+      "logFgsApiBegin": 10,
+      "resumeAppSwitches": 95,
+      "requestBugReport": 152,
+      "getContentProviderExternal": 132,
+      "getIntentForIntentSender": 163,
+      "setProcessLimit": 55,
+      "signalPersistentProcesses": 64,
+      "updateConfiguration": 52,
+      "appNotRespondingViaProvider": 174,
+      "shutdown": 93,
+      "broadcastIntentWithFeature": 26
+    },
+    "android.hardware.face.IFaceService": {
+      "generateChallenge": 19
+    },
+    "android.app.IUiModeManager": {
+      "requestProjection": 21,
+      "getActiveProjectionTypes": 26
+    },
+    "com.android.internal.app.IAppOpsService": {
+      "clearHistory": 27,
+      "setUserRestriction": 35,
+      "getHistoricalOps": 20,
+      "getUidOps": 29,
+      "noteOperation": 2,
+      "permissionToOpCode": 7
+    },
+    "android.app.ondeviceintelligence.IOnDeviceIntelligenceManager": {
+      "getVersion": 2,
+      "getFeature": 3
+    },
+    "android.view.accessibility.IAccessibilityManager": {
+      "registerUiTestAutomationService": 10,
+      "setPictureInPictureActionReplacingConnection": 9,
+      "getWindowToken": 12
+    },
+    "com.android.internal.appwidget.IAppWidgetService": {
+      "setBindAppWidgetPermission": 21
+    },
+    "android.app.trust.ITrustManager": {
+      "reportEnabledTrustAgentsChanged": 5,
+      "unregisterTrustListener": 7
+    },
+    "android.uwb.IUwbAdapter": {
+      "getSpecificationInfo": 8,
+      "openRanging": 9
+    },
+    "android.security.attestationverification.IAttestationVerificationManagerService": {
+      "verifyToken": 2,
+      "verifyAttestation": 1
+    },
+    "android.net.wifi.IWifiManager": {
+      "getWifiApConfiguration": 86,
+      "stopSoftAp": 77,
+      "setCoexUnsafeChannels": 71,
+      "setOverrideCountryCode": 51,
+      "unregisterCoexCallback": 73,
+      "setWifiEnabled": 42,
+      "restartWifiSubsystem": 159
+    },
+    "android.hardware.usb.IUsbManager": {
+      "getControlFd": 37
+    },
+    "android.permission.IPermissionManager": {
+      "isAutoRevokeExempted": 26,
+      "addOnPermissionsChangeListener": 10
+    },
+    "android.media.IMediaRouterService": {
+      "registerProxyRouter": 31,
+      "registerManager": 30
+    },
+    "android.app.admin.IDevicePolicyManager": {
+      "setUserControlDisabledPackages": 346,
+      "setKeyguardDisabledFeatures": 61,
+      "getDoNotAskCredentialsOnBoot": 240,
+      "setShortSupportMessage": 254,
+      "getNearbyNotificationStreamingPolicy": 58,
+      "setPermittedInputMethods": 146,
+      "setStrings": 385,
+      "setApplicationRestrictions": 127,
+      "getWifiSsidPolicy": 377,
+      "setPermissionGrantState": 245,
+      "setUsbDataSignalingEnabled": 371,
+      "forceSecurityLogs": 280,
+      "setResetPasswordToken": 301,
+      "setFactoryResetProtectionPolicy": 42,
+      "addCrossProfileWidgetProvider": 217,
+      "setConfiguredNetworksLockdownState": 187,
+      "setCommonCriteriaModeEnabled": 348,
+      "getCrossProfileWidgetProviders": 219,
+      "setAccountManagementDisabled": 172,
+      "setStatusBarDisabled": 238,
+      "setSystemUpdatePolicy": 234,
+      "setDeviceOwner": 78,
+      "isPackageSuspended": 99,
+      "setProfileOwnerOnOrganizationOwnedDevice": 329,
+      "setTrustAgentConfiguration": 215,
+      "getString": 387,
+      "hasLockdownAdminConfiguredNetworks": 188,
+      "setLockTaskPackages": 179,
+      "setOrganizationName": 265,
+      "isDevicePotentiallyStolen": 378,
+      "getPermittedInputMethodsAsUser": 148,
+      "setApplicationExemptions": 391,
+      "setDefaultSmsApplication": 125,
+      "setPasswordExpirationTimeout": 20,
+      "installCaCert": 101,
+      "setUserRestriction": 134,
+      "setSecurityLoggingEnabled": 275,
+      "setMaximumTimeToLock": 36,
+      "setScreenCaptureDisabled": 55,
+      "clearSystemUpdatePolicyFreezePeriodRecord": 236,
+      "setCameraDisabled": 53,
+      "installUpdateFromFile": 330,
+      "setMtePolicy": 393,
+      "setMaximumFailedPasswordsForWipe": 33,
+      "installKeyPair": 106
+    },
+    "android.media.tv.ITvInputManager": {
+      "getAvailableExtensionInterfaceNames": 5,
+      "getCurrentTunedInfos": 42
+    },
+    "android.app.IGrammaticalInflectionManager": {
+      "getSystemGrammaticalGender": 3
+    },
+    "android.net.IVpnManager": {
+      "getAlwaysOnVpnPackage": 16
+    },
+    "android.app.wearable.IWearableSensingManager": {
+      "provideDataStream": 7
+    },
+    "android.telephony.ims.aidl.IImsRcsController": {
+      "requestAvailability": 10,
+      "triggerNetworkRegistration": 19
+    },
+    "android.os.IVibratorManagerService": {
+      "startVendorVibrationSession": 12
+    },
+    "android.media.session.ISessionManager": {
+      "setOnMediaKeyListener": 22,
+      "setOnVolumeKeyLongPressListener": 21
+    },
+    "android.app.role.IRoleManager": {
+      "getDefaultApplicationAsUser": 7,
+      "addOnRoleHoldersChangedListenerAsUser": 11,
+      "setBypassingRoleQualification": 14
+    },
+    "android.content.pm.verify.domain.IDomainVerificationManager": {
+      "queryValidVerificationPackageNames": 1,
+      "setDomainVerificationLinkHandlingAllowed": 6
+    },
+    "android.content.rollback.IRollbackManager": {
+      "reloadPersistedData": 5
+    },
+    "com.android.internal.statusbar.IStatusBarService": {
+      "onBiometricHelp": 50
+    }
+  },
+  "services": {
+    "android.ui.ISurfaceComposer": "android.ui.ISurfaceComposer",
+    "GRAMMATICAL_INFLECTION_DESCRIPTOR": "android.app.IGrammaticalInflectionManager",
+    "android.hardware.fingerprint.IFingerprintService": "android.hardware.fingerprint.IFingerprintService",
+    "VIBRATOR_DESCRIPTOR": "android.os.IVibratorService",
+    "MUSIC_RECOGNITION_DESCRIPTOR": "android.media.musicrecognition.IMusicRecognitionManager",
+    "WINDOW_DESCRIPTOR": "android.view.IWindowManager",
+    "android.app.IGameManagerService": "android.app.IGameManagerService",
+    "android.security.intrusiondetection.IIntrusionDetectionService": "android.security.intrusiondetection.IIntrusionDetectionService",
+    "ROLLBACK_DESCRIPTOR": "android.content.rollback.IRollbackManager",
+    "DEVICELOCK_DESCRIPTOR": "android.devicelock.IDeviceLockService",
+    "NETWORK_STATS_DESCRIPTOR": "android.net.INetworkStatsService",
+    "android.app.ILocaleManager": "android.app.ILocaleManager",
+    "android.app.IWallpaperManager": "android.app.IWallpaperManager",
+    "DOMAIN_VERIFICATION_DESCRIPTOR": "android.content.pm.verify.domain.IDomainVerificationManager",
+    "INTRUSION_DETECTION_DESCRIPTOR": "android.security.intrusiondetection.IIntrusionDetectionService",
+    "NETWORK_MANAGEMENT_DESCRIPTOR": "android.os.INetworkManagementService",
+    "ALARM_DESCRIPTOR": "android.app.IAlarmManager",
+    "android.os.IVibratorService": "android.os.IVibratorService",
+    "DISPLAY_DESCRIPTOR": "android.hardware.display.IDisplayManager",
+    "android.app.INotificationManager": "android.app.INotificationManager",
+    "KEY_CHAIN_DESCRIPTOR": "android.security.IKeyChainService",
+    "PERMISSION_CHECKER_DESCRIPTOR": "android.permission.IPermissionChecker",
+    "android.media.projection.IMediaProjectionManager": "android.media.projection.IMediaProjectionManager",
+    "android.service.vr.IVrManager": "android.service.vr.IVrManager",
+    "android.os.ISystemConfig": "android.os.ISystemConfig",
+    "DREAMS_DESCRIPTOR": "android.service.dreams.IDreamManager",
+    "android.companion.ICompanionDeviceManager": "android.companion.ICompanionDeviceManager",
+    "android.os.storage.IStorageManager": "android.os.storage.IStorageManager",
+    "android.service.persistentdata.IPersistentDataBlockService": "android.service.persistentdata.IPersistentDataBlockService",
+    "android.app.cloudsearch.ICloudSearchManager": "android.app.cloudsearch.ICloudSearchManager",
+    "android.security.IFileIntegrityService": "android.security.IFileIntegrityService",
+    "android.os.IStatsManagerService": "android.os.IStatsManagerService",
+    "android.hardware.display.IDisplayManager": "android.hardware.display.IDisplayManager",
+    "RESOURCE_OBSERVER_DESCRIPTOR": "android.media.IResourceObserverService",
+    "SLICE_DESCRIPTOR": "android.app.slice.ISliceManager",
+    "android.safetycenter.ISafetyCenterManager": "android.safetycenter.ISafetyCenterManager",
+    "android.security.IKeyChainService": "android.security.IKeyChainService",
+    "android.view.translation.ITranslationManager": "android.view.translation.ITranslationManager",
+    "BACKUP_DESCRIPTOR": "android.app.backup.IBackupManager",
+    "android.flags.IFeatureFlags": "android.flags.IFeatureFlags",
+    "android.hardware.ISensorPrivacyManager": "android.hardware.ISensorPrivacyManager",
+    "SUBSCRIPTION_DESCRIPTOR": "com.android.internal.telephony.ISub",
+    "FILE_INTEGRITY_DESCRIPTOR": "android.security.IFileIntegrityService",
+    "HEALTH_CONNECT_DESCRIPTOR": "android.health.connect.aidl.IHealthConnectService",
+    "android.security.authenticationpolicy.IAuthenticationPolicyService": "android.security.authenticationpolicy.IAuthenticationPolicyService",
+    "ROLE_DESCRIPTOR": "android.app.role.IRoleManager",
+    "INPUTMETHOD_DESCRIPTOR": "com.android.internal.view.IInputMethodManager",
+    "com.android.internal.app.IVoiceInteractionManagerService": "com.android.internal.app.IVoiceInteractionManagerService",
+    "ON_DEVICE_INTELLINGENCE_DESCRIPTOR": "android.app.ondeviceintelligence.IOnDeviceIntelligenceManager",
+    "TELEPHONY_IMS_DESCRIPTOR": "android.telephony.ims.aidl.IImsRcsController",
+    "CONNECTIVITY_DESCRIPTOR": "android.net.IConnectivityManager",
+    "PDB_DESCRIPTOR": "android.service.persistentdata.IPersistentDataBlockService",
+    "android.hardware.ICameraService": "android.hardware.ICameraService",
+    "TIME_DETECTOR_DESCRIPTOR": "android.app.timedetector.ITimeDetectorService",
+    "DEVICE_STATE_DESCRIPTOR": "android.hardware.devicestate.IDeviceStateManager",
+    "COMPANION_DEVICE_DESCRIPTOR": "android.companion.ICompanionDeviceManager",
+    "FEATURE_FLAGS_DESCRIPTOR": "android.flags.IFeatureFlags",
+    "INPUT_DESCRIPTOR": "android.hardware.input.IInputManager",
+    "URI_GRANTS_DESCRIPTOR": "android.app.IUriGrantsManager",
+    "WIFI_DESCRIPTOR": "android.net.wifi.IWifiManager",
+    "android.media.IAudioService": "android.media.IAudioService",
+    "android.content.pm.IShortcutService": "android.content.pm.IShortcutService",
+    "com.android.internal.telephony.ITelephony": "com.android.internal.telephony.ITelephony",
+    "DROPBOX_DESCRIPTOR": "com.android.internal.os.IDropBoxManagerService",
+    "UI_MODE_DESCRIPTOR": "android.app.IUiModeManager",
+    "NFC_DESCRIPTOR": "android.nfc.INfcAdapter",
+    "AUDIO_DESCRIPTOR": "android.media.IAudioService",
+    "SOUND_TRIGGER_SESSION_DESCRIPTOR": "com.android.internal.app.ISoundTriggerSession",
+    "CONTEXTUAL_SEARCH_DESCRIPTOR": "android.app.contextualsearch.IContextualSearchManager",
+    "android.content.pm.IPackageManager": "android.content.pm.IPackageManager",
+    "APPWIDGET_DESCRIPTOR": "com.android.internal.appwidget.IAppWidgetService",
+    "ACCESSIBILITY_DESCRIPTOR": "android.view.accessibility.IAccessibilityManager",
+    "android.app.IAlarmManager": "android.app.IAlarmManager",
+    "AUDIO_POLICY_SERVICE_DESCRIPTOR": "android.media.IAudioPolicyService",
+    "android.media.IResourceManagerService": "android.media.IResourceManagerService",
+    "android.app.timedetector.ITimeDetectorService": "android.app.timedetector.ITimeDetectorService",
+    "android.scheduling.IRebootReadinessManager": "android.scheduling.IRebootReadinessManager",
+    "android.hardware.devicestate.IDeviceStateManager": "android.hardware.devicestate.IDeviceStateManager",
+    "VR_DESCRIPTOR": "android.service.vr.IVrManager",
+    "CLOUDSEARCH_DESCRIPTOR": "android.app.cloudsearch.ICloudSearchManager",
+    "android.app.IActivityManager": "android.app.IActivityManager",
+    "TRADE_IN_MODE_DESCRIPTOR": "android.os.ITradeInMode",
+    "android.app.IUiModeManager": "android.app.IUiModeManager",
+    "com.android.internal.app.IAppOpsService": "com.android.internal.app.IAppOpsService",
+    "android.app.ondeviceintelligence.IOnDeviceIntelligenceManager": "android.app.ondeviceintelligence.IOnDeviceIntelligenceManager",
+    "android.view.accessibility.IAccessibilityManager": "android.view.accessibility.IAccessibilityManager",
+    "RESOURCE_MANAGER_DESCRIPTOR": "android.media.IResourceManagerService",
+    "SENSOR_PRIVACY_DESCRIPTOR": "android.hardware.ISensorPrivacyManager",
+    "NSD_DESCRIPTOR": "android.net.nsd.INsdManager",
+    "android.uwb.IUwbAdapter": "android.uwb.IUwbAdapter",
+    "android.security.attestationverification.IAttestationVerificationManagerService": "android.security.attestationverification.IAttestationVerificationManagerService",
+    "android.net.wifi.IWifiManager": "android.net.wifi.IWifiManager",
+    "MOUNT_DESCRIPTOR": "android.os.storage.IStorageManager",
+    "TV_INPUT_DESCRIPTOR": "android.media.tv.ITvInputManager",
+    "android.app.IGrammaticalInflectionManager": "android.app.IGrammaticalInflectionManager",
+    "android.media.session.ISessionManager": "android.media.session.ISessionManager",
+    "android.app.role.IRoleManager": "android.app.role.IRoleManager",
+    "LOCK_SETTINGS_DESCRIPTOR": "com.android.internal.widget.ILockSettings",
+    "android.content.pm.verify.domain.IDomainVerificationManager": "android.content.pm.verify.domain.IDomainVerificationManager",
+    "android.content.rollback.IRollbackManager": "android.content.rollback.IRollbackManager",
+    "SPEECH_RECOGNITION_DESCRIPTOR": "android.speech.IRecognitionServiceManager",
+    "android.content.pm.IBackgroundInstallControlService": "android.content.pm.IBackgroundInstallControlService",
+    "android.net.nsd.INsdManager": "android.net.nsd.INsdManager",
+    "WALLPAPER_EFFECTS_GENERATION_DESCRIPTOR": "android.app.wallpapereffectsgeneration.IWallpaperEffectsGenerationManager",
+    "POWER_DESCRIPTOR": "android.os.IPowerManager",
+    "UWB_DESCRIPTOR": "android.uwb.IUwbAdapter",
+    "REBOOT_READINESS_DESCRIPTOR": "android.scheduling.IRebootReadinessManager",
+    "android.app.IUriGrantsManager": "android.app.IUriGrantsManager",
+    "com.android.internal.widget.ILockSettings": "com.android.internal.widget.ILockSettings",
+    "android.app.usage.IUsageStatsManager": "android.app.usage.IUsageStatsManager",
+    "android.media.musicrecognition.IMusicRecognitionManager": "android.media.musicrecognition.IMusicRecognitionManager",
+    "WALLPAPER_DESCRIPTOR": "android.app.IWallpaperManager",
+    "android.os.IPowerManager": "android.os.IPowerManager",
+    "AUTH_DESCRIPTOR": "android.hardware.biometrics.IAuthService",
+    "android.nfc.INfcAdapter": "android.nfc.INfcAdapter",
+    "BATTERY_STATS_DESCRIPTOR": "com.android.internal.app.IBatteryStats",
+    "PERMISSION_MANAGER_DESCRIPTOR": "android.permission.IPermissionManager",
+    "NOTIFICATION_DESCRIPTOR": "android.app.INotificationManager",
+    "android.media.IResourceObserverService": "android.media.IResourceObserverService",
+    "android.app.wallpapereffectsgeneration.IWallpaperEffectsGenerationManager": "android.app.wallpapereffectsgeneration.IWallpaperEffectsGenerationManager",
+    "AUTHENTICATION_POLICY_SERVICE_DESCRIPTOR": "android.security.authenticationpolicy.IAuthenticationPolicyService",
+    "android.app.smartspace.ISmartspaceManager": "android.app.smartspace.ISmartspaceManager",
+    "android.content.IClipboard": "android.content.IClipboard",
+    "android.content.pm.ICrossProfileApps": "android.content.pm.ICrossProfileApps",
+    "USB_DESCRIPTOR": "android.hardware.usb.IUsbManager",
+    "FINGERPRINT_DESCRIPTOR": "android.hardware.fingerprint.IFingerprintService",
+    "ACTIVITY_DESCRIPTOR": "android.app.IActivityManager",
+    "FACE_DESCRIPTOR": "android.hardware.face.IFaceService",
+    "USAGE_STATS_DESCRIPTOR": "android.app.usage.IUsageStatsManager",
+    "SAFETY_CENTER_MANAGER_MANAGER_DESCRIPTOR": "android.safetycenter.ISafetyCenterManager",
+    "android.app.IActivityClientController": "android.app.IActivityClientController",
+    "PEOPLE_DESCRIPTOR": "android.app.people.IPeopleManager",
+    "TRANSLATION_DESCRIPTOR": "android.view.translation.ITranslationManager",
+    "com.android.internal.view.IInputMethodManager": "com.android.internal.view.IInputMethodManager",
+    "SMART_SPACE_DESCRIPTOR": "android.app.smartspace.ISmartspaceManager",
+    "android.os.INetworkManagementService": "android.os.INetworkManagementService",
+    "android.devicelock.IDeviceLockService": "android.devicelock.IDeviceLockService",
+    "android.health.connect.aidl.IHealthConnectService": "android.health.connect.aidl.IHealthConnectService",
+    "CLIPBOARD_DESCRIPTOR": "android.content.IClipboard",
+    "CAMERA_DESCRIPTOR": "android.hardware.ICameraService",
+    "android.companion.virtual.IVirtualDeviceManager": "android.companion.virtual.IVirtualDeviceManager",
+    "VIRTUAL_DEVICE_MANAGER_DESCRIPTOR": "android.companion.virtual.IVirtualDeviceManager",
+    "android.service.dreams.IDreamManager": "android.service.dreams.IDreamManager",
+    "LOCALE_DESCRIPTOR": "android.app.ILocaleManager",
+    "android.view.IWindowManager": "android.view.IWindowManager",
+    "WEARABLES_DESCRIPTOR": "android.app.wearable.IWearableSensingManager",
+    "android.app.backup.IBackupManager": "android.app.backup.IBackupManager",
+    "STATUS_BAR_DESCRIPTOR": "com.android.internal.statusbar.IStatusBarService",
+    "com.android.internal.graphics.fonts.IFontManager": "com.android.internal.graphics.fonts.IFontManager",
+    "SHORTCUT_DESCRIPTOR": "android.content.pm.IShortcutService",
+    "CREDENTIAL_DESCRIPTOR": "android.credentials.ICredentialManager",
+    "SURFACE_FLINGER_DESCRIPTOR": "android.ui.ISurfaceComposer",
+    "android.speech.IRecognitionServiceManager": "android.speech.IRecognitionServiceManager",
+    "com.android.internal.app.ISoundTriggerSession": "com.android.internal.app.ISoundTriggerSession",
+    "SOUND_TRIGGER_DESCRIPTOR": "com.android.internal.app.ISoundTriggerService",
+    "CROSS_PROFILE_APPS_DESCRIPTOR": "android.content.pm.ICrossProfileApps",
+    "TRUST_DESCRIPTOR": "android.app.trust.ITrustManager",
+    "com.android.internal.os.IDropBoxManagerService": "com.android.internal.os.IDropBoxManagerService",
+    "SYSTEM_CONFIG_DESCRIPTOR": "android.os.ISystemConfig",
+    "android.net.IConnectivityManager": "android.net.IConnectivityManager",
+    "android.permission.IPermissionChecker": "android.permission.IPermissionChecker",
+    "APP_OPS_DESCRIPTOR": "com.android.internal.app.IAppOpsService",
+    "android.hardware.biometrics.IBiometricService": "android.hardware.biometrics.IBiometricService",
+    "STATS_DESCRIPTOR": "android.os.IStatsManagerService",
+    "android.net.INetworkStatsService": "android.net.INetworkStatsService",
+    "android.hardware.input.IInputManager": "android.hardware.input.IInputManager",
+    "VPN_DESCRIPTOR": "android.net.IVpnManager",
+    "android.media.IAudioPolicyService": "android.media.IAudioPolicyService",
+    "GAME_DESCRIPTOR": "android.app.IGameManagerService",
+    "DEVICE_POLICY_DESCRIPTOR": "android.app.admin.IDevicePolicyManager",
+    "FONT_DESCRIPTOR": "com.android.internal.graphics.fonts.IFontManager",
+    "com.android.internal.telephony.euicc.IEuiccController": "com.android.internal.telephony.euicc.IEuiccController",
+    "com.android.internal.compat.IPlatformCompat": "com.android.internal.compat.IPlatformCompat",
+    "android.credentials.ICredentialManager": "android.credentials.ICredentialManager",
+    "com.android.internal.app.ISoundTriggerService": "com.android.internal.app.ISoundTriggerService",
+    "android.app.slice.ISliceManager": "android.app.slice.ISliceManager",
+    "android.hardware.biometrics.IAuthService": "android.hardware.biometrics.IAuthService",
+    "TELEPHONY_DESCRIPTOR": "com.android.internal.telephony.ITelephony",
+    "com.android.internal.app.IBatteryStats": "com.android.internal.app.IBatteryStats",
+    "android.os.ITradeInMode": "android.os.ITradeInMode",
+    "NET_POLICY_DESCRIPTOR": "android.net.INetworkPolicyManager",
+    "com.android.internal.telephony.ISub": "com.android.internal.telephony.ISub",
+    "VIBRATOR_MANAGER_DESCRIPTOR": "android.os.IVibratorManagerService",
+    "EUICC_CONTROLLER_DESCRIPTOR": "com.android.internal.telephony.euicc.IEuiccController",
+    "android.app.people.IPeopleManager": "android.app.people.IPeopleManager",
+    "BIOMETRIC_DESCRIPTOR": "android.hardware.biometrics.IBiometricService",
+    "ATTESTATION_VERIFICATION_DESCRIPTOR": "android.security.attestationverification.IAttestationVerificationManagerService",
+    "android.app.contextualsearch.IContextualSearchManager": "android.app.contextualsearch.IContextualSearchManager",
+    "android.net.INetworkPolicyManager": "android.net.INetworkPolicyManager",
+    "android.app.ambientcontext.IAmbientContextManager": "android.app.ambientcontext.IAmbientContextManager",
+    "android.app.IActivityTaskManager": "android.app.IActivityTaskManager",
+    "PACKAGE_DESCRIPTOR": "android.content.pm.IPackageManager",
+    "ACTIVITY_CLIENT_DESCRIPTOR": "android.app.IActivityClientController",
+    "android.hardware.face.IFaceService": "android.hardware.face.IFaceService",
+    "AMBIENT_CONTEXT_MANAGER_DESCRIPTOR": "android.app.ambientcontext.IAmbientContextManager",
+    "VOICE_INTERACTION_DESCRIPTOR": "com.android.internal.app.IVoiceInteractionManagerService",
+    "ACTIVITY_TASK_DESCRIPTOR": "android.app.IActivityTaskManager",
+    "com.android.internal.appwidget.IAppWidgetService": "com.android.internal.appwidget.IAppWidgetService",
+    "android.app.trust.ITrustManager": "android.app.trust.ITrustManager",
+    "MEDIA_PROJECTION_DESCRIPTOR": "android.media.projection.IMediaProjectionManager",
+    "android.hardware.usb.IUsbManager": "android.hardware.usb.IUsbManager",
+    "android.permission.IPermissionManager": "android.permission.IPermissionManager",
+    "android.media.IMediaRouterService": "android.media.IMediaRouterService",
+    "android.app.admin.IDevicePolicyManager": "android.app.admin.IDevicePolicyManager",
+    "BACKGROUND_INSTALL_CONTROL_DESCRIPTOR": "android.content.pm.IBackgroundInstallControlService",
+    "PLATFORM_COMPAT_DESCRIPTOR": "com.android.internal.compat.IPlatformCompat",
+    "android.media.tv.ITvInputManager": "android.media.tv.ITvInputManager",
+    "android.net.IVpnManager": "android.net.IVpnManager",
+    "android.app.wearable.IWearableSensingManager": "android.app.wearable.IWearableSensingManager",
+    "android.telephony.ims.aidl.IImsRcsController": "android.telephony.ims.aidl.IImsRcsController",
+    "android.os.IVibratorManagerService": "android.os.IVibratorManagerService",
+    "MEDIA_SESSION_DESCRIPTOR": "android.media.session.ISessionManager",
+    "com.android.internal.statusbar.IStatusBarService": "com.android.internal.statusbar.IStatusBarService",
+    "MEDIA_ROUTER_DESCRIPTOR": "android.media.IMediaRouterService"
+  }
+}

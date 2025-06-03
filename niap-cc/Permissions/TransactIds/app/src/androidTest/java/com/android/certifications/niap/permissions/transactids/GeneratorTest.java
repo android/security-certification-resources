@@ -33,15 +33,11 @@ public class GeneratorTest {
     @Before
     public void setUp() {
         mUiAutomation = InstrumentationRegistry.getInstrumentation().getUiAutomation();
-
-
     }
 
     @After
     public void tearDown() {
         mUiAutomation.dropShellPermissionIdentity();
-
-
     }
 
     @Test

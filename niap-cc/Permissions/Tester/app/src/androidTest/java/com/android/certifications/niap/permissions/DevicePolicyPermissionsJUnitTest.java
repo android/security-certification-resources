@@ -128,6 +128,18 @@ public class DevicePolicyPermissionsJUnitTest {
         mPermissions.add(permission.MANAGE_DEVICE_POLICY_WIFI);
         mPermissions.add(permission.MANAGE_DEVICE_POLICY_WINDOWS);
         mPermissions.add(permission.MANAGE_DEVICE_POLICY_WIPE_DATA);
+        //15
+        mPermissions.add(permission.MANAGE_DEVICE_POLICY_THREAD_NETWORK);
+        mPermissions.add(permission.MANAGE_DEVICE_POLICY_ASSIST_CONTENT);
+        mPermissions.add(permission.MANAGE_DEVICE_POLICY_AUDIT_LOGGING);
+        mPermissions.add(permission.MANAGE_DEVICE_POLICY_CONTENT_PROTECTION);
+        mPermissions.add(permission.MANAGE_DEVICE_POLICY_MANAGED_SUBSCRIPTIONS);
+        mPermissions.add(permission.MANAGE_DEVICE_POLICY_BLOCK_UNINSTALL);
+        mPermissions.add(permission.MANAGE_DEVICE_POLICY_CAMERA_TOGGLE);
+        mPermissions.add(permission.MANAGE_DEVICE_POLICY_MICROPHONE_TOGGLE);
+        mPermissions.add(permission.MANAGE_DEVICE_POLICY_STORAGE_LIMIT);
+        mPermissions.add(permission.EMBED_ANY_APP_IN_UNTRUSTED_MODE);
+
     }
 
     private UiAutomation mUiAutomation;

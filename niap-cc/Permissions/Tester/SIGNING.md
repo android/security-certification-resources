@@ -60,6 +60,7 @@ It is also possible to use below command to build those variants.
 ./gradlew assembleNormal
 ./gradlew assembleNoperm
 ./gradlew assemblePlatform
+./gradlew assembleAndroidTest
 ```
 The build results would be output under a directory below
 >**[:projectroot]**/app/build/outputs/apk

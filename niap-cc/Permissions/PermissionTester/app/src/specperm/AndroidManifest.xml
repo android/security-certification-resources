@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2025 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.android.certification.niap.permission.dpctester">
+    <uses-permission android:name="android.permission.RADIO_SCAN_WITHOUT_LOCATION"
+        tools:ignore="ProtectedPermissions"/>
+    <!--RADIO_SCAN_WITHOUT_LOCATION request CHANGE_WIFI_STATE permission-->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
+    <uses-permission android:name="android.permission.UWB_PRIVILEGED"
+        tools:ignore="ProtectedPermissions"/>
+    <!--UWB_PRIVILEGED request UWB_RANGING permission-->
+    <uses-permission android:name="android.permission.UWB_RANGING"
+        tools:ignore="ProtectedPermissions"/>
+
+    <uses-permission android:name="android.permission.NETWORK_SCAN"
+        tools:ignore="ProtectedPermissions" />
+    <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    -->
+    <uses-permission android:name="android.permission.MANAGE_SMARTSPACE"
+        tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.GET_BINDING_UID_IMPORTANCE" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!--To test below permission you shouldn't declare query_all_packages in manifest -->
+    <uses-permission android:name="android.permission.LIST_ENABLED_CREDENTIAL_PROVIDERS" />
+    <!--LIST_ENABLED_CREDENTIAL_PROVIDERS request INTERACT_ACROSS_USERS permission-->
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS"
+        tools:ignore="ProtectedPermissions" />
+
+    <!--Below permission require query_all_packages declaration for testing -->
+    <!--<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />-->
+    <uses-permission android:name="android.permission.SET_APP_SPECIFIC_LOCALECONFIG" />
+</manifest>

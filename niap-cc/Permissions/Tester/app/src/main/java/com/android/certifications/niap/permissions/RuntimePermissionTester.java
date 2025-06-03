@@ -830,7 +830,11 @@ public class RuntimePermissionTester extends BasePermissionTester {
             }
         }
     }
-    /**
+
+    @Override
+    public Map<String,PermissionTest> getRegisteredPermissions() {
+        return mPermissionTasks;
+    }/**
      * Enables the specified {@code bluetoothAdapter} if the required permission is granted.
      *
      * @param bluetoothAdapter the adapter to be enabled
@@ -860,9 +864,5 @@ public class RuntimePermissionTester extends BasePermissionTester {
                     + " bluetooth adapter to be enabled");
         }
         return bluetoothAdapter.isEnabled();
-    }
-    @Override
-    public Map<String,PermissionTest> getRegisteredPermissions() {
-        return mPermissionTasks;
     }
 }
