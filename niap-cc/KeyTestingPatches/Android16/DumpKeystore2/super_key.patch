@@ -1,0 +1,54 @@
+--- super_key.rs.orig	2025-06-11 10:11:19.831689925 +0000
++++ super_key.rs	2025-06-18 19:15:55.160035055 +0000
+@@ -51,7 +51,7 @@ use std::{
+     sync::{Mutex, RwLock, Weak},
+ };
+ use std::{convert::TryFrom, ops::Deref};
+-
++use std::fmt;
+ #[cfg(test)]
+ mod tests;
+
+@@ -73,6 +73,16 @@ pub enum SuperEncryptionAlgorithm {
+     EcdhP521,
+ }
+
++
++impl fmt::Display for SuperEncryptionAlgorithm {
++    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
++       match self {
++           SuperEncryptionAlgorithm::Aes256Gcm => write!(f, "AES-256-GCM"),
++           SuperEncryptionAlgorithm::EcdhP521 => write!(f, "ECDH P-521"),
++       }
++    }
++}
++
+ /// A particular user may have several superencryption keys in the database, each for a
+ /// different purpose, distinguished by alias. Each is associated with a static
+ /// constant of this type.
+@@ -560,6 +570,7 @@ impl SuperKeyManager {
+                     ));
+                 }
+             };
++            log::debug!("CKM.4 keystore daemon Master key read:{}",format!("algorithm:{}; {:02x?}",algorithm,key));
+             Ok(Arc::new(SuperKey {
+                 algorithm,
+                 key,
+@@ -589,6 +600,7 @@ impl SuperKeyManager {
+             .context(ks_err!("Failed to encrypt new super key."))?;
+         metadata.add(BlobMetaEntry::Iv(iv));
+         metadata.add(BlobMetaEntry::AeadTag(tag));
++        log::debug!("CKM.4 keystore daemon Password key:{}",format!("{:02x?}",encrypted_key));
+         Ok((encrypted_key, metadata))
+     }
+
+@@ -772,6 +784,9 @@ impl SuperKeyManager {
+         let key_entry = db
+             .store_super_key(user_id, key_type, &encrypted_super_key, &blob_metadata, &key_metadata)
+             .context(ks_err!("Failed to store super key."))?;
++
++        log::debug!("CKM.4 keystore daemon Master key generate:{}",format!("algorithm:{};{:02x?}",key_type.algorithm,super_key));
++
+         Ok(Arc::new(SuperKey {
+             algorithm: key_type.algorithm,
+             key: super_key,
