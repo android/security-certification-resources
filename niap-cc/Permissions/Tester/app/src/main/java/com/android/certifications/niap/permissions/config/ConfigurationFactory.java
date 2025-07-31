@@ -140,6 +140,7 @@ public class ConfigurationFactory {
 
         InstallPermissionOnlyConfiguration installPermissionOnlyConfiguration =
                 new  InstallPermissionOnlyConfiguration(activity);
+
         if(installPermissionOnlyConfiguration.enabled()){
             configurations.add(installPermissionOnlyConfiguration);
         }
@@ -165,7 +166,7 @@ public class ConfigurationFactory {
         DevicePolicyConfiguration devicePolicyConfiguration =
                 new DevicePolicyConfiguration(activity);
         if(devicePolicyConfiguration.enabled()){
-            additionalConfigurations.add(devicePolicyConfiguration);
+            //additionalConfigurations.add(devicePolicyConfiguration);
         }
 
 

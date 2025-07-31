@@ -38,6 +38,7 @@ import com.android.certifications.niap.permissions.log.LoggerFactory;
 import com.android.certifications.niap.permissions.log.StatusLogger;
 import com.android.certifications.niap.permissions.utils.PermissionUtils;
 import com.android.certifications.niap.permissions.utils.SignatureUtils;
+import com.android.certifications.niap.permissions.utils.TesterUtils;
 import com.android.certifications.niap.permissions.utils.Transacts;
 
 import java.util.ArrayList;
@@ -153,6 +154,7 @@ public abstract class BasePermissionTester {
         mPackageManager = mContext.getPackageManager();
         mLogger = LoggerFactory.createActivityLogger(TAG, (MainActivity) mActivity);
         mDeviceApiLevel = Build.VERSION.SDK_INT;
+
         mTransacts = Transacts.createTransactsForApiLevel(mDeviceApiLevel);
 
         // Use this app's signing certificate to determine if the platform is signed with the same

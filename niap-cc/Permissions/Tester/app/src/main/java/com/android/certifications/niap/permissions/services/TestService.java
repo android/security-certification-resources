@@ -24,6 +24,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 
 import com.android.certifications.niap.permissions.Constants;
@@ -70,7 +71,14 @@ public class TestService extends Service {
                                     .setSmallIcon(R.drawable.ic_launcher_foreground)
                                     .setContentIntent(pendingIntent)
                                     .build();
-                    startForeground(NOTIFICATION_ID, notification);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        startForeground(NOTIFICATION_ID, notification,flags);
+                        //foregroundInfo = new ForegroundInfo(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+                    } else {
+                        startForeground(NOTIFICATION_ID, notification);
+                        //foregroundInfo = new ForegroundInfo(notificationId, notification);
+                    }
+
                     stopForeground(true);
                     StatusLogger.logTestStatus(permission, permissionGranted, true);
                     //getAndLogTestStatus

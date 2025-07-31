@@ -17,12 +17,15 @@
 package com.android.certifications.niap.permissions.utils;
 
 import android.os.Binder;
+import android.security.FileIntegrityManager;
 import android.util.Log;
 import com.android.certifications.niap.permissions.BasePermissionTester;
 import com.android.certifications.niap.permissions.log.Logger;
 import com.android.certifications.niap.permissions.log.LoggerFactory;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -65,6 +68,26 @@ public class ReflectionUtils {
         }
     }
 
+   /* public static Object invokeReflectionCall(Object targetObject, String methodName,
+                                               Class<?>[] parameterClasses, Object... parameters) {
+        invokeReflectionCall(targetObject.getClass(),methodName,targetObject,parameterClasses,parameters);
+    }*/
+
+    public static Object invokeReflectionCall(String className, String methodName,
+                                              Object targetObject, Class<?>[] parameterClasses, Object... parameters) {
+        try {
+            Class<?> targetClass = Class.forName(className);
+            Method method = targetClass.getMethod(methodName, parameterClasses);
+            return method.invoke(targetObject, parameters);
+        } catch (ReflectiveOperationException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof SecurityException) {
+                throw (SecurityException) cause;
+            } else {
+                throw new BasePermissionTester.UnexpectedPermissionTestFailureException(e);
+            }
+        }
+    }
 
     public static Object stubFromInterface(String className)  {
         try {
@@ -121,6 +144,7 @@ public class ReflectionUtils {
             return null;
         }
     }
+
 
     public static Object stubHiddenObject(String classname)  {
         try {
@@ -197,7 +221,19 @@ public class ReflectionUtils {
         }
         return a.stream().filter(str->str.startsWith(filter)).collect(Collectors.toList());
     }
-
+    public static List<String> checkDeclaredProperties(Object target,final String filter){
+        List<String> a = new ArrayList<>();
+        Class<?> clazz = target.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        mLogger.logSystem(fields.toString());
+        for(Field f : fields){
+            StringBuilder method = new StringBuilder(f.getName() + "(");
+            //Class<?>[] types = f.getType();
+            //or(Class<?> t:types) method.append(" ").append(t.);
+            a.add(method+"<"+f.getType()+">");
+        }
+        return a.stream().filter(str->str.startsWith(filter)).collect(Collectors.toList());
+    }
     public static List<String> checkDeclaredMethod(Class<?> clazz,final String f){
         List<String> a = new ArrayList<>();
         Method[] methods = clazz.getDeclaredMethods();
@@ -211,4 +247,6 @@ public class ReflectionUtils {
         }
         return a.stream().filter(str->str.startsWith(f)).collect(Collectors.toList());
     }
+
+
 }

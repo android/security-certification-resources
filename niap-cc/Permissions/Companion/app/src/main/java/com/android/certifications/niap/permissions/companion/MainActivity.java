@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                             boolean.class}, namespace, name, value, makeDefault);
             return (boolean)r;
         } catch (Exception e) {
-            logdebug("DeviceConfig.setProperty failed.(" + a + "," + b + "," + value + ")",e);
+            logdebug("DeviceConfig.setProperty failed.(" + namespace + "," + name + "," + value + ")",e);
             e.printStackTrace();
             return false;
         }
@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mSetupButton = findViewById(R.id.setupButton);
-        mCheckBoxButton = findViewById(R.id.flgDPECheckBox);
+        //mCheckBoxButton = findViewById(R.id.flgDPECheckBox);
         mSetupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -237,13 +237,16 @@ public class MainActivity extends AppCompatActivity {
             boolean result;
             setupLocusTest();
             result = setupMediaLocationTest();
+            //logdebug("result1>"+result);
             if (mGmsAvailable) {
                 // if the location settings are not correct then prompt the user for correction
                 // before attempting to set up the location tests.
                 if (!verifyLocationSettings()) {
+                    //logdebug("verifylocation>"+result);
                     return false;
                 }
                 result = result && setupLocationTest();
+                //logdebug("result2>"+result);
             }
             /**
              * Set flags for enable experimental flags to new device_policy_engine
@@ -251,10 +254,11 @@ public class MainActivity extends AppCompatActivity {
              */
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 String value = "false";
-                if(mCheckBoxButton.isChecked()){
+                //disabled : because it's infeasible to test with this application
+                /*if(mCheckBoxButton.isChecked()){
                     value = "true";
-                }
-
+                }*/
+                /*
                 String dvc =
                         deviceConfigGetProperty("device_policy_manager", "enable_device_policy_engine");
                 if(dvc == null || !dvc.equals(value)){
@@ -272,6 +276,8 @@ public class MainActivity extends AppCompatActivity {
                 logdebug("force flag enable_permission_based_access set "+value+"=>"
                         +deviceConfigGetProperty("device_policy_manager",
                         "enable_permission_based_access"));
+
+                 */
             }
 
             return result;
@@ -399,7 +405,8 @@ public class MainActivity extends AppCompatActivity {
         boolean locationReceived = false;
         if(Build.VERSION.SDK_INT<Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             Intent intent = new Intent(ACCESS_LOCATION_ACTION);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent,
+            PendingIntent pendingIntent =
+                    PendingIntent.getBroadcast(this, 0, intent,
                     PendingIntent.FLAG_MUTABLE);
             //FLAG_NO_CREATE
 
@@ -423,11 +430,13 @@ public class MainActivity extends AppCompatActivity {
                 logerror("Location update not received within timeout window");
             }
         } else {
+
             //Implementation for android UDC or later (maybe it works on more previous versions)
             latch[0] = new CountDownLatch(1);
             LocationCallback locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
+                    //logdebug("onlocation result");
                     if (locationResult == null) {
                         return;
                     }
@@ -443,11 +452,16 @@ public class MainActivity extends AppCompatActivity {
 
             FusedLocationProviderClient locationClient =
                     LocationServices.getFusedLocationProviderClient(getApplicationContext());
+
             locationClient.requestLocationUpdates(locationRequest,
                     locationCallback,
                     Looper.getMainLooper());
             try {
+                //logdebug("start checking");
                 locationReceived = latch[0].await(10, TimeUnit.SECONDS);
+                if(!locationReceived){
+                    logerror("Operation timeout, maybe location feature is disabled or no internet connection.");
+                }
             } catch (InterruptedException e) {
                 logerror("Caught an InterruptedException: "+e.getLocalizedMessage(),e);
             }
@@ -591,7 +605,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
             int[] grantResults) {
-        //Inspector request below line but in this case we shouldn't call super method.
+        //Inspector requests below line but in this case we shouldn't call super method.
         //    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean permissionGranted = true;
         for (int grantResult : grantResults) {

@@ -32,6 +32,7 @@
         tools:ignore="HardcodedDebugMode">
         <activity
             android:name=".activities.TestActivity"
+            android:theme="@style/Theme.App.HomeScreen"
             android:launchMode="singleTop"
             android:exported="true">
             <intent-filter>
@@ -43,7 +44,7 @@
         <activity
             android:name=".activities.MainActivity"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/Theme.App.HomeScreen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,6 +53,7 @@
         </activity>
         <activity
             android:name=".activities.SettingsActivity"
+            android:theme="@style/Theme.App.HomeScreen"
             android:exported="false">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -118,7 +120,10 @@
             android:name=".services.FgSystemExemptedService"
             android:foregroundServiceType="systemExempted"
             android:exported="false" />
-
+        <service
+            android:name=".services.FgMediaProcessingService"
+            android:foregroundServiceType="mediaProcessing"
+            android:exported="false" />
 
 
         <receiver

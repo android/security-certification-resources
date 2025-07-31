@@ -321,6 +321,10 @@ public class Transacts {
     public static final String ATTESTATION_VERIFICATION_DESCRIPTOR =
             "android.security.attestationverification.IAttestationVerificationManagerService";
 
+
+
+
+
     public static final String verifyAttestation = "verifyAttestation";
     public static final String verifyToken = "verifyToken";
 
@@ -335,7 +339,7 @@ public class Transacts {
     public static final String search="search";
     //WallPaperEffectsGenerationManager
     public static final String WALLPAPER_EFFECTS_GENERATION_SERVICE =
-            "wallpaper_effects_generation";;
+            "wallpaper_effects_generation";
     public static final String WALLPAPER_EFFECTS_GENERATION_DESCRIPTOR
             = "android.app.wallpapereffectsgeneration.IWallpaperEffectsGenerationManager";
     //generateCinematicEffect(in CinematicEffectRequest request,in ICinematicEffectListener listener);
@@ -369,6 +373,7 @@ public class Transacts {
     public static final String setProfileOwnerOnOrganizationOwnedDevice="setProfileOwnerOnOrganizationOwnedDevice";
     public static final String cancelStateRequest="cancelStateRequest";
     public static final String setUserPreferredDisplayMode="setUserPreferredDisplayMode";
+    public static final String getUserPreferredDisplayMode="getUserPreferredDisplayMode";
     public static final String stopAppForUser="stopAppForUser";
 
     public static final String ETHERNET_MANAGER_SERVICE = "ethernet";
@@ -446,11 +451,15 @@ public class Transacts {
     public static final String enableLocationUpdates = "enableLocationUpdates";
     public static final String setAlwaysFinish = "setAlwaysFinish";
     public static final String addKeyboardLayoutForInputDevice = "addKeyboardLayoutForInputDevice";
+    public static final String setKeyboardLayoutForInputDevice = "setKeyboardLayoutForInputDevice";
+
     public static final String setWallpaper = "setWallpaper";
     public static final String setWallpaperComponent = "setWallpaperComponent";
     public static final String setStandbyEnabled = "setStandbyEnabled";
     public static final String getCacheSizeBytes = "getCacheSizeBytes";
     public static final String setUserRestriction = "setUserRestriction";
+    public static final String permissionToOpCode = "permissionToOpCode";
+
     public static final String monitorGestureInput = "monitorGestureInput";
     public static final String moveActivityTaskToBack = "moveActivityTaskToBack";
     public static final String getRuntimePermissionsVersion = "getRuntimePermissionsVersion";
@@ -705,7 +714,126 @@ public class Transacts {
     public static final String requestAppKeyboardShortcuts = "requestAppKeyboardShortcuts";
     public static final String getSupportedCountries = "getSupportedCountries";
     public static final String openRanging = "openRanging";
+
+
+    /* For Android 35*/
+    public static final String registerScreenRecordingCallback="registerScreenRecordingCallback";
+    public static final String PDB_SERVICE = "persistent_data_block";//PersistentDataBlockService
+    public static final String PDB_DESCRIPTOR = "android.service.persistentdata.IPersistentDataBlockService";
+    public static final String deactivateFactoryResetProtection = "deactivateFactoryResetProtection";
+    //ITelephony.getLastKnownCellIdentity
+    public static final String getLastKnownCellIdentity = "getLastKnownCellIdentity";
+    public static final String SYSTEM_CONFIG_SERVICE =  "system_config";//PersistentDataBlockService
+    public static final String SYSTEM_CONFIG_DESCRIPTOR = "android.os.ISystemConfig";
+    public static final String getEnhancedConfirmationTrustedPackages = "getEnhancedConfirmationTrustedPackages";
+    public static final String startObservingDevicePresence ="startObservingDevicePresence";
+    public static final String getAllAssociationsForUser = "getAllAssociationsForUser";
+    public static final String addOnTransportsChangedListener = "addOnTransportsChangedListener";
+    public static final String removeOnTransportsChangedListener = "removeOnTransportsChangedListener";
+    public static final String sendMessage = "sendMessage";
+    public static final String addOnMessageReceivedListener = "addOnMessageReceivedListener";
+
+    public static final String MEDIA_ROUTER_SERVICE = "media_router";//PersistentDataBlockService
+    public static final String MEDIA_ROUTER_DESCRIPTOR = "android.media.IMediaRouterService";
+    public static final String registerManager = "registerManager";
+    public static final String registerProxyRouter = "registerProxyRouter";
+
+    public static final String USAGE_STATS_SERVICE = "usagestats";//PersistentDataBlockService
+    public static final String USAGE_STATS_DESCRIPTOR = "android.app.usage.IUsageStatsManager";
+    public static final String reportChooserSelection = "reportChooserSelection";
+
+    public static final String CONTEXTUAL_SEARCH_SERVICE = "contextual_search";//PersistentDataBlockService
+    public static final String CONTEXTUAL_SEARCH_DESCRIPTOR = "android.app.contextualsearch.IContextualSearchManager";
+    public static final String startContextualSearch = "startContextualSearch";
+    //IInputManager
+    public static final String registerStickyModifierStateListener = "registerStickyModifierStateListener";
+    public static final String unregisterStickyModifierStateListener = "unregisterStickyModifierStateListener";
+
+    public static final String ON_DEVICE_INTELLIGENCE_SERVICE = "on_device_intelligence";//PersistentDataBlockService
+    public static final String ON_DEVICE_INTELLINGENCE_DESCRIPTOR = "android.app.ondeviceintelligence.IOnDeviceIntelligenceManager";
+    public static final String getVersion = "getVersion";
+    public static final String getFeature = "getFeature";
+    public static final String enableConnectedDisplay = "enableConnectedDisplay";
+
+    public static final String BACKGROUND_INSTALL_CONTROL_SERVICE = "background_install_control";//PersistentDataBlockService
+    public static final String BACKGROUND_INSTALL_CONTROL_DESCRIPTOR = "android.content.pm.IBackgroundInstallControlService";
+    public static final String getBackgroundInstalledPackages = "getBackgroundInstalledPackages";
+
+    public static final String GRAMMATICAL_INFLECTION_SERVICE = "grammatical_inflection";//PersistentDataBlockService
+    public static final String GRAMMATICAL_INFLECTION_DESCRIPTOR = "android.app.IGrammaticalInflectionManager";
+    public static final String getSystemGrammaticalGender= "getSystemGrammaticalGender";
+    //
+    public static final String requestDisplayModes = "requestDisplayModes";
+    //
+    public static final String FILE_INTEGRITY_SERVICE = "file_integrity";//PersistentDataBlockService
+    public static final String FILE_INTEGRITY_DESCRIPTOR = "android.security.IFileIntegrityService";
+    public static final String setupFsverity= "setupFsverity";
+    public static final String createAuthToken="createAuthToken";
+
+    public static final String isDevicePotentiallyStolen = "isDevicePotentiallyStolen";
+    public static final String getBindingUidProcessState = "getBindingUidProcessState";
+
+    public static final String NSD_SERVICE = "servicediscovery";
+    public static final String NSD_DESCRIPTOR = "android.net.nsd.INsdManager";
+    public static final String connect = "connect";
+    //"com.android.packageinstaller"
+    public static final String PACKAGE_INSTALLER_SERVICE = "servicediscovery";
+    public static final String PACKAGE_INSTALLER_DESCRIPTOR = "android.content.pm.IPackageInstaller";
+    public static final String openSession = "openSession";
+
+    public static final String FEATURE_FLAGS_SERVICE = "feature_flags";
+    public static final String FEATURE_FLAGS_DESCRIPTOR = "android.flags.IFeatureFlags";
+    public static final String overrideFlag = "overrideFlag";
+    public static final String resetFlag = "resetFlag";
+
+    public static final String isWakeLockLevelSupported = "isWakeLockLevelSupported";
+    public static final String setPackagesSuspendedAsUser = "setPackagesSuspendedAsUser";
+
+    public static final String getActiveNetwork = "getActiveNetwork";
+    public static final String getActiveNetworkInfo = "getActiveNetworkInfo";
+
+    /* For Android 36*/
+    public static final String INTRUSION_DETECTION_DESCRIPTOR =
+            "android.security.intrusiondetection.IIntrusionDetectionService";
+    public static final String INTRUSION_DETECTION_SERVICE = "intrusion_detection";
+    public static final String enable = "enable";
+    public static final String disable  = "disable";
+    public static final String addStateCallback  = "addStateCallback";
+
+    /* For IInputManger */
+
+    public static final String registerKeyGestureEventListener  = "registerKeyGestureEventListener";
+    public static final String registerKeyEventActivityListener = "registerKeyEventActivityListener";
+    public static final String unregisterKeyEventActivityListener = "unregisterKeyEventActivityListener";
+    /*For IHealthConnectService */
+    public static final String getChangesForBackup  = "getChangesForBackup";
+    public static final String canRestore  = "canRestore";
+    public static final String restoreChanges  = "restoreChanges";
+
+    /*For IHealthConnectService */
+    public static final String TRADE_IN_MODE_DESCRIPTOR = "android.os.ITradeInMode";
+    public static final String TRADE_IN_MODE_SERVICE = "tradeinmode";
+    public static final String start = "start";
+    public static final String enterEvaluationMode = "enterEvaluationMode";
+
+    public static final String VIBRATOR_MANAGER_SERVICE = Context.VIBRATOR_MANAGER_SERVICE;
+    public static final String VIBRATOR_MANAGER_DESCRIPTOR = "android.os.IVibratorManagerService";
+    public static final String startVendorVibrationSession="startVendorVibrationSession";
+
+    public static final String DYNAMIC_INSTRUMENTATION_MANAGER_DESCRIPTOR = "";
+
+    public static final String AUDIO_POLICY_SERVICE_DESCRIPTOR = "android.media.IAudioPolicyService";
+    public static final String AUDIO_POLICY_SERVICE  = "audio_policy";
+    public static final String getInputForAttr = "getInputForAttr";
+
+    public static final String AUTHENTICATION_POLICY_SERVICE = "authentication_policy";
+    public static final String AUTHENTICATION_POLICY_SERVICE_DESCRIPTOR
+            = "android.security.authenticationpolicy.IAuthenticationPolicyService";
+
+    public static final String enableSecureLockDevice = "enableSecureLockDevice";//
+    public static final String disableSecureLockDevice = "disableSecureLockDevice";//
     /**
+     * Mapping from the descriptor class to the constant variable name for use when writing an
      * Mapping from the descriptor class to the constant variable name for use when writing an
      * extension of the Transacts class for the Permission Test Tool.
      */

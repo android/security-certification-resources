@@ -28,6 +28,7 @@ import static android.Manifest.permission.CREDENTIAL_MANAGER_QUERY_CANDIDATE_CRE
 import static android.Manifest.permission.CREDENTIAL_MANAGER_SET_ALLOWED_PROVIDERS;
 import static android.Manifest.permission.CREDENTIAL_MANAGER_SET_ORIGIN;
 import static android.Manifest.permission.DETECT_SCREEN_CAPTURE;
+import static android.Manifest.permission.DETECT_SCREEN_RECORDING;
 import static android.Manifest.permission.DISABLE_KEYGUARD;
 import static android.Manifest.permission.ENFORCE_UPDATE_OWNERSHIP;
 import static android.Manifest.permission.EXPAND_STATUS_BAR;
@@ -38,6 +39,7 @@ import static android.Manifest.permission.FOREGROUND_SERVICE_DATA_SYNC;
 import static android.Manifest.permission.FOREGROUND_SERVICE_HEALTH;
 import static android.Manifest.permission.FOREGROUND_SERVICE_LOCATION;
 import static android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK;
+import static android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING;
 import static android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION;
 import static android.Manifest.permission.FOREGROUND_SERVICE_MICROPHONE;
 import static android.Manifest.permission.FOREGROUND_SERVICE_PHONE_CALL;
@@ -103,6 +105,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.pm.LauncherApps;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
@@ -126,6 +129,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
+import android.os.UserHandle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.service.notification.StatusBarNotification;
@@ -133,6 +137,7 @@ import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
 import android.telephony.TelephonyManager;
+import android.window.IScreenRecordingCallback;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -163,6 +168,7 @@ import com.android.certifications.niap.permissions.services.FgDataSyncService;
 import com.android.certifications.niap.permissions.services.FgHealthService;
 import com.android.certifications.niap.permissions.services.FgLocationService;
 import com.android.certifications.niap.permissions.services.FgMediaPlaybackService;
+import com.android.certifications.niap.permissions.services.FgMediaProcessingService;
 import com.android.certifications.niap.permissions.services.FgMediaProjectionService;
 import com.android.certifications.niap.permissions.services.FgMicrophoneService;
 import com.android.certifications.niap.permissions.services.FgPhoneCallService;
@@ -171,6 +177,7 @@ import com.android.certifications.niap.permissions.services.FgSpecialUseService;
 import com.android.certifications.niap.permissions.services.FgSystemExemptedService;
 import com.android.certifications.niap.permissions.services.TestJobService;
 import com.android.certifications.niap.permissions.services.TestService;
+import com.android.certifications.niap.permissions.utils.ReflectionUtils;
 import com.android.certifications.niap.permissions.utils.TesterUtils;
 import com.android.certifications.niap.permissions.utils.Transacts;
 
@@ -371,6 +378,7 @@ public class InstallPermissionTester extends BasePermissionTester {
             Intent serviceIntent = new Intent(mActivity, FgCameraService.class);
             try {
                 mActivity.startForegroundService(serviceIntent);
+
                 tryBindingForegroundService(serviceIntent);
             } catch(Throwable t){
                 mLogger.logDebug("FOREGROUND_SERVICE_CAMERA", t);
@@ -488,7 +496,17 @@ public class InstallPermissionTester extends BasePermissionTester {
                 mLogger.logDebug("FOREGROUND_SERVICE_SYSTEM_EXEMPTED", t);
             }
         }));
-
+        mPermissionTasks.put(FOREGROUND_SERVICE_MEDIA_PROCESSING,
+                new PermissionTest(true, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                ///New Foreground Service Permission
+                Intent serviceIntent = new Intent(mActivity, FgMediaProcessingService.class);
+                try {
+                    mActivity.startForegroundService(serviceIntent);
+                    tryBindingForegroundService(serviceIntent);
+                } catch(Throwable t){
+                    mLogger.logDebug("FOREGROUND_SERVICE_MEDIA_PROCESSING", t);
+                }
+            }));
 
         // android.permission.GET_PACKAGE_SIZE only guards PackageManager#getPackageSizeInfoAsUser
         // which is hidden and results in an UnsupportedOperationException after O.
@@ -1024,6 +1042,57 @@ public class InstallPermissionTester extends BasePermissionTester {
             );
         }));
 
+        //"android.permission.DETECT_SCREEN_RECORDING",
+        //"android.permission.ACCESS_HIDDEN_PROFILES",
+        //"android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING"
+
+        //New install permissions for Android 15(VIC)
+        mPermissionTasks.put(DETECT_SCREEN_RECORDING,
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    //IScreenCallback Constructor might be hidden
+                    //If the error message is shown please execute below command from adb
+                    //adb shell settings put global hidden_api_policy  1
+                    IScreenRecordingCallback callback = new IScreenRecordingCallback() {
+                        @Override
+                        public IBinder asBinder() {
+                            return null;
+                        }
+                        @Override
+                        public void onScreenRecordingStateChanged(boolean visibleInScreenRecording) throws RemoteException {
+                            System.out.println("visibleInScreenRecording:"+visibleInScreenRecording);
+                        }
+                    };
+                    //OK
+                    mTransacts.invokeTransact(Transacts.WINDOW_SERVICE,
+                            Transacts.WINDOW_DESCRIPTOR,
+                            Transacts.registerScreenRecordingCallback, callback);
+                }));
+
+        mPermissionTasks.put("android.permission.ACCESS_HIDDEN_PROFILES",
+                new PermissionTest(false, Build.VERSION_CODES.UPSIDE_DOWN_CAKE, () -> {
+                    if(Build.VERSION.SDK_INT>=35){
+                        throw new BypassTestException(
+                                "We can't access space setting intent by normal signature as of sdk35. " +
+                                "So we exec same test on siganature permission tester. Ignore this result.");
+                    }
+
+                    LauncherApps launcherApps = (LauncherApps)
+                            mContext.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+                    //If the caller cannot access hidden profiles the method returns null
+                    // see also. areHiddenApisChecksEnabled() in LauncherAppService
+                    Object intent = ReflectionUtils.invokeReflectionCall
+                            (launcherApps.getClass(),
+                                    "getPrivateSpaceSettingsIntent",
+                                    launcherApps,new Class[]{});
+                    String a = ReflectionUtils.checkDeclaredMethod(launcherApps,"get").toString();
+                    if(intent == null){
+
+                      throw new SecurityException("Caller cannot access hidden profiles");
+                    }
+                }));
+
+
+
         //Infeasible to test - can't raise security error as of now.
         //CREDENTIAL_MANAGER_QUERY_CANDIDATE_CREDENTIALS,
 
@@ -1107,7 +1176,6 @@ public class InstallPermissionTester extends BasePermissionTester {
     public void runPermissionTestsByThreads(Consumer<Result> callback){
         Result.testerName = this.getClass().getSimpleName();
 
-        //mLogger.logSystem(this.getClass().getSimpleName()+" not implemented runPermissionTestsByThreads yet");
         List<String> permissions = mConfiguration.getInstallPermissions().orElse(
                 new ArrayList<>(mPermissionTasks.keySet()));
 
@@ -1116,19 +1184,19 @@ public class InstallPermissionTester extends BasePermissionTester {
         AtomicInteger err = new AtomicInteger(0);
 
         final int total = permissions.size();
-           for (String permission : permissions) {
+           for (String permission : permissions) {Thread thread = new Thread(() -> {
+               String tester = this.getClass().getSimpleName();
+               if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
+                   callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester));
+               } else {
+                   callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
+               }
+           });
 
             // If the permission has a corresponding task then run it.
             // mLogger.logDebug("Starting test for signature permission: "+String.format(Locale.US,
             //"%d/%d ",no,numperms) + permission);
-            Thread thread = new Thread(() -> {
-                String tester = this.getClass().getSimpleName();
-                if (runPermissionTest(permission, mPermissionTasks.get(permission), true)) {
-                    callback.accept(new Result(true, permission, aiIncl(cnt), total,err.get(),tester));
-                } else {
-                    callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
-                }
-            });
+
             thread.start();
             try {
                 thread.join(THREAD_JOIN_DELAY);
@@ -1149,6 +1217,7 @@ public class InstallPermissionTester extends BasePermissionTester {
         synchronized (lock) {
             try {
                 int i=0;
+
                 while (!serviceConnection.mConnected.get()) {
                     try {
                         //wait almost 1 sec along increasing waiting time
@@ -1157,16 +1226,17 @@ public class InstallPermissionTester extends BasePermissionTester {
                             throw new InterruptedException("Connection Timed Out");
                         }
                     } catch (InterruptedException e) {
-                        //throw new RuntimeException(e);
                         throw new UnexpectedPermissionTestFailureException(e.getMessage());
                     }
                 }
-                mLogger.logInfo("Connected To Service in the Tester app="+serviceConnection.mComponentName+
-                        ","+serviceConnection.binderSuccess.get());
+                //mLogger.logInfo("Connected To Service in the Tester app="+serviceConnection.mComponentName+
+                //        ","+serviceConnection.binderSuccess.get());
                 if(!serviceConnection.binderSuccess.get()){
                     throw new SecurityException("Test for "+serviceConnection.mComponentName+" has been failed.");
                 }
+                //mLogger.logSystem("binder success"+serviceConnection.mComponentName);
             } catch (Exception ex){
+                //mLogger.logSystem("binder !exception"+serviceConnection.mComponentName);
                 throw new UnexpectedPermissionTestFailureException(ex);
             } finally {
                 mContext.unbindService(serviceConnection);
@@ -1181,15 +1251,14 @@ public class InstallPermissionTester extends BasePermissionTester {
         public void onServiceConnected(ComponentName name, IBinder binder) {
             synchronized (lock) {
                 mConnected.set(true);
-                binderSuccess.set(true);
+                binderSuccess.set(false);
                 mComponentName = name.getShortClassName();
-                //mLogger.logSystem("Hello Unlock!"+name);
                 TestBindService service = TestBindService.Stub.asInterface(binder);
                 try {
                     service.testMethod();
+                    binderSuccess.set(true);
                 } catch (RemoteException e) {
                     binderSuccess.set(false);
-                    //e.printStackTrace();
                     mLogger.logError(name+" failure."+e.getMessage(),e);
                 }
                 lock.notify();

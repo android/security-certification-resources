@@ -514,9 +514,7 @@ public class GmsPermissionTester extends BasePermissionTester {
             // If the permission has a corresponding task then run it.
             Thread thread = new Thread(() -> {
                 String tester = this.getClass().getSimpleName();
-                //mLogger.logSystem(">"+permission+" thread run");
                 if (mPermissionTasks.containsKey(permission)) {
-                    //mLogger.logSystem(">"+permission+" contains");
                     if (!runPermissionTest(permission, mPermissionTasks.get(permission))) {
                         callback.accept(new Result(false, permission, aiIncl(cnt), total,aiIncl(err),tester));
                     } else {

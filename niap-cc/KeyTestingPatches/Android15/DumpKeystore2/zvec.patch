@@ -1,0 +1,17 @@
+Index: keystore2/src/crypto/zvec.rs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/keystore2/src/crypto/zvec.rs b/keystore2/src/crypto/zvec.rs
+--- a/keystore2/src/crypto/zvec.rs	
++++ b/keystore2/src/crypto/zvec.rs	(date 1733902489725)
+@@ -107,7 +107,7 @@
+         if self.elems.is_empty() {
+             write!(f, "Zvec empty")
+         } else {
+-            write!(f, "Zvec size: {} {}", self.len)
++            write!(f, "Zvec size: {} {:02x?}", self.len,self.elems)
+         }
+     }
+ }
