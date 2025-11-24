@@ -9,19 +9,19 @@
 +    StrToHex(*key, hexKey);
 +    hexKey.push_back('\0');
 +
-+    std::string secDis;
-+    StrToHex(secdiscardable_hash,secDis);
-+    secDis.push_back('\0');
++    std::string hexSecDis;
++    StrToHex(secdiscardable_hash,hexSecDis);
++    hexSecDis.push_back('\0');
 +
-+    std::string appId2;
-+    StrToHex(appId,appId2);
-+    appId.push_back('\0');
++    std::string hexAppId;
++    StrToHex(appId,hexAppId);
++    hexAppId.push_back('\0');
 +    
 +    
 +    LOG(DEBUG) << "KMD Table 4. " << dir << ": " << hexKey.data();
 +    //The Strings keep binary
-+    LOG(DEBUG) << "KMD Table 4. secdiccardablehash: " << secDis.data();
-+    LOG(DEBUG) << "KMD Table 4. application Id(secdis+aut): " << appId2.data();
++    LOG(DEBUG) << "KMD Table 4. secdiccardablehash: " << hexSecDis.data();
++    LOG(DEBUG) << "KMD Table 4. application Id(secdis+aut): " << hexAppId.data();
 +
      return true;
  }

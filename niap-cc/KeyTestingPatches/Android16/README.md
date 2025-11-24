@@ -3,8 +3,8 @@
 We changed the patches and its styles from this version, and renewed according to the updates of
 the systems and the KMD(Key Management Description) document. 
 
-The patch files in the corresponding directory, so you should install them with overwrite it.
-And then run patch commands one by one.
+We placed the patch files in the corresponding directory.
+So you can install them with overwriting, and then run patch commands one by one.
 
 Base Version : 25Q2-release
 
