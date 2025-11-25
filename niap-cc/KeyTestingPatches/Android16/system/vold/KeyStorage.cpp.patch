@@ -1,0 +1,28 @@
+--- KeyStorage.cpp.orig	2025-11-17 02:27:40.246730161 +0000
++++ KeyStorage.cpp	2025-11-19 09:50:15.685241084 +0000
+@@ -620,6 +620,25 @@
+             return false;
+         }
+     }
++
++    KeyBuffer hexKey;
++    StrToHex(*key, hexKey);
++    hexKey.push_back('\0');
++
++    std::string hexSecDis;
++    StrToHex(secdiscardable_hash,hexSecDis);
++    hexSecDis.push_back('\0');
++
++    std::string hexAppId;
++    StrToHex(appId,hexAppId);
++    hexAppId.push_back('\0');
++    
++    
++    LOG(DEBUG) << "KMD Table 4. " << dir << ": " << hexKey.data();
++    //The Strings keep binary
++    LOG(DEBUG) << "KMD Table 4. secdiccardablehash: " << hexSecDis.data();
++    LOG(DEBUG) << "KMD Table 4. application Id(secdis+aut): " << hexAppId.data();
++
+     return true;
+ }
+ 

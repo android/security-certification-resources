@@ -1,0 +1,165 @@
+--- super_key.rs.orig	2025-11-19 04:18:56.390666511 +0000
++++ super_key.rs	2025-11-19 04:18:29.372157563 +0000
+@@ -51,6 +51,7 @@
+     sync::{Mutex, RwLock, Weak},
+ };
+ use std::{convert::TryFrom, ops::Deref};
++use std::fmt;
+ 
+ #[cfg(test)]
+ mod tests;
+@@ -73,6 +74,15 @@
+     EcdhP521,
+ }
+ 
++impl fmt::Display for SuperEncryptionAlgorithm {
++    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
++       match self {
++           SuperEncryptionAlgorithm::Aes256Gcm => write!(f, "AES-256-GCM"),
++           SuperEncryptionAlgorithm::EcdhP521 => write!(f, "ECDH P-521"),
++       }
++    }
++}
++
+ /// A particular user may have several superencryption keys in the database, each for a
+ /// different purpose, distinguished by alias. Each is associated with a static
+ /// constant of this type.
+@@ -538,6 +548,12 @@
+                         .derive_key_hkdf(salt, AES_256_KEY_LENGTH)
+                         .context(ks_err!("Failed to derive key from password."))?;
+ 
++                    log::debug!("KMD.8 keystore super key extract(param):{}",
++                        format!("Present: salt: {:02x?}, iv: {:02x?}, aead_tag: {:02x?}.",
++                        salt,
++                        iv,
++                        tag));
++
+                     aes_gcm_decrypt(blob, iv, tag, &key).or_else(|_e| {
+                         // Handle old key stored before the switch to HKDF.
+                         let key = pw
+@@ -560,6 +576,7 @@
+                     ));
+                 }
+             };
++            log::debug!("KMD.8 keystore super key extract:{}",format!(concat!("algorithm:{}; key:{:02x?}"),algorithm,key));
+             Ok(Arc::new(SuperKey {
+                 algorithm,
+                 key,
+@@ -582,13 +599,23 @@
+         let derived_key = pw
+             .derive_key_hkdf(&salt, AES_256_KEY_LENGTH)
+             .context(ks_err!("Failed to derive key from password."))?;
++
++        log::debug!("KMD.8 keystore encrypt password(param):{}",
++            format!("derived_key: {:?}; Present: salt: {:02x?}.",derived_key,
++            salt));
++
+         let mut metadata = BlobMetaData::new();
+         metadata.add(BlobMetaEntry::EncryptedBy(EncryptedBy::Password));
+         metadata.add(BlobMetaEntry::Salt(salt));
+         let (encrypted_key, iv, tag) = aes_gcm_encrypt(super_key, &derived_key)
+             .context(ks_err!("Failed to encrypt new super key."))?;
++
++        log::debug!("KMD.8 keystore encrypt password Encrypted Key:{}",format!("{:02x?} iv:{:02x?} tag:{:02x?}",encrypted_key,iv,tag));
++
+         metadata.add(BlobMetaEntry::Iv(iv));
+         metadata.add(BlobMetaEntry::AeadTag(tag));
++        
++
+         Ok((encrypted_key, metadata))
+     }
+ 
+@@ -602,12 +629,26 @@
+         if super_key.algorithm != SuperEncryptionAlgorithm::Aes256Gcm {
+             return Err(Error::sys()).context(ks_err!("unexpected algorithm"));
+         }
++
++
++  
+         let mut metadata = BlobMetaData::new();
+         let (encrypted_key, iv, tag) = aes_gcm_encrypt(key_blob, &(super_key.key))
+             .context(ks_err!("Failed to encrypt new super key."))?;
++
++        
++        log::debug!("KMD.8 keystore encrypt aeskey(param):{}",
++            format!("key_blob: {:?}; iv: {:02x?}, aead_tag: {:02x?}.",key_blob,
++            iv,
++            tag));
++
+         metadata.add(BlobMetaEntry::Iv(iv));
+         metadata.add(BlobMetaEntry::AeadTag(tag));
+         super_key.id.add_to_metadata(&mut metadata);
++
++  
++        log::debug!("KMD.8 keystore encrypt aeskey Encrypted Key:{}",format!("{:02x?}",encrypted_key));
++
+         Ok((encrypted_key, metadata))
+     }
+ 
+@@ -648,11 +689,22 @@
+             let (ephem_key, salt, iv, encrypted_key, aead_tag) =
+                 ECDHPrivateKey::encrypt_message(public_key, key_blob)
+                     .context(ks_err!("ECDHPrivateKey::encrypt_message failed."))?;
++
++            log::debug!("KMD.8 keystore encrypt ecdh-key(param):{}",
++                format!("Present: salt: {:02x?}, iv: {:02x?}, aead_tag: {:02x?}",
++                salt,
++                iv,
++                aead_tag));
++            log::debug!("KMD.8 keystore encrypt ecdh-key Encrypted Key:{} PublicKey:{}",format!("{:02x?}",encrypted_key),format!("{:02x?}",ephem_key));
++
+             metadata.add(BlobMetaEntry::PublicKey(ephem_key));
+             metadata.add(BlobMetaEntry::Salt(salt));
+             metadata.add(BlobMetaEntry::Iv(iv));
+             metadata.add(BlobMetaEntry::AeadTag(aead_tag));
+             SuperKeyIdentifier::DatabaseId(key_id_guard.id()).add_to_metadata(&mut metadata);
++
++        
++
+             Ok((encrypted_key, metadata))
+         }
+     }
+@@ -761,6 +813,11 @@
+                 )
+             }
+         };
++
++        log::debug!("KMD.8 keystore super keygen super,private_key {}",format!("algorithm:{};{:02x?}",key_type.algorithm,super_key));
++        log::debug!("KMD.8 keystore super keygen public_key {}",format!("algorithm:{};{:02x?}",key_type.algorithm,public_key.is_some()));
++        //encrypted_key shows next
++
+         // Derive an AES-256 key from the password and re-encrypt the super key before we insert it
+         // in the database.
+         let (encrypted_super_key, blob_metadata) =
+@@ -772,6 +829,8 @@
+         let key_entry = db
+             .store_super_key(user_id, key_type, &encrypted_super_key, &blob_metadata, &key_metadata)
+             .context(ks_err!("Failed to store super key."))?;
++
++
+         Ok(Arc::new(SuperKey {
+             algorithm: key_type.algorithm,
+             key: super_key,
+@@ -829,6 +888,8 @@
+             return Ok(());
+         }
+ 
++        log::debug!("KMD.8 unlock unlocked device required keys symmetric");
++
+         let aes = if let Some(symmetric) = symmetric {
+             // This is weird. If this point is reached only one of the UnlockedDeviceRequired super
+             // keys was initialized. This should never happen.
+@@ -927,6 +988,13 @@
+                     symmetric: LockedKey::new(&encrypting_key, &aes)?,
+                     private: LockedKey::new(&encrypting_key, &ecdh)?,
+                 });
++
++                log::debug!("KMD.8 class3 biometric unlock symetric:{:02x?} private:{:02x?}",
++                    entry.biometric_unlock.as_ref().unwrap().symmetric.ciphertext,
++                    entry.biometric_unlock.as_ref().unwrap().private.ciphertext,
++                );
++
++
+                 Ok(())
+             })();
+             if let Err(e) = res {

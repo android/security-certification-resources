@@ -1,0 +1,22 @@
+--- LockSettingsService.java.orig	2025-11-19 02:32:00.865718521 +0000
++++ LockSettingsService.java	2025-11-19 03:47:33.243336866 +0000
+@@ -241,6 +241,8 @@
+  */
+ public class LockSettingsService extends ILockSettings.Stub {
+     private static final String TAG = "LockSettingsService";
++    private static final String TAGKMD = "LockSettingsService(KMD)";
++
+     private static final String PERMISSION = ACCESS_KEYGUARD_SECURE_STORAGE;
+     private static final String BIOMETRIC_PERMISSION = MANAGE_BIOMETRIC;
+ 
+@@ -2205,6 +2207,10 @@
+     private void setCeStorageProtection(@UserIdInt int userId, SyntheticPassword sp) {
+         final byte[] secret = sp.deriveFileBasedEncryptionKey();
+         final long callingId = Binder.clearCallingIdentity();
++
++        String hexPwdToken = String.valueOf(HexEncoding.encode(secret));
++        Log.i(TAGKMD, "KMD.3 FBE KEK(setCeStorageProtection)" + hexPwdToken);
++
+         try {
+             mStorageManager.setCeStorageProtection(userId, secret);
+         } catch (RemoteException e) {

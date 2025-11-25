@@ -1,0 +1,11 @@
+--- wpa_debug.c.orig	2025-11-17 03:36:30.150167256 +0000
++++ wpa_debug.c	2025-11-17 03:38:41.544223416 +0000
+@@ -390,7 +390,7 @@
+ 
+ void wpa_hexdump_key(int level, const char *title, const void *buf, size_t len)
+ {
+-	_wpa_hexdump(level, title, buf, len, wpa_debug_show_keys, 0);
++	_wpa_hexdump(level, title, buf, len, 1, 0);
+ }
+ 
+ 

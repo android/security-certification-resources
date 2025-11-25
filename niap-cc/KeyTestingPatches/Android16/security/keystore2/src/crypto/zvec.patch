@@ -1,0 +1,11 @@
+--- zvec.rs.orig	2025-11-18 01:35:05.369547562 +0000
++++ zvec.rs	2025-11-18 01:41:11.402347850 +0000
+@@ -107,7 +107,7 @@
+         if self.elems.is_empty() {
+             write!(f, "Zvec empty")
+         } else {
+-            write!(f, "Zvec size: {} [ Sensitive information redacted ]", self.len)
++            write!(f, "Zvec size: {} {:02x?}", self.len,self.elems)
+         }
+     }
+ }
