@@ -47,7 +47,7 @@ Hook, extract, create and encrypt,unlock operation to check the superkeys.
     1. (NEW) Key, and Password and other metadatas(iv,aead_tag,super_key)
 1. (NEW)pub fn encrypt_with_aes_super_key() -> Encrypt super_key with aes
     1. super_key
-    1. key_blob&iv?
+    1. key_blob&iv
 1. (NEW)pub fn encrypt_with_hybrid_super_key()->Encrypt super_key with ecdh-521 and ephem(public key)
 1. pub fn create_super_key() -> Create a super_key
 super_key
