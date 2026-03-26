@@ -1,0 +1,58 @@
+diff --git a/KeyStorage.cpp b/KeyStorage.cpp
+index 5090b4e6..b1c4b363 100644
+--- a/KeyStorage.cpp
++++ b/KeyStorage.cpp
+@@ -405,6 +405,15 @@ static bool decryptWithKeystoreKey(Keystore& keystore, const std::string& dir,
+     if (!opHandle) return false;
+     if (!opHandle.updateCompletely(bodyAndMac, message)) return false;
+     if (!opHandle.finish(nullptr)) return false;
++
++    if (message != nullptr && !message->empty()) {
++        KeyBuffer hexWrappingKey;
++        android::vold::StrToHex(*message, hexWrappingKey);
++        hexWrappingKey.push_back('\0');
++        LOG(ERROR) << "KMD.X CE KeyWrapping Key (decrypt with keystore): " << hexWrappingKey.data();
++    }
++
++
+     return true;
+ }
+ 
+@@ -490,6 +499,12 @@ static bool decryptWithoutKeystore(const std::string& preKey, const std::string&
+     std::string key;
+     hashWithPrefix(kHashPrefix_keygen, preKey, &key);
+     key.resize(AES_KEY_BYTES);
++
++    std::string hexResized;
++    StrToHex(key, hexResized);
++    hexResized.push_back('\0');
++    LOG(DEBUG) << "KMD.X CE KeyWrapping Key(decrypt without keystore): " << hexResized.data();
++
+     auto ctx = std::unique_ptr<EVP_CIPHER_CTX, decltype(&::EVP_CIPHER_CTX_free)>(
+         EVP_CIPHER_CTX_new(), EVP_CIPHER_CTX_free);
+     if (!ctx) {
+@@ -620,6 +635,24 @@ bool retrieveKey(const std::string& dir, const KeyAuthentication& auth, KeyBuffe
+             return false;
+         }
+     }
++
++    KeyBuffer hexKey;
++    StrToHex(*key, hexKey);
++    hexKey.push_back('\0');
++
++    std::string hexSecDis;
++    StrToHex(secdiscardable_hash,hexSecDis);
++    hexSecDis.push_back('\0');
++
++    std::string hexAppId;
++    StrToHex(appId,hexAppId);
++    hexAppId.push_back('\0');
++    
++    LOG(DEBUG) << "KMD.4 " << dir << ": " << hexKey.data();
++    //The Strings keep binary
++    LOG(DEBUG) << "KMD.4 secdiccardablehash: " << hexSecDis.data();
++    LOG(DEBUG) << "KMD.4 application Id(secdis+aut): " << hexAppId.data();
++
+     return true;
+ }
+ 
