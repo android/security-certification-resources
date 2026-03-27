@@ -1,6 +1,8 @@
---- zvec.rs.orig	2025-11-18 01:35:05.369547562 +0000
-+++ zvec.rs	2025-11-18 01:41:11.402347850 +0000
-@@ -107,7 +107,7 @@
+diff --git a/keystore2/src/crypto/zvec.rs b/keystore2/src/crypto/zvec.rs
+index 00cbb1c8..25bd9458 100644
+--- a/keystore2/src/crypto/zvec.rs
++++ b/keystore2/src/crypto/zvec.rs
+@@ -107,7 +107,7 @@ impl fmt::Debug for ZVec {
          if self.elems.is_empty() {
              write!(f, "Zvec empty")
          } else {

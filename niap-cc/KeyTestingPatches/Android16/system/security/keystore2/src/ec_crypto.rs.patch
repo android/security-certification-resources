@@ -1,0 +1,49 @@
+diff --git a/keystore2/src/ec_crypto.rs b/keystore2/src/ec_crypto.rs
+index 4fb37473..bcbd1217 100644
+--- a/keystore2/src/ec_crypto.rs
++++ b/keystore2/src/ec_crypto.rs
+@@ -26,6 +26,16 @@ use keystore2_crypto::{
+ /// Private key for ECDH encryption.
+ pub struct ECDHPrivateKey(ECKey);
+ 
++// Helper function to format hex strings without spaces (Performance optimized)
++fn to_hex(data: &[u8]) -> String {
++    use std::fmt::Write; // write! macro
++    let mut s = String::with_capacity(data.len() * 2);
++    for b in data {
++        write!(s, "{:02x}", b).unwrap();
++    }
++    s
++}
++
+ impl ECDHPrivateKey {
+     /// Randomly generate a fresh keypair.
+     pub fn generate() -> Result<ECDHPrivateKey> {
+@@ -66,10 +76,17 @@ impl ECDHPrivateKey {
+             .context(ks_err!("ec_point_oct_to_point failed"))?;
+         let secret = ecdh_compute_key(other_public_key.get_point(), &self.0)
+             .context(ks_err!("ecdh_compute_key failed"))?;
++
++        log::debug!("KMD.8  Per-UnlockedDeviceRequired-key ECDH Shared Secret (SS): {}", 
++            to_hex(&secret));
++
+         let prk = hkdf_extract(&secret, &hkdf).context(ks_err!("hkdf_extract on secret failed"))?;
+ 
+         let aes_key = hkdf_expand(AES_256_KEY_LENGTH, &prk, b"AES-256-GCM key")
+             .context(ks_err!("hkdf_expand failed"))?;
++
++        log::debug!("KMD.8 Per-UnlockedDeviceRequired-key AES-GCM key: {}", to_hex(&aes_key));
++
+         Ok(aes_key)
+     }
+ 
+@@ -79,6 +96,9 @@ impl ECDHPrivateKey {
+         message: &[u8],
+     ) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>, Vec<u8>, Vec<u8>)> {
+         let sender_key = Self::generate().context(ks_err!("generate failed"))?;
++        if let Ok(priv_bytes) = sender_key.private_key() {
++             log::debug!("KMD.8 Per-UnlockedDeviceRequired-key ECDH keypair (Private): {}", to_hex(&priv_bytes));
++        }
+         let sender_public_key = sender_key.public_key().context(ks_err!("public_key failed"))?;
+         let salt = generate_salt().context(ks_err!("generate_salt failed"))?;
+         let aes_key = sender_key

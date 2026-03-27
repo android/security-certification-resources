@@ -1,0 +1,169 @@
+diff --git a/keystore2/src/super_key.rs b/keystore2/src/super_key.rs
+index 3e657530..17470730 100644
+--- a/keystore2/src/super_key.rs
++++ b/keystore2/src/super_key.rs
+@@ -51,6 +51,7 @@ use std::{
+     sync::{Mutex, RwLock, Weak},
+ };
+ use std::{convert::TryFrom, ops::Deref};
++use std::fmt;
+ 
+ #[cfg(test)]
+ mod tests;
+@@ -73,6 +74,25 @@ pub enum SuperEncryptionAlgorithm {
+     EcdhP521,
+ }
+ 
++impl fmt::Display for SuperEncryptionAlgorithm {
++    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
++       match self {
++           SuperEncryptionAlgorithm::Aes256Gcm => write!(f, "AES-256-GCM"),
++           SuperEncryptionAlgorithm::EcdhP521 => write!(f, "ECDH P-521"),
++       }
++    }
++}
++
++// Helper function to format hex strings without spaces (Performance optimized)
++fn to_hex(data: &[u8]) -> String {
++    use std::fmt::Write; // write! macro
++    let mut s = String::with_capacity(data.len() * 2);
++    for b in data {
++        write!(s, "{:02x}", b).unwrap();
++    }
++    s
++}
++
+ /// A particular user may have several superencryption keys in the database, each for a
+ /// different purpose, distinguished by alias. Each is associated with a static
+ /// constant of this type.
+@@ -513,6 +533,9 @@ impl SuperKeyManager {
+     ) -> Result<Arc<SuperKey>> {
+         let super_key = Self::extract_super_key_from_key_entry(algorithm, entry, pw, None)
+             .context(ks_err!("Failed to extract super key from key entry"))?;
++        //The method passes when handle AFU Key.
++        log::debug!("KMD.8 AfterFirstUnlock (AFU) Key: {}", to_hex(&super_key.key));
++
+         self.install_after_first_unlock_key_for_user(user_id, super_key.clone())
+             .context(ks_err!("Failed to install AfterFirstUnlock super key for user!"))?;
+         Ok(super_key)
+@@ -538,11 +561,14 @@ impl SuperKeyManager {
+                         .derive_key_hkdf(salt, AES_256_KEY_LENGTH)
+                         .context(ks_err!("Failed to derive key from password."))?;
+ 
++                   log::debug!("KMD.8 Keystore Password Derived Key(KEK): {}", to_hex(&key));
++
+                     aes_gcm_decrypt(blob, iv, tag, &key).or_else(|_e| {
+                         // Handle old key stored before the switch to HKDF.
+                         let key = pw
+                             .derive_key_pbkdf2(salt, AES_256_KEY_LENGTH)
+                             .context(ks_err!("Failed to derive key from password (PBKDF2)."))?;
++
+                         aes_gcm_decrypt(blob, iv, tag, &key)
+                             .context(ks_err!("Failed to decrypt key blob."))
+                     })?
+@@ -560,6 +586,7 @@ impl SuperKeyManager {
+                     ));
+                 }
+             };
++
+             Ok(Arc::new(SuperKey {
+                 algorithm,
+                 key,
+@@ -582,13 +609,19 @@ impl SuperKeyManager {
+         let derived_key = pw
+             .derive_key_hkdf(&salt, AES_256_KEY_LENGTH)
+             .context(ks_err!("Failed to derive key from password."))?;
++
++        log::debug!("KMD.8 Keystore Password Salt: {}", to_hex(&salt));    
++        log::debug!("KMD.8 Keystore Password Derived Key [Generated for wrapping a Super Key]: {}", to_hex(&derived_key));
++
+         let mut metadata = BlobMetaData::new();
+         metadata.add(BlobMetaEntry::EncryptedBy(EncryptedBy::Password));
+         metadata.add(BlobMetaEntry::Salt(salt));
+         let (encrypted_key, iv, tag) = aes_gcm_encrypt(super_key, &derived_key)
+             .context(ks_err!("Failed to encrypt new super key."))?;
++
+         metadata.add(BlobMetaEntry::Iv(iv));
+         metadata.add(BlobMetaEntry::AeadTag(tag));
++        
+         Ok((encrypted_key, metadata))
+     }
+ 
+@@ -648,6 +681,9 @@ impl SuperKeyManager {
+             let (ephem_key, salt, iv, encrypted_key, aead_tag) =
+                 ECDHPrivateKey::encrypt_message(public_key, key_blob)
+                     .context(ks_err!("ECDHPrivateKey::encrypt_message failed."))?;
++
++            log::debug!("KMD.8 Per-UnlockedDeviceRequired-key ECDH keypair (Public): {}", to_hex(&ephem_key));
++           
+             metadata.add(BlobMetaEntry::PublicKey(ephem_key));
+             metadata.add(BlobMetaEntry::Salt(salt));
+             metadata.add(BlobMetaEntry::Iv(iv));
+@@ -761,6 +797,10 @@ impl SuperKeyManager {
+                 )
+             }
+         };
++
++        //raw_key shows next
++        log::debug!("KMD.8 {}: {}", key_type.name, to_hex(&super_key));
++
+         // Derive an AES-256 key from the password and re-encrypt the super key before we insert it
+         // in the database.
+         let (encrypted_super_key, blob_metadata) =
+@@ -793,12 +833,30 @@ impl SuperKeyManager {
+     ) -> Result<Arc<SuperKey>> {
+         let loaded_key = db.load_super_key(key_type, user_id)?;
+         if let Some((_, key_entry)) = loaded_key {
+-            Ok(Self::extract_super_key_from_key_entry(
++
++            if key_type.algorithm == SuperEncryptionAlgorithm::EcdhP521 {
++                if let Some(pub_key) = key_entry.metadata().sec1_public_key() {
++                    log::debug!("KMD.8 UnlockedDeviceRequired ECDH super key(public): {}", to_hex(pub_key));
++                } else {
++                    log::debug!("KMD.8 UnlockedDeviceRequired ECDH super key(public): None (sec1_public_key missing)");
++                }
++            }
++
++
++            let extracted = Self::extract_super_key_from_key_entry(
+                 key_type.algorithm,
+                 key_entry,
+                 password,
+                 reencrypt_with,
+-            )?)
++            )?;
++
++            let key_name = match key_type.algorithm {
++                SuperEncryptionAlgorithm::Aes256Gcm => "UnlockedDeviceRequired symmetric super key",
++                SuperEncryptionAlgorithm::EcdhP521 => "UnlockedDeviceRequired ECDH super key(private)",
++            };
++            log::debug!("KMD.8 {}: {}", key_name, to_hex(&extracted.key));
++
++            Ok(extracted)
+         } else {
+             self.create_super_key(db, user_id, key_type, password, reencrypt_with)
+         }
+@@ -906,6 +964,9 @@ impl SuperKeyManager {
+                         HardwareAuthenticatorType::FINGERPRINT,
+                     ),
+                 ];
++
++                log::debug!("KMD.8 Biometric Unlock Key (BUK) [Dynamically generated on device lock]: {}", to_hex(&encrypting_key));
++
+                 for sid in unlocking_sids {
+                     key_params.push(KeyParameterValue::UserSecureID(*sid));
+                 }
+@@ -927,6 +988,13 @@ impl SuperKeyManager {
+                     symmetric: LockedKey::new(&encrypting_key, &aes)?,
+                     private: LockedKey::new(&encrypting_key, &ecdh)?,
+                 });
++
++               log::debug!("KMD.8 UnlockedDeviceRequired symmetric super key (Encrypted by BUK): {}", 
++                    to_hex(&entry.biometric_unlock.as_ref().unwrap().symmetric.ciphertext));
++               log::debug!("KMD.8 UnlockedDeviceRequired asymmetric super key (Encrypted by BUK): {}", 
++                    to_hex(&entry.biometric_unlock.as_ref().unwrap().private.ciphertext));
++
++
+                 Ok(())
+             })();
+             if let Err(e) = res {
