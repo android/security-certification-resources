@@ -28,7 +28,7 @@ index da01d510ab8e..6260550251f9 100644
          final byte[] secret = sp.deriveFileBasedEncryptionKey();
 +
 +        String hexPwdToken = String.valueOf(libcore.util.HexEncoding.encode(secret));
-+        og.i(TAGKMD, "KMD.3 FBE KEY(unlockCeStorage()) " + hexPwdToken);
++        Log.i(TAGKMD, "KMD.3 FBE KEY(unlockCeStorage()) " + hexPwdToken);
 +
          try {
              mStorageManager.unlockCeStorage(userId, secret);
