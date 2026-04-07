@@ -553,9 +553,24 @@ class DPCTestModule(val ctx: Activity): PermissionTestModuleBase(ctx){
         checkUserRestriction(UserManager.DISALLOW_THREAD_NETWORK);
     }*/
 
-    @PermissionTest("MANAGE_DEVICE_POLICY_APP_FUNCTIONS",36)
-    fun testAppFunctions(){
+    @PermissionTest("MANAGE_DEVICE_POLICY_APP_FUNCTIONS", 36)
+    fun testAppFunctions() {
         dpm.setAppFunctionPolicy(0)//not controlled
+    }
+
+    @PermissionTest("MANAGE_DEVICE_POLICY_CONTENT_RESTRICTION_APPS", 37)
+    fun testManageDevicePolicyContentRestrictionApps() {
+        logger.debug("Placeholder for MANAGE_DEVICE_POLICY_CONTENT_RESTRICTION_APPS")
+    }
+
+    @PermissionTest("MANAGE_DEVICE_POLICY_KEYGUARD_STATUS", 37)
+    fun testManageDevicePolicyKeyguardStatus() {
+        logger.debug("Placeholder for MANAGE_DEVICE_POLICY_KEYGUARD_STATUS")
+    }
+
+    @PermissionTest("MANAGE_DEVICE_POLICY_LOCKSCREEN_MESSAGE", 37)
+    fun testManageDevicePolicyLockscreenMessage() {
+        logger.debug("Placeholder for MANAGE_DEVICE_POLICY_LOCKSCREEN_MESSAGE")
     }
 
     ////////////////////////////////////////////////////////////

@@ -790,6 +790,13 @@ public class RuntimeTestModule extends PermissionTestModuleBase {
 		session.stop();
 		//reconfigureRangingInterval(100); <= this method crashes device
 	}
+
+	//**** method template for target runtime SDK37
+	@PermissionTest(permission="ACCESS_LOCAL_NETWORK",sdkMin=37)
+	public void testAccessLocalNetwork(){
+	    logger.debug("The test for android.permission.ACCESS_LOCAL_NETWORK is not implemented yet");
+	}
+
 	/* Could not find implementations...
 	@PermissionTest(permission="EYE_TRACKING_COARSE",sdkMin=36)
 	public void testEyeTrackingCoarse(){

@@ -21,21 +21,21 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * Exported service used to test the BIND_APP_FUNCTION_SERVICE permission.
+ * Exported service used to test the BIND_MOTION_CUES_SERVICE permission.
  *
- * This service requires clients are granted the BIND_APP_FUNCTION_SERVICE
+ * This service requires clients are granted the BIND_MOTION_CUES_SERVICE
  * permission to bind to it. The Permission Test Tool can attempt to bind to this service
- * and invoke the {@link TestBindAppFunctionServiceServiceImpl#testMethod()} method
+ * and invoke the {@link TestBindMotionCuesServiceServiceImpl#testMethod()} method
  * to verify that the platform properly enforces this permission requirement.
  */
-public class TestBindAppFunctionServiceService extends Service {
-    private static final String TAG = "TestBindAppFunctionServiceService";
-    private TestBindAppFunctionServiceServiceImpl bindService;
+public class TestBindMotionCuesServiceService extends Service {
+    private static final String TAG = "TestBindMotionCuesServiceService";
+    private TestBindMotionCuesServiceServiceImpl bindService;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        bindService = new TestBindAppFunctionServiceServiceImpl();
+        bindService = new TestBindMotionCuesServiceServiceImpl();
     }
 
     @Override
@@ -43,10 +43,10 @@ public class TestBindAppFunctionServiceService extends Service {
         return bindService;
     }
 
-    static class TestBindAppFunctionServiceServiceImpl extends TestBindService.Stub {
+    static class TestBindMotionCuesServiceServiceImpl extends TestBindService.Stub {
         public void testMethod() {
             Log.d(TAG, "The caller successfully invoked the test method on service "
-                    + "TestBindAppFunctionServiceServiceService");
+                    + "TestBindMotionCuesServiceServiceService");
         }
     }
 }

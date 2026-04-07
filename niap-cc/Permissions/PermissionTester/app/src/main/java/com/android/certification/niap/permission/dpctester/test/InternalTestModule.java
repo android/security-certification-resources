@@ -524,4 +524,55 @@ public class InternalTestModule extends PermissionTestModuleBase {
 		logger.debug("The test for android.permission.EXECUTE_APP_FUNCTIONS is not implemented yet");
 	}
 
+	//**** method template for target internal SDK37
+	@PermissionTest(permission="ACCESS_BIOMETRIC_SENSOR_STRENGTHS",sdkMin=37)
+	public void testAccessBiometricSensorStrengths(){
+	    logger.debug("The test for android.permission.ACCESS_BIOMETRIC_SENSOR_STRENGTHS is not implemented yet");
+	}
+	@PermissionTest(permission="ACCESS_COMPUTER_CONTROL",sdkMin=37)
+	public void testAccessComputerControl(){
+	    logger.debug("The test for android.permission.ACCESS_COMPUTER_CONTROL is not implemented yet");
+	}
+	@PermissionTest(permission="ACCESS_HID",sdkMin=37)
+	public void testAccessHid(){
+	    logger.debug("The test for android.permission.ACCESS_HID is not implemented yet");
+	}
+	@PermissionTest(permission="BIND_ALLOWLIST_PROVIDER_SERVICE",sdkMin=37)
+	public void testBindAllowlistProviderService(){
+	    logger.debug("The test for android.permission.BIND_ALLOWLIST_PROVIDER_SERVICE is not implemented yet");
+	}
+	@PermissionTest(permission="BIND_DEVELOPER_VERIFICATION_AGENT",sdkMin=37)
+	public void testBindDeveloperVerificationAgent(){
+	    logger.debug("The test for android.permission.BIND_DEVELOPER_VERIFICATION_AGENT is not implemented yet");
+	}
+	@PermissionTest(permission="DISCOVER_APP_FUNCTIONS",sdkMin=37)
+	public void testDiscoverAppFunctions(){
+	    logger.debug("The test for android.permission.DISCOVER_APP_FUNCTIONS is not implemented yet");
+	}
+	@PermissionTest(permission="EXECUTE_APP_FUNCTIONS_SYSTEM",sdkMin=37)
+	public void testExecuteAppFunctionsSystem(){
+	    logger.debug("The test for android.permission.EXECUTE_APP_FUNCTIONS_SYSTEM is not implemented yet");
+	}
+	@PermissionTest(permission="LOCK_APPS",sdkMin=37)
+	public void testLockApps(){
+	    logger.debug("The test for android.permission.LOCK_APPS is not implemented yet");
+	}
+
+	@PermissionTest(permission="MANAGE_SUPERVISION",sdkMin=37)
+	public void testManageSupervision(){
+	    logger.debug("The test for android.permission.MANAGE_SUPERVISION is not implemented yet");
+	}
+	@PermissionTest(permission="SET_DEVELOPER_VERIFICATION_USER_RESPONSE",sdkMin=37)
+	public void testSetDeveloperVerificationUserResponse(){
+	    logger.debug("The test for android.permission.SET_DEVELOPER_VERIFICATION_USER_RESPONSE is not implemented yet");
+	}
+	@PermissionTest(permission="SHOW_POWER_MENU",sdkMin=37)
+	public void testShowPowerMenu(){
+	    logger.debug("The test for android.permission.SHOW_POWER_MENU is not implemented yet");
+	}
+	@PermissionTest(permission="SHOW_POWER_MENU_PRIVILEGED",sdkMin=37)
+	public void testShowPowerMenuPrivileged(){
+	    logger.debug("The test for android.permission.SHOW_POWER_MENU_PRIVILEGED is not implemented yet");
+	}
+
 }

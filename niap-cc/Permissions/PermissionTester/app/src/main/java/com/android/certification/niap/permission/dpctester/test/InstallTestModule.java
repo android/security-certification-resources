@@ -1048,6 +1048,31 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		logger.debug("The test for android.permission.XR_TRACKING_IN_BACKGROUND is not implemented yet");
 	}
 
+	//**** method template for target install SDK37
+	@PermissionTest(permission="CAPTURE_KEYBOARD",sdkMin=37)
+	public void testCaptureKeyboard(){
+	    logger.debug("The test for android.permission.CAPTURE_KEYBOARD is not implemented yet");
+	}
+	@PermissionTest(permission="POST_PROMOTED_NOTIFICATIONS",sdkMin=37)
+	public void testPostPromotedNotifications(){
+	    logger.debug("The test for android.permission.POST_PROMOTED_NOTIFICATIONS is not implemented yet");
+	}
+	@PermissionTest(permission="READ_ASSIST_STRUCTURE_SCREEN_CONTENT",sdkMin=37)
+	public void testReadAssistStructureScreenContent(){
+	    logger.debug("The test for android.permission.READ_ASSIST_STRUCTURE_SCREEN_CONTENT is not implemented yet");
+	}
+	@PermissionTest(permission="REQUEST_COMPANION_PROFILE_MEDICAL",sdkMin=37)
+	public void testRequestCompanionProfileMedical(){
+	    logger.debug("The test for android.permission.REQUEST_COMPANION_PROFILE_MEDICAL is not implemented yet");
+	}
+	@PermissionTest(permission="USE_LOCATION_BUTTON",sdkMin=37)
+	public void testUseLocationButton(){
+	    logger.debug("The test for android.permission.USE_LOCATION_BUTTON is not implemented yet");
+	}
+	@PermissionTest(permission="USE_LOOPBACK_INTERFACE",sdkMin=37)
+	public void testUseLoopbackInterface(){
+	    logger.debug("The test for android.permission.USE_LOOPBACK_INTERFACE is not implemented yet");
+	}
 
 	@RequiresApi(api = Build.VERSION_CODES.Q)
     public void tryBindingForegroundService(Intent serviceIntent){
