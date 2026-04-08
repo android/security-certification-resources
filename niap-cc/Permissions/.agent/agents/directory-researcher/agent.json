@@ -1,0 +1,6 @@
+{
+  "name": "directory-researcher",
+  "configPath": {
+    "relativePathToConfig": "config.yaml"
+  }
+}

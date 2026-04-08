@@ -48,6 +48,7 @@ import com.android.certification.niap.permission.dpctester.test.GmsTestModule
 import com.android.certification.niap.permission.dpctester.test.InstallTestModule
 import com.android.certification.niap.permission.dpctester.test.NonPlatformTestModule
 import com.android.certification.niap.permission.dpctester.test.RuntimeDependentTestModule
+import com.android.certification.niap.permission.dpctester.test.RuntimeTestModule
 import com.android.certification.niap.permission.dpctester.test.SpecificDependentTestModule
 import com.android.certification.niap.permission.dpctester.test.log.ActivityLogger
 import com.android.certification.niap.permission.dpctester.test.log.Logger
@@ -189,6 +190,7 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
                 SingleModuleTestSuite(this, InstallTestModule(this)),
                 SingleModuleTestSuite(this, NonPlatformTestModule(this)),
                 SingleModuleTestSuite(this, GmsTestModule(this)),
+                SingleModuleTestSuite(this, RuntimeTestModule(this)),
             )
             //four setting patterns
             //if(SignatureUtils.hasSameSigningCertificateAsPackage(this, Constants.PLATFORM_PACKAGE)){
@@ -212,6 +214,12 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
                 mBottomSheet!!.setState(BottomSheetBehavior.STATE_EXPANDED)
             } else if (mBottomSheet!!.state == BottomSheetBehavior.STATE_EXPANDED) {
                 mBottomSheet!!.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+        // Add click listener to the bottom sheet layout to make it easier to expand
+        binding.mainLayout.setOnClickListener {
+            if (mBottomSheet!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                mBottomSheet!!.setState(BottomSheetBehavior.STATE_EXPANDED)
             }
         }
         // let the tester know the test result should be inverse or not
@@ -332,6 +340,16 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
         }
         progressAlertDialog= createProgressDialog( this )
 
+        // Enable launching tests via Intent
+        val suiteLabel = intent.getStringExtra("suite_label")
+        if (suiteLabel != null) {
+            val button = mTestButtons.find { it.text.toString() == suiteLabel }
+            button?.performClick()
+        } else if (intent.getBooleanExtra("auto_run", false)) {
+            if (mTestButtons.isNotEmpty()) {
+                mTestButtons[0].performClick()
+            }
+        }
     }
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

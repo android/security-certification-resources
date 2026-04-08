@@ -1,0 +1,6 @@
+{
+  "name": "permission-researcher",
+  "configPath": {
+    "relativePathToConfig": "config.yaml"
+  }
+}

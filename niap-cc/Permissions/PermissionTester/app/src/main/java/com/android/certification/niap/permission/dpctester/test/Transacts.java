@@ -257,6 +257,12 @@ public class Transacts {
 
     public static final String enableSecureLockDevice = "enableSecureLockDevice";//
     public static final String disableSecureLockDevice = "disableSecureLockDevice";//
+    
+    /* For Android 37 */
+    public static final String TRUST_TOKEN_DESCRIPTOR = "android.security.trusttoken.ITrustTokenManager";
+    public static final String TRUST_TOKEN_SERVICE = "trust_token";
+    public static final String acquirePreparedIdentitySet = "acquirePreparedIdentitySet";
+    public static final String acquireVerifiedDeviceToken = "acquireVerifiedDeviceToken";
 
 
 }

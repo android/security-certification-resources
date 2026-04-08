@@ -65,11 +65,21 @@
     ]
   },
   "37": {
+    "install": [
+      "android.permission.CAPTURE_KEYBOARD",
+      "android.permission.POST_PROMOTED_NOTIFICATIONS",
+      "android.permission.READ_ASSIST_STRUCTURE_SCREEN_CONTENT",
+      "android.permission.REQUEST_COMPANION_PROFILE_MEDICAL",
+      "android.permission.USE_LOCATION_BUTTON",
+      "android.permission.USE_LOOPBACK_INTERFACE",
+      "android.permission.USE_PINNED_WINDOWING_LAYER"
+    ],
     "signature": [
       "android.permission.ACCESS_ATTENTION_LISTENER",
       "android.permission.ACCESS_CELL_BROADCAST",
       "android.permission.ACCESS_COMPANION_INFO",
       "android.permission.ACCESS_COMPANION_MESSAGE_PCC",
+      "android.permission.ACCESS_LAUNCHER_DATA",
       "android.permission.ACCESS_NPU_MODEL_MANAGER_API",
       "android.permission.ACQUIRE_SLEEP_LOCK",
       "android.permission.ACQUIRE_VERIFIED_DEVICE_TOKEN",
@@ -80,6 +90,7 @@
       "android.permission.BIND_CONTENT_RESTRICTION_SERVICE",
       "android.permission.BIND_CONTENT_SAFETY_SERVICE",
       "android.permission.BIND_CONTEXT_COMPONENT_SERVICE",
+      "android.permission.BIND_DATA_MIGRATION_FOR_PRIVATECOMPUTE",
       "android.permission.BIND_INSIGHT_RENDERER_SERVICE",
       "android.permission.BIND_INSIGHT_SURFACE_VISUALIZER_SERVICE",
       "android.permission.BIND_MOTION_CUES_SERVICE",
@@ -135,6 +146,7 @@
       "android.permission.READ_REMOTE_TASKS",
       "android.permission.READ_UPDATE_ENGINE_LOGS",
       "android.permission.REMOTE_MULTISENSORY_PLAYBACK",
+      "android.permission.REPORT_UI_LATENCY_STATS",
       "android.permission.REPOSITION_SELF_WINDOWS",
       "android.permission.REQUEST_COMPANION_PROFILE_VIRTUAL_DEVICE",
       "android.permission.REQUEST_LOCATION_BUTTON_PERMISSIONS",
@@ -169,14 +181,6 @@
       "android.permission.SET_DEVELOPER_VERIFICATION_USER_RESPONSE",
       "android.permission.SHOW_POWER_MENU",
       "android.permission.SHOW_POWER_MENU_PRIVILEGED"
-    ],
-    "install": [
-      "android.permission.CAPTURE_KEYBOARD",
-      "android.permission.POST_PROMOTED_NOTIFICATIONS",
-      "android.permission.READ_ASSIST_STRUCTURE_SCREEN_CONTENT",
-      "android.permission.REQUEST_COMPANION_PROFILE_MEDICAL",
-      "android.permission.USE_LOCATION_BUTTON",
-      "android.permission.USE_LOOPBACK_INTERFACE"
     ]
   }
 }
