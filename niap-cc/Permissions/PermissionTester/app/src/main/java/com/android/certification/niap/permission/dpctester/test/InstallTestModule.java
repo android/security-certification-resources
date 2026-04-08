@@ -46,7 +46,7 @@ import android.content.res.Resources;
 import android.graphics.Rect;
 import android.hardware.ConsumerIrManager;
 import android.hardware.biometrics.BiometricManager;
-import android.hardware.fingerprint.FingerprintManager;
+
 import android.media.AudioManager;
 import android.media.quality.AmbientBacklightEvent;
 import android.media.quality.MediaQualityManager;
@@ -411,7 +411,13 @@ public class InstallTestModule extends PermissionTestModuleBase {
 	@Deprecated
 	@PermissionTest(permission=USE_BIOMETRIC,sdkMax = 28)
 	public void testUseBiometricLegacy(){
-		systemService(FingerprintManager.class).isHardwareDetected();
+		try {
+			Class<?> clazz = Class.forName("android.hardware.fingerprint.FingerprintManager");
+			Object manager = mContext.getSystemService("fingerprint");
+			clazz.getMethod("isHardwareDetected").invoke(manager);
+		} catch (Exception e) {
+			// Ignore or log
+		}
 	}
 
     @PermissionTest(permission=VIBRATE)

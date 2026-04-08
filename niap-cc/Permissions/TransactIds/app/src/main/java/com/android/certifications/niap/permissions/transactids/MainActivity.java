@@ -131,7 +131,9 @@ public class MainActivity extends AppCompatActivity {
             deviceName = deviceName.substring(0, 1).toUpperCase() + deviceName.substring(
                     1).toLowerCase();
         }
-        if(isAtLeastBaklava()) {
+        if (Build.VERSION.SDK_INT >= 37) {
+            sClassName = "SDKCinammonBun_Transacts";
+        } else if(isAtLeastBaklava()) {
             sClassName = "SdkBaklava_Transacts";
         }else if(isAtLeastV()){
             sClassName = "SdkV_Transacts";//deviceName + "ApiLevel35Transacts";
@@ -144,7 +146,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(isAtLeastBaklava()){
+        if (Build.VERSION.SDK_INT >= 37) {
+            ACTUAL_SDK_INT = 37;
+        } else if(isAtLeastBaklava()){
             ACTUAL_SDK_INT = 36;
         } else if(isAtLeastV()){
             ACTUAL_SDK_INT = 35;

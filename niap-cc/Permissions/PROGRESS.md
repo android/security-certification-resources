@@ -22,3 +22,4 @@ This file tracks the progress of the Android 17 (SDK 37) permission update task.
 - Verify compilation on `shiba` and `cuttlefish`.
 - Update `TransactIds` if possible (requires real device, so might be blocked or need simulation).
 - Continue implementing and testing the remaining permissions in the checklist.
+

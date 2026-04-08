@@ -42,7 +42,7 @@ public class Transacts {
     public static final String DROPBOX_SERVICE = Context.DROPBOX_SERVICE;
     public static final String EUICC_CONTROLLER_SERVICE = "econtroller";
     public static final String FACE_SERVICE = "face";
-    public static final String FINGERPRINT_SERVICE = Context.FINGERPRINT_SERVICE;
+    public static final String FINGERPRINT_SERVICE = "fingerprint";
     public static final String FONT_SERVICE = "font";
     public static final String GAME_SERVICE = Context.GAME_SERVICE;
     public static final String INPUT_SERVICE = Context.INPUT_SERVICE;

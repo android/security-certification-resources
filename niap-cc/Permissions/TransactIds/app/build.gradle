@@ -19,6 +19,7 @@ apply plugin: 'com.android.application'
 android {
     namespace 'com.android.certifications.niap.permissions.transactids'
     compileSdk 35
+    buildToolsVersion "35.0.0"
     //compileSdkPreview "VanillaIceCream"
     //compileSdkPreview "Baklava"
     signingConfigs {
