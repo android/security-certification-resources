@@ -21,6 +21,7 @@ Update the Permission Test Tooling for Android 17 (SDK 37).
 - This project is part of a security certification resource update.
 - Focus on updating `Companion` and `TransactIds` or creating a new tester mechanism as needed for Android 17.
 - Reference the research in `xpermission` to understand the changes in Android 17 permissions.
+- **Reference [TESTAUTONOMOUS.md](file:///usr/local/google/home/wkouki/AndroidStudioProjects/security-certification-resources/niap-cc/Permissions/TESTAUTONOMOUS.md) for automation procedures, including how to scope test execution via `SharedPreferences` manipulation.**
 
 ## Module Installation and Verification
 

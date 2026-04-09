@@ -7,7 +7,7 @@ DEVICE=${1:-localhost:38189}
 echo "Using DEVICE: $DEVICE"
 
 # Build
-./gradlew assemblePlatformDebug
+../gradlew assemblePlatformDebug -p ..
 
 # Install with -t and -g options
-adb -s $DEVICE install -t -g app/build/outputs/apk/platform/debug/Tester-platform-debug.apk
+adb -s $DEVICE install -t -g ../app/build/outputs/apk/platform/debug/Tester-platform-debug.apk

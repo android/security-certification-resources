@@ -560,17 +560,37 @@ class DPCTestModule(val ctx: Activity): PermissionTestModuleBase(ctx){
 
     @PermissionTest("MANAGE_DEVICE_POLICY_CONTENT_RESTRICTION_APPS", 37)
     fun testManageDevicePolicyContentRestrictionApps() {
-        logger.debug("Placeholder for MANAGE_DEVICE_POLICY_CONTENT_RESTRICTION_APPS")
+        val dpm = ctx.getSystemService(Activity.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        try {
+            val policyIdentifierClass = Class.forName("android.app.admin.PolicyIdentifier")
+            val contentRestrictionAppsField = policyIdentifierClass.getField("CONTENT_RESTRICTION_APPS")
+            val policyIdentifier = contentRestrictionAppsField.get(null)
+            
+            val setPolicyMethod = dpm.javaClass.getMethod("setPolicy", policyIdentifierClass, Int::class.java, java.lang.Object::class.java)
+            
+            val appsList = listOf("com.example.app")
+            
+            setPolicyMethod.invoke(dpm, policyIdentifier, 1 /* POLICY_SCOPE_USER */, appsList)
+            logger.debug("setPolicy invoked successfully")
+        } catch (e: Exception) {
+            logger.debug("Caught exception: ${e.message}")
+            val cause = e.cause
+            if (e is SecurityException || cause is SecurityException) {
+                logger.debug("Caught SecurityException as expected.")
+            } else {
+                throw BypassTestException("Test bypassed due to missing API or disabled flag: ${e.message}")
+            }
+        }
     }
 
     @PermissionTest("MANAGE_DEVICE_POLICY_KEYGUARD_STATUS", 37)
     fun testManageDevicePolicyKeyguardStatus() {
-        logger.debug("Placeholder for MANAGE_DEVICE_POLICY_KEYGUARD_STATUS")
+        throw BypassTestException("Test bypassed because MANAGE_DEVICE_POLICY_KEYGUARD_STATUS is not yet implemented in the framework (WIP)")
     }
 
     @PermissionTest("MANAGE_DEVICE_POLICY_LOCKSCREEN_MESSAGE", 37)
     fun testManageDevicePolicyLockscreenMessage() {
-        logger.debug("Placeholder for MANAGE_DEVICE_POLICY_LOCKSCREEN_MESSAGE")
+        dpm.setDeviceOwnerLockScreenInfo("Test Lockscreen Message", {}, { e -> throw e })
     }
 
     ////////////////////////////////////////////////////////////

@@ -205,6 +205,19 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
             defaults
         }
 
+        val enableModule = intent.getStringExtra("enable_module")
+        if (enableModule != null) {
+            suites.forEach { suite ->
+                val iterator = suite.modules.iterator()
+                while (iterator.hasNext()) {
+                    val module = iterator.next()
+                    if (module.javaClass.simpleName != enableModule && module.title != enableModule) {
+                        iterator.remove()
+                    }
+                }
+            }
+        }
+
         //val layout = findViewById<LinearLayout>(R.id.mainLayout)
         val mStatusTextView = findViewById<TextView>(R.id.bsArrow)
         mBottomSheet = BottomSheetBehavior.from(binding.mainLayout)
@@ -307,7 +320,7 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
                     val box = LogBox(Random.nextLong(), "Finish module", desc
                         , childs = info.moduleLog);
                     if(info.count_errors>0){
-                        box.type="error"
+                        box.ty
                     } else if(info.count_bypassed>0){
                         box.type="bypassed"
                     } else if(info.skipped){

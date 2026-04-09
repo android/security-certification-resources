@@ -195,7 +195,7 @@ class PermissionTestRunner {
                 success = B_FAILURE
                 apisuccess=false
                 bypassed=false
-                message = ex.cause?.message!!
+                message = ex.cause?.message ?: ex.cause?.toString() ?: "Unknown unexpected failure"
             } catch (ex:Exception){
                 //Unexpected Failures
 
