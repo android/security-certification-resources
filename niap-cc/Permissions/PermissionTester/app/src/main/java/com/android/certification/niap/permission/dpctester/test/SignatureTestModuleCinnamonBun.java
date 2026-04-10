@@ -18,6 +18,7 @@ package com.android.certification.niap.permission.dpctester.test;
 import android.app.Activity;
 import android.os.Binder;
 import android.os.IWakeLockCallback;
+import com.android.certification.niap.permission.dpctester.test.exception.BypassTestException;
 import android.os.RemoteException;
 import android.os.WorkSource;
 
@@ -71,8 +72,11 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                     logger.debug("setListener threw expected non-security exception: " + cause);
                 }
             }
+        } catch (SecurityException e) {
+            throw e;
         } catch (Exception e) {
             logger.debug("Error testing ACCESS_ATTENTION_LISTENER: " + e.getMessage());
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
     @PermissionTest(permission="ACCESS_BIOMETRIC_SENSOR_STRENGTHS",sdkMin=37)
@@ -169,8 +173,11 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                     logger.debug("getTrustedAssociations threw expected non-security exception: " + cause);
                 }
             }
+        } catch (SecurityException e) {
+            throw e;
         } catch (Exception e) {
             logger.debug("Error testing ACCESS_COMPANION_MESSAGE_PCC: " + e.getMessage());
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
     // Evidence: NpuManager service not found on test device. Cannot verify API execution.
@@ -192,8 +199,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             }
             
             if (method == null) {
-                logger.debug("newSleepLock method not found in PowerManager");
-                return;
+                throw new BypassTestException("newSleepLock method not found in PowerManager");
             }
             
             try {
@@ -204,11 +210,14 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                 if (cause instanceof SecurityException) {
                     throw (SecurityException) cause;
                 } else {
-                    logger.debug("newSleepLock threw expected non-security exception: " + cause);
+                    throw new BypassTestException("newSleepLock threw expected non-security exception: " + cause);
                 }
             }
         } catch (Exception e) {
-            logger.debug("Error testing ACQUIRE_SLEEP_LOCK: " + e.getMessage());
+            if (e instanceof SecurityException) {
+                throw (SecurityException) e;
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
     // Evidence added to TESTAUTONOMOUS.md. Removed @PermissionTest annotation as it fails on platform variant due to missing implementation/state, but verified permission enforcement.
@@ -235,8 +244,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
         try {
             Object manager = mContext.getSystemService("personal_context");
             if (manager == null) {
-                logger.debug("personal_context service not available");
-                return;
+                throw new BypassTestException("personal_context service not available");
             }
             java.lang.reflect.Method method = manager.getClass().getMethod("setPersonalContextModeEnabled", String.class, boolean.class);
             method.invoke(manager, "test", true);
@@ -433,8 +441,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             android.os.IBinder binder = (android.os.IBinder) Class.forName("android.os.ServiceManager")
                     .getMethod("getService", String.class).invoke(null, "statusbar");
             if (binder == null) {
-                logger.debug("statusbar service not available");
-                return;
+                throw new BypassTestException("statusbar service not available");
             }
             Class<?> stubClass = Class.forName("com.android.internal.statusbar.IStatusBarService$Stub");
             java.lang.reflect.Method asInterface = stubClass.getMethod("asInterface", android.os.IBinder.class);
@@ -449,8 +456,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             }
             
             if (startMotionCuesSession == null) {
-                logger.debug("startMotionCuesSession method not found");
-                return;
+                throw new BypassTestException("startMotionCuesSession method not found");
             }
             
             android.content.ComponentName cn = new android.content.ComponentName(mContext, mContext.getClass());
@@ -467,12 +473,15 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                 }
             }
         } catch (Exception e) {
-            logger.debug("Error testing DRAW_MOTION_CUES: " + e.getMessage());
+            if (e instanceof SecurityException) {
+                throw (SecurityException) e;
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
     @PermissionTest(permission="FORCE_USE_LOOPBACK_INTERFACE",sdkMin=37)
     public void testForceUseLoopbackInterface(){
-        logger.debug("FORCE_USE_LOOPBACK_INTERFACE is enforced at eBPF level in Connectivity module. Not implementable via manager API.");
+        throw new BypassTestException("FORCE_USE_LOOPBACK_INTERFACE is enforced at eBPF level in Connectivity module. Not implementable via manager API.");
     }
     @PermissionTest(permission="GET_DEVICE_LOCK_ENROLLMENT_TYPE",sdkMin=37)
     public void testGetDeviceLockEnrollmentType(){
@@ -489,8 +498,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             }
             
             if (method == null) {
-                logger.debug("getEnrollmentType method not found in DeviceLockManager");
-                return;
+                throw new BypassTestException("getEnrollmentType method not found in DeviceLockManager");
             }
             
             try {
@@ -507,13 +515,16 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                 if (cause instanceof SecurityException) {
                     throw (SecurityException) cause;
                 } else if (cause instanceof NullPointerException) {
-                    logger.debug("getEnrollmentType threw expected NullPointerException (passed permission check)");
+                    throw new BypassTestException("getEnrollmentType threw NullPointerException. Cannot verify permission enforcement.");
                 } else {
-                    logger.debug("getEnrollmentType threw expected non-security exception: " + cause);
+                    throw new BypassTestException("getEnrollmentType threw expected non-security exception: " + cause);
                 }
             }
         } catch (Exception e) {
-            logger.debug("Error testing GET_DEVICE_LOCK_ENROLLMENT_TYPE: " + e.getMessage());
+            if (e instanceof SecurityException) {
+                throw (SecurityException) e;
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
     @PermissionTest(permission="GET_ROLE_HOLDERS",sdkMin=37)
@@ -553,12 +564,14 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             }
             
             nm.notify(1, builder.build());
-            logger.debug("Notification sent with EXTRA_HIDE_STATUS_BAR_NOTIFICATION");
+            throw new BypassTestException("Sending notification with EXTRA_HIDE_STATUS_BAR_NOTIFICATION did not throw SecurityException. Cannot verify permission enforcement via this API.");
         } catch (Exception e) {
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
-    @PermissionTest(permission="INITIATE_BUGREPORT_AS_NON_ADMIN",sdkMin=37)
+    // This test requires DUMP permission or bugreport whitelisting, which cannot be granted to normal apps.
+    // It should be run in an Instrumentation test that can adopt shell permission identity (InternalTest).
+    // @PermissionTest(permission="INITIATE_BUGREPORT_AS_NON_ADMIN",sdkMin=37)
     public void testInitiateBugreportAsNonAdmin(){
         try {
             android.os.BugreportManager bugreportManager = mContext.getSystemService(android.os.BugreportManager.class);
@@ -635,7 +648,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             
             try {
                 java.lang.reflect.Method setInputDeviceNameMethod = builderClass.getMethod("setInputDeviceName", String.class);
-                setInputDeviceNameMethod.invoke(builder, "dummy_device");
+                setInputDeviceNameMethod.invoke(builder, "dummy_device_" + System.currentTimeMillis());
                 java.lang.reflect.Method setLanguageTagMethod = builderClass.getMethod("setLanguageTag", String.class);
                 setLanguageTagMethod.invoke(builder, "en-US");
                 java.lang.reflect.Method setLayoutTypeMethod = builderClass.getMethod("setLayoutType", String.class);
@@ -673,7 +686,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             if (e.getCause() instanceof SecurityException) {
                 throw (SecurityException) e.getCause();
             }
-            logger.debug("connectService threw: " + e.getCause());
+            throw new BypassTestException("connectService threw non-security exception: " + e.getCause());
         } catch (Exception e) {
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
@@ -683,11 +696,11 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
         try {
             Object manager = mContext.getSystemService("app_function");
             if (manager == null) {
-                logger.debug("app_function service not available");
-                return;
+                throw new BypassTestException("app_function service not available");
             }
             java.lang.reflect.Method method = manager.getClass().getMethod("getValidAgents");
             method.invoke(manager);
+            throw new BypassTestException("getValidAgents succeeded. Cannot verify permission enforcement via this API.");
         } catch (java.lang.reflect.InvocationTargetException e) {
             if (e.getCause() instanceof SecurityException) {
                 throw (SecurityException) e.getCause();
@@ -918,8 +931,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
         try {
             Object manager = mContext.getSystemService("personal_context");
             if (manager == null) {
-                logger.debug("personal_context service not available");
-                return;
+                throw new BypassTestException("personal_context service not available");
             }
             
             java.lang.reflect.Method method = null;
@@ -952,8 +964,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
         try {
             Object manager = mContext.getSystemService("personal_context");
             if (manager == null) {
-                logger.debug("personal_context service not available");
-                return;
+                throw new BypassTestException("personal_context service not available");
             }
             
             java.lang.reflect.Method method = null;
@@ -986,8 +997,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
         try {
             Object manager = mContext.getSystemService("personal_context");
             if (manager == null) {
-                logger.debug("personal_context service not available");
-                return;
+                throw new BypassTestException("personal_context service not available");
             }
             
             java.lang.reflect.Method method = null;
@@ -1020,8 +1030,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
         try {
             Object manager = mContext.getSystemService("personal_context");
             if (manager == null) {
-                logger.debug("personal_context service not available");
-                return;
+                throw new BypassTestException("personal_context service not available");
             }
             
             java.lang.reflect.Method method = manager.getClass().getMethod("isEnabled");
@@ -1038,19 +1047,18 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
     }
     @PermissionTest(permission="PERSONAL_CONTEXT_RECEIVE_HINTS",sdkMin=37)
     public void testPersonalContextReceiveHints(){
-        logger.debug("PERSONAL_CONTEXT_RECEIVE_HINTS is required by apps hosting a HintRefinerService, not by API callers. Not implementable via manager API.");
+        throw new BypassTestException("PERSONAL_CONTEXT_RECEIVE_HINTS is required by apps hosting a HintRefinerService, not by API callers. Not implementable via manager API.");
     }
     @PermissionTest(permission="PERSONAL_CONTEXT_RECEIVE_INSIGHTS",sdkMin=37)
     public void testPersonalContextReceiveInsights(){
-        logger.debug("PERSONAL_CONTEXT_RECEIVE_INSIGHTS is required by apps hosting an InsightRendererService, not by API callers. Not implementable via manager API.");
+        throw new BypassTestException("PERSONAL_CONTEXT_RECEIVE_INSIGHTS is required by apps hosting an InsightRendererService, not by API callers. Not implementable via manager API.");
     }
     @PermissionTest(permission="PERSONAL_CONTEXT_WRITE_SETTINGS",sdkMin=37)
     public void testPersonalContextWriteSettings(){
         try {
             Object manager = mContext.getSystemService("personal_context");
             if (manager == null) {
-                logger.debug("personal_context service not available");
-                return;
+                throw new BypassTestException("personal_context service not available");
             }
             java.lang.reflect.Method method = manager.getClass().getMethod("setEnabled", boolean.class);
             method.invoke(manager, true);
@@ -1078,9 +1086,9 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             if (method != null) {
                 method.setAccessible(true);
                 method.invoke(builder, (Object) null);
-                logger.debug("setBridgedNotificationMetadata called successfully");
+                throw new BypassTestException("setBridgedNotificationMetadata called successfully. Cannot verify permission enforcement via this API.");
             } else {
-                logger.debug("setBridgedNotificationMetadata method not found");
+                throw new BypassTestException("setBridgedNotificationMetadata method not found");
             }
         } catch (java.lang.reflect.InvocationTargetException e) {
             if (e.getCause() instanceof SecurityException) {
@@ -1114,7 +1122,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
     }
     @PermissionTest(permission="PROVIDE_PRIVATE_COMPUTE_SERVICES",sdkMin=37)
     public void testProvidePrivateComputeServices(){
-        logger.debug("PROVIDE_PRIVATE_COMPUTE_SERVICES is used for identifying Private Compute Services packages, not enforced on API calls. Not implementable via manager API.");
+        throw new BypassTestException("PROVIDE_PRIVATE_COMPUTE_SERVICES is used for identifying Private Compute Services packages, not enforced on API calls. Not implementable via manager API.");
     }
     @PermissionTest(permission="QUERY_ALLOWLIST",sdkMin=37)
     public void testQueryAllowlist(){
@@ -1405,11 +1413,6 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                 throw new IllegalStateException("REQUEST_COMPANION_PROFILE_VIRTUAL_DEVICE not granted but associate succeeded!");
             }
             logger.debug("associate called successfully (positive test passed or waiting for UI).");
-        } catch (SecurityException e) {
-            if (hasPermission) {
-                throw e; 
-            }
-            logger.debug("SecurityException thrown as expected for negative test: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             // Might be thrown if profile is invalid in this build
             logger.debug("IllegalArgumentException thrown: " + e.getMessage());
@@ -1510,6 +1513,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                         throw (SecurityException) cause;
                     }
                     logger.debug("SecurityException thrown as expected for negative test: " + cause.getMessage());
+                    throw (SecurityException) cause;
                 } else {
                     if (!hasPermission) {
                          throw new IllegalStateException("REQUEST_TASK_HANDOFF not granted but threw non-SecurityException: " + cause);
@@ -1518,6 +1522,8 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                 }
             }
             
+        } catch (SecurityException | BypassTestException e) {
+            throw e;
         } catch (Exception e) {
             logger.debug("Reflection error: " + e.getMessage());
         }
@@ -1565,22 +1571,24 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             if (method != null) {
                 try {
                     method.invoke(service, new Object[]{null, false});
-                    logger.debug("enqueueEvent called successfully.");
+                    throw new BypassTestException("enqueueEvent called successfully. Cannot verify permission enforcement via this API.");
                 } catch (java.lang.reflect.InvocationTargetException e) {
                     Throwable cause = e.getCause();
                     if (cause instanceof SecurityException) {
                         logger.debug("SecurityException thrown: " + cause.getMessage());
                         throw (SecurityException) cause;
                     } else if (cause instanceof NullPointerException) {
-                        logger.debug("NullPointerException thrown as expected when passing null to enqueueEvent. Positive test passed.");
+                        throw new BypassTestException("NullPointerException thrown when passing null to enqueueEvent. Cannot verify permission enforcement.");
                     } else {
-                        logger.debug("Unexpected exception: " + cause);
+                        throw new BypassTestException("Unexpected exception: " + cause);
                     }
                 }
             } else {
                 logger.debug("enqueueEvent method not found.");
             }
             
+        } catch (SecurityException | BypassTestException e) {
+            throw e;
         } catch (Exception e) {
             logger.debug("Reflection error: " + e.getMessage());
         }
@@ -1623,16 +1631,18 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             
             try {
                 method.invoke(service, allowlist);
-                logger.debug("setContentProtectionAllowlist called successfully on service.");
+                throw new BypassTestException("setContentProtectionAllowlist called successfully on service. Cannot verify permission enforcement via this API.");
             } catch (java.lang.reflect.InvocationTargetException e) {
                 Throwable cause = e.getCause();
                 if (cause instanceof SecurityException) {
                     logger.debug("SecurityException thrown: " + cause.getMessage());
                     throw (SecurityException) cause;
                 } else {
-                    logger.debug("Unexpected exception: " + cause);
+                    throw new BypassTestException("Unexpected exception: " + cause);
                 }
             }
+        } catch (SecurityException | BypassTestException e) {
+            throw e;
         } catch (Exception e) {
             logger.debug("Reflection error: " + e.getMessage());
         }
@@ -1664,16 +1674,18 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             
             try {
                 method.invoke(service, challenge);
-                logger.debug("acquireVerifiedDeviceToken called successfully.");
+                throw new BypassTestException("acquireVerifiedDeviceToken called successfully. Cannot verify permission enforcement via this API.");
             } catch (java.lang.reflect.InvocationTargetException e) {
                 Throwable cause = e.getCause();
                 if (cause instanceof SecurityException) {
                     logger.debug("SecurityException thrown: " + cause.getMessage());
                     throw (SecurityException) cause;
                 } else {
-                    logger.debug("Unexpected exception: " + cause);
+                    throw new BypassTestException("Unexpected exception: " + cause);
                 }
             }
+        } catch (SecurityException | BypassTestException e) {
+            throw e;
         } catch (Exception e) {
             logger.debug("Reflection error: " + e.getMessage());
         }
@@ -1686,20 +1698,22 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             
             try {
                 method.invoke(pm, "com.example.app", true);
-                logger.debug("setPackageAppLockEnabled called successfully.");
+                throw new BypassTestException("setPackageAppLockEnabled called successfully. Cannot verify permission enforcement via this API.");
             } catch (java.lang.reflect.InvocationTargetException e) {
                 Throwable cause = e.getCause();
                 if (cause instanceof SecurityException) {
                     logger.debug("SecurityException thrown: " + cause.getMessage());
                     throw (SecurityException) cause;
                 } else if (cause instanceof UnsupportedOperationException) {
-                    logger.debug("UnsupportedOperationException thrown (likely unsupported on this form factor or flag disabled): " + cause.getMessage());
+                    throw new BypassTestException("UnsupportedOperationException thrown: " + cause.getMessage());
                 } else {
-                    logger.debug("Unexpected exception: " + cause);
+                    throw new BypassTestException("Unexpected exception: " + cause);
                 }
             }
         } catch (NoSuchMethodException e) {
             logger.debug("Method setPackageAppLockEnabled not found in PackageManager.");
+        } catch (SecurityException | BypassTestException e) {
+            throw e;
         } catch (Exception e) {
             logger.debug("Reflection error: " + e.getMessage());
         }
@@ -1740,18 +1754,20 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             
             try {
                 method.invoke(service, (Object) null);
-                logger.debug("updateThemeSettings called successfully.");
+                throw new BypassTestException("updateThemeSettings called successfully. Cannot verify permission enforcement via this API.");
             } catch (java.lang.reflect.InvocationTargetException e) {
                 Throwable cause = e.getCause();
                 if (cause instanceof SecurityException) {
                     logger.debug("SecurityException thrown: " + cause.getMessage());
                     throw (SecurityException) cause;
                 } else if (cause instanceof NullPointerException) {
-                    logger.debug("NullPointerException thrown as expected when passing null to updateThemeSettings. Positive test passed.");
+                    throw new BypassTestException("NullPointerException thrown when passing null to updateThemeSettings. Cannot verify permission enforcement.");
                 } else {
-                    logger.debug("Unexpected exception: " + cause);
+                    throw new BypassTestException("Unexpected exception: " + cause);
                 }
             }
+        } catch (SecurityException | BypassTestException e) {
+            throw e;
         } catch (Exception e) {
             logger.debug("Reflection error: " + e.getMessage());
         }
@@ -1776,18 +1792,20 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             
             try {
                 method.invoke(tm, 0, 0, "");
-                logger.debug("getIccAuthentication called successfully.");
+                throw new BypassTestException("getIccAuthentication called successfully. Cannot verify permission enforcement via this API.");
             } catch (java.lang.reflect.InvocationTargetException e) {
                 Throwable cause = e.getCause();
                 if (cause instanceof SecurityException) {
                     logger.debug("SecurityException thrown: " + cause.getMessage());
                     throw (SecurityException) cause;
                 } else if (cause instanceof IllegalArgumentException) {
-                    logger.debug("IllegalArgumentException thrown (likely bad args): " + cause.getMessage());
+                    throw new BypassTestException("IllegalArgumentException thrown: " + cause.getMessage());
                 } else {
-                    logger.debug("Unexpected exception: " + cause);
+                    throw new BypassTestException("Unexpected exception: " + cause);
                 }
             }
+        } catch (SecurityException | BypassTestException e) {
+            throw e;
         } catch (Exception e) {
             logger.debug("Error getting TelephonyManager: " + e.getMessage());
         }
@@ -1820,22 +1838,26 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                 
                 try {
                     method.invoke(vm, 0, null, null, null);
-                    logger.debug("startHapticGeneratorSession called successfully.");
+                    throw new BypassTestException("startHapticGeneratorSession called successfully. Cannot verify permission enforcement via this API.");
                 } catch (java.lang.reflect.InvocationTargetException e) {
                     Throwable cause = e.getCause();
                     if (cause instanceof SecurityException) {
                         logger.debug("SecurityException thrown: " + cause.getMessage());
                         throw (SecurityException) cause;
                     } else if (cause instanceof NullPointerException) {
-                        logger.debug("NullPointerException thrown as expected when passing null to startHapticGeneratorSession. Positive test passed.");
+                        throw new BypassTestException("NullPointerException thrown when passing null to startHapticGeneratorSession. Cannot verify permission enforcement.");
                     } else {
-                        logger.debug("Unexpected exception: " + cause);
+                        throw new BypassTestException("Unexpected exception: " + cause);
                     }
                 }
                 
+            } catch (SecurityException | BypassTestException e) {
+                throw e;
             } catch (Exception e) {
                 logger.debug("Reflection error: " + e.getMessage());
             }
+        } catch (SecurityException | BypassTestException e) {
+            throw e;
         } catch (Exception e) {
             logger.debug("Error getting VibratorManager: " + e.getMessage());
         }
@@ -1867,16 +1889,18 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             
             try {
                 method.invoke(cm, cameraId);
-                logger.debug("warmUp called successfully for camera: " + cameraId);
+                throw new BypassTestException("warmUp called successfully. Cannot verify permission enforcement via this API.");
             } catch (java.lang.reflect.InvocationTargetException e) {
                 Throwable cause = e.getCause();
                 if (cause instanceof SecurityException) {
                     logger.debug("SecurityException thrown: " + cause.getMessage());
                     throw (SecurityException) cause;
                 } else {
-                    logger.debug("Unexpected exception: " + cause);
+                    throw new BypassTestException("Unexpected exception: " + cause);
                 }
             }
+        } catch (SecurityException | BypassTestException e) {
+            throw e;
         } catch (Exception e) {
             logger.debug("Error: " + e.getMessage());
         }

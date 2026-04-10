@@ -1,8 +1,7 @@
 # 自動テストの状況整理 (TESTAUTONOMOUS.md)
 
 ## 【重要】テスト手順 (Test Procedure)
-テストを実行する際は、以下の手順に従ってください。
-
+テストを実行する際は、以下の手順に従ってください。Testbed mcpツールを利用してlogcatの取得やUIを制御できます。詳しくはtestbed-mcp-reference.mdを参照してください。ツールは常に更新されています。
 
 *** IMPORTANT DO NOT FORGET ***
 ***  normal variantでのsignature permissionのテストは　platform variantで動くまで実施するな!! ***
@@ -35,7 +34,7 @@
    - `Platform` variant で正常系（権限がある場合の動作）を確認します。
    - `Noperm` variant で異常系（権限がない場合の `SecurityException` やタイムアウト等）を確認します。
 
-このファイルは、Android 17 (SDK 37) 向け Permission Tester の自動実行における成功例と課題、および学んだ事項をまとめたものです。
+このファイルは、Android 17 / Android 26Q2 (SDK 37) 向け Permission Tester の自動実行における成功例と課題、および学んだ事項をまとめたものです。
 
 ## うまくいったこと (成功した操作)
 
@@ -96,6 +95,26 @@
    - adb shell settings put global package_verifier_user_consent -1
 5. **MCPのLogcatツールの活用**:
    - ログの確認には、通常の `adb logcat` よりも MCP の `mcp_testbed_get_logcat` ツールを使用する方が、トークン消費を抑えられ、フィルタリングも効くため推奨されます。動作確認済み。
+6. **テストメソッド内での例外処理（例外の再スロー）**:
+   - `PermissionTestRunner` は、ネガティブテスト（権限が付与されていない状態でのテスト）において、API呼び出しが `SecurityException` を投げることを期待します。
+   - テストメソッド内で `SecurityException` をキャッチしてログ出力（"Reflection error" など）のみを行い、正常終了させてしまうと、テストランナーは「権限がないのにAPIが成功した」と判断し、テストを **FAILED** にしてしまいます。
+   - したがって、リフレクション等で例外をキャッチした場合でも、それが `SecurityException` や `BypassTestException` である場合は、キャッチブロックから **再度スロー (re-throw)** する必要があります。
+   - 例：
+     ```java
+     try {
+         method.invoke(...);
+     } catch (InvocationTargetException e) {
+         Throwable cause = e.getCause();
+         if (cause instanceof SecurityException) {
+             throw (SecurityException) cause;
+         }
+         // その他の例外処理
+     } catch (SecurityException | BypassTestException e) {
+         throw e; // Runnerに例外を伝えるために再スロー
+     } catch (Exception e) {
+         logger.debug("Reflection error: " + e.getMessage());
+     }
+     ```
 
 ## トランザクションIDが不足する場合のワークフロー
 

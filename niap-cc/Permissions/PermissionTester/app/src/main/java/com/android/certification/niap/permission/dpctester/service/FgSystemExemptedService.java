@@ -18,9 +18,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED;
 
 public class FgSystemExemptedService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED;
-       mId = mServiceType+1;
+    public FgSystemExemptedService() {
+        super(FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED, FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED + 1);
     }
 }

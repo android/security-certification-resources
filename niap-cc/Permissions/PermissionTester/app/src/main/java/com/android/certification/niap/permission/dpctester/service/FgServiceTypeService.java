@@ -43,8 +43,13 @@ abstract class FgServiceTypeService extends Service {
     protected AtomicBoolean mRunning = new AtomicBoolean(false);
     private final IBinder mBinder = new LocalBinder();
 
-    static int mServiceType = 0;
-    static int mId = 0;
+    protected final int mServiceType;
+    protected final int mId;
+
+    protected FgServiceTypeService(int serviceType, int id) {
+        this.mServiceType = serviceType;
+        this.mId = id;
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -73,8 +78,9 @@ abstract class FgServiceTypeService extends Service {
                     throw new RuntimeException(e);
                 }
             }
-            stopForeground(Service.STOP_FOREGROUND_DETACH);
+            stopForeground(Service.STOP_FOREGROUND_REMOVE);
             mRunning.set(false);
+            stopSelf();
         });
         th.start();
         //System.out.println("started fgservice =>"+channel_id);

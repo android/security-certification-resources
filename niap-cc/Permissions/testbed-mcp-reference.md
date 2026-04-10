@@ -10,19 +10,37 @@
 デバイスの画面状態やシステム情報を取得するツールです。
 
 ### `get_ui_dump`
-* **説明**: 現在の画面のUI階層(JSON)と、スクリーンショット画像(Base64)を取得します。
+* **説明**: 現在の画面のUI階層を取得します。デフォルトはLLM向けに最適化されたコンパクトなフラット形式（~1KB）です。
 * **パラメータ**:
-  * `include_image` (Boolean / 任意 / デフォルト:`false`) : 画像データをレスポンスに含めるかどうか。
+  * `format` (String / 任意 / デフォルト:`"summary"`) : 出力形式。`"summary"`=コンパクトなフラットリスト、`"json"`=従来のフルツリーJSON
+  * `include_image` (Boolean / 任意 / デフォルト:`false`) : 画像データをレスポンスに含めるかどうか（`format="json"` の場合のみ有効）
   * `image_quality` (Int / 任意 / デフォルト:`2`) : 1=100%, 2=50%, 3=33%, 4=25%
-* **戻り値**: `json_dump` (UI階層) および `screenshot` (Base64、要求された場合) を含むJSON
+* **戻り値**:
+  * `format="summary"` の場合: テキスト形式のフラットリスト（各ノードにインデックス、クラス名、ラベル、タップ座標、フラグ付き）
+  * `format="json"` の場合: `json_dump` (UI階層) および `screenshot` (Base64、要求された場合) を含むJSON
 * **実行例**:
-  * **リクエスト**:
+  * **リクエスト（デフォルト: summary形式）**:
+    ```json
+    {}
+    ```
+  * **レスポンス（summary形式）**:
+    ```
+    Screen: 1080x2400 | App: com.example.app
+    ───────────────────────────────────────────────
+    [0] ImageButton "Back" tap(73,205) clickable
+    [1] TextView "Settings" at(540,205)
+    [2] CheckBox "Option A" tap(540,484) clickable checked=true ★
+    [3] CheckBox "Option B" tap(540,625) clickable checked=false
+    ──────────────────── scrollable: RecyclerView ─
+    ```
+  * **リクエスト（JSON形式）**:
     ```json
     {
-      "include_image": false
+      "format": "json",
+      "include_image": true
     }
     ```
-  * **レスポンス**:
+  * **レスポンス（JSON形式）**:
     ```json
     {
       "json_dump": "{\"className\":\"android.widget.FrameLayout\",\"bounds\":\"[0,0][1080,2400]\",\"children\":[...]}"
@@ -88,14 +106,14 @@
 
 ## 2. Action (UI操作)
 
-デバイスに対してタッチや入力などの操作を行うツールです。これらは実行後、自動的に画面のアイドルを待ち、最新のUIダンプを返します。
+デバイスに対してタッチや入力などの操作を行うツールです。これらは実行後、自動的に画面のアイドルを待ち、**クリック可能なUI要素のみのサマリー**を返します（`get_ui_dump` の summary形式のインタラクタブル要素版）。
 
 ### `tap`
 * **説明**: 指定した(x, y)座標をタップします。
 * **パラメータ**:
   * `x` (Int / 必須) : X座標
   * `y` (Int / 必須) : Y座標
-* **戻り値**: 最新の `get_ui_dump` の結果
+* **戻り値**: インタラクト可能なUI要素のサマリー（clickable/checkable/scrollable要素のみ）
 * **実行例**:
   * **リクエスト**:
     ```json
@@ -110,7 +128,7 @@
 * **説明**: フォーカスされている入力フィールドにテキストを入力します。
 * **パラメータ**:
   * `text` (String / 必須) : 入力する文字列。スペースは自動的にエスケープされる場合があります。
-* **戻り値**: 最新の `get_ui_dump` の結果
+* **戻り値**: インタラクト可能なUI要素のサマリー
 * **実行例**:
   * **リクエスト**:
     ```json
@@ -127,7 +145,7 @@
   * `start_y` (Int / 必須)
   * `end_x` (Int / 必須)
   * `end_y` (Int / 必須)
-* **戻り値**: 最新の `get_ui_dump` の結果
+* **戻り値**: インタラクト可能なUI要素のサマリー
 * **実行例**:
   * **リクエスト**:
     ```json
@@ -144,7 +162,7 @@
 * **説明**: 物理キーまたはシステムキーのイベントを送信します。
 * **パラメータ**:
   * `keycode` (String / 必須) : キー名 (例: `"BACK"`, `"HOME"`, `"ENTER"`)
-* **戻り値**: 最新の `get_ui_dump` の結果
+* **戻り値**: インタラクト可能なUI要素のサマリー
 * **実行例**:
   * **リクエスト**:
     ```json
@@ -258,17 +276,26 @@
 * **説明**: フィルタリングされたLogcatログを取得します。トークン節約のためにフィルタの使用を強く推奨します。
 * **パラメータ**:
   * `tags` (String[] / 任意 / デフォルト:`[]`) : ログタグのリスト
-  * `level` (String / 任意 / デフォルト:`"I"`) : 最小ログレベル (`V`, `D`, `I`, `W`, `E`, `F`)
+  * `level` (String / 任意 / デフォルト:`"V"`) : 最小ログレベル (`V`, `D`, `I`, `W`, `E`, `F`)
   * `grep_pattern` (String / 任意 / デフォルト:`""`) : 絞り込み正規表現
   * `max_lines` (Int / 任意 / デフォルト:`100`) : 最大行数
+  * `process` (String / 任意 / デフォルト:`""`) : プロセスフィルタ。パッケージ名（例: `"com.android.settings"`）またはPID（例: `"1234"`）を指定できます。パッケージ名が指定された場合、内部でPIDに自動解決されます（ProcessNameResolverのキャッシュ → `pidof` コマンドの順にフォールバック）。
 * **戻り値**: ログのプレーンテキスト
 * **実行例**:
-  * **リクエスト**:
+  * **タグ指定**:
     ```json
     {
       "tags": ["ActivityManager"],
       "level": "I",
       "max_lines": 5
+    }
+    ```
+  * **プロセス指定（パッケージ名）**:
+    ```json
+    {
+      "process": "com.android.settings",
+      "level": "D",
+      "max_lines": 50
     }
     ```
   * **レスポンス**:
@@ -354,7 +381,8 @@
 
 ## LLM向けTips & ベストプラクティス
 
-1. **トークン節約**: `get_ui_dump` や `get_logcat` は情報量が多くなりがちです。`get_ui_dump` では `include_image` を必要な時だけ `true` にし、`get_logcat` では必ず `tags` や `max_lines` で絞り込んでください。
-2. **自動待機**: `tap` や `input_text` などの操作ツールは、実行後に画面が落ち着く（アイドル状態になる）のを待ってから最新のUIダンプを返します。そのため、操作の直後に連続して `get_ui_dump` を呼ぶ必要はありません。
-3. **復旧**: UI操作や取得でエラー（`rootInActiveWindow returned null` など）が発生した場合、`cleanup_agent` を実行してエージェントを再起動すると解決する場合があります。
-4. **コマンドの注意**: `execute_adb_shell` でスペースを含むテキストを扱う場合（例: `input text "hello world"`）、Adamライブラリの仕様上、スペースを `%s` に置換する必要がある場合があります（`input text hello%sworld`）。MCPツール（`input_text`）側で処理されている場合は不要ですが、直接シェルを叩く場合は注意してください。
+1. **トークン節約**: `get_ui_dump` はデフォルトで `summary` 形式（~1KB）を返します。フルJSONが必要な場合のみ `format="json"` を使用してください。`get_logcat` では必ず `tags` や `max_lines` で絞り込んでください。
+2. **自動待機**: `tap` や `input_text` などの操作ツールは、実行後に画面が落ち着く（アイドル状態になる）のを待ってからインタラクト可能なUI要素のサマリーを返します。そのため、操作の直後に連続して `get_ui_dump` を呼ぶ必要はありません。
+3. **summary形式の読み方**: 各行は `[インデックス] クラス名 "ラベル" tap(x,y) フラグ` の形式です。`tap(x,y)` はそのまま `tap` ツールの座標として使えます。`at(x,y)` はクリック不可のテキスト要素です。
+4. **復旧**: UI操作や取得でエラー（`rootInActiveWindow returned null` など）が発生した場合、`cleanup_agent` を実行してエージェントを再起動すると解決する場合があります。
+5. **コマンドの注意**: `execute_adb_shell` でスペースを含むテキストを扱う場合（例: `input text "hello world"`）、Adamライブラリの仕様上、スペースを `%s` に置換する必要がある場合があります（`input text hello%sworld`）。MCPツール（`input_text`）側で処理されている場合は不要ですが、直接シェルを叩く場合は注意してください。

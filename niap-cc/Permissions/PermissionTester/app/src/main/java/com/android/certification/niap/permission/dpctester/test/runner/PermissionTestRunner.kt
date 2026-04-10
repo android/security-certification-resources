@@ -122,7 +122,7 @@ class PermissionTestRunner {
                         )
                     }
 
-                    //StaticLogger.debug("running=>"+testCase.methodName)
+                    StaticLogger.info("running=>"+testCase.methodName)
                     ReflectionUtil.invoke(root, testCase.methodName)
 
 

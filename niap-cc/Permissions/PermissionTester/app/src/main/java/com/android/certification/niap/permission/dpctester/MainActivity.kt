@@ -186,8 +186,8 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
             mutableListOf(SingleModuleTestSuite(this, CoreTestModule(this)))
         } else {
             val defaults = mutableListOf(
-                SignatureTestSuite(this),
                 SingleModuleTestSuite(this, InstallTestModule(this)),
+                SignatureTestSuite(this),
                 SingleModuleTestSuite(this, NonPlatformTestModule(this)),
                 SingleModuleTestSuite(this, GmsTestModule(this)),
                 SingleModuleTestSuite(this, RuntimeTestModule(this)),
@@ -320,7 +320,7 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
                     val box = LogBox(Random.nextLong(), "Finish module", desc
                         , childs = info.moduleLog);
                     if(info.count_errors>0){
-                        box.ty
+                        box.type = "error"
                     } else if(info.count_bypassed>0){
                         box.type="bypassed"
                     } else if(info.skipped){
@@ -356,7 +356,7 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
         // Enable launching tests via Intent
         val suiteLabel = intent.getStringExtra("suite_label")
         if (suiteLabel != null) {
-            val button = mTestButtons.find { it.text.toString() == suiteLabel }
+            val button = mTestButtons.find { it.text.toString().equals(suiteLabel, ignoreCase = true) }
             button?.performClick()
         } else if (intent.getBooleanExtra("auto_run", false)) {
             if (mTestButtons.isNotEmpty()) {
@@ -384,13 +384,13 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
                 val l = ArrayList<Pair<String,String>>() // we can't use kotlin map for this purpose
                 //TODO: generate preference data from actual data
                 for(s in suites){
-                    //s.add()
                     if(s is SingleModuleTestSuite){
                         l.add(Pair("suite",s.key!!))
-                        s.modules.get(0).prefList.forEach{
-                            l.add(it)
+                        if (s.modules.isNotEmpty()) {
+                            s.modules.get(0).prefList.forEach{
+                                l.add(it)
+                            }
                         }
-
                     } else if(s is SignatureTestSuite){
                         l.add(Pair("suite",s.key!!))
                         for(mm in s.modules){

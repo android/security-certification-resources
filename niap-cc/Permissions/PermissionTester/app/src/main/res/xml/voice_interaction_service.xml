@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<voice-interaction-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:sessionService="com.android.certification.niap.permission.dpctester.service.MyVoiceInteractionSessionService"
+    android:recognitionService="com.android.certification.niap.permission.dpctester.service.MyRecognitionService"
+    android:settingsActivity="com.android.certification.niap.permission.dpctester.MainActivity"
+    android:supportsAssist="true"
+    android:supportsLocalInteraction="true"/>

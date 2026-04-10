@@ -1804,6 +1804,7 @@
     <uses-permission android:name="android.permission.TEST_LOCK_APPS" />
     <uses-permission android:name="android.permission.UPDATE_THEME_SETTINGS" />
     <uses-permission android:name="android.permission.USE_ICC_AUTH" />
+    <uses-permission android:name="android.permission.USE_PINNED_WINDOWING_LAYER" />
     <uses-permission android:name="android.permission.USE_VIBRATOR_HAPTIC_GENERATOR" />
     <uses-permission android:name="android.permission.WARM_UP_CAMERA" />
 </manifest>

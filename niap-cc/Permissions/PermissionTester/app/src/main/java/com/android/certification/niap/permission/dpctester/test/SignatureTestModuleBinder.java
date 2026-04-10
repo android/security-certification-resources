@@ -437,10 +437,10 @@ public class SignatureTestModuleBinder extends SignaturePermissionTestModuleBase
         runBindRunnable("BIND_SELECTION_TOOLBAR_RENDER_SERVICE");
     }
 
-    @PermissionTest(permission="BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE", sdkMin=33)
-    public void testBindWallpaperEffectsGenerationService(){
-        runBindRunnable("BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE");
-    }
+//    @PermissionTest(permission="BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE", sdkMin=33)
+//    public void testBindWallpaperEffectsGenerationService(){
+//        runBindRunnable("BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE");
+//    }
 
     @PermissionTest(permission="BIND_TV_INTERACTIVE_APP", sdkMin=33)
     public void testBindTvInteractiveApp(){

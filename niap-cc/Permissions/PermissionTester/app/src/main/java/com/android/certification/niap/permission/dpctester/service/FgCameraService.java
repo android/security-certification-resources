@@ -19,9 +19,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA;
 
 public class FgCameraService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_CAMERA;
-       mId = mServiceType+1;
+    public FgCameraService() {
+        super(FOREGROUND_SERVICE_TYPE_CAMERA, FOREGROUND_SERVICE_TYPE_CAMERA + 1);
     }
 }
