@@ -331,9 +331,6 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		if (adapter == null) {
 			throw new BypassTestException("A NFC adapter is not available to run this test");
 		}
-		//:TODO setNdefPushMesssage is obsolated?
-		//adapter.setNdefPushMessage(null, mActivity);
-
 		CardEmulation emulation = CardEmulation.getInstance(adapter);
 		emulation.isDefaultServiceForCategory(new ComponentName(mContext, TestService.class),
 				CardEmulation.CATEGORY_PAYMENT);
@@ -824,83 +821,6 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		);
 	}
 
-	@PermissionTest(permission="android.permission.REQUEST_COMPANION_PROFILE_MEDICAL", sdkMin=37)
-	public void testRequestCompanionProfileMedical(){
-		CompletableFuture<AssociationRequest> associationRequest =
-				new CompletableFuture<AssociationRequest>().completeAsync(() -> {
-					return new AssociationRequest.Builder()
-							.setDeviceProfile("android.app.role.COMPANION_DEVICE_MEDICAL").build();
-				});
-		TesterUtils.tryBluetoothAssociationRequest
-				(mPackageManager, mActivity, associationRequest);
-	}
-
-	@PermissionTest(permission="android.permission.USE_LOOPBACK_INTERFACE", sdkMin=37)
-	public void testUseLoopbackInterface(){
-		try {
-			java.net.Socket socket = new java.net.Socket();
-			socket.connect(new java.net.InetSocketAddress("127.0.0.1", 65535), 100);
-			socket.close();
-		} catch (java.net.SocketException e) {
-			if (e.getMessage().contains("EACCES") || e.getMessage().contains("EPERM")) {
-				throw new SecurityException(e);
-			}
-			logger.debug("SocketException: " + e.getMessage());
-		} catch (java.io.IOException e) {
-			logger.debug("IOException: " + e.getMessage());
-		}
-	}
-
-	@PermissionTest(permission="android.permission.POST_PROMOTED_NOTIFICATIONS", sdkMin=37)
-	public void testPostPromotedNotifications() throws Exception {
-		NotificationManager nm = mContext.getSystemService(NotificationManager.class);
-		String channelId = "test_promoted_channel";
-		NotificationChannel channel = new NotificationChannel(channelId, "Test Promoted Channel", NotificationManager.IMPORTANCE_DEFAULT);
-		nm.createNotificationChannel(channel);
-
-		Notification.Builder builder = new Notification.Builder(mContext, channelId)
-				.setContentTitle("Test Promoted Notification")
-				.setContentText("This is a test notification")
-				.setSmallIcon(android.R.drawable.ic_dialog_info)
-				.setStyle(new Notification.BigTextStyle().bigText("Big text"))
-				.setOngoing(true);
-
-		android.os.Bundle extras = new android.os.Bundle();
-		extras.putBoolean("android.requestPromotedOngoing", true);
-		builder.addExtras(extras);
-
-		Notification notification = builder.build();
-		int id = 1001;
-		nm.notify(id, notification);
-
-		// Wait a bit for the notification to be posted and processed
-		Thread.sleep(500);
-
-		StatusBarNotification[] activeNotifications = nm.getActiveNotifications();
-		boolean found = false;
-		boolean isPromoted = false;
-		for (StatusBarNotification sbn : activeNotifications) {
-			if (sbn.getId() == id) {
-				found = true;
-				Notification postedNotification = sbn.getNotification();
-				// FLAG_PROMOTED_ONGOING = 0x00040000
-				isPromoted = (postedNotification.flags & 0x00040000) != 0;
-				break;
-			}
-		}
-
-		// Cleanup
-		nm.cancel(id);
-		nm.deleteNotificationChannel(channelId);
-
-		if (!found) {
-			throw new RuntimeException("Notification not found in active notifications");
-		}
-
-		if (!isPromoted) {
-			throw new SecurityException("Notification was not promoted despite requesting it");
-		}
-	}
 
 //	@PermissionTest(permission=ACCESS_HIDDEN_PROFILES, sdkMin=34,sdkMax = 34)
 //	public void testAccessHiddenProfiles(){
@@ -1139,7 +1059,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		logger.debug("The test for android.permission.XR_TRACKING_IN_BACKGROUND is not implemented yet");
 	}
 
-	//**** method template for target install SDK37
+	//**** Install level permissions as of sdk 37
 	@PermissionTest(permission="CAPTURE_KEYBOARD",sdkMin=37)
 	public void testCaptureKeyboard(){
 		throw new BypassTestException("CAPTURE_KEYBOARD is not easily testable via app. It requires accessibility service or specific input method context to verify, which is not feasible in this test module.");
@@ -1180,7 +1100,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 			}
 		}
 	}
-
+	//TODO : Location Button is implemented as JetPack Compose, check the test with that component!
 	@PermissionTest(permission="USE_LOCATION_BUTTON",sdkMin=37)
 	public void testUseLocationButton(){
 		Intent intent = new Intent();
@@ -1255,6 +1175,85 @@ public class InstallTestModule extends PermissionTestModuleBase {
 			throw e;
 		}
 	}
+
+	@PermissionTest(permission="android.permission.REQUEST_COMPANION_PROFILE_MEDICAL", sdkMin=37)
+	public void testRequestCompanionProfileMedical(){
+		CompletableFuture<AssociationRequest> associationRequest =
+				new CompletableFuture<AssociationRequest>().completeAsync(() -> {
+					return new AssociationRequest.Builder()
+							.setDeviceProfile("android.app.role.COMPANION_DEVICE_MEDICAL").build();
+				});
+		TesterUtils.tryBluetoothAssociationRequest
+				(mPackageManager, mActivity, associationRequest);
+	}
+
+	@PermissionTest(permission="android.permission.USE_LOOPBACK_INTERFACE", sdkMin=37)
+	public void testUseLoopbackInterface(){
+		try {
+			java.net.Socket socket = new java.net.Socket();
+			socket.connect(new java.net.InetSocketAddress("127.0.0.1", 65535), 100);
+			socket.close();
+		} catch (java.net.SocketException e) {
+			if (e.getMessage().contains("EACCES") || e.getMessage().contains("EPERM")) {
+				throw new SecurityException(e);
+			}
+			logger.debug("SocketException: " + e.getMessage());
+		} catch (java.io.IOException e) {
+			logger.debug("IOException: " + e.getMessage());
+		}
+	}
+
+	@PermissionTest(permission="android.permission.POST_PROMOTED_NOTIFICATIONS", sdkMin=37)
+	public void testPostPromotedNotifications() throws Exception {
+		NotificationManager nm = mContext.getSystemService(NotificationManager.class);
+		String channelId = "test_promoted_channel";
+		NotificationChannel channel = new NotificationChannel(channelId, "Test Promoted Channel", NotificationManager.IMPORTANCE_DEFAULT);
+		nm.createNotificationChannel(channel);
+
+		Notification.Builder builder = new Notification.Builder(mContext, channelId)
+				.setContentTitle("Test Promoted Notification")
+				.setContentText("This is a test notification")
+				.setSmallIcon(android.R.drawable.ic_dialog_info)
+				.setStyle(new Notification.BigTextStyle().bigText("Big text"))
+				.setOngoing(true);
+
+		android.os.Bundle extras = new android.os.Bundle();
+		extras.putBoolean("android.requestPromotedOngoing", true);
+		builder.addExtras(extras);
+
+		Notification notification = builder.build();
+		int id = 1001;
+		nm.notify(id, notification);
+
+		// Wait a bit for the notification to be posted and processed
+		Thread.sleep(500);
+
+		StatusBarNotification[] activeNotifications = nm.getActiveNotifications();
+		boolean found = false;
+		boolean isPromoted = false;
+		for (StatusBarNotification sbn : activeNotifications) {
+			if (sbn.getId() == id) {
+				found = true;
+				Notification postedNotification = sbn.getNotification();
+				// FLAG_PROMOTED_ONGOING = 0x00040000
+				isPromoted = (postedNotification.flags & 0x00040000) != 0;
+				break;
+			}
+		}
+
+		// Cleanup
+		nm.cancel(id);
+		nm.deleteNotificationChannel(channelId);
+
+		if (!found) {
+			throw new RuntimeException("Notification not found in active notifications");
+		}
+
+		if (!isPromoted) {
+			throw new SecurityException("Notification was not promoted despite requesting it");
+		}
+	}
+
 
 	@RequiresApi(api = Build.VERSION_CODES.Q)
     public void tryBindingForegroundService(Intent serviceIntent){

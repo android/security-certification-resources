@@ -102,9 +102,6 @@ class PermissionTestRunner {
                     // Check Android Version
 
                     var SDK_INT = Build.VERSION.SDK_INT
-                    if(TesterUtils.isAtLeastBaklava()){
-                        SDK_INT = 36
-                    }
 
                     if(SDK_INT<testCase.sdkMin){
                         throw BypassTestException(

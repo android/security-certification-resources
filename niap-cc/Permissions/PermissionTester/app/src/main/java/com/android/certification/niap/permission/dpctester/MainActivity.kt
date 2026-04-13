@@ -138,6 +138,7 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
     //Change the test modules here by resource settings
     lateinit var suites:MutableList<PermissionTestSuiteBase>
     lateinit var mCurrentModule: PermissionTestModuleBase
+    val receivedKeyCodes = mutableListOf<Int>()
     //
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -638,5 +639,10 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
         runOnUiThread {
             this.recyclerView?.adapter?.notifyDataSetChanged()
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: android.view.KeyEvent?): Boolean {
+        receivedKeyCodes.add(keyCode)
+        return super.onKeyDown(keyCode, event)
     }
 }

@@ -183,6 +183,12 @@ public class InternalPermissionCinnamonBunTest {
     }
 
     @Test
+    @PermissionTest(permission="REQUEST_LOCATION_BUTTON_PERMISSIONS", sdkMin=37)
+    public void testRequestLocationButtonPermissions(){
+        internalTestModule.testRequestLocationButtonPermissions();
+    }
+
+    @Test
     @PermissionTest(permission="DISCOVER_APP_FUNCTIONS", sdkMin=37)
     public void testDiscoverAppFunctions(){
         internalTestModule.testDiscoverAppFunctions();
@@ -208,17 +214,35 @@ public class InternalPermissionCinnamonBunTest {
     //     internalTestModule.testManageSupervision();
     // }
 
+    @Test
+    @PermissionTest(permission="SHOW_POWER_MENU", sdkMin=37)
+    public void testShowPowerMenu(){
+        internalTestModule.testShowPowerMenu();
+    }
+
+    @Test
+    @PermissionTest(permission="SHOW_POWER_MENU_PRIVILEGED", sdkMin=37)
+    public void testShowPowerMenuPrivileged(){
+        internalTestModule.testShowPowerMenuPrivileged();
+    }
+
+    @Test
+    @PermissionTest(permission="SET_DEVELOPER_VERIFICATION_USER_RESPONSE", sdkMin=37)
+    public void testSetDeveloperVerificationUserResponse(){
+        internalTestModule.testSetDeveloperVerificationUserResponse();
+    }
+
     // @Test
     // @PermissionTest(permission="CREATE_APP_SPECIFIC_NETWORK", sdkMin=37)
     // public void testCreateAppSpecificNetwork(){
     //     internalTestModule.testCreateAppSpecificNetwork();
     // }
 
-    // @Test
-    // @PermissionTest(permission="INITIATE_BUGREPORT_AS_NON_ADMIN", sdkMin=37)
-    // public void testInitiateBugreportAsNonAdmin(){
-    //     // Fails with SecurityException: requires DUMP permission or bugreport whitelisting.
-    //     // Even with shell permission identity, it fails if the package is not whitelisted in sysconfig.
-    //     internalTestModule.testInitiateBugreportAsNonAdmin();
-    // }
+    @Test
+    @PermissionTest(permission="INITIATE_BUGREPORT_AS_NON_ADMIN", sdkMin=37)
+    public void testInitiateBugreportAsNonAdmin(){
+        // Fails with SecurityException: requires DUMP permission or bugreport whitelisting.
+        // Even with shell permission identity, it fails if the package is not whitelisted in sysconfig.
+        internalTestModule.testInitiateBugreportAsNonAdmin();
+    }
 }

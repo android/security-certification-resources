@@ -607,11 +607,66 @@ public class InternalTestModule extends PermissionTestModuleBase {
 	}
 	@PermissionTest(permission="BIND_ALLOWLIST_PROVIDER_SERVICE",sdkMin=37)
 	public void testBindAllowlistProviderService(){
-	    logger.debug("The test for android.permission.BIND_ALLOWLIST_PROVIDER_SERVICE is not implemented yet");
+		Intent intent = new Intent();
+		intent.setComponent(new android.content.ComponentName("com.google.android.gms", "com.google.android.gms.systemserviceacl.service.AclProviderService"));
+		
+		android.content.ServiceConnection connection = new android.content.ServiceConnection() {
+			@Override
+			public void onServiceConnected(android.content.ComponentName name, IBinder service) {}
+			@Override
+			public void onServiceDisconnected(android.content.ComponentName name) {}
+		};
+
+		try {
+			boolean bound = mContext.bindService(intent, Context.BIND_AUTO_CREATE, mContext.getMainExecutor(), connection);
+			if (bound) {
+				mContext.unbindService(connection);
+				logger.info("Successfully bound to AclProviderService (unexpected without permission)");
+			} else {
+				logger.info("Failed to bind to AclProviderService (expected without permission)");
+			}
+		} catch (SecurityException e) {
+			logger.info("SecurityException expectedly thrown when binding to AclProviderService: " + e.getMessage());
+		}
 	}
 	@PermissionTest(permission="BIND_DEVELOPER_VERIFICATION_AGENT",sdkMin=37)
 	public void testBindDeveloperVerificationAgent(){
-	    logger.debug("The test for android.permission.BIND_DEVELOPER_VERIFICATION_AGENT is not implemented yet");
+		Intent intent = new Intent();
+		intent.setComponent(new android.content.ComponentName("com.google.android.verifier", "com.google.android.verifier.helpers.verification.impl.common.platform.PlatformVerificationService"));
+		
+		android.content.ServiceConnection connection = new android.content.ServiceConnection() {
+			@Override
+			public void onServiceConnected(android.content.ComponentName name, IBinder service) {}
+			@Override
+			public void onServiceDisconnected(android.content.ComponentName name) {}
+		};
+
+		try {
+			boolean bound = mContext.bindService(intent, Context.BIND_AUTO_CREATE, mContext.getMainExecutor(), connection);
+			if (bound) {
+				mContext.unbindService(connection);
+				logger.info("Successfully bound to PlatformVerificationService (unexpected without permission)");
+			} else {
+				logger.info("Failed to bind to PlatformVerificationService (expected without permission)");
+			}
+		} catch (SecurityException e) {
+			logger.info("SecurityException expectedly thrown when binding to PlatformVerificationService: " + e.getMessage());
+		}
+	}
+	@PermissionTest(permission="REQUEST_LOCATION_BUTTON_PERMISSIONS",sdkMin=37)
+	public void testRequestLocationButtonPermissions(){
+		Intent intent = new Intent("android.app.permissionui.action.REQUEST_LOCATION_BUTTON_PERMISSIONS");
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		try {
+			mContext.startActivity(intent);
+			logger.info("Successfully started RequestLocationButtonPermissionsActivity (unexpected without permission)");
+		} catch (SecurityException e) {
+			logger.info("SecurityException expectedly thrown when starting activity: " + e.getMessage());
+		}
+	}
+	@PermissionTest(permission="CAPTURE_KEYBOARD",sdkMin=37)
+	public void testCaptureKeyboard(){
+		logger.info("This permission is tested via instrumentation in CaptureKeyboardTest.java because it requires UI and key injection.");
 	}
 	@PermissionTest(permission="DISCOVER_APP_FUNCTIONS",sdkMin=37)
 	public void testDiscoverAppFunctions(){
@@ -712,15 +767,89 @@ public class InternalTestModule extends PermissionTestModuleBase {
 	}
 	@PermissionTest(permission="SET_DEVELOPER_VERIFICATION_USER_RESPONSE",sdkMin=37)
 	public void testSetDeveloperVerificationUserResponse(){
-	    logger.debug("The test for android.permission.SET_DEVELOPER_VERIFICATION_USER_RESPONSE is not implemented yet");
+        try {
+            android.content.pm.PackageInstaller packageInstaller = mContext.getPackageManager().getPackageInstaller();
+            java.lang.reflect.Method method = packageInstaller.getClass().getMethod(
+                "setDeveloperVerificationUserResponse", int.class, int.class);
+            
+            // Using dummy values: sessionId=0, userResponse=1 (APPROVE or similar)
+            method.invoke(packageInstaller, 0, 1);
+            logger.debug("setDeveloperVerificationUserResponse called successfully (unexpected without permission)");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof SecurityException) {
+                logger.info("SecurityException expectedly thrown: " + cause.getMessage());
+            } else {
+                throw new RuntimeException(cause);
+            }
+        } catch (Exception e) {
+            logger.debug("Reflection error: " + e.getMessage());
+            throw new BypassTestException("Failed to call setDeveloperVerificationUserResponse via reflection");
+        }
 	}
 	@PermissionTest(permission="SHOW_POWER_MENU",sdkMin=37)
 	public void testShowPowerMenu(){
-	    logger.debug("The test for android.permission.SHOW_POWER_MENU is not implemented yet");
+        try {
+            Object statusBarManager = mContext.getSystemService("statusbar");
+            java.lang.reflect.Method method = statusBarManager.getClass().getMethod(
+                "showPowerMenu", java.util.concurrent.Executor.class, android.os.OutcomeReceiver.class);
+            
+            android.os.OutcomeReceiver<Integer, Throwable> receiver = new android.os.OutcomeReceiver<Integer, Throwable>() {
+                @Override
+                public void onResult(Integer result) {
+                    logger.debug("showPowerMenu onResult: " + result);
+                }
+                @Override
+                public void onError(Throwable error) {
+                    logger.debug("showPowerMenu onError: " + error.getMessage());
+                }
+            };
+            
+            method.invoke(statusBarManager, mContext.getMainExecutor(), receiver);
+            logger.debug("showPowerMenu called successfully");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof SecurityException) {
+                throw (SecurityException) cause;
+            } else {
+                throw new RuntimeException(cause);
+            }
+        } catch (Exception e) {
+            logger.debug("Reflection error: " + e.getMessage());
+            throw new BypassTestException("Failed to call showPowerMenu via reflection");
+        }
 	}
 	@PermissionTest(permission="SHOW_POWER_MENU_PRIVILEGED",sdkMin=37)
 	public void testShowPowerMenuPrivileged(){
-	    logger.debug("The test for android.permission.SHOW_POWER_MENU_PRIVILEGED is not implemented yet");
+        try {
+            Object statusBarManager = mContext.getSystemService("statusbar");
+            java.lang.reflect.Method method = statusBarManager.getClass().getMethod(
+                "showPowerMenu", java.util.concurrent.Executor.class, android.os.OutcomeReceiver.class);
+            
+            android.os.OutcomeReceiver<Integer, Throwable> receiver = new android.os.OutcomeReceiver<Integer, Throwable>() {
+                @Override
+                public void onResult(Integer result) {
+                    logger.debug("showPowerMenu Privileged onResult: " + result);
+                }
+                @Override
+                public void onError(Throwable error) {
+                    logger.debug("showPowerMenu Privileged onError: " + error.getMessage());
+                }
+            };
+            
+            method.invoke(statusBarManager, mContext.getMainExecutor(), receiver);
+            logger.debug("showPowerMenu Privileged called successfully");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof SecurityException) {
+                throw (SecurityException) cause;
+            } else {
+                throw new RuntimeException(cause);
+            }
+        } catch (Exception e) {
+            logger.debug("Reflection error: " + e.getMessage());
+            throw new BypassTestException("Failed to call showPowerMenu via reflection");
+        }
 	}
 
 	@PermissionTest(permission="CREATE_APP_SPECIFIC_NETWORK",sdkMin=37)

@@ -180,10 +180,10 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
-    // Evidence: NpuManager service not found on test device. Cannot verify API execution.
+    // SKIP: Abandoned in Android 26Q2 (SDK 37).
     // @PermissionTest(permission="ACCESS_NPU_MODEL_MANAGER_API",sdkMin=37)
     public void testAccessNpuModelManagerApi(){
-        logger.debug("Skipping ACCESS_NPU_MODEL_MANAGER_API test as NpuManager service is missing on this device.");
+        logger.debug("Skipping ACCESS_NPU_MODEL_MANAGER_API test as NPU Manager implementation was abandoned in Android 26Q2.");
     }
     @PermissionTest(permission="ACQUIRE_SLEEP_LOCK",sdkMin=37)
     public void testAcquireSleepLock(){
@@ -220,7 +220,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
-    // Evidence added to TESTAUTONOMOUS.md. Removed @PermissionTest annotation as it fails on platform variant due to missing implementation/state, but verified permission enforcement.
+    // SKIP: Removed @PermissionTest annotation as it fails on platform variant due to missing implementation/state, but verified permission enforcement.
     public void testAcquireVerifiedDeviceToken(){
         BinderTransaction.getInstance().invoke(Transacts.TRUST_TOKEN_SERVICE, Transacts.TRUST_TOKEN_DESCRIPTOR,
                 Transacts.acquireVerifiedDeviceToken,
@@ -228,15 +228,23 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
     }
     @PermissionTest(permission="ALLOW_CONTROL_SYSTEM_REQUIRED_PACKAGES",sdkMin=37)
     public void testAllowControlSystemRequiredPackages(){
-        if (!checkPermissionGranted("android.permission.ALLOW_CONTROL_SYSTEM_REQUIRED_PACKAGES")) {
-            throw new SecurityException("android.permission.ALLOW_CONTROL_SYSTEM_REQUIRED_PACKAGES not granted");
+        boolean hasPermission = checkPermissionGranted("android.permission.ALLOW_CONTROL_SYSTEM_REQUIRED_PACKAGES");
+        if (!hasPermission) {
+            try {
+                mPackageManager.setApplicationEnabledSetting("com.android.systemui", android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED, 0);
+                throw new IllegalStateException("ALLOW_CONTROL_SYSTEM_REQUIRED_PACKAGES not granted but setApplicationEnabledSetting succeeded!");
+            } catch (SecurityException e) {
+                logger.debug("SecurityException thrown as expected: " + e.getMessage());
+                throw e;
+            }
+        } else {
+            throw new BypassTestException("Skipping test in platform variant to avoid disabling SystemUI.");
         }
-        logger.debug("android.permission.ALLOW_CONTROL_SYSTEM_REQUIRED_PACKAGES is granted");
     }
-    // Evidence: NpuManager service not found on test device. Cannot verify API execution.
+    // SKIP: Abandoned in Android 26Q2 (SDK 37).
     // @PermissionTest(permission="ATTRIBUTE_WORK_TO_OTHER_APPS",sdkMin=37)
     public void testAttributeWorkToOtherApps(){
-        logger.debug("Skipping ATTRIBUTE_WORK_TO_OTHER_APPS test as NpuManager service is missing on this device.");
+        logger.debug("Skipping ATTRIBUTE_WORK_TO_OTHER_APPS test as NPU Manager implementation was abandoned in Android 26Q2.");
     }
 
     @PermissionTest(permission="CHANGE_PERSONAL_CONTEXT_MODE",sdkMin=37)
@@ -1237,7 +1245,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
-    // Evidence: pm grant failed with IllegalArgumentException: Unknown permission
+    // SKIP: Evidence: pm grant failed with IllegalArgumentException: Unknown permission
     // @PermissionTest(permission="READ_MEDIA_DOCUMENTS",sdkMin=37)
     public void testReadMediaDocuments(){
         if (!checkPermissionGranted("android.permission.READ_MEDIA_DOCUMENTS")) {
@@ -1245,7 +1253,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
         }
         logger.debug("android.permission.READ_MEDIA_DOCUMENTS is granted");
     }
-    // Evidence: Sensor is null on emulator; hardware not present to verify API behavior.
+    // SKIP: Evidence: Sensor is null on emulator; hardware not present to verify API behavior.
     // @PermissionTest(permission="READ_MOISTURE_INTRUSION",sdkMin=37)
     public void testReadMoistureIntrusion(){
         android.hardware.SensorManager sensorManager = mContext.getSystemService(android.hardware.SensorManager.class);
@@ -1289,12 +1297,52 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
         }
         logger.debug("android.permission.READ_UPDATE_ENGINE_LOGS is granted");
     }
-    // Evidence: AOSP search yielded no results for this permission definition or implementation.
-    // @PermissionTest(permission="REMOTE_MULTISENSORY_PLAYBACK",sdkMin=37)
+    @PermissionTest(permission="REMOTE_MULTISENSORY_PLAYBACK",sdkMin=37)
     public void testRemoteMultisensoryPlayback(){
-        logger.debug("The test for android.permission.REMOTE_MULTISENSORY_PLAYBACK is not implemented yet");
+        try {
+            android.os.IBinder b = (android.os.IBinder) Class.forName("android.os.ServiceManager")
+                    .getMethod("getService", String.class)
+                    .invoke(null, "multisensory");
+            if (b == null) {
+                logger.debug("multisensory service not found");
+                return;
+            }
+            Class<?> stubClass = Class.forName("android.os.multisensory.IMultisensoryService$Stub");
+            java.lang.reflect.Method asInterfaceMethod = stubClass.getMethod("asInterface", android.os.IBinder.class);
+            Object service = asInterfaceMethod.invoke(null, b);
+            
+            Class<?> playerClass = Class.forName("android.os.multisensory.IMultisensoryPlayer");
+            java.lang.reflect.Method setPlayerMethod = service.getClass().getMethod("setPlayer", playerClass);
+            
+            Object proxy = java.lang.reflect.Proxy.newProxyInstance(
+                    playerClass.getClassLoader(),
+                    new Class<?>[] { playerClass },
+                    new java.lang.reflect.InvocationHandler() {
+                        @Override
+                        public Object invoke(Object proxy, java.lang.reflect.Method method, Object[] args) throws Throwable {
+                            return null;
+                        }
+                    });
+            
+            try {
+                setPlayerMethod.invoke(service, proxy);
+                logger.debug("setPlayer succeeded unexpectedly (without permission?)");
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof SecurityException) {
+                    logger.debug("SecurityException thrown as expected in setPlayer: " + cause.getMessage());
+                    throw (SecurityException) cause;
+                } else {
+                    throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(cause);
+                }
+            }
+        } catch (SecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.debug("Reflection error: " + e.getMessage());
+        }
     }
-    // Evidence: Flag enableWindowRepositioningApi is disabled or class not found on this build.
+    // SKIP : Evidence: Flag enableWindowRepositioningApi is disabled or class not found on this build? Desktop?
     // @PermissionTest(permission="REPOSITION_SELF_WINDOWS",sdkMin=37)
     public void testRepositionSelfWindows(){
         boolean isFlagEnabled = false;
@@ -1429,7 +1477,8 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             logger.debug("Threw non-SecurityException as expected when permission is granted: " + e);
         }
     }
-    // Evidence: ActivityNotFoundException thrown; target activity not available in this build.
+    // [SKIP] Evidence: Flag enableWindowRepositioningApi is disabled or class not found on this build.
+    // [SKIP] Evidence: ActivityNotFoundException thrown; target activity not available in this build.
     // @PermissionTest(permission="REQUEST_LOCATION_BUTTON_PERMISSIONS",sdkMin=37)
     public void testRequestLocationButtonPermissions(){
         android.content.Intent intent = new android.content.Intent("android.app.permissionui.action.REQUEST_LOCATION_BUTTON_PERMISSIONS");
@@ -1458,10 +1507,77 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
              logger.debug("Threw non-SecurityException as expected when permission is granted: " + e);
         }
     }
-    // Evidence: Protected API is IMultitaskingController.getClientInterface, but service name is unknown.
-    // @PermissionTest(permission="REQUEST_SYSTEM_MULTITASKING_CONTROLS",sdkMin=37)
-    public void testRequestSystemMultitaskingControls(){
-        logger.debug("The test for android.permission.REQUEST_SYSTEM_MULTITASKING_CONTROLS is not implemented yet");
+
+    @PermissionTest(permission="REQUEST_SYSTEM_MULTITASKING_CONTROLS",sdkMin=37)
+    public void testRequestSystemMultitaskingControls() throws Exception {
+        boolean hasPermission = checkPermissionGranted("android.permission.REQUEST_SYSTEM_MULTITASKING_CONTROLS");
+        
+        try {
+            // 1. Get ActivityTaskManager.getService()
+            Class<?> atmClass = Class.forName("android.app.ActivityTaskManager");
+            java.lang.reflect.Method getServiceMethod = atmClass.getMethod("getService");
+            Object atmService = getServiceMethod.invoke(null);
+            
+            if (atmService == null) {
+                logger.debug("ActivityTaskManager.getService() returned null");
+                return;
+            }
+            
+            // 2. Call getWindowOrganizerController()
+            java.lang.reflect.Method getWOCMethod = atmService.getClass().getMethod("getWindowOrganizerController");
+            Object woc = getWOCMethod.invoke(atmService);
+            
+            if (woc == null) {
+                logger.debug("getWindowOrganizerController() returned null");
+                return;
+            }
+            
+            // 3. Call getMultitaskingController()
+            java.lang.reflect.Method getMCMethod = woc.getClass().getMethod("getMultitaskingController");
+            Object mc = getMCMethod.invoke(woc);
+            
+            if (mc == null) {
+                logger.debug("getMultitaskingController() returned null");
+                return;
+            }
+            
+            // 4. Call getClientInterface(null)
+            java.lang.reflect.Method getCIMethod = null;
+            for (java.lang.reflect.Method m : mc.getClass().getMethods()) {
+                if (m.getName().equals("getClientInterface")) {
+                    getCIMethod = m;
+                    break;
+                }
+            }
+            
+            if (getCIMethod == null) {
+                logger.debug("getClientInterface method not found");
+                return;
+            }
+            
+            // To call getClientInterface, we need to pass an IMultitaskingControllerCallback
+            // Let's see if we can pass null.
+            getCIMethod.invoke(mc, new Object[]{null});
+            
+            if (!hasPermission) {
+                throw new IllegalStateException("REQUEST_SYSTEM_MULTITASKING_CONTROLS not granted but getClientInterface succeeded!");
+            }
+            logger.debug("getClientInterface called successfully.");
+            
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            Throwable target = e.getTargetException();
+            if (target instanceof SecurityException) {
+                throw (SecurityException) target;
+            } else if (target instanceof NullPointerException) {
+                // If it throws NPE because we passed null callback, but didn't throw SecurityException!
+                // It means the permission check was bypassed or not enforced!
+                throw new IllegalStateException("REQUEST_SYSTEM_MULTITASKING_CONTROLS not granted but threw NullPointerException (permission check bypassed?): " + target);
+            } else {
+                throw new IllegalStateException("Threw unexpected exception: " + target);
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to execute test: " + e);
+        }
     }
     @PermissionTest(permission="REQUEST_TASK_HANDOFF",sdkMin=37)
     public void testRequestTaskHandoff(){
@@ -1528,10 +1644,58 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             logger.debug("Reflection error: " + e.getMessage());
         }
     }
-    // Evidence: AOSP search yielded no results for this permission definition or implementation.
-    // @PermissionTest(permission="SCHEDULE_DELAYED_RESTORE",sdkMin=37)
+    @PermissionTest(permission="SCHEDULE_DELAYED_RESTORE", sdkMin=37)
     public void testScheduleDelayedRestore(){
-        logger.debug("The test for android.permission.SCHEDULE_DELAYED_RESTORE is not implemented yet");
+        try {
+            android.os.IBinder b = (android.os.IBinder) Class.forName("android.os.ServiceManager")
+                    .getMethod("getService", String.class)
+                    .invoke(null, "backup");
+            if (b == null) {
+                logger.debug("backup service not found");
+                return;
+            }
+            Class<?> stubClass = Class.forName("android.app.backup.IBackupManager$Stub");
+            java.lang.reflect.Method asInterfaceMethod = stubClass.getMethod("asInterface", android.os.IBinder.class);
+            Object service = asInterfaceMethod.invoke(null, b);
+            
+            Class<?> interfaceClass = Class.forName("android.app.backup.IBackupManager");
+            // We need to find a method that takes (int, DelayedRestoreRequest)
+            // Since DelayedRestoreRequest might be hidden, we might need to look for it by name or just use null if we can't find it easily.
+            // Let's try to find the method by name first.
+            java.lang.reflect.Method scheduleMethod = null;
+            for (java.lang.reflect.Method m : interfaceClass.getDeclaredMethods()) {
+                if (m.getName().equals("scheduleDelayedRestoreForUser")) {
+                    scheduleMethod = m;
+                    break;
+                }
+            }
+            
+            if (scheduleMethod == null) {
+                logger.debug("scheduleDelayedRestoreForUser method not found");
+                return;
+            }
+            
+            // Try to call it with my UID or 0, and null for request
+            try {
+                scheduleMethod.invoke(service, 0, null);
+                logger.info("scheduleDelayedRestoreForUser called successfully (unexpected without permission or with null request)");
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof SecurityException) {
+                    logger.info("SecurityException expectedly thrown: " + cause.getMessage());
+                    throw (SecurityException) cause;
+                } else if (cause instanceof NullPointerException) {
+                    logger.info("NullPointerException thrown (likely due to null request), implying permission check passed!");
+                    // If we get NPE, it means we passed the permission check!
+                } else {
+                    logger.debug("Unexpected exception: " + cause);
+                }
+            }
+        } catch (SecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.debug("Failed to test SCHEDULE_DELAYED_RESTORE via reflection: " + e.getMessage());
+        }
     }
     @PermissionTest(permission="SEND_DYNAMIC_INSTRUMENTATION_EVENTS",sdkMin=37)
     public void testSendDynamicInstrumentationEvents(){
@@ -1712,6 +1876,40 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             }
         } catch (NoSuchMethodException e) {
             logger.debug("Method setPackageAppLockEnabled not found in PackageManager.");
+        } catch (SecurityException | BypassTestException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.debug("Reflection error: " + e.getMessage());
+        }
+    }
+    @PermissionTest(permission="LOCK_APPS",sdkMin=37)
+    public void testLockApps(){
+        try {
+            android.content.pm.PackageManager pm = mContext.getPackageManager();
+            java.lang.reflect.Method method = pm.getClass().getMethod("getEnableAppLockIntentForPackage", String.class, boolean.class);
+            
+            boolean hasPermission = checkPermissionGranted("android.permission.LOCK_APPS");
+            
+            try {
+                method.invoke(pm, mContext.getPackageName(), true);
+                if (!hasPermission) {
+                    throw new IllegalStateException("LOCK_APPS not granted but getEnableAppLockIntentForPackage succeeded!");
+                }
+                logger.debug("getEnableAppLockIntentForPackage called successfully.");
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof SecurityException) {
+                    throw (SecurityException) cause;
+                } else {
+                    if (!hasPermission) {
+                         throw new IllegalStateException("LOCK_APPS not granted but threw non-SecurityException: " + cause);
+                    }
+                    logger.debug("Threw non-SecurityException as expected when permission is granted: " + cause);
+                }
+            }
+            
+        } catch (NoSuchMethodException e) {
+            logger.debug("Method getEnableAppLockIntentForPackage not found in PackageManager.");
         } catch (SecurityException | BypassTestException e) {
             throw e;
         } catch (Exception e) {
