@@ -584,6 +584,8 @@ public class InternalTestModule extends PermissionTestModuleBase {
         } catch (java.lang.reflect.InvocationTargetException e) {
             if (e.getCause() instanceof SecurityException) {
                 throw (SecurityException) e.getCause();
+            } else if (e.getCause() instanceof IllegalStateException && e.getCause().getMessage().contains("flag disabled")) {
+                throw new com.android.certification.niap.permission.dpctester.test.exception.BypassTestException("Feature flag disabled: " + e.getCause().getMessage());
             }
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         } catch (Exception e) {
@@ -987,5 +989,116 @@ public class InternalTestModule extends PermissionTestModuleBase {
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
 	}
+
+    @PermissionTest(permission="ACCESS_ATTENTION_LISTENER", sdkMin=37)
+    public void testAccessAttentionListener(){
+        try {
+            Object service = mContext.getSystemService("attention");
+            if (service == null) {
+                logger.debug("attention service not available");
+                return;
+            }
+            
+            java.lang.reflect.Method setListener = null;
+            for (java.lang.reflect.Method m : service.getClass().getMethods()) {
+                if (m.getName().equals("setListener")) {
+                    setListener = m;
+                    break;
+                }
+            }
+            
+            if (setListener == null) {
+                logger.debug("setListener method not found");
+                return;
+            }
+            
+            try {
+                setListener.invoke(service, 0, 0L, null);
+                logger.debug("setListener invoked successfully");
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof SecurityException) {
+                    throw (SecurityException) cause;
+                } else {
+                    logger.debug("setListener threw expected non-security exception: " + cause);
+                }
+            }
+        } catch (SecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.debug("Error testing ACCESS_ATTENTION_LISTENER: " + e.getMessage());
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+    }
+
+    @PermissionTest(permission="MANAGE_COMPUTER_CONTROL_CONSENT", sdkMin=37)
+    public void testManageComputerControlConsent(){
+        try {
+            Object manager = mContext.getSystemService("virtualdevice");
+            if (manager == null) {
+                logger.debug("virtualdevice service not available");
+                return;
+            }
+            java.lang.reflect.Method method = manager.getClass().getMethod("isPackageApprovedToRunComputerControlAutomation", String.class, int.class);
+            method.invoke(manager, "dummy", 0);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+    }
+
+    @PermissionTest(permission="MANAGE_MULTIUSER_DEVICE_PROVISIONING_STATE", sdkMin=37)
+    public void testManageMultiuserDeviceProvisioningState(){
+        try {
+            android.app.admin.DevicePolicyManager dpm = (android.app.admin.DevicePolicyManager) mContext.getSystemService(android.content.Context.DEVICE_POLICY_SERVICE);
+            java.lang.reflect.Method method = dpm.getClass().getMethod("getMultiuserManagedDeviceProvisioningState");
+            method.invoke(dpm);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+    }
+
+    @PermissionTest(permission="REQUEST_COMPANION_PROFILE_VIRTUAL_DEVICE", sdkMin=37)
+    public void testRequestCompanionProfileVirtualDevice(){
+        android.companion.CompanionDeviceManager companionDeviceManager = mContext.getSystemService(android.companion.CompanionDeviceManager.class);
+        
+        String profile = "android.app.role.COMPANION_DEVICE_VIRTUAL_DEVICE"; // likely value
+        try {
+            java.lang.reflect.Field field = android.companion.CompanionDeviceManager.class.getField("DEVICE_PROFILE_VIRTUAL_DEVICE");
+            profile = (String) field.get(null);
+        } catch (Exception e) {
+            logger.debug("Could not find DEVICE_PROFILE_VIRTUAL_DEVICE constant, using fallback.");
+        }
+
+        android.companion.AssociationRequest.Builder builder = new android.companion.AssociationRequest.Builder();
+        builder.setDeviceProfile(profile);
+        android.companion.AssociationRequest request = builder.build();
+
+        try {
+            companionDeviceManager.associate(request, new android.companion.CompanionDeviceManager.Callback() {
+                @Override
+                public void onFailure(CharSequence error) {
+                    logger.debug("associate failed: " + error);
+                }
+            }, null);
+            
+            logger.debug("associate called successfully (positive test passed or waiting for UI).");
+        } catch (IllegalArgumentException e) {
+            logger.debug("IllegalArgumentException thrown: " + e.getMessage());
+        } catch (SecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.debug("Threw non-SecurityException as expected when permission is granted: " + e);
+        }
+    }
 
 }

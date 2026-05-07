@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <privapp-permissions package="com.android.certification.niap.permission.dpctester">
+        <permission name="android.permission.ACCESS_ATTENTION_LISTENER"/>
+        <permission name="android.permission.ACCESS_BIOMETRIC_SENSOR_STRENGTHS"/>
+        <permission name="android.permission.LOCK_APPS"/>
+        <permission name="android.permission.MANAGE_APP_FUNCTION_ACCESS"/>
+        <permission name="android.permission.MANAGE_COMPUTER_CONTROL_CONSENT"/>
+        <permission name="android.permission.MANAGE_HEADLESS_SYSTEM_USER_ALLOWLISTS"/>
+        <permission name="android.permission.MANAGE_MULTIUSER_DEVICE_PROVISIONING_STATE"/>
+        <permission name="android.permission.REQUEST_COMPANION_PROFILE_VIRTUAL_DEVICE"/>
+    </privapp-permissions>
+</permissions>

@@ -117,14 +117,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
-        <!--
-        <service android:name="com.example.accounts.GenericAccountService"
+        <service
+            android:name=".service.DummyDataMigrationService"
+            android:permission="android.permission.BIND_DATA_MIGRATION_FOR_PRIVATECOMPUTE"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
+                <action android:name="android.app.privatecompute.DataMigrationToPccService" />
             </intent-filter>
-            <meta-data android:name="android.accounts.AccountAuthenticator" android:resource="@xml/authenticator" />
-        </service>-->
+        </service>
     </application>
 
 

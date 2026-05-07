@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
+    <boolean name="core_test_module" value="false" />
     <boolean name="install_test_module" value="false" />
     <boolean name="runtime_test_module" value="false" />
     <boolean name="signature_test_module_cinnamon_bun" value="true" />

@@ -61,7 +61,9 @@ public class BinderTransactsDict {
             //Change suffix depends on system version
 
             var SDK_INT = Build.VERSION.SDK_INT;
-            if(TesterUtils.isAtLeastBaklava()){
+            if (SDK_INT >= 37) {
+                // Keep actual SDK_INT for 37 and above
+            } else if (TesterUtils.isAtLeastBaklava()) {
                 SDK_INT = 36;
             }
 

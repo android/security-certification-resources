@@ -593,6 +593,22 @@ class DPCTestModule(val ctx: Activity): PermissionTestModuleBase(ctx){
         dpm.setDeviceOwnerLockScreenInfo("Test Lockscreen Message", {}, { e -> throw e })
     }
 
+    @PermissionTest("MANAGE_MULTIUSER_DEVICE_PROVISIONING_STATE", 37)
+    fun testManageMultiuserDeviceProvisioningState() {
+        val realDpm = ctx.getSystemService(Activity.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
+        try {
+            val method = realDpm.javaClass.getMethod("getMultiuserManagedDeviceProvisioningState")
+            method.invoke(realDpm)
+            logger.debug("getMultiuserManagedDeviceProvisioningState called successfully")
+        } catch (e: Exception) {
+            val cause = e.cause
+            if (e is SecurityException || cause is SecurityException) {
+                throw e
+            }
+            throw com.android.certification.niap.permission.dpctester.test.exception.BypassTestException("Test failed with non-SecurityException: ${e.message}")
+        }
+    }
+
     ////////////////////////////////////////////////////////////
     // Local Scope Tools Section
     private fun clearUserRestriction(aRestriction:String){

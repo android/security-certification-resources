@@ -1,5 +1,9 @@
 # Permission Test Tool
 
+> [!WARNING]
+> **DEPRECATED**: This project (Tester) is deprecated for API level 35 and later.
+> Please use `PermissionTester` instead for newer SDK versions.
+
 This sample app is a tool which aids OEMs in testing their devices for
 evaluation of the Common Criteria certificate through
 [NIAP](https://www.niap-ccevs.org/).
