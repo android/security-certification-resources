@@ -92,6 +92,7 @@
     <uses-feature android:name="android.software.companion_device_setup"
         android:required="false" />
 
+    <uses-permission android:name="android.permission.BIND_DATA_MIGRATION_FOR_PRIVATECOMPUTE" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />

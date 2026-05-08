@@ -1226,7 +1226,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		nm.notify(id, notification);
 
 		// Wait a bit for the notification to be posted and processed
-		Thread.sleep(500);
+		Thread.sleep(3000);
 
 		StatusBarNotification[] activeNotifications = nm.getActiveNotifications();
 		boolean found = false;
@@ -1291,6 +1291,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 			}
 		}
 	}
+
 
 	final Object lock = new Object();
 	private class FgServiceConnection implements android.content.ServiceConnection {

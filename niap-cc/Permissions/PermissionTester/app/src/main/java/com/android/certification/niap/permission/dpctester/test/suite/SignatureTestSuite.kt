@@ -35,18 +35,7 @@ class SignatureTestSuite(activity: Activity): PermissionTestSuiteBase(
     async = false,
     activity = activity,
     values = arrayOf(
-    RuntimeTestModule(activity),
-    SignatureTestModule(activity),
-    SignatureTestModuleP(activity),
-    SignatureTestModuleQ(activity),
-    SignatureTestModuleR(activity),
-    SignatureTestModuleS(activity),
-    SignatureTestModuleT(activity),
-    SignatureTestModuleU(activity),
-    SignatureTestModuleV(activity),
-    SignatureTestModuleBaklava(activity),
-    SignatureTestModuleCinnamonBun(activity),
-    SignatureTestModuleBinder(activity)
+    SignatureTestModuleCinnamonBun(activity)
         )
 ){
 

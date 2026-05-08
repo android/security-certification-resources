@@ -251,3 +251,60 @@
   ```
   04-09 12:56:24.105 15695 15742 D Signature 37(CinnamonBun) Test Cases: getEnrollmentType threw expected NullPointerException (passed permission check)
   ```
+
+## 調査失敗の記録 (Research Failures)
+
+SDK 37 (CinnamonBun) の追加テストにおいて、`noperm` バリアント（権限なし）で実行したにもかかわらず、API の呼び出しが成功してしまった項目があります。これらは権限検証のテストとして適切でなかった（またはOS側のチェックが未実装）可能性が高いため、調査の失敗として記録し、代替のAPIや検証方法を検討する必要があります。
+
+### ❌ 予期せず成功した項目 (Unexpected Successes)
+
+1. **`android.permission.BIND_DATA_MIGRATION_FOR_PRIVATECOMPUTE`**
+   - **現象**: `DummyDataMigrationService` へのバインドが成功。
+   - **原因**: 対象サービスがテストアプリ自身の中に定義されているため、同一UID間のバインドとして権限チェックがバイパスされた可能性が高い。
+   - **対策**: `Companion` アプリなどの別アプリにサービスを定義し、そこへのバインドを試みる必要がある。
+
+2. **`android.permission.CHANGE_PERSONAL_CONTEXT_OPERATING_MODE`**
+   - **現象**: `PersonalContextManager.setOperatingMode` が成功。
+   - **原因**: OSの `PersonalContextManagerService` 側で、テストモードなどのフラグによって権限チェックがスキップされている可能性がある。
+   - **対策**: 他の `PersonalContext` 関連のAPIで権限チェックが厳密に行われるものを探す。
+
+3. **`android.permission.PERFORM_GESTURE_EXCHANGE`**
+   - **現象**: `NfcAdapter.registerGestureExchangeReaderCallback` が成功。
+   - **原因**: NFCサービスの内部で権限チェックが行われていないか、スタブ実装である可能性がある。
+
+4. **`android.permission.PERSONAL_CONTEXT_HOST_INSIGHT_SURFACE`**
+   - **現象**: `registerInsightSurfaceClient` が成功。
+5. **`android.permission.PERSONAL_CONTEXT_PUBLISH_HINTS`**
+   - **現象**: `publishTriggeringHint` が成功。
+6. **`android.permission.PERSONAL_CONTEXT_PUBLISH_INSIGHTS`**
+   - **現象**: `publishInsight` が成功。
+7. **`android.permission.PERSONAL_CONTEXT_READ_SETTINGS`**
+   - **現象**: `isEnabled` が成功。
+
+   - **PersonalContext関連の共通原因**: `PersonalContextManagerService` の `enforceAccess` や `enforcePermissions` が、動作モード（`OperatingMode`）によってチェックをスキップする構造になっている可能性があり、テスト環境ではチェックが有効になっていなかった可能性がある。
+
+8. **`android.permission.REMOTE_MULTISENSORY_PLAYBACK`**
+   - **現象**: `setPlayer` が成功。
+9. **`android.permission.SCHEDULE_DELAYED_RESTORE`**
+   - **現象**: `scheduleDelayedRestoreForUser` が成功。
+10. **`android.permission.SIGN_WITH_TRUST_TOKEN`**
+    - **現象**: `acquireVerifiedDeviceToken` が成功。
+12. **`android.permission.UPDATE_THEME_SETTINGS`**
+    - **現象**: `updateThemeSettings` が成功。
+
+これらの項目については、単にAPIを呼び出すだけでは権限の有無を検証できないため、別のAPIを探すか、OSのソースコード（`frameworks/base` 等）を詳細に調査して、確実に権限チェックが走るパスを特定する必要があります。
+
+## 正しい作業手順 (Correct Working Procedure)
+
+今後の調査および修正作業において、効率的に進め、かつ誤認を防ぐための手順を以下に定めます。
+
+1. **テストの絞り込みとログの絞り込みは最初から行う**:
+   - 調査対象のモジュールやテスト項目が特定できている場合は、`active_modules` や `enable_module` 等を利用して、**最初からテスト対象を絞り込んで実行**すること。全件実行はコンテキスト汚染やタイムアウトの原因となる。
+   - ログの確認も、対象のプロセスやタグ、あるいはテスト範囲に絞って行うこと。
+
+2. **Nullを返すAPIの検証**:
+   - APIが `null` を返した場合、それが権限不足によるものか、単に状態や機能が未サポートであるためか（あるいは引数が不正なためか）を検証すること。
+   - 単に `null` を受け取って例外を投げるだけでは、正しい権限検証にならない場合がある。
+
+3. **予期せぬ成功の記録**:
+   - 権限がない状態で API が成功してしまった場合は、調査の失敗として速やかに記録し、深追いを避けて代替 API の調査に切り替えること。

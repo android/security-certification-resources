@@ -7,7 +7,7 @@ DEVICE=${1:-localhost:38189}
 echo "Using DEVICE: $DEVICE"
 
 # Build
-./gradlew assembleNopermDebug
+../gradlew assembleNopermDebug -p ..
 
 # Install with -t and -g options
-adb -s $DEVICE install -t -g app/build/outputs/apk/noperm/debug/Tester-noperm-debug.apk
+adb -s $DEVICE install -t -g ../app/build/outputs/apk/noperm/debug/Tester-noperm-debug.apk

@@ -588,6 +588,10 @@
             android:permission="android.permission.BIND_CONTENT_RESTRICTION_SERVICE" 
             android:enabled="true" android:exported="true" />
 
+        <service android:name=".services.TestBindDataMigrationForPrivatecomputeService"
+            android:permission="android.permission.BIND_DATA_MIGRATION_FOR_PRIVATECOMPUTE" 
+            android:enabled="true" android:exported="true" />
+
     </application>
 
 </manifest>

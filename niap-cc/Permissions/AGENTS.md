@@ -25,7 +25,7 @@ Update the Permission Test Tooling for Android 17 / Android 26Q2 (SDK 37).
 
 ### ❗ Essential Rules for Agents
 - **Timer Rule**: When you say "wait" or similar, you **MUST** set a timer (using `schedule` tool) to ensure you don't forget to check back.
-- **Logcat Rule**: When searching logcat, prefer filtering by process name or PID for efficiency and to avoid noise.
+- **Logcat Rule**: When searching logcat or getting logs with MCP tools, you **MUST** prioritize filtering by process name or PID (e.g., `com.android.certification.niap.permission.dpctester`) to avoid noise and context pollution. Scoping tests and logs must be done from the beginning.
 
 ### 🛠️ Prerequisites for Testing on Real Devices
 - **Companion App**: Must be installed and running for normal operation of some tests.
