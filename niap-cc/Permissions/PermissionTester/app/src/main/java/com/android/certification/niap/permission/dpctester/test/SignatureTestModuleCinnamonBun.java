@@ -260,10 +260,11 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                 throw new BypassTestException("personal_context service not available");
             }
             java.lang.reflect.Method method = manager.getClass().getMethod("setPersonalContextModeEnabled", String.class, boolean.class);
-            method.invoke(manager, "test", true);
+            method.invoke(manager, mContext.getPackageName(), true);
         } catch (java.lang.reflect.InvocationTargetException e) {
-            if (e.getCause() instanceof SecurityException) {
-                throw (SecurityException) e.getCause();
+            Throwable cause = e.getCause();
+            if (cause instanceof SecurityException) {
+                throw (SecurityException) cause;
             }
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         } catch (com.android.certification.niap.permission.dpctester.test.exception.BypassTestException e) {
@@ -275,15 +276,26 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
     @PermissionTest(permission="CHANGE_PERSONAL_CONTEXT_OPERATING_MODE",sdkMin=37)
     public void testChangePersonalContextOperatingMode(){
         try {
-            // TODO: Implement test for CHANGE_PERSONAL_CONTEXT_OPERATING_MODE
-            logger.debug("Placeholder for CHANGE_PERSONAL_CONTEXT_OPERATING_MODE");
-            throw new BypassTestException("Not implemented yet");
+            Object manager = mContext.getSystemService("personal_context");
+            if (manager == null) {
+                throw new BypassTestException("personal_context service not available");
+            }
+            java.lang.reflect.Method method = manager.getClass().getMethod("setOperatingMode", int.class);
+            method.invoke(manager, 0); // OPERATING_MODE_DEFAULT
+            logger.debug("setOperatingMode called successfully");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof SecurityException) {
+                throw (SecurityException) cause;
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         } catch (com.android.certification.niap.permission.dpctester.test.exception.BypassTestException e) {
             throw e;
         } catch (Exception e) {
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
+
     @PermissionTest(permission="CHECK_CONTENT_SAFETY",sdkMin=37)
     public void testCheckContentSafety(){
         try {
@@ -1017,25 +1029,15 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                 throw new BypassTestException("personal_context service not available");
             }
             
-            java.lang.reflect.Method method = null;
-            for (java.lang.reflect.Method m : manager.getClass().getDeclaredMethods()) {
-                if (m.getName().equals("publishTriggeringHint")) {
-                    method = m;
-                    break;
-                }
-            }
-            
-            if (method == null) {
-                logger.debug("publishTriggeringHint method not found");
-                return;
-            }
+            java.lang.reflect.Method method = manager.getClass().getMethod("publishTriggeringHint", java.util.List.class, java.util.List.class);
             
             method.setAccessible(true);
-            method.invoke(manager, null, null);
+            method.invoke(manager, java.util.Collections.emptyList(), null);
             logger.debug("publishTriggeringHint called successfully");
         } catch (java.lang.reflect.InvocationTargetException e) {
-            if (e.getCause() instanceof SecurityException) {
-                throw (SecurityException) e.getCause();
+            Throwable cause = e.getCause();
+            if (cause instanceof SecurityException) {
+                throw (SecurityException) cause;
             }
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         } catch (com.android.certification.niap.permission.dpctester.test.exception.BypassTestException e) {
@@ -1052,25 +1054,15 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                 throw new BypassTestException("personal_context service not available");
             }
             
-            java.lang.reflect.Method method = null;
-            for (java.lang.reflect.Method m : manager.getClass().getDeclaredMethods()) {
-                if (m.getName().equals("publishInsight")) {
-                    method = m;
-                    break;
-                }
-            }
-            
-            if (method == null) {
-                logger.debug("publishInsight method not found");
-                return;
-            }
+            java.lang.reflect.Method method = manager.getClass().getMethod("publishInsight", java.util.List.class, java.util.UUID.class);
             
             method.setAccessible(true);
-            method.invoke(manager, null, null);
+            method.invoke(manager, java.util.Collections.emptyList(), java.util.UUID.randomUUID());
             logger.debug("publishInsight called successfully");
         } catch (java.lang.reflect.InvocationTargetException e) {
-            if (e.getCause() instanceof SecurityException) {
-                throw (SecurityException) e.getCause();
+            Throwable cause = e.getCause();
+            if (cause instanceof SecurityException) {
+                throw (SecurityException) cause;
             }
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         } catch (com.android.certification.niap.permission.dpctester.test.exception.BypassTestException e) {
@@ -2224,14 +2216,14 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                     throw (SecurityException) cause;
                 } else {
                     logger.debug("reportEvent threw non-SecurityException: " + cause);
-                    throw new com.android.certification.niap.permission.dpctester.test.exception.BypassTestException("Failed: " + cause);
+                    throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
                 }
             }
         } catch (SecurityException e) {
             throw e;
         } catch (Exception e) {
             logger.debug("Reflection error: " + e.getMessage());
-            throw new com.android.certification.niap.permission.dpctester.test.exception.BypassTestException("Failed to call reportEvent via reflection");
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
 }

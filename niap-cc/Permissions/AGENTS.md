@@ -23,6 +23,16 @@ Update the Permission Test Tooling for Android 17 / Android 26Q2 (SDK 37).
 - Reference the research in `xpermission` to understand the changes in Android 17 / 26Q2 permissions.
 - **Reference [TESTAUTONOMOUS.md](file:///usr/local/google/home/wkouki/AndroidStudioProjects/security-certification-resources/niap-cc/Permissions/TESTAUTONOMOUS.md) for automation procedures, including how to scope test execution via `SharedPreferences` manipulation.** and mcp tools ot communcating test devices.
 
+### ❗ Essential Rules for Agents
+- **Timer Rule**: When you say "wait" or similar, you **MUST** set a timer (using `schedule` tool) to ensure you don't forget to check back.
+- **Logcat Rule**: When searching logcat, prefer filtering by process name or PID for efficiency and to avoid noise.
+
+### 🛠️ Prerequisites for Testing on Real Devices
+- **Companion App**: Must be installed and running for normal operation of some tests.
+- **SELinux**: Must be disabled before running tests. Use `adb shell setenforce 0`.
+- **Hidden API**: Must be enabled before running tests. Use `adb shell settings put global hidden_api_policy 1` (or appropriate command for the target OS).
+- **Scope Execution**: Always scope test execution to specific modules via `SharedPreferences` to save time and avoid crashes.
+
 ## Module Installation and Verification
 
 When installing the test modules, the `-g` option is **ALWAYS required** to grant all runtime permissions automatically. Also, the `-t` option is needed as it behaves as a test app. You can use the shell command in PermissionTester/script` to build and install the test modules.
