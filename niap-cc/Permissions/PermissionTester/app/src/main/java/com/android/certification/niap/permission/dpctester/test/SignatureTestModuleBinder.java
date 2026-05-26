@@ -562,7 +562,7 @@ public class SignatureTestModuleBinder extends SignaturePermissionTestModuleBase
     }
 
     // @PermissionTest(permission="BIND_DEVELOPER_VERIFICATION_AGENT", sdkMin=37)
-    // 動作確認の結果、Android 17実機では internal パーミッションとなっており、通常アプリからはグラントされないため現状テスト不可。
+    // As a result of verification, this is an internal permission on Android 17 actual devices and is not granted to normal apps, so it cannot be tested at present.
     public void testBindDeveloperVerificationAgent(){
         runBindRunnable("BIND_DEVELOPER_VERIFICATION_AGENT");
     }
@@ -578,7 +578,7 @@ public class SignatureTestModuleBinder extends SignaturePermissionTestModuleBase
     }
 
     // @PermissionTest(permission="BIND_ALLOWLIST_PROVIDER_SERVICE", sdkMin=37)
-    // 動作確認の結果、Android 17実機では internal パーミッションとなっており、通常アプリからはグラントされないため現状テスト不可。
+    // As a result of verification, this is an internal permission on Android 17 actual devices and is not granted to normal apps, so it cannot be tested at present.
     public void testBindAllowlistProviderService(){
         runBindRunnable("BIND_ALLOWLIST_PROVIDER_SERVICE");
     }
@@ -609,7 +609,7 @@ public class SignatureTestModuleBinder extends SignaturePermissionTestModuleBase
     }
 
     // @PermissionTest(permission="BIND_CONTENT_RESTRICTION_SERVICE", sdkMin=37)
-    // 動作確認の結果、Android 17実機ではパーミッション自体が存在しないためテスト不可。
+    // As a result of verification, this permission itself does not exist on Android 17 actual devices, so it cannot be tested.
     public void testBindContentRestrictionService(){
         runBindRunnable("BIND_CONTENT_RESTRICTION_SERVICE");
     }

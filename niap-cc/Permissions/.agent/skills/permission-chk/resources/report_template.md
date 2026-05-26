@@ -1,45 +1,45 @@
-# 🔍 調査パーミッション: [パーミッション名]
-リスクスコア: [100, 10, 7.5, 5, 2.5, 0]
+# 🔍 Investigated Permission: [Permission Name]
+Risk Score: [100, 10, 7.5, 5, 2.5, 0]
 
-## 📖 概要
-このパーミッションの役割や目的を簡潔に記述してください。
+## 📖 Overview
+Briefly describe the role and purpose of this permission.
 
-## ⚖️ 調査項目（9カテゴリー）
+## ⚖️ Investigation Items (9 Categories)
 
-1. **未実装 (WIP) の除外**: [該当/非該当]
-   - 理由と根拠（@RequiresPermission のチェック等が見つからない、など）
+1. **Exclusion of Work-in-Progress (WIP)**: [Applicable/Not Applicable]
+   - Reason and evidence (e.g., @RequiresPermission checks are not found).
 
-2. **Phone以外 (Wear, Auto, TV 等) 制限の分離**: [該当/非該当]
-   - 理由（特定モジュール内に閉じているか）
+2. **Isolation of Non-Phone Limits (Wear, Auto, TV, etc.)**: [Applicable/Not Applicable]
+   - Reason (e.g., whether it is confined to specific modules).
 
-3. **Feature Flag 制御 (Default Disabled) の識別**: [該当/非該当]
-   - 理由（フラグチェックの有無）
+3. **Identification of Feature Flag Control (Default Disabled)**: [Applicable/Not Applicable]
+   - Reason (e.g., presence/absence of flag checks).
 
-4. **`BIND_*` 系パーミッションの識別**: [該当/非該当]
+4. **Identification of `BIND_*` Permissions**: [Applicable/Not Applicable]
 
-5. **DPC (Device Policy Controller) 系パーミッションの識別**: [該当/非該当]
+5. **Identification of DPC (Device Policy Controller) Permissions**: [Applicable/Not Applicable]
 
-6. **Google Playなど framework外に適用されるPermissionかどうか?**: [はい/いいえ]
+6. **Whether It Applies Outside the Framework (e.g., Google Play)**: [Yes/No]
 
-7. **対応すると思われるCTSテスト**:
-   - **テスト名**: [テストクラス名やモジュール名]
-   - **テストの概要**: [何を確認するテストか]
-   - **ユーザーレベル再現可能性**: [可/不可（理由など）]
-   - **再現パス**: [実行コマンド（例: adb shell am instrument ...）や再現手順]
+7. **Corresponding CTS Tests**:
+   - **Test Name**: [Test class name or module name]
+   - **Test Summary**: [What the test verifies]
+   - **User-Level Reproducibility**: [Yes/No (with reasons)]
+   - **Reproduction Path**: [Execution command (e.g., adb shell am instrument ...) or steps to reproduce]
 
-8. **再現パスの確認**:
-   - **利用頻度と配置箇所**: [多い/少ない。システムサービス、プロバイダなど]
-   - **ソースコードの場所 (ファイル名と行番号)**: [ファイル名](file:///絶対パス#L行番号)
-   - **証拠コードスニペット**:
+8. **Reproduction Path Verification**:
+   - **Usage Frequency and Location**: [High/Low. System services, providers, etc.]
+   - **Source Code Locations**: [Filename](file:///absolute/path#Lline_number)
+   - **Evidence Snippets**:
      ```java
-     // 実際の権限チェックや呼び出しコード
+     // Actual permission check or invocation code
      ```
-   - **再現方法 (検証手法)**:
-     - **公開API**: [クラス名.メソッド名など]
-     - **非公開/隠しAPI (システムAPI)**: [システムサービス、非公開クラスなど]
-     - **ServiceManager / Binder IPC**: [AIDLインターフェース呼び出しなど]
-     - **Shellコマンド**: [adb shell content / am / service など]
+   - **Reproduction Method (Verification Techniques)**:
+     - **Public API**: [Classname.methodname, etc.]
+     - **Non-Public/Hidden API (System API)**: [System services, non-public classes, etc.]
+     - **ServiceManager / Binder IPC**: [AIDL interface calls, etc.]
+     - **Shell Command**: [adb shell content / am / service, etc.]
 
-9. **許可時の危険度の判定**:
-   - **スコア**: [100, 10, 7.5, 5, 2.5, 0]
-   - **所感とアタックシナリオ**: 
+9. **Risk Level Assessment on Permission Granted**:
+   - **Score**: [100, 10, 7.5, 5, 2.5, 0]
+   - **Remarks and Attack Scenarios**: 

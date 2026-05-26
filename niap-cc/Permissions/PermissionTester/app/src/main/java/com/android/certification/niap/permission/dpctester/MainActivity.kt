@@ -79,7 +79,7 @@ class MainViewAdapter(private val list: List<LogBox>,
         )
     }
 
-    // ViewHolder内に表示するデータを指定。
+    // Bind data to the ViewHolder.
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
         fun textView(resId:Int):TextView {
             return holder.itemView.findViewById(resId)
@@ -109,7 +109,7 @@ class MainViewAdapter(private val list: List<LogBox>,
         }
     }
 
-    // 表示したいリストの数を指定
+    // Return the number of items in the list
     override fun getItemCount(): Int {
         return list.size
     }

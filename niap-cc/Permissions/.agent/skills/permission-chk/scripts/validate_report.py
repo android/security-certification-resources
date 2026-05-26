@@ -8,31 +8,31 @@ def validate_report(file_path):
 
     errors = []
 
-    # 必須セクションのチェック
+    # Check for required sections
     required_sections = [
-        r"# 🔍 調査パーミッション:",
-        r"## ⚖️ 調査項目（9カテゴリー）",
-        r"1. \*\*未実装 \(WIP\) の除外\*\*",
-        r"2. \*\*Phone以外",
-        r"3. \*\*Feature Flag",
-        r"4. \*\*\`BIND_\*",
-        r"5. \*\*DPC",
-        r"6. \*\*Google Play",
-        r"7. \*\*対応すると思われるCTSテスト",
-        r"8. \*\*再現パスの確認",
-        r"9. \*\*許可時の危険度の判定"
+        r"# 🔍 Investigated Permission:",
+        r"## ⚖️ Investigation Items \(9 Categories\)",
+        r"1. \*\*Exclusion of Work-in-Progress \(WIP\)\*\*",
+        r"2. \*\*Isolation of Non-Phone Limits",
+        r"3. \*\*Identification of Feature Flag Control",
+        r"4. \*\*Identification of \`BIND_\*",
+        r"5. \*\*Identification of DPC",
+        r"6. \*\*Whether It Applies Outside the Framework",
+        r"7. \*\*Corresponding CTS Tests",
+        r"8. \*\*Reproduction Path",
+        r"9. \*\*Risk Level Assessment"
     ]
 
     for section in required_sections:
         if not re.search(section, content):
             errors.append(f"Missing required section or pattern: {section}")
 
-    # スコアのチェック (100, 10, 7.5, 5, 2.5, 0)
-    score_match = re.search(r"リスクスコア:\s*(100|10|7\.5|5|2\.5|0)", content)
+    # Check for risk score (100, 10, 7.5, 5, 2.5, 0)
+    score_match = re.search(r"Risk Score:\s*(100|10|7\.5|5|2\.5|0)", content)
     if not score_match:
-        errors.append("Risk score not found or invalid format. Must be 'リスクスコア: [100, 10, 7.5, 5, 2.5, 0]'.")
+        errors.append("Risk score not found or invalid format. Must be 'Risk Score: [100, 10, 7.5, 5, 2.5, 0]'.")
 
-    # Zoektリンク (file:///) のチェック
+    # Check for Zoekt links (file:///)
     if "file:///" not in content:
         errors.append("No file:/// links found. Proof is required.")
 

@@ -21,7 +21,7 @@ Update the Permission Test Tooling for Android 17 / Android 26Q2 (SDK 37).
 - This project is part of a security certification resource update.
 - Focus on updating `Companion` and `TransactIds` or creating a new tester mechanism as needed for Android 17 / 26Q2.
 - Reference the research in `xpermission` to understand the changes in Android 17 / 26Q2 permissions.
-- **Reference [TESTAUTONOMOUS.md](file:///usr/local/google/home/wkouki/AndroidStudioProjects/security-certification-resources/niap-cc/Permissions/TESTAUTONOMOUS.md) for automation procedures, including how to scope test execution via `SharedPreferences` manipulation.** and mcp tools ot communcating test devices.
+- **Reference [TESTAUTONOMOUS.md](file:///~/AndroidStudioProjects/security-certification-resources/niap-cc/Permissions/TESTAUTONOMOUS.md) for automation procedures, including how to scope test execution via `SharedPreferences` manipulation.** and mcp tools ot communcating test devices.
 
 ### ❗ Essential Rules for Agents
 - **Timer Rule**: When you say "wait" or similar, you **MUST** set a timer (using `schedule` tool) to ensure you don't forget to check back.
@@ -59,10 +59,10 @@ Use these scripts for verification.
 ## Permissions Checklist Legend
 
 The `permissions_checklist.csv` file uses the following status codes:
-- `-`: 実装不可 (Not implementable)
-- `0`: 未実装 (Not implemented)
-- `1`: プレースホルダの準備 (Placeholder ready)
-- `2`: 仮実装 (Tentative implementation)
-- `3`: 実装 (Implemented)
-- `4`: 動作確認済み (Verified)
-- `5`: 実装済み (Completed)
+- `-`: Not implementable
+- `0`: Not implemented
+- `1`: Placeholder ready
+- `2`: Tentative implementation
+- `3`: Implemented
+- `4`: Verified
+- `5`: Completed

@@ -45,7 +45,7 @@ class DetailsViewAdapter(private val list: List<LogBox>,
     interface ListListener {
         fun onClickItem(tappedView: View, itemModel: LogBox)
     }
-    // その名の通りViewHolderを作成。MainViewHolderの引数にinflateしたレイアウトを入れている
+    // Create ViewHolder and pass the inflated layout as an argument to the ViewHolder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailsViewHolder {
         return DetailsViewHolder(
             LayoutInflater.from(parent.context)
@@ -53,7 +53,7 @@ class DetailsViewAdapter(private val list: List<LogBox>,
         )
     }
 
-    // ViewHolder内に表示するデータを指定。
+    // Bind data to the ViewHolder.
     override fun onBindViewHolder(holder: DetailsViewHolder, position: Int) {
         fun textView(resId:Int):TextView {
             return holder.itemView.findViewById(resId)
@@ -72,7 +72,7 @@ class DetailsViewAdapter(private val list: List<LogBox>,
 
     }
 
-    // 表示したいリストの数を指定
+    // Return the number of items in the list
     override fun getItemCount(): Int {
         return list.size
     }

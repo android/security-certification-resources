@@ -8,6 +8,8 @@ This project contains tools for testing Android permissions, currently being upd
 - **Companion**: A tool that provides service stubs to call services via Transaction ID, and handles some settings.
 - **TransactIds**: A tool to retrieve actual Transaction IDs from a device.
 - **Tester**: (Appears in directory listing, likely related to PermissionTester or legacy code).
+- **.agent**: Configuration and tools for AI agent orchestration and task execution.
+  - **skills/permission-chk**: A specialized skill for executing comprehensive research on Android permissions. It automates fast searches via Zoekt, standardizes 9-category classification (such as WIP exclusion, DPC/feature flag identification, and risk scoring), and generates evidence-based evaluation reports. Includes report templates, Python validation scripts (`validate_report.py`), and lists of advanced verification techniques (e.g., direct Binder transactions).
 
 ## Current Status & Context
 
@@ -42,13 +44,13 @@ Use these scripts for verification.
 ## Permissions Checklist Legend
 
 The `permissions_checklist.csv` file uses the following status codes:
-- `-`: 実装不可 (Not implementable)
-- `0`: 未実装 (Not implemented)
-- `1`: プレースホルダの準備 (Placeholder ready)
-- `2`: 仮次走 (Tentative run)
-- `3`: 実装 (Implemented)
-- `4`: 動作確認済み (Verified)
-- `5`: 実装済み (Completed)
+- `-`: Not implementable
+- `0`: Not implemented
+- `1`: Placeholder ready
+- `2`: Tentative run
+- `3`: Implemented
+- `4`: Verified
+- `5`: Completed
 
 
 ## Switch cf and out
@@ -56,7 +58,7 @@ The `permissions_checklist.csv` file uses the following status codes:
 export OUT_DIR=cfout
 source build/envsetup.sh
 lunch cf_x86_64_phone-trunk_staging-userdebug
-# この時点で ANDROID_PRODUCT_OUT は cfout/target/product/... を指しているため、そのまま実行可能
+# At this point, ANDROID_PRODUCT_OUT points to cfout/target/product/..., so it can be executed as is
 acloud create --local-image
 
 I shouldn't use cuttlefish, because I have to lunch it on cloudtop, and it's very slow to use it over double vpn. I should use my Pixel 8 device via ponits instead.

@@ -1,94 +1,93 @@
-# パーミッション調査スキル (Permission Research Skill)
+# Permission Research Skill (SKILL.md)
 
-## 概要
-Android パーミッションの網羅的調査を手順通りに実行するためのスキルです。
-`agent_and_report_plan.md` を正とし、手抜きを排除し、証拠に基づいたレポートを作成します。
+## Overview
+This skill is designed to execute a comprehensive investigation of Android permissions according to the defined procedure.
+It strictly follows `agent_and_report_plan.md` to avoid shortcut actions and creates evidence-based reports.
 
-## 利用可能ツール
-- `run_command` (zoekt 検索の実行)
-- `read_url_content` (zoekt web 検索の実行 - 推奨)
-- `view_file` (コードの確認)
-- `write_to_file` (レポートの作成)
-- `send_message` (進捗報告)
+## Available Tools
+- `run_command` (to execute zoekt searches)
+- `read_url_content` (to execute zoekt web searches - Recommended)
+- `view_file` (to inspect code)
+- `write_to_file` (to generate reports)
+- `send_message` (to report progress)
 
-## 🚫 禁止事項と行動規範（手抜き・サボり防止）
+## 🚫 Prohibited Actions & Code of Conduct (To Prevent Cutting Corners)
 
-あなたはサブエージェント（ワーカー）として行動します。以下の行為は厳格に禁止されており、違反した場合はタスクが破棄されます。
+You will act as a subagent (worker). The following actions are strictly prohibited, and failure to comply will result in the task being discarded:
 
-1. **`run_command` による `grep` や `find` の実行**: AOSPなどの巨大なコードベースではパフォーマンスを悪化させるため禁止です。必ず `read_url_content` で Zoekt Web サーバー（`http://localhost:6070/search?q=...`）を利用してください。
-2. **サブエージェントの起動 (`invoke_subagent`)**: タスクを外部に丸投げしてはいけません。必ずあなた自身がすべてのファイルを確認してください。
-3. **ユーザーへの質問・承認待ち**: 調査中に迷った際、ユーザーに質問を投げて作業を止めてはいけません。見つからない場合は「見つからない」として、論理的に推論して評価を決定し、レポートを作成しきってください。
-4. **自分が親エージェント（統括役）であると錯覚すること**: ユーザーや親エージェントに指示を出したり、作業を要求してはいけません。
+1. **Running `grep` or `find` via `run_command`**: Using these commands is prohibited in huge codebases like AOSP as it degrades performance. You MUST use `read_url_content` with the Zoekt Web Server (`http://localhost:6070/search?q=...`).
+2. **Invoking Subagents (`invoke_subagent`)**: Do not outsource the task to another agent. You must inspect all files yourself.
+3. **Asking Users for Questions/Approvals**: Do not block the task by asking the user questions when you are unsure during the investigation. If something is not found, record it as "not found", logically deduce and determine the evaluation, and complete the report.
+4. **Acting as the Host/Orchestrator Agent**: Do not issue instructions or demand actions from the user or the parent agent.
 
+## Workflow & Steps
 
-## ワークフローと手順
+You must execute the following steps **in order**:
 
-あなたは以下の手順を **順番に** 実行しなければなりません。
+### Step 1: Identify the Target
+Identify the target permission string (e.g., `android.permission.READ_CONTACTS`) from the specified CSV file or list.
 
-### 手順 1: 調査対象の特定
-指定されたCSVファイルやリストから、調査対象のパーミッション文字列（例: `android.permission.READ_CONTACTS`）を特定します。
+### Step 2: Report Start of Investigation (For Liveness Checks)
+Once the target permission is identified, report "Start of Investigation" to the parent agent before beginning intensive searches (Zoekt).
+- **Read File**: Retrieve the parent's Conversation ID from `xpermssion/active_parent_id.txt`.
+- **Send Message**: Use `send_message` to send "Start: [Permission Name]" to that ID.
+- **Purpose**: To track whether the agent is alive (not hung) during large batch processing.
 
-### 手順 2: 調査開始の報告 (死活確認用)
-調査対象が特定できたら、本格的な検索（Zoekt）を始める前に親エージェントに「調査開始」を報告します。
-- **ファイル読み込み**: `xpermssion/active_parent_id.txt` から親の会話 ID を取得します。
-- **メッセージ送信**: `send_message` を用いて、その ID に「調査開始: [Permission名]」と送信します。
-- **目的**: 大量バッチ処理時にエージェントが生存しているか（ハングしていないか）を追跡するためです。
+### Step 3: Fast Search via Zoekt
+Search the target permission string using `zoekt`.
+- Search Keyword Example: `android.permission.READ_CONTACTS` or `READ_CONTACTS`
+- Purpose: Identify the definition location (`AndroidManifest.xml`) and usage locations (such as `checkPermission` or `RequiresPermission`).
+- **Important**: To prevent timeouts, use `zoekt` instead of `find` or standard `grep`.
 
-### 手順 3: Zoektによる超高速検索
-対象のパーミッション文字列を `zoekt` を用いて検索します。
-- 検索キーワード例: `android.permission.READ_CONTACTS` または `READ_CONTACTS`
-- 目的: 定義箇所（`AndroidManifest.xml`）と、使用箇所（`checkPermission` や `RequiresPermission` 等）を特定する。
-- **重要**: タイムアウトを防ぐため、`find` や標準の `grep` ではなく `zoekt` を使用してください。
+### Step 4: Classify and Score Across 9 Categories
+Based on the found code, classify the permission into the following 9 categories:
+1. **Exclusion of Work-in-Progress (WIP)**
+2. **Isolation of Non-Phone Limits (Wear, Auto, TV, etc.)**
+3. **Identification of Feature Flag Control (Default Disabled)**
+4. **Identification of `BIND_*` Permissions**
+5. **Identification of DPC (Device Policy Controller) Permissions**
+6. **Whether It Applies Outside the Framework (e.g., Google Play)**
+7. **Corresponding CTS Tests**
+   - If corresponding tests exist, document the test name, test summary, user-level reproducibility, and the path to reproduce.
+8. **Reproduction Path Verification (Java code, Intent, Shell)**
+9. **Risk Level Assessment on Permission Granted (Level 0-5, Score 100-0)**
+   - **Level 0 (Score 100)**: Too dangerous to define, or already blocked in operation (e.g., AccessibilityService)
+   - **Level 1 (Score 10)**: Passwords, tokens, financial data
+   - **Level 2 (Score 7.5)**: Privacy (contacts, location, photos, etc.)
+   - **Level 3 (Score 5)**: PII (calendar, health data, etc.)
+   - **Level 4 (Score 2.5)**: Relatively harmless (app list, settings, etc.)
+   - **Level 5 (Score 0)**: Completely harmless
+   - The score must be determined using the **last number** from the table in `agent_and_report_plan.md`.
 
-### 手順 4: 9カテゴリーの分類とスコアリング
-見つかったコードを元に、以下の9カテゴリーに分類します。
-1. **未実装 (WIP) の除外**
-2. **Phone以外 (Wear, Auto, TV 等) 制限の分離**
-3. **Feature Flag 制御 (Default Disabled) の識別**
-4. **`BIND_*` 系パーミッションの識別**
-5. **DPC (Device Policy Controller) 系パーミッションの識別**
-6. **Google Playなど framework外に適用されるPermissionかどうか?**
-7. **対応すると思われるCTSテスト**
-   - 対応するテストがある場合は、テスト名、テストの概要、ユーザーレベル環境での再現可能性、再現パスを記載する。
-8. **再現パスの確認 (Javaコード、Intent、Shell)**
-9. **許可時の危険度の判定 (Level 0-5, スコア 100-0)**
-   - **Level 0 (スコア 100)**: 危険すぎて未定義、または運用で既にブロックされている（例: AccessibilityServiceなど）
-   - **Level 1 (スコア 10)**: パスワード、トークン、金融情報
-   - **Level 2 (スコア 7.5)**: プライバシー（連絡先、位置情報、写真等）
-   - **Level 3 (スコア 5)**: PII（カレンダー、健康情報等）
-   - **Level 4 (スコア 2.5)**: 比較的無害（アプリ一覧、設定等）
-   - **Level 5 (スコア 0)**: 完全無害
-   - スコア判定は `agent_and_report_plan.md` の表の **最後の数値** を使用すること。
+### Step 5: Create Report
+Read `resources/report_template.md` and fill in the details to generate a report.
+- Destination Path: `xpermssion/permission-research/<Permission_Name>.md`
+- **Attach Evidence**: The unique "Verification Data" section is deprecated; consolidate all file links (file:///absolute_path#Lline_number), snippets, and reproduction methods inside **"8. Reproduction Path Verification"**.
+- If the permission is deemed highly utilized, list **at least 5 locations** where the permission is explicitly checked (e.g., via `if` conditions or explicit checking functions like `checkCallingOrSelfPermission`) in the actual source code (Java/C++, etc.). Prioritize execution code over configuration properties or manifest definitions.
+- For the reproduction method, clearly specify whether verification is possible using a **Public API**, **Non-Public/System API**, **ServiceManager / Binder IPC Call**, or **Shell Command**.
 
-### 手順 5: レポートの作成
-`resources/report_template.md` を読み込み、内容を埋めてレポートを作成します。
-- 出力先: `xpermssion/permission-research/<Permission名>.md`
-- **証拠の添付**: 独自の「実証データ」セクションは廃止し、すべてのファイルリンク（file:///絶対パス#L行番号）、スニペット、再現方法を **「8. 再現パスの確認」** に集約してください。
-- 利用頻度が多いと判断される場合、実際のソースコード（Java/C++等）上で `if` 文や明示的なチェック関数（`checkCallingOrSelfPermission` 等）によって権限がチェックされている箇所を **少なくとも5箇所** リストアップしてください。設定プロパティやManifestの定義のみではなく、実行コードを優先します。
-- 再現方法には、**公開API**、**非公開/システムAPI**、**ServiceManager / Binder IPC 呼び出し**、**Shellコマンド** のどれを用いて検証可能かを具体的に明記してください。
-
-### 手順 6: セルフバリデーションの実行
-作成したレポートが基準を満たしているか、以下のコマンドで検証します。
+### Step 6: Execute Self-Validation
+Verify if the generated report meets the criteria using the following command:
 ```bash
-python3 .agent/skills/permission-chk/scripts/validate_report.py xpermssion/permission-research/<Permission名>.md
+python3 .agent/skills/permission-chk/scripts/validate_report.py xpermssion/permission-research/<Permission_Name>.md
 ```
-- 検証が失敗した場合は、レポートを修正してください。
+- If the validation fails, fix the report.
 
-### 手順 7: 親エージェントへの報告 (🚨 極めて重要)
+### Step 7: Report to Parent Agent (🚨 Extremely Important)
 
 > [!IMPORTANT]
-> この報告（`send_message`）が行われないと、大量のパーミッションを同時にバッチ処理する際に親エージェントがタスク完了を把握できず、システム全体が破綻します。迷いや人間の手動操作待ちを挟むことは許されません。
+> If this report (`send_message`) is not sent, the parent agent cannot recognize the completion of tasks when batch-processing a large number of permissions simultaneously, causing the entire system to collapse. Do not delay or wait for manual human interaction.
 
-1. `xpermssion/active_parent_id.txt` の内容を読み込み、宛先となる親の会話 ID を取得します。
-2. `send_message` ツールを用いて、取得した ID に調査完了を報告します。
-   - **Recipient**: `active_parent_id.txt` で読み取った ID
-   - **Message**: 「調査完了: android.permission.XXXX (スコア: 7.5)」などの概要
+1. Read the parent's Conversation ID from `xpermssion/active_parent_id.txt`.
+2. Use the `send_message` tool to report completion to the retrieved ID.
+   - **Recipient**: The ID read from `active_parent_id.txt`
+   - **Message**: Summary message like "Completed: android.permission.XXXX (Score: 7.5)"
 
-迷わずにツール（コマンド）を実行して送信を完了させてください。
+Execute the tools/commands without hesitation to complete the transmission.
 
 ---
 
-## リソース
-- テンプレート: `resources/report_template.md`
-- バリデーションスクリプト: `scripts/validate_report.py`
-- サンプル: `examples/gold_sample.md`
+## Resources
+- Template: `resources/report_template.md`
+- Validation Script: `scripts/validate_report.py`
+- Example: `examples/gold_sample.md`
