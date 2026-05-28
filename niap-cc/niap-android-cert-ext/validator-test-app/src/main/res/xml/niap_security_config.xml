@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2026 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<niap-security-config>
+    <!-- Enforce strict signature algorithm constraints (SHA-384 or stronger) as per RFC 8603 (CNSA). -->
+    <niap-rfc8603-strict-sigalg>true</niap-rfc8603-strict-sigalg>
+    
+    <!-- List of TLDs for which wildcards are prohibited. -->
+    <prohibited-tld-wildcards>
+        <tld>*.COM</tld>
+        <tld>*.NET</tld>
+        <tld>*.ORG</tld>
+        <tld>*.GOV</tld>
+        <tld>*.EDU</tld>
+    </prohibited-tld-wildcards>
+    
+    <!-- List of allowed cipher suites. If empty, platform defaults are used. -->
+    <allowed-cipher-suites>
+        <cipher>TLS_AES_128_GCM_SHA256</cipher>
+        <cipher>TLS_AES_256_GCM_SHA384</cipher>
+        <cipher>TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</cipher>
+        <cipher>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</cipher>
+        <cipher>TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</cipher>
+        <cipher>TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</cipher>
+    </allowed-cipher-suites>
+    
+    <!-- Trust anchor policy (SYSTEM_CA_ONLY, USER_CA_ONLY, BOTH_CA). -->
+    <trust-anchor-policy>BOTH_CA</trust-anchor-policy>
+    
+    <!-- Other constraints -->
+    
+    <!-- Enforce TLS 1.2 or higher. -->
+    <enforce-tls-1-2>true</enforce-tls-1-2>
+    
+    <!-- Enforce checks for mandatory extensions (AKID, SKID, KeyUsage). Required by FIA_X509_EXT.1.2. -->
+    <enforce-mandatory-extensions>true</enforce-mandatory-extensions>
+    
+    <!-- Enforce check for Extended Key Usage (Server Authentication). -->
+    <enforce-eku>true</enforce-eku>
+    
+    <!-- Required Extended Key Usage (EKU). Can be a comma-separated list of aliases ('serverAuth', 'clientAuth') or raw OIDs. -->
+    <required-eku>serverAuth</required-eku>
+    
+    <!-- Enforce CA constraints (End-entity must not be a CA). -->
+    <enforce-ca-constraints>true</enforce-ca-constraints>
+</niap-security-config>

@@ -1,0 +1,29 @@
+services:
+  est-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # libest branch/tag/commit hash (pin for reproducibility)
+        # Example: LIBEST_REF: "a464ba8a66717419ba71d289ef82c7b2315b2006"
+        # To find the latest commit: git ls-remote https://github.com/cisco/libest HEAD
+        LIBEST_REF: main
+    image: est-validation-server:local
+    container_name: est-validation-server
+    ports:
+      - "8443:8443"   # EST endpoints (HTTPS + mTLS optional)
+      - "8081:8081"   # mTLS test endpoint (HTTPS + mTLS required)
+      - "8080:8080"   # Admin HTTP (CA cert download, health check)
+    environment:
+      - TZ=Asia/Tokyo
+      # Certificate profile:
+      #   general = basic EST protocol verification (RSA-2048, SHA-256, minimal extensions)
+      #   niap    = full NIAP/CC validator compliance (ECDSA P-384, SHA-384, all extensions)
+      - EST_CERT_PROFILE=niap
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
