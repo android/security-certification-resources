@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
     //Change the test modules here by resource settings
     lateinit var suites:MutableList<PermissionTestSuiteBase>
     lateinit var mCurrentModule: PermissionTestModuleBase
-    val receivedKeyCodes = mutableListOf<Int>()
+    val receivedKeyCodes = java.util.concurrent.CopyOnWriteArrayList<Int>()
     //
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

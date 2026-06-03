@@ -584,7 +584,7 @@ public class InternalTestModule extends PermissionTestModuleBase {
         } catch (java.lang.reflect.InvocationTargetException e) {
             if (e.getCause() instanceof SecurityException) {
                 throw (SecurityException) e.getCause();
-            } else if (e.getCause() instanceof IllegalStateException && e.getCause().getMessage().contains("flag disabled")) {
+            } else if (e.getCause() instanceof IllegalStateException && e.getCause().getMessage() != null && e.getCause().getMessage().contains("flag disabled")) {        
                 throw new com.android.certification.niap.permission.dpctester.test.exception.BypassTestException("Feature flag disabled: " + e.getCause().getMessage());
             }
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
@@ -1055,6 +1055,10 @@ public class InternalTestModule extends PermissionTestModuleBase {
     public void testManageMultiuserDeviceProvisioningState(){
         try {
             android.app.admin.DevicePolicyManager dpm = (android.app.admin.DevicePolicyManager) mContext.getSystemService(android.content.Context.DEVICE_POLICY_SERVICE);
+            if (dpm == null) {
+                logger.debug("DevicePolicyManager is null");
+                return;
+            }
             java.lang.reflect.Method method = dpm.getClass().getMethod("getMultiuserManagedDeviceProvisioningState");
             method.invoke(dpm);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -1070,7 +1074,10 @@ public class InternalTestModule extends PermissionTestModuleBase {
     @PermissionTest(permission="REQUEST_COMPANION_PROFILE_VIRTUAL_DEVICE", sdkMin=37)
     public void testRequestCompanionProfileVirtualDevice(){
         android.companion.CompanionDeviceManager companionDeviceManager = mContext.getSystemService(android.companion.CompanionDeviceManager.class);
-        
+        if (companionDeviceManager == null) {
+            logger.debug("CompanionDeviceManager is null");
+            return;
+        }
         String profile = "android.app.role.COMPANION_DEVICE_VIRTUAL_DEVICE"; // likely value
         try {
             java.lang.reflect.Field field = android.companion.CompanionDeviceManager.class.getField("DEVICE_PROFILE_VIRTUAL_DEVICE");

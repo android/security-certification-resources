@@ -78,7 +78,11 @@ abstract class FgServiceTypeService extends Service {
                     throw new RuntimeException(e);
                 }
             }
-            stopForeground(Service.STOP_FOREGROUND_REMOVE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                stopForeground(Service.STOP_FOREGROUND_REMOVE);
+            } else {
+                stopForeground(true);
+            }
             mRunning.set(false);
             stopSelf();
         });

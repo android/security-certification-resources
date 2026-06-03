@@ -1194,7 +1194,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 			socket.connect(new java.net.InetSocketAddress("127.0.0.1", 65535), 100);
 			socket.close();
 		} catch (java.net.SocketException e) {
-			if (e.getMessage().contains("EACCES") || e.getMessage().contains("EPERM")) {
+			if (e.getMessage() != null && e.getMessage().contains("EACCES") || e.getMessage().contains("EPERM")) {
 				throw new SecurityException(e);
 			}
 			logger.debug("SocketException: " + e.getMessage());
