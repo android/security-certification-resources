@@ -20,7 +20,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.niap.cert.ext.validator"
+    namespace = "com.android.niap.cert.validator"
     compileSdk = 34
 
     defaultConfig {

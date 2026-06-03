@@ -116,7 +116,9 @@ class EncryptionManager(
             }
             // If successful and requested, delete original
             if (deleteOriginal) {
-                sourceFile.delete()
+                if (!sourceFile.delete()) {
+                    throw java.io.IOException("Failed to delete original plaintext file after encryption.")
+                }
             }
         } catch (e: Exception) {
             // Clean up temporary file on failure

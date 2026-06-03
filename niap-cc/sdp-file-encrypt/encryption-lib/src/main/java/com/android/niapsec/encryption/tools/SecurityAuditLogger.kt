@@ -42,7 +42,8 @@ object SecurityAuditLogger {
             Log.d("${name} KMD",  "returns null (error or hardware backend)")
             return
         }
-        Log.d("${name} KMD",  bytes.toHexString())
+Log.d("${name} KMD", "[MASKED - Use bytes.toHExString() here to dump key]")
+
         bytes.fill(0)
     }
 

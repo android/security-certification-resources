@@ -129,11 +129,10 @@ class NiapCertValidator(
             }
         } else if (pubKey is ECPublicKey) {
             // Check field size (P-384 has field size 384)
-            if (pubKey.params.curve.field.fieldSize < 384) {
+            val params = pubKey.params
+            if (params == null || params.curve.field.fieldSize < 384) {
                  throw CertificateException("EC key size must be 384 bits or greater")
             }
-        } else {
-            throw CertificateException("Unsupported public key type: ${pubKey.algorithm}")
         }
     }
 
@@ -220,8 +219,7 @@ class NiapCertValidator(
         params.isRevocationEnabled = true
         
         val checker = cpv.revocationChecker as PKIXRevocationChecker
-        // Android 9以降ではフォールバックが発生するとエラーになるため、NO_FALLBACKを強制する
-        checker.options = EnumSet.of(PKIXRevocationChecker.Option.NO_FALLBACK)
+         checker.options = EnumSet.of(PKIXRevocationChecker.Option.NO_FALLBACK)
         params.addCertPathChecker(checker)
         
         try {

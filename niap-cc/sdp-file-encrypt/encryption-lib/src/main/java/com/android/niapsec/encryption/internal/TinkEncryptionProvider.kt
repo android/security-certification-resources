@@ -44,10 +44,13 @@ class TinkEncryptionProvider(
 
         return object : ByteArrayOutputStream() {
             override fun close() {
-                val ciphertext = aead.encrypt(toByteArray(), providerHeader)
-                fileOutputStream.write(ciphertext)
-                fileOutputStream.close()
-                super.close()
+                try {
+                    val ciphertext = aead.encrypt(toByteArray(), providerHeader)
+                    fileOutputStream.write(ciphertext)
+                } finally {
+                    fileOutputStream.close()
+                    super.close()
+                }
             }
         }
     }
@@ -73,8 +76,13 @@ class TinkEncryptionProvider(
     override fun encryptStream(file: File): OutputStream {
         val streamingAead = keyProvider.getStreamingAead() ?: throw UnsupportedOperationException("Streaming not supported")
         val fileOutputStream = FileOutputStream(file)
-        fileOutputStream.write(providerHeader)
-        return streamingAead.newEncryptingStream(fileOutputStream, providerHeader)
+        try {
+            fileOutputStream.write(providerHeader)
+            return streamingAead.newEncryptingStream(fileOutputStream, providerHeader)
+        } catch (e: Exception) {
+            fileOutputStream.close()
+            throw e
+        }
     }
 
     override fun decryptStream(file: File): InputStream {

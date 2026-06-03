@@ -22,7 +22,6 @@ import android.security.keystore.KeyProperties
 import android.util.Base64
 import android.util.Log
 import androidx.core.content.edit
-import com.android.niapsec.encryption.tools.Asn1Helper
 import com.android.niapsec.encryption.tools.CleanSecretKeySpec
 import com.android.niapsec.encryption.tools.SafeHkdf
 import com.android.niapsec.encryption.tools.SecurityAuditLogger
@@ -96,9 +95,6 @@ class RawHybridKeyProvider(
 
     private val storageContext: Context = context.createDeviceProtectedStorageContext()
 
-
-
-
     private val prefs = storageContext.getSharedPreferences(keysetPrefName, Context.MODE_PRIVATE)
 
     companion object {
@@ -113,11 +109,12 @@ class RawHybridKeyProvider(
         private const val GCM_TAG_LENGTH_BITS = 128
         const val MAGIC_BYTE_ASYMMETRIC: Byte = 0x01 // Temporary storage while locked (current Hybrid scheme)
         const val MAGIC_BYTE_SYMMETRIC: Byte = 0x02  // Re-encrypted after unlock (symmetric UDR scheme)
-
+        val dummyPubKey: PublicKey by lazy {
+            val kpg = KeyPairGenerator.getInstance("EC")
+            kpg.initialize(java.security.spec.ECGenParameterSpec("secp521r1"))
+            kpg.generateKeyPair().public
+        }
     }
-
-
-
 
     init {
         generateAndStoreKeyPairIfNeeded()

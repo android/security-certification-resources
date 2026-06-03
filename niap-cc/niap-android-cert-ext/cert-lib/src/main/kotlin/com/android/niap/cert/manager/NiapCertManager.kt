@@ -47,9 +47,10 @@ import javax.net.ssl.X509TrustManager
  * instance until [close] is called.
  */
 class NiapCertManager(private val context: Context) {
-    private var service: INiapCertManager? = null
-    private var latch = CountDownLatch(1)
-    private var isBinding = false
+@Volatile private var service: INiapCertManager? = null
+@Volatile private var latch = CountDownLatch(1)
+@Volatile private var isBinding = false
+
 
     /**
      * Pending enrollment futures. We keep a strong reference to each callback's
