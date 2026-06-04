@@ -1,0 +1,1 @@
+This is a sample file from the app's resources.

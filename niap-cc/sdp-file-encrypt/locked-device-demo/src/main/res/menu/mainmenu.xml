@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+    >
+    <item android:id="@+id/action_enable_sweep"
+        android:title="@string/enable_sweep"
+        android:checkable="true"
+        android:showAsAction="never" />
+    <item android:id="@+id/action_enable_log"
+        android:title="@string/enable_logging"
+        android:checkable="true"
+        android:showAsAction="never" />
+</menu>
