@@ -26,7 +26,7 @@ kotlin {
 
 dependencies {
     // 1. 本体のコンパイル済みクラスを参照
-    compileOnly(files("${rootProject.projectDir}/../testbed-core/composeApp/build/classes/kotlin/jvm/main"))
+    compileOnly(files("${rootProject.projectDir}/../../../testbed-core/composeApp/build/classes/kotlin/jvm/main"))
     implementation(project(":common-utils"))
     
     // 2. テスト実行に必要な最小限の依存関係
@@ -59,7 +59,7 @@ tasks.jar {
         exclude("META-INF/*.DSA")
         exclude("META-INF/*.RSA")
     }
-    destinationDirectory.set(file("${rootProject.projectDir}/../testbed-core/composeApp/plugins/$pluginName"))
+    destinationDirectory.set(file("${rootProject.projectDir}/../../../testbed-core/composeApp/plugins/$pluginName"))
 }
 
 java {

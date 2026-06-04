@@ -321,12 +321,7 @@ class RawHybridKeyProvider(
      */
     private fun flushKeystoreBinderBuffer(keystorePrivateKey: PrivateKey) {
         try {
-            // 1. Instantly generate dummy public key in software (P-521)
-            val kpg = KeyPairGenerator.getInstance("EC")
-            kpg.initialize(java.security.spec.ECGenParameterSpec("secp521r1"))
-            val dummyPubKey = kpg.generateKeyPair().public
-
-            // 2. Prepare dummy agreement by explicitly specifying AndroidKeyStore
+            // Prepare dummy agreement by explicitly specifying AndroidKeyStore
             val dummyAgreement = KeyAgreement.getInstance("ECDH", "AndroidKeyStore")
             dummyAgreement.init(keystorePrivateKey)
             dummyAgreement.doPhase(dummyPubKey, true)
@@ -444,6 +439,7 @@ class RawHybridKeyProvider(
                 val dataIv = dataCipher.iv
                 val ephemeralKpg = KeyPairGenerator.getInstance(EC_KEY_ALGORITHM).apply { initialize(ECGenParameterSpec("secp521r1")) }
                 val keyPair = ephemeralKpg.generateKeyPair()
+                ephemeralKeyPair = keyPair
 
                 
                 val keyAgreement = KeyAgreement.getInstance(KEY_AGREEMENT_ALGORITHM)
