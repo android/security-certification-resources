@@ -1,0 +1,28 @@
+# 🤖 Multi-Agent Collaboration Configuration Draft (agent.yaml)
+
+This file is an idea sketch to facilitate "multi-window collaboration (distributed research via host and workers)" starting tomorrow.
+
+---
+
+## 💡 Communication Design: Discovery via Shared ID File
+
+Uses a common directory in the workspace (e.g., `xpermssion/`) accessible by all agents as a communication buffer.
+
+### 1. Role of Host (Orchestrator Agent)
+On startup, writes its own `Conversation ID` to a file.
+*   Write Destination: `xpermssion/active_parent_id.txt`
+
+### 2. Role of Worker (Research Agent)
+On startup, reads the shared file above.
+*   Sends `send_message` to the retrieved ID, notifying: "I (worker) have started. Please give instructions."
+
+---
+
+## 📋 Agent Role Definitions (Panel Classification Image)
+
+*   **Role: Permission_Host (Research Orchestrator)**
+    *   **Responsibilities**: Managing target list (CSV), allocating tasks to workers, and summarizing results into a comprehensive report.
+*   **Role: Permission_Worker_Zoekt (Search Specialist)**
+    *   **Responsibilities**: Running Zoekt for permissions specified by the host (running as parent agent avoids sandbox restrictions!), and notifying the host of occurrences in the source code.
+
+Let's launch multiple windows of this configuration tomorrow to begin verification!

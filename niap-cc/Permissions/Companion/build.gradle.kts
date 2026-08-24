@@ -63,7 +63,22 @@ class BindServiceCodeGenPlugin:Plugin<Project> {
         "BIND_INTRUSION_DETECTION_EVENT_TRANSPORT_SERVICE",
         "BIND_RKP_SERVICE",
         "BIND_APP_FUNCTION_SERVICE",
-        "BIND_DEPENDENCY_INSTALLER"
+        "BIND_DEPENDENCY_INSTALLER",
+        "BIND_INSIGHT_SURFACE_VISUALIZER_SERVICE",
+        "BIND_CONTEXT_COMPONENT_SERVICE",
+        "BIND_APP_SEARCH_ISOLATED_STORAGE_SERVICE",
+        "BIND_TRUST_TOKEN_SERVICE",
+        "BIND_INSIGHT_RENDERER_SERVICE",
+        "BIND_DEVELOPER_VERIFICATION_AGENT",
+        "BIND_MOTION_CUES_SERVICE",
+        "BIND_SETTINGS_CONTENT_SAFETY_SERVICE",
+        "BIND_ALLOWLIST_PROVIDER_SERVICE",
+        "BIND_SUPERVISION_APP_SERVICE",
+        "BIND_CONTENT_SAFETY_SERVICE",
+        "BIND_TO_TAP_TO_SHARE_SERVICE",
+        "BIND_SANDBOXED_CONTENT_SAFETY_SERVICE",
+        "BIND_ALTERNATIVE_MESSAGE_TRANSPORT_SERVICE",
+        "BIND_CONTENT_RESTRICTION_SERVICE"
     )
     override fun apply(project:Project){
         project.task("bindServiceCodeGen"){
@@ -79,7 +94,7 @@ class BindServiceCodeGenPlugin:Plugin<Project> {
                     if(f.exists()) Files.delete(f.toPath())
                     val generatedCode = """
 /*
- * Copyright 2025 The Android Open Source Project
+ * Copyright 2026 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

@@ -19,9 +19,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE;
 
 public class FgShortService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_SHORT_SERVICE;
-       mId = mServiceType+1;
+    public FgShortService() {
+        super(FOREGROUND_SERVICE_TYPE_SHORT_SERVICE, FOREGROUND_SERVICE_TYPE_SHORT_SERVICE + 1);
     }
 }

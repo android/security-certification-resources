@@ -376,8 +376,10 @@ public class GmsTestModule extends PermissionTestModuleBase {
 		}
 
 		Intent intent = new Intent(ACCESS_BACKGROUND_LOCATION_TEST);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent,
-				PendingIntent.FLAG_IMMUTABLE);
+		intent.setPackage(mContext.getPackageName());
+		int flags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+				PendingIntent.FLAG_MUTABLE : PendingIntent.FLAG_IMMUTABLE;
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, flags);
 
 		GeofencingClient geofencingClient = LocationServices.getGeofencingClient(
 				mContext);

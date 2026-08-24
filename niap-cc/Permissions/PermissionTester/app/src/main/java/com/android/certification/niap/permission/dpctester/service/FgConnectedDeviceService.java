@@ -19,9 +19,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE;
 
 public class FgConnectedDeviceService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE;
-       mId = mServiceType+1;
+    public FgConnectedDeviceService() {
+        super(FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE, FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE + 1);
     }
 }

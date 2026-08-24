@@ -19,9 +19,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION;
 
 public class FgLocationService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_LOCATION;
-       mId = mServiceType+1;
+    public FgLocationService() {
+        super(FOREGROUND_SERVICE_TYPE_LOCATION, FOREGROUND_SERVICE_TYPE_LOCATION + 1);
     }
 }

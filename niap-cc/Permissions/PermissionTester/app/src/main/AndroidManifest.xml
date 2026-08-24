@@ -41,6 +41,10 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".activity.SettingsActivity"
@@ -85,14 +89,42 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/stubauth" />
         </service>
-        <!--
-        <service android:name="com.example.accounts.GenericAccountService"
+
+        <service
+            android:name=".service.MyVoiceInteractionService"
+            android:permission="android.permission.BIND_VOICE_INTERACTION"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
+                <action android:name="android.service.voice.VoiceInteractionService" />
             </intent-filter>
-            <meta-data android:name="android.accounts.AccountAuthenticator" android:resource="@xml/authenticator" />
-        </service>-->
+            <meta-data
+                android:name="android.service.voice.VoiceInteractionService"
+                android:resource="@xml/voice_interaction_service" />
+        </service>
+
+        <service
+            android:name=".service.MyVoiceInteractionSessionService"
+            android:permission="android.permission.BIND_VOICE_INTERACTION"
+            android:exported="true">
+        </service>
+
+        <service
+            android:name=".service.MyRecognitionService"
+            android:permission="android.permission.BIND_RECOGNITION_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.speech.RecognitionService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".service.DummyDataMigrationService"
+            android:permission="android.permission.BIND_DATA_MIGRATION_FOR_PRIVATECOMPUTE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.app.privatecompute.DataMigrationToPccService" />
+            </intent-filter>
+        </service>
     </application>
 
 

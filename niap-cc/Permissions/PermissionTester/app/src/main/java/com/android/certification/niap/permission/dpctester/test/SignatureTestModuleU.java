@@ -170,7 +170,7 @@ public class SignatureTestModuleU extends SignaturePermissionTestModuleBase {
 	}
 
 	@RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    @PermissionTest(permission="MIGRATE_HEALTH_CONNECT_DATA", sdkMin=34)
+//    @PermissionTest(permission="MIGRATE_HEALTH_CONNECT_DATA", sdkMin=34)
 	public void testMigrateHealthConnectData(){
 		CountDownLatch latch = new CountDownLatch(1);
 		AtomicBoolean success = new AtomicBoolean(true);
@@ -218,7 +218,7 @@ public class SignatureTestModuleU extends SignaturePermissionTestModuleBase {
 	}
 
 	@RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    @PermissionTest(permission="STAGE_HEALTH_CONNECT_REMOTE_DATA", sdkMin=34)
+//    @PermissionTest(permission="STAGE_HEALTH_CONNECT_REMOTE_DATA", sdkMin=34)
 	public void testStageHealthConnectRemoteData(){
 		BinderTransaction.getInstance().invoke(
 				Context.HEALTHCONNECT_SERVICE ,

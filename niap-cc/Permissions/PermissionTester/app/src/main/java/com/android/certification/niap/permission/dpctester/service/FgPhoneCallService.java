@@ -19,9 +19,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL;
 
 public class FgPhoneCallService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_PHONE_CALL;
-       mId = mServiceType+1;
+    public FgPhoneCallService() {
+        super(FOREGROUND_SERVICE_TYPE_PHONE_CALL, FOREGROUND_SERVICE_TYPE_PHONE_CALL + 1);
     }
 }

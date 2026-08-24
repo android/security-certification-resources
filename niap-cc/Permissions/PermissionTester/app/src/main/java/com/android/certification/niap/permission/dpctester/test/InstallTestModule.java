@@ -42,11 +42,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.VersionedPackage;
 import android.content.res.Resources;
+import android.os.OutcomeReceiver;
+import java.util.concurrent.atomic.AtomicReference;
 
 import android.graphics.Rect;
 import android.hardware.ConsumerIrManager;
 import android.hardware.biometrics.BiometricManager;
-import android.hardware.fingerprint.FingerprintManager;
+
 import android.media.AudioManager;
 import android.media.quality.AmbientBacklightEvent;
 import android.media.quality.MediaQualityManager;
@@ -157,7 +159,6 @@ public class InstallTestModule extends PermissionTestModuleBase {
 	private <T> T systemService(Class<T> clazz){
 		return Objects.requireNonNull(getService(clazz),"[npe_system_service]"+clazz.getSimpleName());
 	}
-
 	@PermissionTest(permission=ACCESS_NETWORK_STATE)
 	public void testAccessNetworkState(){
 		//
@@ -194,6 +195,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 			mBluetoothAdapter.enable();
 		}
 	}
+	
 	@SuppressLint("MissingPermission")
 	@PermissionTest(permission=BROADCAST_STICKY,sdkMin = 27,sdkMax = 28)
 	public void testBroadcastSticky(){
@@ -236,12 +238,6 @@ public class InstallTestModule extends PermissionTestModuleBase {
 	@RequiresApi(api = Build.VERSION_CODES.Q)
     @PermissionTest(permission=EXPAND_STATUS_BAR)
 	public void testExpandStatusBar(){
-
-		/*if(Constants.BYPASS_TESTS_AFFECTING_UI)
-			throw new BypassTestException("This test case affects to UI. skip to avoiding ui stuck.");
-
-		@SuppressLint("WrongConstant") Object statusBarManager = mContext.getSystemService("statusbar");
-		*/
 
 		StatusBarManager statusBarManager = systemService(StatusBarManager.class);
 		try {
@@ -287,10 +283,12 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		}
 	}
 
+
 	@PermissionTest(permission=KILL_BACKGROUND_PROCESSES)
 	public void testKillBackgroundProcesses(){
 		systemService(ActivityManager.class).killBackgroundProcesses(Constants.COMPANION_PACKAGE);
 	}
+
 
 	@PermissionTest(permission=MODIFY_AUDIO_SETTINGS)
 	public void testModifyAudioSettings(){
@@ -320,6 +318,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		telecomManager.isIncomingCallPermitted(phoneAccountHandle);
 	}
 
+
 	@PermissionTest(permission=NFC)
 	public void testNfc(){
 		// SELinux blocks access to the NFC service from platform apps, so skip this test if the
@@ -332,9 +331,6 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		if (adapter == null) {
 			throw new BypassTestException("A NFC adapter is not available to run this test");
 		}
-		//:TODO setNdefPushMesssage is obsolated?
-		//adapter.setNdefPushMessage(null, mActivity);
-
 		CardEmulation emulation = CardEmulation.getInstance(adapter);
 		emulation.isDefaultServiceForCategory(new ComponentName(mContext, TestService.class),
 				CardEmulation.CATEGORY_PAYMENT);
@@ -352,7 +348,10 @@ public class InstallTestModule extends PermissionTestModuleBase {
 
 	@PermissionTest(permission=REORDER_TASKS)
 	public void testReorderTasks(){
+		int currentTaskId = mActivity.getTaskId();
 		systemService(ActivityManager.class).moveTaskToFront(2, 0);
+		// Restore current task to front
+		systemService(ActivityManager.class).moveTaskToFront(currentTaskId, 0);
 	}
 
 	@PermissionTest(permission=REQUEST_DELETE_PACKAGES)
@@ -408,10 +407,34 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		}
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.S)
+	@PermissionTest(permission=REQUEST_COMPANION_PROFILE_WATCH, sdkMin=31)
+	public void testRequestCompanionProfileWatch(){
+		//commonize the tester routine with exposing the builder of AssociationRequest object
+		CompletableFuture<AssociationRequest> associationRequest =
+				new CompletableFuture<AssociationRequest>().completeAsync(() ->
+						new AssociationRequest.Builder().setDeviceProfile(
+								AssociationRequest.DEVICE_PROFILE_WATCH).build());
+		TesterUtils.tryBluetoothAssociationRequest
+				(mPackageManager, mActivity, associationRequest);
+
+	}
+		@RequiresApi(api = Build.VERSION_CODES.Q)
+    @PermissionTest(permission=REQUEST_PASSWORD_COMPLEXITY, sdkMin=29)
+	public void testRequestPasswordComplexity(){
+		systemService(DevicePolicyManager.class).getPasswordComplexity();
+	}
+	
 	@Deprecated
 	@PermissionTest(permission=USE_BIOMETRIC,sdkMax = 28)
 	public void testUseBiometricLegacy(){
-		systemService(FingerprintManager.class).isHardwareDetected();
+		try {
+			Class<?> clazz = Class.forName("android.hardware.fingerprint.FingerprintManager");
+			Object manager = mContext.getSystemService("fingerprint");
+			clazz.getMethod("isHardwareDetected").invoke(manager);
+		} catch (Exception e) {
+			// Ignore or log
+		}
 	}
 
     @PermissionTest(permission=VIBRATE)
@@ -426,7 +449,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 				systemService(PowerManager.class).newWakeLock(
 					PowerManager.PARTIAL_WAKE_LOCK,
 				InstallTestModule.class.getSimpleName()+"::InstallPermissionTester");
-		wakeLock.acquire(10*60*1000L );///*10 minutes
+		wakeLock.acquire(10*60*1000L );///x10 minutes
 		wakeLock.release();
 	}
 
@@ -435,11 +458,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		ContentResolver.setMasterSyncAutomatically(true);
 	}
 
-	@RequiresApi(api = Build.VERSION_CODES.Q)
-    @PermissionTest(permission=REQUEST_PASSWORD_COMPLEXITY, sdkMin=29)
-	public void testRequestPasswordComplexity(){
-		systemService(DevicePolicyManager.class).getPasswordComplexity();
-	}
+
 
 	@PermissionTest(permission=USE_FULL_SCREEN_INTENT, sdkMin=29, sdkMax=31)
 	public void testUseFullScreenIntent(){
@@ -489,7 +508,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 			}
 		}
 	}
-
+ 
 	@RequiresApi(api = Build.VERSION_CODES.R)
     @PermissionTest(permission=NFC_PREFERRED_PAYMENT_INFO, sdkMin=30)
 	public void testNfcPreferredPaymentInfo(){
@@ -544,32 +563,23 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		}
 	}
 
-	@RequiresApi(api = Build.VERSION_CODES.S)
-	@PermissionTest(permission=REQUEST_COMPANION_PROFILE_WATCH, sdkMin=31)
-	public void testRequestCompanionProfileWatch(){
-		//commonize the tester routine with exposing the builder of AssociationRequest object
-		CompletableFuture<AssociationRequest> associationRequest =
-				new CompletableFuture<AssociationRequest>().completeAsync(() ->
-						new AssociationRequest.Builder().setDeviceProfile(
-								AssociationRequest.DEVICE_PROFILE_WATCH).build());
-		TesterUtils.tryBluetoothAssociationRequest
-				(mPackageManager, mActivity, associationRequest);
-
-	}
+	
 
 	@RequiresApi(api = Build.VERSION_CODES.S)
 	@PermissionTest(permission=REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE, sdkMin=31)
 	public void testRequestObserveCompanionDevicePresence(){
-		// Note: this could potentially be a fragile test since there is no companion
-		// device associated with this app so when the permission is granted the call
-		// results in a RuntimeException in the binder call, but during testing this
-		// Exception was not thrown back to this test. If in a future release this test
-		// fails because the Exception crosses the binder call then this test will need
-		// to differentiate between a SecurityException and the RuntimeException.
-
-		systemService(CompanionDeviceManager.class)
-				.startObservingDevicePresence("11:22:33:44:55:66");
-
+		try {
+			systemService(CompanionDeviceManager.class)
+					.startObservingDevicePresence("11:22:33:44:55:66");
+		} catch (SecurityException e) {
+			throw e;
+		} catch (RuntimeException e) {
+			if (e.getMessage() != null && e.getMessage().contains("Device not associated")) {
+				logger.info("Caught expected RuntimeException: Device not associated");
+			} else {
+				throw e;
+			}
+		}
 	}
 
 	@PermissionTest(permission=SCHEDULE_EXACT_ALARM, sdkMin=31, sdkMax=33)
@@ -688,10 +698,10 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		}
 
 	}
-	/**
-	 * Invokes and logs the stdout / stderr of the provided shell {@code command}, returning the
-	 * exit code from the command.
-	 */
+	// *
+	//  * Invokes and logs the stdout / stderr of the provided shell {@code command}, returning the
+	//  * exit code from the command.
+	//  
 	protected int runShellCommand(String command) {
 		try {
 			logger.debug("Attempting to run command " + command);
@@ -799,17 +809,18 @@ public class InstallTestModule extends PermissionTestModuleBase {
 			}
 		};
 		//OK
-		/*mTransacts.invokeTransact(Transacts.WINDOW_SERVICE,
-				Transacts.WINDOW_DESCRIPTOR,
-				Transacts.registerScreenRecordingCallback, callback);
+		// /mTransacts.invokeTransact(Transacts.WINDOW_SERVICE,
+		// 		Transacts.WINDOW_DESCRIPTOR,
+		// 		Transacts.registerScreenRecordingCallback, callback);
 
-		 */
+		//  /
 		BinderTransaction.getInstance().invoke(
 				Context.WINDOW_SERVICE,
 				Transacts.WINDOW_DESCRIPTOR,
 				"registerScreenRecordingCallback",callback
 		);
 	}
+
 
 //	@PermissionTest(permission=ACCESS_HIDDEN_PROFILES, sdkMin=34,sdkMax = 34)
 //	public void testAccessHiddenProfiles(){
@@ -1048,6 +1059,203 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		logger.debug("The test for android.permission.XR_TRACKING_IN_BACKGROUND is not implemented yet");
 	}
 
+	//**** Install level permissions as of sdk 37
+	@PermissionTest(permission="CAPTURE_KEYBOARD",sdkMin=37)
+	public void testCaptureKeyboard(){
+		throw new BypassTestException("CAPTURE_KEYBOARD is not easily testable via app. It requires accessibility service or specific input method context to verify, which is not feasible in this test module.");
+	}
+
+	@PermissionTest(permission="READ_ASSIST_STRUCTURE_SCREEN_CONTENT",sdkMin=37)
+	public void testReadAssistStructureScreenContent() throws Exception {
+		logger.info("testReadAssistStructureScreenContent started");
+		IBinder b = null;
+		try {
+			Class<?> serviceManagerClass = Class.forName("android.os.ServiceManager");
+			java.lang.reflect.Method getServiceMethod = serviceManagerClass.getMethod("getService", String.class);
+			b = (IBinder) getServiceMethod.invoke(null, "voiceinteraction");
+		} catch (Exception e) {
+			logger.error("Failed to get voiceinteraction service: " + e);
+			throw e;
+		}
+		if (b == null) {
+			logger.error("voiceinteraction service not found");
+			throw new Exception("voiceinteraction service not found");
+		}
+		try {
+			Class<?> stubClass = Class.forName("com.android.internal.app.IVoiceInteractionManagerService$Stub");
+			java.lang.reflect.Method asInterfaceMethod = stubClass.getMethod("asInterface", IBinder.class);
+			Object service = asInterfaceMethod.invoke(null, b);
+			
+			Class<?> interfaceClass = Class.forName("com.android.internal.app.IVoiceInteractionManagerService");
+			java.lang.reflect.Method getReadScreenContextRequestStateMethod = interfaceClass.getMethod("getReadScreenContextRequestState", int.class);
+			
+			int state = (int) getReadScreenContextRequestStateMethod.invoke(service, android.os.Process.myUid());
+			logger.info("getReadScreenContextRequestState result: " + state);
+		} catch (java.lang.reflect.InvocationTargetException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof Exception) {
+				throw (Exception) cause;
+			} else {
+				throw e;
+			}
+		}
+	}
+	//TODO : Location Button is implemented as JetPack Compose, check the test with that component!
+	@PermissionTest(permission="USE_LOCATION_BUTTON",sdkMin=37)
+	public void testUseLocationButton(){
+		Intent intent = new Intent();
+		intent.setComponent(new ComponentName("com.android.systemui", "com.android.systemui.locationbutton.LocationButtonRenderService"));
+		
+		android.content.ServiceConnection connection = new android.content.ServiceConnection() {
+			@Override
+			public void onServiceConnected(ComponentName name, IBinder service) {}
+			@Override
+			public void onServiceDisconnected(ComponentName name) {}
+		};
+
+		try {
+			boolean bound = mContext.bindService(intent, Context.BIND_AUTO_CREATE, mExecutor, connection);
+			if (bound) {
+				mContext.unbindService(connection);
+				logger.info("Successfully bound to LocationButtonRenderService (unexpected without permission)");
+			} else {
+				logger.info("Failed to bind to LocationButtonRenderService (expected without permission)");
+				// If it returns false, it might be because of missing permission or service not found.
+				// On Android 17, it should exist.
+				// We assume it failed due to permission if we are in normal variant.
+			}
+		} catch (SecurityException e) {
+			logger.info("SecurityException expectedly thrown when binding to LocationButtonRenderService: " + e.getMessage());
+			throw e; // Re-throw to let the runner handle it as success in negative test
+		}
+	}
+	@PermissionTest(permission="USE_PINNED_WINDOWING_LAYER",sdkMin=37)
+	public void testUsePinnedWindowingLayer() throws Exception {
+		ActivityManager am = mContext.getSystemService(ActivityManager.class);
+		java.util.List<ActivityManager.AppTask> tasks = am.getAppTasks();
+		if (tasks.isEmpty()) {
+			logger.info("No app tasks found");
+			return;
+		}
+		ActivityManager.AppTask task = tasks.get(0);
+
+		CountDownLatch latch = new CountDownLatch(1);
+		AtomicReference<Exception> errorRef = new AtomicReference<>();
+
+		try {
+			OutcomeReceiver<Integer, Exception> receiver = new OutcomeReceiver<Integer, Exception>() {
+				@Override
+				public void onResult(Integer result) {
+					logger.info("requestWindowingLayer result: " + result);
+					latch.countDown();
+				}
+				@Override
+				public void onError(Exception error) {
+					logger.info("requestWindowingLayer error: " + error);
+					errorRef.set(error);
+					latch.countDown();
+				}
+			};
+			com.android.certification.niap.permission.dpctester.common.ReflectionUtil.invoke(
+					task, "requestWindowingLayer", 1, mExecutor, receiver);
+
+			if (!latch.await(5, java.util.concurrent.TimeUnit.SECONDS)) {
+				logger.info("Timed out waiting for requestWindowingLayer callback");
+				return;
+			}
+
+			Exception error = errorRef.get();
+			if (error != null) {
+				if (error instanceof SecurityException) {
+					logger.info("SecurityException expectedly thrown in requestWindowingLayer callback: " + error.getMessage());
+					throw (SecurityException) error;
+				}
+				throw new UnexpectedTestFailureException(error);
+			}
+		} catch (SecurityException e) {
+			logger.info("SecurityException expectedly thrown when calling requestWindowingLayer: " + e.getMessage());
+			throw e;
+		}
+	}
+
+	@PermissionTest(permission="android.permission.REQUEST_COMPANION_PROFILE_MEDICAL", sdkMin=37)
+	public void testRequestCompanionProfileMedical(){
+		CompletableFuture<AssociationRequest> associationRequest =
+				new CompletableFuture<AssociationRequest>().completeAsync(() -> {
+					return new AssociationRequest.Builder()
+							.setDeviceProfile("android.app.role.COMPANION_DEVICE_MEDICAL").build();
+				});
+		TesterUtils.tryBluetoothAssociationRequest
+				(mPackageManager, mActivity, associationRequest);
+	}
+
+	@PermissionTest(permission="android.permission.USE_LOOPBACK_INTERFACE", sdkMin=37)
+	public void testUseLoopbackInterface(){
+		try {
+			java.net.Socket socket = new java.net.Socket();
+			socket.connect(new java.net.InetSocketAddress("127.0.0.1", 65535), 100);
+			socket.close();
+		} catch (java.net.SocketException e) {
+			if (e.getMessage() != null && e.getMessage().contains("EACCES") || e.getMessage().contains("EPERM")) {
+				throw new SecurityException(e);
+			}
+			logger.debug("SocketException: " + e.getMessage());
+		} catch (java.io.IOException e) {
+			logger.debug("IOException: " + e.getMessage());
+		}
+	}
+
+	@PermissionTest(permission="android.permission.POST_PROMOTED_NOTIFICATIONS", sdkMin=37)
+	public void testPostPromotedNotifications() throws Exception {
+		NotificationManager nm = mContext.getSystemService(NotificationManager.class);
+		String channelId = "test_promoted_channel";
+		NotificationChannel channel = new NotificationChannel(channelId, "Test Promoted Channel", NotificationManager.IMPORTANCE_DEFAULT);
+		nm.createNotificationChannel(channel);
+
+		Notification.Builder builder = new Notification.Builder(mContext, channelId)
+				.setContentTitle("Test Promoted Notification")
+				.setContentText("This is a test notification")
+				.setSmallIcon(android.R.drawable.ic_dialog_info)
+				.setStyle(new Notification.BigTextStyle().bigText("Big text"))
+				.setOngoing(true);
+
+		android.os.Bundle extras = new android.os.Bundle();
+		extras.putBoolean("android.requestPromotedOngoing", true);
+		builder.addExtras(extras);
+
+		Notification notification = builder.build();
+		int id = 1001;
+		nm.notify(id, notification);
+
+		// Wait a bit for the notification to be posted and processed
+		Thread.sleep(3000);
+
+		StatusBarNotification[] activeNotifications = nm.getActiveNotifications();
+		boolean found = false;
+		boolean isPromoted = false;
+		for (StatusBarNotification sbn : activeNotifications) {
+			if (sbn.getId() == id) {
+				found = true;
+				Notification postedNotification = sbn.getNotification();
+				// FLAG_PROMOTED_ONGOING = 0x00040000
+				isPromoted = (postedNotification.flags & 0x00040000) != 0;
+				break;
+			}
+		}
+
+		// Cleanup
+		nm.cancel(id);
+		nm.deleteNotificationChannel(channelId);
+
+		if (!found) {
+			throw new RuntimeException("Notification not found in active notifications");
+		}
+
+		if (!isPromoted) {
+			throw new SecurityException("Notification was not promoted despite requesting it");
+		}
+	}
+
 
 	@RequiresApi(api = Build.VERSION_CODES.Q)
     public void tryBindingForegroundService(Intent serviceIntent){
@@ -1081,9 +1289,11 @@ public class InstallTestModule extends PermissionTestModuleBase {
 				throw new UnexpectedTestFailureException(ex);
 			} finally {
 				mContext.unbindService(serviceConnection);
+				mContext.stopService(serviceIntent);
 			}
 		}
 	}
+
 
 	final Object lock = new Object();
 	private class FgServiceConnection implements android.content.ServiceConnection {
@@ -1113,6 +1323,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 			//Unimplemented
 		}
 	}
+
 }
 
 

@@ -388,7 +388,7 @@ public class SignatureTestModuleT extends SignaturePermissionTestModuleBase {
 
     }
 
-	@PermissionTest(permission="REQUEST_UNIQUE_ID_ATTESTATION", sdkMin=33)
+	@PermissionTest(permission="REQUEST_UNIQUE_ID_ATTESTATION", sdkMin=33, sdkMax=36)
 	public void testRequestUniqueIdAttestation(){
 		String keystoreAlias = "test_key";
 		KeyGenParameterSpec.Builder builder =

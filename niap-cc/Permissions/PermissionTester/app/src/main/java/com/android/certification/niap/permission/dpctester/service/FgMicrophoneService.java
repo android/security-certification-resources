@@ -19,9 +19,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE;
 
 public class FgMicrophoneService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_MICROPHONE;
-       mId = mServiceType+1;
+    public FgMicrophoneService() {
+        super(FOREGROUND_SERVICE_TYPE_MICROPHONE, FOREGROUND_SERVICE_TYPE_MICROPHONE + 1);
     }
 }

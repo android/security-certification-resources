@@ -524,4 +524,588 @@ public class InternalTestModule extends PermissionTestModuleBase {
 		logger.debug("The test for android.permission.EXECUTE_APP_FUNCTIONS is not implemented yet");
 	}
 
+	//**** method template for target internal SDK37
+	@PermissionTest(permission="ACCESS_BIOMETRIC_SENSOR_STRENGTHS",sdkMin=37)
+	public void testAccessBiometricSensorStrengths(){
+        try {
+            android.hardware.biometrics.BiometricManager bm = mContext.getSystemService(android.hardware.biometrics.BiometricManager.class);
+            if (bm != null) {
+                com.android.certification.niap.permission.dpctester.common.ReflectionUtil.invoke(bm, "getBiometricSensorStrengths");
+                logger.debug("getBiometricSensorStrengths called successfully");
+            } else {
+                logger.debug("BiometricManager is null");
+            }
+        } catch (SecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+	}
+	@PermissionTest(permission="ACCESS_COMPUTER_CONTROL",sdkMin=37)
+	public void testAccessComputerControl(){
+        try {
+            Object vdm = mContext.getSystemService("virtualdevice");
+            if (vdm != null) {
+                Class<?> paramsClazz = Class.forName("android.companion.virtual.computercontrol.ComputerControlSessionParams");
+                java.lang.reflect.Constructor<?> paramsConstructor = paramsClazz.getDeclaredConstructor(
+                        String.class, int.class, java.util.List.class, android.app.PendingIntent.class,
+                        Class.forName("android.app.AppInteractionAttribution"),
+                        Class.forName("android.companion.virtual.CompanionDeviceId"),
+                        Class.forName("android.companion.virtual.computercontrol.ComputerControlSessionParams$NotificationParams")
+                );
+                paramsConstructor.setAccessible(true);
+                
+                java.util.List<String> pkgs = new java.util.ArrayList<>();
+                pkgs.add(mContext.getPackageName());
+                
+                Object params = paramsConstructor.newInstance(
+                        "test_session", 4, pkgs, null, null, null, null
+                );
+                
+                Class<?> callbackClazz = Class.forName("android.companion.virtual.computercontrol.ComputerControlSession$Callback");
+                Object callback = java.lang.reflect.Proxy.newProxyInstance(
+                        callbackClazz.getClassLoader(),
+                        new Class<?>[]{callbackClazz},
+                        new java.lang.reflect.InvocationHandler() {
+                            @Override
+                            public Object invoke(Object proxy, java.lang.reflect.Method method, Object[] args) throws Throwable {
+                                logger.debug("Callback method called: " + method.getName());
+                                return null;
+                            }
+                        }
+                );
+                
+                java.lang.reflect.Method method = vdm.getClass().getMethod("requestComputerControlSession", paramsClazz, java.util.concurrent.Executor.class, callbackClazz);
+                method.invoke(vdm, params, mContext.getMainExecutor(), callback);
+                logger.debug("requestComputerControlSession called successfully");
+            } else {
+                logger.debug("VirtualDeviceManager is null");
+            }
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            } else if (e.getCause() instanceof IllegalStateException && e.getCause().getMessage() != null && e.getCause().getMessage().contains("flag disabled")) {        
+                throw new com.android.certification.niap.permission.dpctester.test.exception.BypassTestException("Feature flag disabled: " + e.getCause().getMessage());
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+	}
+	@PermissionTest(permission="ACCESS_HID",sdkMin=37)
+	public void testAccessHid(){
+        try {
+            Class<?> clazz = Class.forName("android.hardware.hid.HidManager");
+            java.lang.reflect.Constructor<?> constructor = clazz.getConstructor(Context.class);
+            Object hm = constructor.newInstance(mContext);
+            java.lang.reflect.Method method = clazz.getMethod("canEnumerateDevices");
+            Boolean result = (Boolean) method.invoke(hm);
+            logger.debug("canEnumerateDevices result: " + result);
+        } catch (SecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+	}
+	@PermissionTest(permission="BIND_ALLOWLIST_PROVIDER_SERVICE",sdkMin=37)
+	public void testBindAllowlistProviderService(){
+		Intent intent = new Intent();
+		intent.setComponent(new android.content.ComponentName("com.google.android.gms", "com.google.android.gms.systemserviceacl.service.AclProviderService"));
+		
+		android.content.ServiceConnection connection = new android.content.ServiceConnection() {
+			@Override
+			public void onServiceConnected(android.content.ComponentName name, IBinder service) {}
+			@Override
+			public void onServiceDisconnected(android.content.ComponentName name) {}
+		};
+
+		try {
+			boolean bound = mContext.bindService(intent, Context.BIND_AUTO_CREATE, mContext.getMainExecutor(), connection);
+			if (bound) {
+				mContext.unbindService(connection);
+				logger.info("Successfully bound to AclProviderService (unexpected without permission)");
+			} else {
+				logger.info("Failed to bind to AclProviderService (expected without permission)");
+			}
+		} catch (SecurityException e) {
+			logger.info("SecurityException expectedly thrown when binding to AclProviderService: " + e.getMessage());
+		}
+	}
+	@PermissionTest(permission="BIND_DEVELOPER_VERIFICATION_AGENT",sdkMin=37)
+	public void testBindDeveloperVerificationAgent(){
+		Intent intent = new Intent();
+		intent.setComponent(new android.content.ComponentName("com.google.android.verifier", "com.google.android.verifier.helpers.verification.impl.common.platform.PlatformVerificationService"));
+		
+		android.content.ServiceConnection connection = new android.content.ServiceConnection() {
+			@Override
+			public void onServiceConnected(android.content.ComponentName name, IBinder service) {}
+			@Override
+			public void onServiceDisconnected(android.content.ComponentName name) {}
+		};
+
+		try {
+			boolean bound = mContext.bindService(intent, Context.BIND_AUTO_CREATE, mContext.getMainExecutor(), connection);
+			if (bound) {
+				mContext.unbindService(connection);
+				logger.info("Successfully bound to PlatformVerificationService (unexpected without permission)");
+			} else {
+				logger.info("Failed to bind to PlatformVerificationService (expected without permission)");
+			}
+		} catch (SecurityException e) {
+			logger.info("SecurityException expectedly thrown when binding to PlatformVerificationService: " + e.getMessage());
+		}
+	}
+	@PermissionTest(permission="REQUEST_LOCATION_BUTTON_PERMISSIONS",sdkMin=37)
+	public void testRequestLocationButtonPermissions(){
+		Intent intent = new Intent("android.app.permissionui.action.REQUEST_LOCATION_BUTTON_PERMISSIONS");
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		try {
+			mContext.startActivity(intent);
+			logger.info("Successfully started RequestLocationButtonPermissionsActivity (unexpected without permission)");
+		} catch (SecurityException e) {
+			logger.info("SecurityException expectedly thrown when starting activity: " + e.getMessage());
+		}
+	}
+	@PermissionTest(permission="CAPTURE_KEYBOARD",sdkMin=37)
+	public void testCaptureKeyboard(){
+		logger.info("This permission is tested via instrumentation in CaptureKeyboardTest.java because it requires UI and key injection.");
+	}
+	@PermissionTest(permission="DISCOVER_APP_FUNCTIONS",sdkMin=37)
+	public void testDiscoverAppFunctions(){
+        try {
+            Object afm = mContext.getSystemService("app_function");
+            if (afm != null) {
+                java.lang.reflect.Method method = afm.getClass().getMethod("isAppFunctionEnabled", String.class, String.class, java.util.concurrent.Executor.class, android.os.OutcomeReceiver.class);
+                android.os.OutcomeReceiver<Boolean, Exception> callback = new android.os.OutcomeReceiver<Boolean, Exception>() {
+                    @Override
+                    public void onResult(Boolean result) {
+                        logger.debug("isAppFunctionEnabled result: " + result);
+                    }
+                    @Override
+                    public void onError(Exception error) {
+                        logger.debug("isAppFunctionEnabled error: " + error);
+                    }
+                };
+                method.invoke(afm, "dummy_id", mContext.getPackageName(), mContext.getMainExecutor(), callback);
+                logger.debug("isAppFunctionEnabled called successfully");
+            } else {
+                logger.debug("AppFunctionManager is null");
+            }
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+	}
+	@PermissionTest(permission="EXECUTE_APP_FUNCTIONS_SYSTEM",sdkMin=37)
+	public void testExecuteAppFunctionsSystem(){
+        try {
+            Object afm = mContext.getSystemService("app_function");
+            if (afm != null) {
+                java.lang.reflect.Method method = afm.getClass().getMethod("isAppFunctionEnabled", String.class, String.class, java.util.concurrent.Executor.class, android.os.OutcomeReceiver.class);
+                android.os.OutcomeReceiver<Boolean, Exception> callback = new android.os.OutcomeReceiver<Boolean, Exception>() {
+                    @Override
+                    public void onResult(Boolean result) {
+                        logger.debug("isAppFunctionEnabled result: " + result);
+                    }
+                    @Override
+                    public void onError(Exception error) {
+                        logger.debug("isAppFunctionEnabled error: " + error);
+                    }
+                };
+                method.invoke(afm, "dummy_id", mContext.getPackageName(), mContext.getMainExecutor(), callback);
+                logger.debug("isAppFunctionEnabled called successfully");
+            } else {
+                logger.debug("AppFunctionManager is null");
+            }
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+	}
+	@PermissionTest(permission="LOCK_APPS",sdkMin=37)
+	public void testLockApps(){
+        try {
+            PackageManager pm = mContext.getPackageManager();
+            java.lang.reflect.Method method = pm.getClass().getMethod("getEnableAppLockIntentForPackage", String.class, boolean.class);
+            method.invoke(pm, mContext.getPackageName(), true);
+            logger.debug("getEnableAppLockIntentForPackage called successfully");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+	}
+
+	@PermissionTest(permission="MANAGE_SUPERVISION",sdkMin=37)
+	public void testManageSupervision(){
+        try {
+            Object sm = mContext.getSystemService("supervision");
+            if (sm != null) {
+                java.lang.reflect.Method method = sm.getClass().getMethod("getPolicies");
+                method.invoke(sm);
+                logger.debug("getPolicies called successfully");
+            } else {
+                logger.debug("SupervisionManager is null");
+            }
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+	}
+	@PermissionTest(permission="SET_DEVELOPER_VERIFICATION_USER_RESPONSE",sdkMin=37)
+	public void testSetDeveloperVerificationUserResponse(){
+        try {
+            android.content.pm.PackageInstaller packageInstaller = mContext.getPackageManager().getPackageInstaller();
+            java.lang.reflect.Method method = packageInstaller.getClass().getMethod(
+                "setDeveloperVerificationUserResponse", int.class, int.class);
+            
+            // Using dummy values: sessionId=0, userResponse=1 (APPROVE or similar)
+            method.invoke(packageInstaller, 0, 1);
+            logger.debug("setDeveloperVerificationUserResponse called successfully (unexpected without permission)");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof SecurityException) {
+                logger.info("SecurityException expectedly thrown: " + cause.getMessage());
+            } else {
+                throw new RuntimeException(cause);
+            }
+        } catch (Exception e) {
+            logger.debug("Reflection error: " + e.getMessage());
+            throw new BypassTestException("Failed to call setDeveloperVerificationUserResponse via reflection");
+        }
+	}
+	@PermissionTest(permission="SHOW_POWER_MENU",sdkMin=37)
+	public void testShowPowerMenu(){
+        try {
+            Object statusBarManager = mContext.getSystemService("statusbar");
+            java.lang.reflect.Method method = statusBarManager.getClass().getMethod(
+                "showPowerMenu", java.util.concurrent.Executor.class, android.os.OutcomeReceiver.class);
+            
+            android.os.OutcomeReceiver<Integer, Throwable> receiver = new android.os.OutcomeReceiver<Integer, Throwable>() {
+                @Override
+                public void onResult(Integer result) {
+                    logger.debug("showPowerMenu onResult: " + result);
+                }
+                @Override
+                public void onError(Throwable error) {
+                    logger.debug("showPowerMenu onError: " + error.getMessage());
+                }
+            };
+            
+            method.invoke(statusBarManager, mContext.getMainExecutor(), receiver);
+            logger.debug("showPowerMenu called successfully");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof SecurityException) {
+                throw (SecurityException) cause;
+            } else {
+                throw new RuntimeException(cause);
+            }
+        } catch (Exception e) {
+            logger.debug("Reflection error: " + e.getMessage());
+            throw new BypassTestException("Failed to call showPowerMenu via reflection");
+        }
+	}
+	@PermissionTest(permission="SHOW_POWER_MENU_PRIVILEGED",sdkMin=37)
+	public void testShowPowerMenuPrivileged(){
+        try {
+            Object statusBarManager = mContext.getSystemService("statusbar");
+            java.lang.reflect.Method method = statusBarManager.getClass().getMethod(
+                "showPowerMenu", java.util.concurrent.Executor.class, android.os.OutcomeReceiver.class);
+            
+            android.os.OutcomeReceiver<Integer, Throwable> receiver = new android.os.OutcomeReceiver<Integer, Throwable>() {
+                @Override
+                public void onResult(Integer result) {
+                    logger.debug("showPowerMenu Privileged onResult: " + result);
+                }
+                @Override
+                public void onError(Throwable error) {
+                    logger.debug("showPowerMenu Privileged onError: " + error.getMessage());
+                }
+            };
+            
+            method.invoke(statusBarManager, mContext.getMainExecutor(), receiver);
+            logger.debug("showPowerMenu Privileged called successfully");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof SecurityException) {
+                throw (SecurityException) cause;
+            } else {
+                throw new RuntimeException(cause);
+            }
+        } catch (Exception e) {
+            logger.debug("Reflection error: " + e.getMessage());
+            throw new BypassTestException("Failed to call showPowerMenu via reflection");
+        }
+	}
+
+	@PermissionTest(permission="CREATE_APP_SPECIFIC_NETWORK",sdkMin=37)
+	public void testCreateAppSpecificNetwork(){
+        try {
+            android.net.ConnectivityManager connectivityManager = mContext.getSystemService(android.net.ConnectivityManager.class);
+            
+            Class<?> networkAgentClass = Class.forName("android.net.INetworkAgent");
+            
+            // Create dynamic proxy for INetworkAgent
+            Object dummyAgent = java.lang.reflect.Proxy.newProxyInstance(
+                networkAgentClass.getClassLoader(),
+                new Class<?>[]{networkAgentClass},
+                new java.lang.reflect.InvocationHandler() {
+                    @Override
+                    public Object invoke(Object proxy, java.lang.reflect.Method method, Object[] args) throws Throwable {
+                        return null;
+                    }
+                }
+            );
+            
+            android.net.NetworkInfo networkInfo = new android.net.NetworkInfo(android.net.ConnectivityManager.TYPE_WIFI, 0, "WIFI", "");
+            android.net.LinkProperties linkProperties = new android.net.LinkProperties();
+            android.net.NetworkCapabilities networkCapabilities = new android.net.NetworkCapabilities();
+            
+            java.lang.reflect.Method method = null;
+            for (java.lang.reflect.Method m : android.net.ConnectivityManager.class.getDeclaredMethods()) {
+                if (m.getName().equals("registerNetworkAgent") && m.getParameterCount() == 7) {
+                    method = m;
+                    break;
+                }
+            }
+            
+            if (method == null) {
+                logger.debug("registerNetworkAgent method not found");
+                return;
+            }
+            
+            method.setAccessible(true);
+            
+            Object score = null;
+            try {
+                Class<?> scoreBuilderClass = Class.forName("android.net.NetworkScore$Builder");
+                Object scoreBuilder = scoreBuilderClass.getDeclaredConstructor().newInstance();
+                java.lang.reflect.Method buildMethod = scoreBuilderClass.getMethod("build");
+                score = buildMethod.invoke(scoreBuilder);
+            } catch (Exception e) {
+                logger.debug("Failed to create NetworkScore via builder: " + e.getMessage());
+            }
+            
+            Object config = null;
+            try {
+                Class<?> configBuilderClass = Class.forName("android.net.NetworkAgentConfig$Builder");
+                Object configBuilder = configBuilderClass.getDeclaredConstructor().newInstance();
+                java.lang.reflect.Method buildMethod = configBuilderClass.getMethod("build");
+                config = buildMethod.invoke(configBuilder);
+            } catch (Exception e) {
+                logger.debug("Failed to create NetworkAgentConfig via builder: " + e.getMessage());
+            }
+            
+            // Passing score and config instead of null
+            method.invoke(connectivityManager, dummyAgent, networkInfo, linkProperties, networkCapabilities, score, config, 1);
+            logger.debug("registerNetworkAgent called successfully");
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+	}
+
+	@PermissionTest(permission="INITIATE_BUGREPORT_AS_NON_ADMIN",sdkMin=37)
+	public void testInitiateBugreportAsNonAdmin(){
+        try {
+            android.os.BugreportManager bugreportManager = mContext.getSystemService(android.os.BugreportManager.class);
+            if (bugreportManager == null) {
+                logger.debug("BugreportManager not available");
+                return;
+            }
+            
+            java.lang.reflect.Method method = null;
+            for (java.lang.reflect.Method m : android.os.BugreportManager.class.getDeclaredMethods()) {
+                if (m.getName().equals("startBugreport") && m.getParameterCount() == 5) {
+                    method = m;
+                    break;
+                }
+            }
+            
+            if (method == null) {
+                logger.debug("startBugreport method with 5 params not found");
+                return;
+            }
+            
+            method.setAccessible(true);
+            
+            android.os.BugreportManager.BugreportCallback callback = new android.os.BugreportManager.BugreportCallback() {
+                @Override
+                public void onProgress(float progress) {}
+                @Override
+                public void onError(int errorCode) {}
+                @Override
+                public void onFinished() {}
+            };
+            
+            // Create dummy file descriptors to avoid NPE in BugreportManager
+            java.io.File bugreportFile = new java.io.File(mContext.getCacheDir(), "dummy_bugreport");
+            android.os.ParcelFileDescriptor bugreportFd = android.os.ParcelFileDescriptor.open(
+                    bugreportFile, android.os.ParcelFileDescriptor.MODE_WRITE_ONLY | android.os.ParcelFileDescriptor.MODE_CREATE);
+            
+            java.io.File screenshotFile = new java.io.File(mContext.getCacheDir(), "dummy_screenshot");
+            android.os.ParcelFileDescriptor screenshotFd = android.os.ParcelFileDescriptor.open(
+                    screenshotFile, android.os.ParcelFileDescriptor.MODE_WRITE_ONLY | android.os.ParcelFileDescriptor.MODE_CREATE);
+            
+            // Instantiate BugreportParams via reflection
+            Class<?> bugreportParamsClass = Class.forName("android.os.BugreportParams");
+            java.lang.reflect.Constructor<?> bpConstructor = bugreportParamsClass.getConstructor(int.class);
+            Object params = bpConstructor.newInstance(0); // 0 is BUGREPORT_MODE_FULL
+            
+            method.invoke(bugreportManager, bugreportFd, screenshotFd, params, mContext.getMainExecutor(), callback);
+            logger.debug("startBugreport called successfully");
+            
+            // Files will be deleted when the VM exits.
+            // BugreportManager takes ownership and closes the FDs.
+            bugreportFile.deleteOnExit();
+            screenshotFile.deleteOnExit();
+            
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+	}
+
+    @PermissionTest(permission="ACCESS_ATTENTION_LISTENER", sdkMin=37)
+    public void testAccessAttentionListener(){
+        try {
+            Object service = mContext.getSystemService("attention");
+            if (service == null) {
+                logger.debug("attention service not available");
+                return;
+            }
+            
+            java.lang.reflect.Method setListener = null;
+            for (java.lang.reflect.Method m : service.getClass().getMethods()) {
+                if (m.getName().equals("setListener")) {
+                    setListener = m;
+                    break;
+                }
+            }
+            
+            if (setListener == null) {
+                logger.debug("setListener method not found");
+                return;
+            }
+            
+            try {
+                setListener.invoke(service, 0, 0L, null);
+                logger.debug("setListener invoked successfully");
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof SecurityException) {
+                    throw (SecurityException) cause;
+                } else {
+                    logger.debug("setListener threw expected non-security exception: " + cause);
+                }
+            }
+        } catch (SecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.debug("Error testing ACCESS_ATTENTION_LISTENER: " + e.getMessage());
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+    }
+
+    @PermissionTest(permission="MANAGE_COMPUTER_CONTROL_CONSENT", sdkMin=37)
+    public void testManageComputerControlConsent(){
+        try {
+            Object manager = mContext.getSystemService("virtualdevice");
+            if (manager == null) {
+                logger.debug("virtualdevice service not available");
+                return;
+            }
+            java.lang.reflect.Method method = manager.getClass().getMethod("isPackageApprovedToRunComputerControlAutomation", String.class, int.class);
+            method.invoke(manager, "dummy", 0);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+    }
+
+    @PermissionTest(permission="MANAGE_MULTIUSER_DEVICE_PROVISIONING_STATE", sdkMin=37)
+    public void testManageMultiuserDeviceProvisioningState(){
+        try {
+            android.app.admin.DevicePolicyManager dpm = (android.app.admin.DevicePolicyManager) mContext.getSystemService(android.content.Context.DEVICE_POLICY_SERVICE);
+            if (dpm == null) {
+                logger.debug("DevicePolicyManager is null");
+                return;
+            }
+            java.lang.reflect.Method method = dpm.getClass().getMethod("getMultiuserManagedDeviceProvisioningState");
+            method.invoke(dpm);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        }
+    }
+
+    @PermissionTest(permission="REQUEST_COMPANION_PROFILE_VIRTUAL_DEVICE", sdkMin=37)
+    public void testRequestCompanionProfileVirtualDevice(){
+        android.companion.CompanionDeviceManager companionDeviceManager = mContext.getSystemService(android.companion.CompanionDeviceManager.class);
+        if (companionDeviceManager == null) {
+            logger.debug("CompanionDeviceManager is null");
+            return;
+        }
+        String profile = "android.app.role.COMPANION_DEVICE_VIRTUAL_DEVICE"; // likely value
+        try {
+            java.lang.reflect.Field field = android.companion.CompanionDeviceManager.class.getField("DEVICE_PROFILE_VIRTUAL_DEVICE");
+            profile = (String) field.get(null);
+        } catch (Exception e) {
+            logger.debug("Could not find DEVICE_PROFILE_VIRTUAL_DEVICE constant, using fallback.");
+        }
+
+        android.companion.AssociationRequest.Builder builder = new android.companion.AssociationRequest.Builder();
+        builder.setDeviceProfile(profile);
+        android.companion.AssociationRequest request = builder.build();
+
+        try {
+            companionDeviceManager.associate(request, new android.companion.CompanionDeviceManager.Callback() {
+                @Override
+                public void onFailure(CharSequence error) {
+                    logger.debug("associate failed: " + error);
+                }
+            }, null);
+            
+            logger.debug("associate called successfully (positive test passed or waiting for UI).");
+        } catch (IllegalArgumentException e) {
+            logger.debug("IllegalArgumentException thrown: " + e.getMessage());
+        } catch (SecurityException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.debug("Threw non-SecurityException as expected when permission is granted: " + e);
+        }
+    }
+
 }

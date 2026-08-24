@@ -131,7 +131,9 @@ public class MainActivity extends AppCompatActivity {
             deviceName = deviceName.substring(0, 1).toUpperCase() + deviceName.substring(
                     1).toLowerCase();
         }
-        if(isAtLeastBaklava()) {
+        if (Build.VERSION.SDK_INT >= 37) {
+            sClassName = "SDKCinammonBun_Transacts";
+        } else if(isAtLeastBaklava()) {
             sClassName = "SdkBaklava_Transacts";
         }else if(isAtLeastV()){
             sClassName = "SdkV_Transacts";//deviceName + "ApiLevel35Transacts";
@@ -144,7 +146,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(isAtLeastBaklava()){
+        if (Build.VERSION.SDK_INT >= 37) {
+            ACTUAL_SDK_INT = 37;
+        } else if(isAtLeastBaklava()){
             ACTUAL_SDK_INT = 36;
         } else if(isAtLeastV()){
             ACTUAL_SDK_INT = 35;
@@ -160,10 +164,6 @@ public class MainActivity extends AppCompatActivity {
                 new TransactIdQueryAsyncTask().execute();
             }
         });
-
-        //Transaction APIs as of Android 34
-        // ProxyChecker.check(WINDOW_DESCRIPTOR, "requestAppKeyboardShortcuts");
-        //ProxyChecker.check(EUICC_CONTROLLER_DESCRIPTOR,"getSupportedCountries");
 
         ProxyChecker.check(WINDOW_DESCRIPTOR,Transacts.registerScreenRecordingCallback);
     }
@@ -790,9 +790,10 @@ public class MainActivity extends AppCompatActivity {
             queryTransactId(SYSTEM_CONFIG_DESCRIPTOR,Transacts.getEnhancedConfirmationTrustedPackages,descriptorTransacts);
             queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.startObservingDevicePresence,descriptorTransacts);
             queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.getAllAssociationsForUser,descriptorTransacts);
+            queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.getAssociationByDeviceId,descriptorTransacts);
             queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.addOnMessageReceivedListener,descriptorTransacts);
-            queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.removeOnTransportsChangedListener,descriptorTransacts);
             queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.addOnTransportsChangedListener,descriptorTransacts);
+            queryTransactId(Transacts.TRUST_TOKEN_DESCRIPTOR, Transacts.acquirePreparedIdentitySet, descriptorTransacts);
             queryTransactId(COMPANION_DEVICE_DESCRIPTOR,Transacts.sendMessage,descriptorTransacts);
             queryTransactId(MEDIA_ROUTER_DESCRIPTOR,Transacts.registerManager,descriptorTransacts);
             queryTransactId(MEDIA_ROUTER_DESCRIPTOR,Transacts.registerProxyRouter,descriptorTransacts);

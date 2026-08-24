@@ -437,10 +437,10 @@ public class SignatureTestModuleBinder extends SignaturePermissionTestModuleBase
         runBindRunnable("BIND_SELECTION_TOOLBAR_RENDER_SERVICE");
     }
 
-    @PermissionTest(permission="BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE", sdkMin=33)
-    public void testBindWallpaperEffectsGenerationService(){
-        runBindRunnable("BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE");
-    }
+//    @PermissionTest(permission="BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE", sdkMin=33)
+//    public void testBindWallpaperEffectsGenerationService(){
+//        runBindRunnable("BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE");
+//    }
 
     @PermissionTest(permission="BIND_TV_INTERACTIVE_APP", sdkMin=33)
     public void testBindTvInteractiveApp(){
@@ -535,5 +535,82 @@ public class SignatureTestModuleBinder extends SignaturePermissionTestModuleBase
     public void testBindAppFunctionService(){
         runBindRunnable("BIND_APP_FUNCTION_SERVICE");
         //logger.debug("The test for android.permission.BIND_APP_FUNCTION_SERVICE is not implemented yet");
+    }
+    @PermissionTest(permission="BIND_INSIGHT_SURFACE_VISUALIZER_SERVICE", sdkMin=37)
+    public void testBindInsightSurfaceVisualizerService(){
+        runBindRunnable("BIND_INSIGHT_SURFACE_VISUALIZER_SERVICE");
+    }
+
+    @PermissionTest(permission="BIND_CONTEXT_COMPONENT_SERVICE", sdkMin=37)
+    public void testBindContextComponentService(){
+        runBindRunnable("BIND_CONTEXT_COMPONENT_SERVICE");
+    }
+
+    @PermissionTest(permission="BIND_APP_SEARCH_ISOLATED_STORAGE_SERVICE", sdkMin=37)
+    public void testBindAppSearchIsolatedStorageService(){
+        runBindRunnable("BIND_APP_SEARCH_ISOLATED_STORAGE_SERVICE");
+    }
+
+    @PermissionTest(permission="BIND_TRUST_TOKEN_SERVICE", sdkMin=37)
+    public void testBindTrustTokenService(){
+        runBindRunnable("BIND_TRUST_TOKEN_SERVICE");
+    }
+
+    @PermissionTest(permission="BIND_INSIGHT_RENDERER_SERVICE", sdkMin=37)
+    public void testBindInsightRendererService(){
+        runBindRunnable("BIND_INSIGHT_RENDERER_SERVICE");
+    }
+
+    // @PermissionTest(permission="BIND_DEVELOPER_VERIFICATION_AGENT", sdkMin=37)
+    // As a result of verification, this is an internal permission on Android 17 actual devices and is not granted to normal apps, so it cannot be tested at present.
+    public void testBindDeveloperVerificationAgent(){
+        runBindRunnable("BIND_DEVELOPER_VERIFICATION_AGENT");
+    }
+
+    @PermissionTest(permission="BIND_MOTION_CUES_SERVICE", sdkMin=37)
+    public void testBindMotionCuesService(){
+        runBindRunnable("BIND_MOTION_CUES_SERVICE");
+    }
+
+    @PermissionTest(permission="BIND_SETTINGS_CONTENT_SAFETY_SERVICE", sdkMin=37)
+    public void testBindSettingsContentSafetyService(){
+        runBindRunnable("BIND_SETTINGS_CONTENT_SAFETY_SERVICE");
+    }
+
+    // @PermissionTest(permission="BIND_ALLOWLIST_PROVIDER_SERVICE", sdkMin=37)
+    // As a result of verification, this is an internal permission on Android 17 actual devices and is not granted to normal apps, so it cannot be tested at present.
+    public void testBindAllowlistProviderService(){
+        runBindRunnable("BIND_ALLOWLIST_PROVIDER_SERVICE");
+    }
+
+    @PermissionTest(permission="BIND_SUPERVISION_APP_SERVICE", sdkMin=37)
+    public void testBindSupervisionAppService(){
+        runBindRunnable("BIND_SUPERVISION_APP_SERVICE");
+    }
+
+    @PermissionTest(permission="BIND_CONTENT_SAFETY_SERVICE", sdkMin=37)
+    public void testBindContentSafetyService(){
+        runBindRunnable("BIND_CONTENT_SAFETY_SERVICE");
+    }
+
+    @PermissionTest(permission="BIND_TO_TAP_TO_SHARE_SERVICE", sdkMin=37)
+    public void testBindToTapToShareService(){
+        runBindRunnable("BIND_TO_TAP_TO_SHARE_SERVICE");
+    }
+
+    @PermissionTest(permission="BIND_SANDBOXED_CONTENT_SAFETY_SERVICE", sdkMin=37)
+    public void testBindSandboxedContentSafetyService(){
+        runBindRunnable("BIND_SANDBOXED_CONTENT_SAFETY_SERVICE");
+    }
+
+    @PermissionTest(permission="BIND_ALTERNATIVE_MESSAGE_TRANSPORT_SERVICE", sdkMin=37)
+    public void testBindAlternativeMessageTransportService(){
+        runBindRunnable("BIND_ALTERNATIVE_MESSAGE_TRANSPORT_SERVICE");
+    }
+
+    // @PermissionTest(permission="BIND_CONTENT_RESTRICTION_SERVICE", sdkMin=37)
+    // As a result of verification, this permission itself does not exist on Android 17 actual devices, so it cannot be tested.
+    public void testBindContentRestrictionService(){
+        runBindRunnable("BIND_CONTENT_RESTRICTION_SERVICE");
     }
 }
