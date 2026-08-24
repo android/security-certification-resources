@@ -530,7 +530,7 @@ public class InternalTestModule extends PermissionTestModuleBase {
         try {
             android.hardware.biometrics.BiometricManager bm = mContext.getSystemService(android.hardware.biometrics.BiometricManager.class);
             if (bm != null) {
-                bm.getBiometricSensorStrengths();
+                com.android.certification.niap.permission.dpctester.common.ReflectionUtil.invoke(bm, "getBiometricSensorStrengths");
                 logger.debug("getBiometricSensorStrengths called successfully");
             } else {
                 logger.debug("BiometricManager is null");

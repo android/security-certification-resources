@@ -1143,7 +1143,7 @@ public class InstallTestModule extends PermissionTestModuleBase {
 		AtomicReference<Exception> errorRef = new AtomicReference<>();
 
 		try {
-			task.requestWindowingLayer(ActivityManager.AppTask.WINDOWING_LAYER_PINNED, mExecutor, new OutcomeReceiver<Integer, Exception>() {
+			OutcomeReceiver<Integer, Exception> receiver = new OutcomeReceiver<Integer, Exception>() {
 				@Override
 				public void onResult(Integer result) {
 					logger.info("requestWindowingLayer result: " + result);
@@ -1155,7 +1155,9 @@ public class InstallTestModule extends PermissionTestModuleBase {
 					errorRef.set(error);
 					latch.countDown();
 				}
-			});
+			};
+			com.android.certification.niap.permission.dpctester.common.ReflectionUtil.invoke(
+					task, "requestWindowingLayer", 1, mExecutor, receiver);
 
 			if (!latch.await(5, java.util.concurrent.TimeUnit.SECONDS)) {
 				logger.info("Timed out waiting for requestWindowingLayer callback");

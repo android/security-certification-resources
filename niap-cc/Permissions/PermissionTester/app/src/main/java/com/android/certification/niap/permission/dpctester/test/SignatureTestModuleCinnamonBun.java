@@ -2301,4 +2301,32 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
+
+    @PermissionTest(permission="MODIFY_AUDIO_SETTINGS_PRIVILEGED", sdkMin=37)
+    public void testModifyAudioSettingsPrivileged() {
+        android.media.AudioManager audioManager = (android.media.AudioManager)
+                mContext.getSystemService(android.content.Context.AUDIO_SERVICE);
+        try {
+            com.android.certification.niap.permission.dpctester.common.ReflectionUtil.invoke(
+                    audioManager, "setVolumeGroupVolumeIndex", 0, 0, 0);
+        } catch (com.android.certification.niap.permission.dpctester.common.ReflectionUtil.ReflectionIsTemporaryException e) {
+            logger.debug("setVolumeGroupVolumeIndex passed permission check: " + e.getMessage());
+        }
+    }
+
+    @PermissionTest(permission="ACCESS_LAST_KNOWN_CELL_ID", sdkMin=37)
+    public void testAccessLastKnownCellId() {
+        if (!checkPermissionGranted("android.permission.ACCESS_LAST_KNOWN_CELL_ID")) {
+            throw new SecurityException("Caller does not have ACCESS_LAST_KNOWN_CELL_ID permission");
+        }
+        android.telephony.TelephonyManager telephonyManager = (android.telephony.TelephonyManager)
+                mContext.getSystemService(android.content.Context.TELEPHONY_SERVICE);
+        try {
+            com.android.certification.niap.permission.dpctester.common.ReflectionUtil.invoke(
+                    telephonyManager, "getLastKnownCellIdentity");
+        } catch (com.android.certification.niap.permission.dpctester.common.ReflectionUtil.ReflectionIsTemporaryException e) {
+            logger.debug("getLastKnownCellIdentity passed permission check: " + e.getMessage());
+        }
+    }
 }
+
