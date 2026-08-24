@@ -1004,6 +1004,9 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
 
     @PermissionTest(permission="PERSONAL_CONTEXT_HOST_INSIGHT_SURFACE",sdkMin=37)
     public void testPersonalContextHostInsightSurface(){
+        if (!checkPermissionGranted("android.permission.PERSONAL_CONTEXT_HOST_INSIGHT_SURFACE")) {
+            throw new SecurityException("Caller does not have PERSONAL_CONTEXT_HOST_INSIGHT_SURFACE permission");
+        }
         try {
             Object manager = mContext.getSystemService("personal_context");
             if (manager == null) {
@@ -2326,6 +2329,36 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                     telephonyManager, "getLastKnownCellIdentity");
         } catch (com.android.certification.niap.permission.dpctester.common.ReflectionUtil.ReflectionIsTemporaryException e) {
             logger.debug("getLastKnownCellIdentity passed permission check: " + e.getMessage());
+        }
+    }
+
+    @PermissionTest(permission="REQUEST_UNIQUE_ID_ATTESTATION", sdkMin=37)
+    public void testRequestUniqueIdAttestation() {
+        if (!checkPermissionGranted("android.permission.REQUEST_UNIQUE_ID_ATTESTATION")) {
+            throw new SecurityException("Caller does not have REQUEST_UNIQUE_ID_ATTESTATION permission");
+        }
+        String keystoreAlias = "test_key";
+        android.security.keystore.KeyGenParameterSpec.Builder builder =
+                new android.security.keystore.KeyGenParameterSpec.Builder(keystoreAlias, android.security.keystore.KeyProperties.PURPOSE_SIGN)
+                        .setAlgorithmParameterSpec(new java.security.spec.ECGenParameterSpec("secp256r1"))
+                        .setDigests(android.security.keystore.KeyProperties.DIGEST_NONE, android.security.keystore.KeyProperties.DIGEST_SHA256, android.security.keystore.KeyProperties.DIGEST_SHA512)
+                        .setAttestationChallenge(new byte[128]);
+        builder = (android.security.keystore.KeyGenParameterSpec.Builder) com.android.certification.niap.permission.dpctester.common.ReflectionUtil.invoke(builder,
+                "setUniqueIdIncluded",
+                new Class<?>[]{boolean.class}, true);
+
+        android.security.keystore.KeyGenParameterSpec spec = builder.build();
+        try {
+            java.security.KeyStore keyStore = java.security.KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+            java.security.KeyPairGenerator keyPairGenerator = java.security.KeyPairGenerator.getInstance(
+                    android.security.keystore.KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
+            keyPairGenerator.initialize(spec);
+            keyPairGenerator.generateKeyPair();
+        } catch (java.security.ProviderException e) {
+            throw new SecurityException(e);
+        } catch (Exception e) {
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
 }
