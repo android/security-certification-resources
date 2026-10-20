@@ -437,10 +437,10 @@ public class SignatureTestModuleBinder extends SignaturePermissionTestModuleBase
         runBindRunnable("BIND_SELECTION_TOOLBAR_RENDER_SERVICE");
     }
 
-//    @PermissionTest(permission="BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE", sdkMin=33)
-//    public void testBindWallpaperEffectsGenerationService(){
-//        runBindRunnable("BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE");
-//    }
+    @PermissionTest(permission="BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE", sdkMin=33)
+    public void testBindWallpaperEffectsGenerationService(){
+        runBindRunnable("BIND_WALLPAPER_EFFECTS_GENERATION_SERVICE");
+    }
 
     @PermissionTest(permission="BIND_TV_INTERACTIVE_APP", sdkMin=33)
     public void testBindTvInteractiveApp(){
@@ -561,12 +561,6 @@ public class SignatureTestModuleBinder extends SignaturePermissionTestModuleBase
         runBindRunnable("BIND_INSIGHT_RENDERER_SERVICE");
     }
 
-    // @PermissionTest(permission="BIND_DEVELOPER_VERIFICATION_AGENT", sdkMin=37)
-    // As a result of verification, this is an internal permission on Android 17 actual devices and is not granted to normal apps, so it cannot be tested at present.
-    public void testBindDeveloperVerificationAgent(){
-        runBindRunnable("BIND_DEVELOPER_VERIFICATION_AGENT");
-    }
-
     @PermissionTest(permission="BIND_MOTION_CUES_SERVICE", sdkMin=37)
     public void testBindMotionCuesService(){
         runBindRunnable("BIND_MOTION_CUES_SERVICE");
@@ -575,12 +569,6 @@ public class SignatureTestModuleBinder extends SignaturePermissionTestModuleBase
     @PermissionTest(permission="BIND_SETTINGS_CONTENT_SAFETY_SERVICE", sdkMin=37)
     public void testBindSettingsContentSafetyService(){
         runBindRunnable("BIND_SETTINGS_CONTENT_SAFETY_SERVICE");
-    }
-
-    // @PermissionTest(permission="BIND_ALLOWLIST_PROVIDER_SERVICE", sdkMin=37)
-    // As a result of verification, this is an internal permission on Android 17 actual devices and is not granted to normal apps, so it cannot be tested at present.
-    public void testBindAllowlistProviderService(){
-        runBindRunnable("BIND_ALLOWLIST_PROVIDER_SERVICE");
     }
 
     @PermissionTest(permission="BIND_SUPERVISION_APP_SERVICE", sdkMin=37)
@@ -606,11 +594,5 @@ public class SignatureTestModuleBinder extends SignaturePermissionTestModuleBase
     @PermissionTest(permission="BIND_ALTERNATIVE_MESSAGE_TRANSPORT_SERVICE", sdkMin=37)
     public void testBindAlternativeMessageTransportService(){
         runBindRunnable("BIND_ALTERNATIVE_MESSAGE_TRANSPORT_SERVICE");
-    }
-
-    // @PermissionTest(permission="BIND_CONTENT_RESTRICTION_SERVICE", sdkMin=37)
-    // As a result of verification, this permission itself does not exist on Android 17 actual devices, so it cannot be tested.
-    public void testBindContentRestrictionService(){
-        runBindRunnable("BIND_CONTENT_RESTRICTION_SERVICE");
     }
 }
