@@ -575,8 +575,10 @@ class DPCTestModule(val ctx: Activity): PermissionTestModuleBase(ctx){
         } catch (e: Exception) {
             logger.debug("Caught exception: ${e.message}")
             val cause = e.cause
-            if (e is SecurityException || cause is SecurityException) {
-                logger.debug("Caught SecurityException as expected.")
+            if (e is SecurityException) {
+                throw e
+            } else if (cause is SecurityException) {
+                throw cause
             } else {
                 throw BypassTestException("Test bypassed due to missing API or disabled flag: ${e.message}")
             }
@@ -602,8 +604,10 @@ class DPCTestModule(val ctx: Activity): PermissionTestModuleBase(ctx){
             logger.debug("getMultiuserManagedDeviceProvisioningState called successfully")
         } catch (e: Exception) {
             val cause = e.cause
-            if (e is SecurityException || cause is SecurityException) {
+            if (e is SecurityException) {
                 throw e
+            } else if (cause is SecurityException) {
+                throw cause
             }
             throw com.android.certification.niap.permission.dpctester.test.exception.BypassTestException("Test failed with non-SecurityException: ${e.message}")
         }

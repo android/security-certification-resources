@@ -15,6 +15,8 @@ package com.android.certification.niap.permission.dpctester;
  * limitations under the License.
  */
 
+import static android.Manifest.permission.INTERNET;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import android.app.Activity;
@@ -86,6 +88,7 @@ public class InternalPermissionCinnamonBunTest {
     static private UiAutomation mUiAutomation;
     static private Context mContext;
     static private Activity mActivity;
+    static private Boolean nonperm = false;
 
     static private InternalTestModule internalTestModule;
 
@@ -96,7 +99,14 @@ public class InternalPermissionCinnamonBunTest {
         mPackageManager = mContext.getPackageManager();
         mActivity = getActivity();
 
-        mUiAutomation.adoptShellPermissionIdentity();
+        if (mPackageManager.checkPermission(INTERNET, mContext.getPackageName())
+                == PackageManager.PERMISSION_GRANTED) {
+            mUiAutomation.adoptShellPermissionIdentity();
+            nonperm = false;
+        } else {
+            mUiAutomation.dropShellPermissionIdentity();
+            nonperm = true;
+        }
 
         internalTestModule = new InternalTestModule(mActivity);
     }
@@ -135,6 +145,16 @@ public class InternalPermissionCinnamonBunTest {
         int sdkMin_ =  m.getAnnotation(PermissionTest.class).sdkMin();
         sdkNotSupported = Build.VERSION.SDK_INT < sdkMin_ || Build.VERSION.SDK_INT > sdkMax_;
         assumeTrue(!sdkNotSupported);
+
+        if (nonperm && permissionGranted) {
+            Log.d("Instrumentation Setup", "Permission " + targetPermission + " is unintentionally granted");
+            assumeFalse(permissionGranted);
+        }
+
+        if (!nonperm && !permissionGranted) {
+            Log.d("Instrumentation Setup", "Permission " + targetPermission + " can not be granted");
+            assumeTrue(permissionGranted);
+        }
 
         Log.d("Instrumentation Setup","Method Info TAG=>"+testName.getMethodName());
         Log.d("Instrumentation Setup","Permission=>"+targetPermission+":"+permissionGranted);

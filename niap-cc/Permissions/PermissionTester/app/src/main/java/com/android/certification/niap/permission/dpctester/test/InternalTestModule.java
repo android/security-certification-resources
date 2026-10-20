@@ -629,6 +629,7 @@ public class InternalTestModule extends PermissionTestModuleBase {
 			}
 		} catch (SecurityException e) {
 			logger.info("SecurityException expectedly thrown when binding to AclProviderService: " + e.getMessage());
+			throw e;
 		}
 	}
 	@PermissionTest(permission="BIND_DEVELOPER_VERIFICATION_AGENT",sdkMin=37)
@@ -653,6 +654,7 @@ public class InternalTestModule extends PermissionTestModuleBase {
 			}
 		} catch (SecurityException e) {
 			logger.info("SecurityException expectedly thrown when binding to PlatformVerificationService: " + e.getMessage());
+			throw e;
 		}
 	}
 	@PermissionTest(permission="REQUEST_LOCATION_BUTTON_PERMISSIONS",sdkMin=37)
@@ -664,6 +666,7 @@ public class InternalTestModule extends PermissionTestModuleBase {
 			logger.info("Successfully started RequestLocationButtonPermissionsActivity (unexpected without permission)");
 		} catch (SecurityException e) {
 			logger.info("SecurityException expectedly thrown when starting activity: " + e.getMessage());
+			throw e;
 		}
 	}
 	@PermissionTest(permission="CAPTURE_KEYBOARD",sdkMin=37)
@@ -781,6 +784,7 @@ public class InternalTestModule extends PermissionTestModuleBase {
             Throwable cause = e.getCause();
             if (cause instanceof SecurityException) {
                 logger.info("SecurityException expectedly thrown: " + cause.getMessage());
+                throw (SecurityException) cause;
             } else {
                 throw new RuntimeException(cause);
             }
