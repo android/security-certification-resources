@@ -15,5 +15,3 @@ ioXt, tools related to the [internet of secure things alliance](https://www.ioxt
 
 The audience for this repo is OEMs working to obtain certifications that require test tools and artifacts. 
 
-SDK37 branch
-
