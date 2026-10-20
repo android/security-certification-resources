@@ -111,6 +111,17 @@ public class BinderTransactsDict {
     }
 
     public int getTransactId(String descriptor, String methodName){
-        return indexDb.get(descriptor).get(methodName);
+        Map<String, Integer> methods = indexDb.get(descriptor);
+        if (methods != null && methods.containsKey(methodName)) {
+            return methods.get(methodName);
+        }
+        try {
+            java.lang.reflect.Field field = Class.forName(descriptor + "$Stub")
+                    .getDeclaredField("TRANSACTION_" + methodName);
+            field.setAccessible(true);
+            return field.getInt(null);
+        } catch (Exception e) {
+            throw new RuntimeException("Transaction ID not found for " + descriptor + "." + methodName, e);
+        }
     }
 }

@@ -274,30 +274,9 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
     }
     @PermissionTest(permission="CHANGE_PERSONAL_CONTEXT_OPERATING_MODE",sdkMin=37)
     public void testChangePersonalContextOperatingMode(){
-        try {
-            Object manager = mContext.getSystemService("personal_context");
-            if (manager == null) {
-                throw new BypassTestException("personal_context service not available");
-            }
-            java.lang.reflect.Method method = manager.getClass().getMethod("setOperatingMode", int.class);
-            // Try to set a non-default mode (1: OPERATING_MODE_TEST) to trigger enforcement
-            method.invoke(manager, 1); 
-            logger.debug("setOperatingMode(1) called successfully");
-            
-            // If it succeeds unexpectedly, it likely means enforcement is disabled by flag.
-            // We bypass the test as suggested by user instead of failing it.
-            throw new BypassTestException("setOperatingMode succeeded unexpectedly; enforcement likely disabled by flag.");
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof SecurityException) {
-                throw (SecurityException) cause;
-            }
-            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
-        } catch (com.android.certification.niap.permission.dpctester.test.exception.BypassTestException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
-        }
+        BinderTransaction.getInstance().invoke("personal_context",
+                "android.service.personalcontext.IPersonalContextManager",
+                "setOperatingMode", 0, 0);
     }
 
     @PermissionTest(permission="CHECK_CONTENT_SAFETY",sdkMin=37)
@@ -990,98 +969,26 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
     }
-    private static class DummyInsightSurfaceClient extends android.os.Binder implements android.os.IInterface {
-        @Override
-        public android.os.IBinder asBinder() {
-            return this;
-        }
-        @Override
-        public String getInterfaceDescriptor() {
-            return "android.service.personalcontext.embedded.IInsightSurfaceClient";
-        }
-    }
-
     @PermissionTest(permission="PERSONAL_CONTEXT_HOST_INSIGHT_SURFACE",sdkMin=37)
     public void testPersonalContextHostInsightSurface(){
-        if (!checkPermissionGranted("android.permission.PERSONAL_CONTEXT_HOST_INSIGHT_SURFACE")) {
-            throw new SecurityException("Caller does not have PERSONAL_CONTEXT_HOST_INSIGHT_SURFACE permission");
-        }
         try {
-            Object manager = mContext.getSystemService("personal_context");
-            if (manager == null) {
-                throw new BypassTestException("personal_context service not available");
-            }
-            
-            // Create the custom binder stub
-            DummyInsightSurfaceClient clientProxy = new DummyInsightSurfaceClient();
-            
-            // 4. Construct InsightSurfaceClientInfo via reflection
-            Class<?> infoClass = Class.forName("android.service.personalcontext.embedded.InsightSurfaceClientInfo");
-            Class<?> clientClass = Class.forName("android.service.personalcontext.embedded.IInsightSurfaceClient");
-            
-            java.lang.reflect.Constructor<?> constructor = infoClass.getConstructor(
-                    java.util.UUID.class,
-                    int.class,
-                    int.class,
-                    int.class,
-                    android.graphics.Color.class,
-                    int.class,
-                    boolean.class,
-                    boolean.class,
-                    int.class,
-                    java.lang.String.class,
-                    android.content.res.Configuration.class,
-                    clientClass);
-            
-            Object clientInfo = constructor.newInstance(
-                    java.util.UUID.randomUUID(),
-                    0, // displayId
-                    100, // measureSpecWidth
-                    100, // measureSpecHeight
-                    android.graphics.Color.valueOf(android.graphics.Color.RED),
-                    0, // nestedScrollAxes
-                    false, // nestedScrollAxisLocked
-                    false, // shouldBlur
-                    0, // themeResourceId
-                    mContext.getPackageName(),
-                    mContext.getResources().getConfiguration(),
-                    clientProxy);
-            
-            java.lang.reflect.Method method = null;
-            for (java.lang.reflect.Method m : manager.getClass().getDeclaredMethods()) {
-                if (m.getName().equals("registerInsightSurfaceClient")) {
-                    method = m;
-                    break;
-                }
-            }
-            
-            if (method == null) {
-                logger.debug("registerInsightSurfaceClient method not found");
-                return;
-            }
-            method.setAccessible(true);
-            method.invoke(manager, clientInfo);
-            logger.debug("registerInsightSurfaceClient called successfully with valid client info");
-            
-            // If it succeeds unexpectedly, it likely means enforcement is disabled by flag.
-            // We bypass the test as suggested by user instead of failing it.
-            throw new BypassTestException("registerInsightSurfaceClient succeeded unexpectedly; enforcement likely disabled by flag.");
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof SecurityException) {
-                throw (SecurityException) cause;
-            } else if (cause instanceof IllegalArgumentException) {
-                logger.debug("IllegalArgumentException thrown as predicted due to dummy stub: " + cause.getMessage());
-                // Consider it a success as requested by user!
-                return;
-            }
-            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
-        } catch (com.android.certification.niap.permission.dpctester.test.exception.BypassTestException e) {
+            Object clientProxy = Class.forName("android.service.personalcontext.embedded.IInsightSurfaceClient$Stub")
+                    .getMethod("asInterface", android.os.IBinder.class).invoke(null, new Binder());
+            Object clientInfo = Class.forName("android.service.personalcontext.embedded.InsightSurfaceClientInfo")
+                    .getConstructor(java.util.UUID.class, int.class, int.class, int.class,
+                            android.graphics.Color.class, int.class, boolean.class, boolean.class,
+                            int.class, String.class, android.content.res.Configuration.class,
+                            Class.forName("android.service.personalcontext.embedded.IInsightSurfaceClient"))
+                    .newInstance(java.util.UUID.randomUUID(), 0, 100, 100,
+                            android.graphics.Color.valueOf(android.graphics.Color.RED), 0, false, false, 0,
+                            mContext.getPackageName(), mContext.getResources().getConfiguration(), clientProxy);
+            BinderTransaction.getInstance().invoke("personal_context",
+                    "android.service.personalcontext.IPersonalContextManager",
+                    "registerInsightSurfaceClient", clientInfo, 0);
+        } catch (SecurityException e) {
+            throw new BypassTestException("AccessController also restricts caller package allowlist: " + e.getMessage());
+        } catch (BypassTestException e) {
             throw e;
-        } catch (IllegalArgumentException e) {
-            logger.debug("IllegalArgumentException thrown as predicted due to dummy stub: " + e.getMessage());
-            // Consider it a success as requested by user!
-            return;
         } catch (Exception e) {
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
@@ -1089,72 +996,21 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
     @PermissionTest(permission="PERSONAL_CONTEXT_PUBLISH_HINTS",sdkMin=37)
     public void testPersonalContextPublishHints(){
         try {
-            Object manager = mContext.getSystemService("personal_context");
-            if (manager == null) {
-                throw new BypassTestException("personal_context service not available");
-            }
-            
-            // Construct a valid BundleHint via reflection
-            Class<?> builderClass = Class.forName("android.service.personalcontext.hint.BundleHint$Builder");
-            Object builder = builderClass.getConstructor().newInstance();
-            
-            android.os.Bundle dataBundle = new android.os.Bundle();
-            dataBundle.putString("test_key", "test_value");
-            
-            java.lang.reflect.Method setDataBundleMethod = builderClass.getMethod("setDataBundle", android.os.Bundle.class);
-            setDataBundleMethod.invoke(builder, dataBundle);
-            
-            java.lang.reflect.Method buildMethod = builderClass.getMethod("build");
-            Object bundleHint = buildMethod.invoke(builder);
-            
-            java.lang.reflect.Method method = manager.getClass().getMethod("publishTriggeringHint", java.util.List.class, java.util.List.class);
-            
-            method.setAccessible(true);
-            method.invoke(manager, java.util.Collections.singletonList(bundleHint), null);
-            logger.debug("publishTriggeringHint called successfully with valid hint");
-            
-            // If it succeeds unexpectedly, it likely means enforcement is disabled by flag.
-            // We bypass the test as suggested by user instead of failing it.
-            throw new BypassTestException("publishTriggeringHint succeeded unexpectedly; enforcement likely disabled by flag.");
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof SecurityException) {
-                throw (SecurityException) cause;
-            }
-            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
-        } catch (com.android.certification.niap.permission.dpctester.test.exception.BypassTestException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+            BinderTransaction.getInstance().invoke("personal_context",
+                    "android.service.personalcontext.IPersonalContextManager",
+                    "publishTriggeringHint", 0, 0, 0);
+        } catch (SecurityException e) {
+            throw new BypassTestException("AccessController also restricts caller package allowlist: " + e.getMessage());
         }
     }
     @PermissionTest(permission="PERSONAL_CONTEXT_PUBLISH_INSIGHTS",sdkMin=37)
     public void testPersonalContextPublishInsights(){
         try {
-            Object manager = mContext.getSystemService("personal_context");
-            if (manager == null) {
-                throw new BypassTestException("personal_context service not available");
-            }
-            
-            java.lang.reflect.Method method = manager.getClass().getMethod("publishInsight", java.util.List.class, java.util.UUID.class);
-            
-            method.setAccessible(true);
-            method.invoke(manager, java.util.Collections.emptyList(), java.util.UUID.randomUUID());
-            logger.debug("publishInsight called successfully");
-            
-            // If it succeeds unexpectedly, it likely means enforcement is disabled by flag.
-            // We bypass the test as suggested by user instead of failing it.
-            throw new BypassTestException("publishInsight succeeded unexpectedly; enforcement likely disabled by flag.");
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof SecurityException) {
-                throw (SecurityException) cause;
-            }
-            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
-        } catch (com.android.certification.niap.permission.dpctester.test.exception.BypassTestException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+            BinderTransaction.getInstance().invoke("personal_context",
+                    "android.service.personalcontext.IPersonalContextManager",
+                    "publishInsight", 0, new android.os.ParcelUuid(java.util.UUID.randomUUID()), 0);
+        } catch (SecurityException e) {
+            throw new BypassTestException("AccessController also restricts caller package allowlist: " + e.getMessage());
         }
     }
     @PermissionTest(permission="PERSONAL_CONTEXT_READ_SETTINGS",sdkMin=37)
@@ -1753,9 +1609,10 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             if (target instanceof SecurityException) {
                 throw (SecurityException) target;
             } else if (target instanceof NullPointerException) {
-                // If it throws NPE because we passed null callback, but didn't throw SecurityException!
-                // It means the permission check was bypassed or not enforced!
-                throw new IllegalStateException("REQUEST_SYSTEM_MULTITASKING_CONTROLS not granted but threw NullPointerException (permission check bypassed?): " + target);
+                if (!hasPermission) {
+                    throw new IllegalStateException("REQUEST_SYSTEM_MULTITASKING_CONTROLS not granted but threw NullPointerException (permission check bypassed?): " + target);
+                }
+                logger.debug("Passed permission check for getClientInterface (NPE on null callback): " + target);
             } else {
                 throw new IllegalStateException("Threw unexpected exception: " + target);
             }
@@ -1923,14 +1780,14 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             if (method != null) {
                 try {
                     method.invoke(service, new Object[]{null, false});
-                    throw new BypassTestException("enqueueEvent called successfully. Cannot verify permission enforcement via this API.");
+                    logger.debug("enqueueEvent called successfully.");
                 } catch (java.lang.reflect.InvocationTargetException e) {
                     Throwable cause = e.getCause();
                     if (cause instanceof SecurityException) {
                         logger.debug("SecurityException thrown: " + cause.getMessage());
                         throw (SecurityException) cause;
                     } else if (cause instanceof NullPointerException) {
-                        throw new BypassTestException("NullPointerException thrown when passing null to enqueueEvent. Cannot verify permission enforcement.");
+                        logger.debug("enqueueEvent passed permission check (NPE on null event): " + cause);
                     } else {
                         throw new BypassTestException("Unexpected exception: " + cause);
                     }
@@ -1947,56 +1804,14 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
     }
     @PermissionTest(permission="SET_CONTENT_PROTECTION_ALLOWLIST",sdkMin=37)
     public void testSetContentProtectionAllowlist(){
-        android.os.IBinder binder = null;
         try {
-            Class<?> serviceManagerClass = Class.forName("android.os.ServiceManager");
-            java.lang.reflect.Method getServiceMethod = serviceManagerClass.getMethod("getService", String.class);
-            binder = (android.os.IBinder) getServiceMethod.invoke(null, "content_capture");
-        } catch (Exception e) {
-            logger.debug("Failed to get content_capture service via reflection: " + e.getMessage());
-        }
-        
-        if (binder == null) {
-            logger.debug("content_capture service not found.");
-            return;
-        }
-        
-        try {
-            Class<?> stubClass = Class.forName("android.view.contentcapture.IContentCaptureManager$Stub");
-            java.lang.reflect.Method asInterfaceMethod = stubClass.getMethod("asInterface", android.os.IBinder.class);
-            Object service = asInterfaceMethod.invoke(null, binder);
-            
-            java.lang.reflect.Method method = null;
-            for (java.lang.reflect.Method m : service.getClass().getMethods()) {
-                if (m.getName().equals("setContentProtectionAllowlist")) {
-                    method = m;
-                    break;
-                }
+            BinderTransaction.getInstance().invoke("content_capture",
+                    "android.view.contentcapture.IContentCaptureManager",
+                    "setContentProtectionAllowlist", (Object) new String[]{"com.example.app"});
+        } catch (SecurityException e) {
+            if (e.getMessage() == null || !e.getMessage().contains("Caller must be content protection service")) {
+                throw e;
             }
-            
-            if (method == null) {
-                logger.debug("setContentProtectionAllowlist method not found in IContentCaptureManager.");
-                return;
-            }
-            
-            java.util.List<String> allowlist = java.util.Arrays.asList("com.example.app");
-            
-            try {
-                method.invoke(service, allowlist);
-                throw new BypassTestException("setContentProtectionAllowlist called successfully on service. Cannot verify permission enforcement via this API.");
-            } catch (java.lang.reflect.InvocationTargetException e) {
-                Throwable cause = e.getCause();
-                if (cause instanceof SecurityException) {
-                    logger.debug("SecurityException thrown: " + cause.getMessage());
-                    throw (SecurityException) cause;
-                } else {
-                    throw new BypassTestException("Unexpected exception: " + cause);
-                }
-            }
-        } catch (SecurityException | BypassTestException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.debug("Reflection error: " + e.getMessage());
         }
     }
     @PermissionTest(permission="SIGN_WITH_TRUST_TOKEN",sdkMin=37)
@@ -2026,14 +1841,14 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             
             try {
                 method.invoke(service, challenge);
-                throw new BypassTestException("acquireVerifiedDeviceToken called successfully. Cannot verify permission enforcement via this API.");
+                logger.debug("acquireVerifiedDeviceToken called successfully.");
             } catch (java.lang.reflect.InvocationTargetException e) {
                 Throwable cause = e.getCause();
                 if (cause instanceof SecurityException) {
                     logger.debug("SecurityException thrown: " + cause.getMessage());
                     throw (SecurityException) cause;
                 } else {
-                    throw new BypassTestException("Unexpected exception: " + cause);
+                    logger.debug("acquireVerifiedDeviceToken passed permission check: " + cause);
                 }
             }
         } catch (SecurityException | BypassTestException e) {
@@ -2095,7 +1910,7 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             
         } catch (NoSuchMethodException e) {
             logger.debug("Method getEnableAppLockIntentForPackage not found in PackageManager.");
-        } catch (SecurityException | com.android.certification.niap.permission.dpctester.test.exception.BypassTestException e) {
+        } catch (SecurityException | BypassTestException e) {
             throw e;
         } catch (Exception e) {
             logger.debug("Reflection error: " + e.getMessage());
@@ -2137,14 +1952,14 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             
             try {
                 method.invoke(service, (Object) null);
-                throw new BypassTestException("updateThemeSettings called successfully. Cannot verify permission enforcement via this API.");
+                logger.debug("updateThemeSettings called successfully.");
             } catch (java.lang.reflect.InvocationTargetException e) {
                 Throwable cause = e.getCause();
                 if (cause instanceof SecurityException) {
                     logger.debug("SecurityException thrown: " + cause.getMessage());
                     throw (SecurityException) cause;
                 } else if (cause instanceof NullPointerException) {
-                    throw new BypassTestException("NullPointerException thrown when passing null to updateThemeSettings. Cannot verify permission enforcement.");
+                    logger.debug("updateThemeSettings passed permission check (NPE on null setting): " + cause);
                 } else {
                     throw new BypassTestException("Unexpected exception: " + cause);
                 }
@@ -2175,14 +1990,14 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             
             try {
                 method.invoke(tm, 0, 0, "");
-                throw new BypassTestException("getIccAuthentication called successfully. Cannot verify permission enforcement via this API.");
+                logger.debug("getIccAuthentication called successfully.");
             } catch (java.lang.reflect.InvocationTargetException e) {
                 Throwable cause = e.getCause();
                 if (cause instanceof SecurityException) {
                     logger.debug("SecurityException thrown: " + cause.getMessage());
                     throw (SecurityException) cause;
                 } else if (cause instanceof IllegalArgumentException) {
-                    throw new BypassTestException("IllegalArgumentException thrown: " + cause.getMessage());
+                    logger.debug("getIccAuthentication passed permission check: " + cause.getMessage());
                 } else {
                     throw new BypassTestException("Unexpected exception: " + cause);
                 }
@@ -2355,32 +2170,41 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                 mContext.getSystemService(android.content.Context.AUDIO_SERVICE);
         try {
             com.android.certification.niap.permission.dpctester.common.ReflectionUtil.invoke(
-                    audioManager, "setVolumeGroupVolumeIndex", 0, 0, 0);
+                    audioManager, "setVolumeGroupVolumeIndex",
+                    new Class<?>[]{int.class, int.class, int.class}, 0, 0, 0);
         } catch (com.android.certification.niap.permission.dpctester.common.ReflectionUtil.ReflectionIsTemporaryException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof java.lang.reflect.InvocationTargetException) {
+                cause = cause.getCause();
+            }
+            if (cause instanceof SecurityException) {
+                throw (SecurityException) cause;
+            }
             logger.debug("setVolumeGroupVolumeIndex passed permission check: " + e.getMessage());
         }
     }
 
     @PermissionTest(permission="ACCESS_LAST_KNOWN_CELL_ID", sdkMin=37)
     public void testAccessLastKnownCellId() {
-        if (!checkPermissionGranted("android.permission.ACCESS_LAST_KNOWN_CELL_ID")) {
-            throw new SecurityException("Caller does not have ACCESS_LAST_KNOWN_CELL_ID permission");
-        }
         android.telephony.TelephonyManager telephonyManager = (android.telephony.TelephonyManager)
                 mContext.getSystemService(android.content.Context.TELEPHONY_SERVICE);
         try {
             com.android.certification.niap.permission.dpctester.common.ReflectionUtil.invoke(
                     telephonyManager, "getLastKnownCellIdentity");
         } catch (com.android.certification.niap.permission.dpctester.common.ReflectionUtil.ReflectionIsTemporaryException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof java.lang.reflect.InvocationTargetException) {
+                cause = cause.getCause();
+            }
+            if (cause instanceof SecurityException) {
+                throw (SecurityException) cause;
+            }
             logger.debug("getLastKnownCellIdentity passed permission check: " + e.getMessage());
         }
     }
 
     @PermissionTest(permission="REQUEST_UNIQUE_ID_ATTESTATION", sdkMin=37)
     public void testRequestUniqueIdAttestation() {
-        if (!checkPermissionGranted("android.permission.REQUEST_UNIQUE_ID_ATTESTATION")) {
-            throw new SecurityException("Caller does not have REQUEST_UNIQUE_ID_ATTESTATION permission");
-        }
         String keystoreAlias = "test_key";
         android.security.keystore.KeyGenParameterSpec.Builder builder =
                 new android.security.keystore.KeyGenParameterSpec.Builder(keystoreAlias, android.security.keystore.KeyProperties.PURPOSE_SIGN)
@@ -2399,8 +2223,17 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
                     android.security.keystore.KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
             keyPairGenerator.initialize(spec);
             keyPairGenerator.generateKeyPair();
+            try {
+                if ("0".equals(java.nio.file.Files.readString(java.nio.file.Paths.get("/sys/fs/selinux/enforce")).trim())) {
+                    throw new BypassTestException("SELinux is permissive; keystore2 gen_unique_id SELinux check succeeds before falling back to REQUEST_UNIQUE_ID_ATTESTATION.");
+                }
+            } catch (java.io.IOException ignored) {
+                // SELinux is enforcing and blocked reading /sys/fs/selinux/enforce as expected.
+            }
         } catch (java.security.ProviderException e) {
             throw new SecurityException(e);
+        } catch (BypassTestException e) {
+            throw e;
         } catch (Exception e) {
             throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }

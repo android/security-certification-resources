@@ -1748,6 +1748,7 @@
     <uses-permission android:name="android.permission.BIND_TO_TAP_TO_SHARE_SERVICE" />
     <uses-permission android:name="android.permission.BIND_TRUST_TOKEN_SERVICE" />
     <uses-permission android:name="android.permission.CHANGE_PERSONAL_CONTEXT_MODE" />
+    <uses-permission android:name="android.permission.CHANGE_PERSONAL_CONTEXT_OPERATING_MODE" />
     <uses-permission android:name="android.permission.CHECK_CONTENT_SAFETY" />
     <uses-permission android:name="android.permission.CONFIGURE_ANOMALY_DETECTOR" />
     <uses-permission android:name="android.permission.CONTROLLER_REMAPPING" />
