@@ -98,12 +98,11 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
     //         throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
     //     }
     // }
+    // No framework, telephony, or cellbroadcast APEX service/provider API enforces
+    // ACCESS_CELL_BROADCAST in Android 17 (referenced only in CHRE capability metadata).
     @PermissionTest(permission="ACCESS_CELL_BROADCAST",sdkMin=37)
     public void testAccessCellBroadcast(){
-        if (!checkPermissionGranted("android.permission.ACCESS_CELL_BROADCAST")) {
-            throw new SecurityException("android.permission.ACCESS_CELL_BROADCAST not granted");
-        }
-        logger.debug("android.permission.ACCESS_CELL_BROADCAST is granted");
+        throw new BypassTestException("ACCESS_CELL_BROADCAST has no callable framework or service API enforcing it in Android 17 (referenced only in CHRE capability metadata).");
     }
     @PermissionTest(permission="ACCESS_COMPANION_INFO",sdkMin=37)
     public void testAccessCompanionInfo(){
@@ -1430,19 +1429,64 @@ public class SignatureTestModuleCinnamonBun extends SignaturePermissionTestModul
             throw new SecurityException("android.permission.READ_MOISTURE_INTRUSION not granted and sensor is not accessible");
         }
     }
+    // Enforced via PermissionEnforcer in ITaskContinuityManager.unregisterRemoteTaskListener ("task_continuity" service).
     @PermissionTest(permission="READ_REMOTE_TASKS",sdkMin=37)
     public void testReadRemoteTasks(){
-        if (!checkPermissionGranted("android.permission.READ_REMOTE_TASKS")) {
-            throw new SecurityException("android.permission.READ_REMOTE_TASKS not granted");
+        try {
+            android.os.IBinder b = (android.os.IBinder) Class.forName("android.os.ServiceManager")
+                    .getMethod("getService", String.class)
+                    .invoke(null, "task_continuity");
+            if (b == null) {
+                throw new BypassTestException("task_continuity service not available");
+            }
+            Class<?> stubClass = Class.forName("android.companion.datatransfer.continuity.ITaskContinuityManager$Stub");
+            Object service = stubClass.getMethod("asInterface", android.os.IBinder.class).invoke(null, b);
+            Class<?> listenerClass = Class.forName("android.companion.datatransfer.continuity.IRemoteTaskListener");
+            final android.os.Binder token = new android.os.Binder();
+            Object dummyListener = java.lang.reflect.Proxy.newProxyInstance(
+                    listenerClass.getClassLoader(),
+                    new Class<?>[]{listenerClass},
+                    (proxy, method, args) -> "asBinder".equals(method.getName()) ? token : null);
+            int userId = android.os.Process.myUserHandle().hashCode();
+            service.getClass()
+                    .getMethod("unregisterRemoteTaskListener", int.class, listenerClass)
+                    .invoke(service, userId, dummyListener);
+            logger.debug("unregisterRemoteTaskListener succeeded");
+        } catch (BypassTestException e) {
+            throw e;
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            if (e instanceof SecurityException) {
+                throw (SecurityException) e;
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
-        logger.debug("android.permission.READ_REMOTE_TASKS is granted");
     }
+    // Grants supplementary Linux group "update_engine_log" (GID 1096) in platform.xml guarding /data/misc/update_engine_log.
     @PermissionTest(permission="READ_UPDATE_ENGINE_LOGS",sdkMin=37)
     public void testReadUpdateEngineLogs(){
-        if (!checkPermissionGranted("android.permission.READ_UPDATE_ENGINE_LOGS")) {
-            throw new SecurityException("android.permission.READ_UPDATE_ENGINE_LOGS not granted");
+        java.nio.file.Path logDir = java.nio.file.Paths.get("/data/misc/update_engine_log");
+        try (java.nio.file.DirectoryStream<java.nio.file.Path> stream =
+                java.nio.file.Files.newDirectoryStream(logDir)) {
+            int count = 0;
+            for (java.nio.file.Path ignored : stream) {
+                count++;
+            }
+            logger.debug("Successfully accessed /data/misc/update_engine_log, entries=" + count);
+        } catch (java.nio.file.AccessDeniedException e) {
+            throw new SecurityException("Access denied to /data/misc/update_engine_log", e);
+        } catch (java.nio.file.NoSuchFileException e) {
+            throw new BypassTestException("/data/misc/update_engine_log does not exist on this device");
+        } catch (java.io.IOException e) {
+            if (e.getMessage() != null && (e.getMessage().contains("EACCES") || e.getMessage().contains("Permission denied"))) {
+                throw new SecurityException("Permission denied reading /data/misc/update_engine_log", e);
+            }
+            throw new com.android.certification.niap.permission.dpctester.test.exception.UnexpectedTestFailureException(e);
         }
-        logger.debug("android.permission.READ_UPDATE_ENGINE_LOGS is granted");
     }
     @PermissionTest(permission="REMOTE_MULTISENSORY_PLAYBACK",sdkMin=37)
     public void testRemoteMultisensoryPlayback(){

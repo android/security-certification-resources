@@ -56,3 +56,5 @@ app/build
 /package
 /package/*
 .idea/
+/doc
+/doc/*
