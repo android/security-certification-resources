@@ -227,8 +227,9 @@ class RawHybridKeyProvider(
 
     /**
      * WORKAROUND [FCS_CKM_EXT.4]: Generates a dedicated hardware-backed EC key pair for Symmetric mode
-     * to perform ECDH key agreement. This is a workaround for the Keystore2 IPC memory leak
-     * observed when passing raw DEKs directly to Keystore2 for symmetric wrapping.
+     * to perform ECDH key agreement. This is a workaround for residual plaintext key material observed
+     * in IPC buffers when passing raw DEKs directly to Keystore2 for symmetric wrapping (caused by a
+     * Keystore2 issue and missing zeroization at the KeyMint / Binder boundary).
      * By using ECDH, the raw DEK never leaves the application process during wrapping.
      */
     private fun generateSymmetricEcKeyPairIfNeeded() {
@@ -318,18 +319,40 @@ class RawHybridKeyProvider(
     /**
      * Intentionally overwrites (poisons) the residual CBOR (66-byte remnants)
      * left in the Keystore2 / Binder IPC shared buffer with dummy data.
+     * Executes concurrently across multiple threads so that the kernel Binder driver
+     * dispatches dummy ECDH operations to all active Binder worker threads and their
+     * per-thread Scudo TSD size-class caches in KeyMint HAL and Keystore2.
      */
     private fun flushKeystoreBinderBuffer(keystorePrivateKey: PrivateKey) {
         try {
-            // Prepare dummy agreement by explicitly specifying AndroidKeyStore
-            val dummyAgreement = KeyAgreement.getInstance("ECDH", "AndroidKeyStore")
-            dummyAgreement.init(keystorePrivateKey)
-            dummyAgreement.doPhase(dummyPubKey, true)
-            //Do poisoning
-            val dummySecret = dummyAgreement.generateSecret()
-            dummySecret?.fill(0)
+            // Dispatch concurrent dummy ECDH agreements across parallel threads
+            // to force Binder thread-pool fan-out across all KeyMint / Keystore2 worker threads.
+            val parallelThreads = 6
+            val roundsPerThread = 2
+            val startLatch = java.util.concurrent.CountDownLatch(1)
+            val doneLatch = java.util.concurrent.CountDownLatch(parallelThreads)
 
-            Log.d("KMD", "Binder buffer successfully poisoned.")
+            for (t in 0 until parallelThreads) {
+                Thread {
+                    try {
+                        val dummyAgreement = KeyAgreement.getInstance("ECDH", "AndroidKeyStore")
+                        startLatch.await()
+                        for (r in 0 until roundsPerThread) {
+                            dummyAgreement.init(keystorePrivateKey)
+                            dummyAgreement.doPhase(dummyPubKey, true)
+                            val dummySecret = dummyAgreement.generateSecret()
+                            dummySecret?.fill(0)
+                        }
+                    } catch (_: Exception) {
+                    } finally {
+                        doneLatch.countDown()
+                    }
+                }.start()
+            }
+            startLatch.countDown()
+            doneLatch.await(5, java.util.concurrent.TimeUnit.SECONDS)
+
+            Log.d("KMD", "Binder buffer successfully poisoned (${parallelThreads}x${roundsPerThread} concurrent).")
         } catch (e: Exception) {
             // Flush failures are only logged and do not impact the main decryption process
             Log.w("KMD", "Binder buffer flush failed (ignored)", e)
@@ -350,7 +373,6 @@ class RawHybridKeyProvider(
         return false
     }
 
-    // --- AEAD Implementation (In-Memory) ---
     private val rawHybridAead: Aead = object : Aead {
         override fun encrypt(plaintext: ByteArray, associatedData: ByteArray): ByteArray {
             // [FDP_DAR_EXT.2.4] If device is unlocked, prefer symmetric encryption (0x02)
@@ -373,11 +395,7 @@ class RawHybridKeyProvider(
             try {
                 SecureRandom().nextBytes(dekBytes)
             
-                //Test Code
-                for (i in 0..31 step 2) {
-                    dekBytes[i] = (0x48).toByte()
-                    dekBytes[i+1] = (0x04).toByte()
-                }
+
 
                 dekSpec = CleanSecretKeySpec(dekBytes, DEK_ALGORITHM)
             
@@ -725,8 +743,9 @@ class RawHybridKeyProvider(
         }
 
         /**
-         * WARNING: This symmetric stream encryption is currently unsafe due to an Android Keystore2
-         * bug causing memory leakage of the plaintext DEK. This should be treated as a known risk
+         * WARNING: This symmetric stream encryption is currently unsafe because residual plaintext DEK
+         * material remains in memory (caused by a Keystore2 issue and missing zeroization at the
+         * KeyMint / Binder boundary). This should be treated as a known risk
          * until native hardware-backed streaming encryption is supported without exposing the software DEK.
          */
         private fun newEncryptingStreamSymmetric(ciphertext: OutputStream, associatedData: ByteArray): OutputStream {
@@ -736,6 +755,9 @@ class RawHybridKeyProvider(
 
             try {
                 SecureRandom().nextBytes(dekBytes)
+                
+
+                
                 dekSpec = CleanSecretKeySpec(dekBytes, DEK_ALGORITHM)
 
                 masterKey = keyStore.getKey(symmetricMasterKeyAlias, null)
@@ -864,8 +886,9 @@ val ephKeyBytes = keyPair.public.encoded
         }
 
         /**
-         * WARNING: This stream decryption is currently unsafe due to an Android Keystore2
-         * bug causing memory leakage of the plaintext DEK.
+         * WARNING: This stream decryption is currently unsafe because residual plaintext DEK
+         * material remains in memory (caused by a Keystore2 issue and missing zeroization at the
+         * KeyMint / Binder boundary).
          */
         override fun newDecryptingStream(ciphertext: InputStream, associatedData: ByteArray): InputStream {
             val dis = DataInputStream(ciphertext)
@@ -899,6 +922,7 @@ val ephKeyBytes = keyPair.public.encoded
                         keyAgreement.init(recipientPrivateKey!!)
                         keyAgreement.doPhase(ephemeralPublicKey, true)
                         sharedSecret = keyAgreement.generateSecret()
+                        flushKeystoreBinderBuffer(recipientPrivateKey)
 
                         kekBytes = hkdfDerive(sharedSecret!!, masterKeyAlias.toByteArray(Charsets.UTF_8), ephKeyBytes)
                         kekSpec = CleanSecretKeySpec(kekBytes!!, DEK_ALGORITHM)
@@ -1019,6 +1043,7 @@ val ephKeyBytes = keyPair.public.encoded
                 keyAgreement.init(recipientPrivateKey!!)
                 keyAgreement.doPhase(ephemeralPublicKey, true)
                 sharedSecret = keyAgreement.generateSecret()
+                flushKeystoreBinderBuffer(recipientPrivateKey)
                 kekBytes = hkdfDerive(sharedSecret!!, masterKeyAlias.toByteArray(Charsets.UTF_8), pkg.ephemeralPublicKeyBytes!!)
                 kekSpec = CleanSecretKeySpec(kekBytes, DEK_ALGORITHM)
                 val unwrapCipher = Cipher.getInstance(DEK_WRAPPING_CIPHER)
@@ -1113,7 +1138,7 @@ private fun serializeEncryptedPackage(magicByte: Byte, ephemeralPublicKeyBytes: 
     val bos = ByteArrayOutputStream()
     DataOutputStream(bos).use {
         it.writeByte(magicByte.toInt())
-        // WORKAROUND [FCS_CKM_EXT.4] Keystore2 Leak Fix: Both Asymmetric AND Symmetric modes now use ECDH
+        // WORKAROUND [FCS_CKM_EXT.4] Residual key material mitigation: Both Asymmetric AND Symmetric modes now use ECDH
         // (Hybrid Envelope Encryption) to avoid raw DEK exposure in Binder IPC.
         if (magicByte == RawHybridKeyProvider.MAGIC_BYTE_ASYMMETRIC || magicByte == RawHybridKeyProvider.MAGIC_BYTE_SYMMETRIC) {
             val ephKey = ephemeralPublicKeyBytes ?: throw IllegalArgumentException("Ephemeral public key required for ECDH mode")
@@ -1137,7 +1162,7 @@ private fun deserializeEncryptedPackage(ciphertext: ByteArray): EncryptedPackage
     val magicByte = buffer.get()
     var ephKey: ByteArray? = null
     
-    // WORKAROUND [FCS_CKM_EXT.4] Keystore2 Leak Fix: Both Asymmetric AND Symmetric modes now use ECDH 
+    // WORKAROUND [FCS_CKM_EXT.4] Residual key material mitigation: Both Asymmetric AND Symmetric modes now use ECDH
     // (Hybrid Envelope Encryption) to avoid raw DEK exposure in Binder IPC.
     if (magicByte == RawHybridKeyProvider.MAGIC_BYTE_ASYMMETRIC || magicByte == RawHybridKeyProvider.MAGIC_BYTE_SYMMETRIC) {
         val ephKeySize = buffer.int

@@ -20,18 +20,19 @@ import java.security.MessageDigest
 import kotlin.math.ceil
 
 object SafeHkdf {
-    private const val SHA256_BLOCK_SIZE = 64
-    private const val SHA256_HASH_SIZE = 32
+    // FIPS 180-4 / FIPS 198-1: SHA-512 uses a 1024-bit (128-byte) block and a 512-bit (64-byte) output.
+    private const val SHA512_BLOCK_SIZE = 128
+    private const val SHA512_HASH_SIZE = 64
 
     /**
-     * Computes HMAC-SHA256 using MessageDigest directly, without relying on JNI Mac.
+     * Computes HMAC-SHA512 using MessageDigest directly, without relying on JNI Mac.
      */
-    private fun hmacSha256(key: ByteArray, data: ByteArray): ByteArray {
-        val md = MessageDigest.getInstance("SHA-256")
-        val paddedKey = ByteArray(SHA256_BLOCK_SIZE)
+    private fun hmacSha512(key: ByteArray, data: ByteArray): ByteArray {
+        val md = MessageDigest.getInstance("SHA-512")
+        val paddedKey = ByteArray(SHA512_BLOCK_SIZE)
 
         // Key padding based on HMAC specification
-        if (key.size > SHA256_BLOCK_SIZE) {
+        if (key.size > SHA512_BLOCK_SIZE) {
             val hashedKey = md.digest(key)
             System.arraycopy(hashedKey, 0, paddedKey, 0, hashedKey.size)
             hashedKey.fill(0) // Immediately clear the intermediate buffer
@@ -39,10 +40,10 @@ object SafeHkdf {
             System.arraycopy(key, 0, paddedKey, 0, key.size)
         }
 
-        val oPad = ByteArray(SHA256_BLOCK_SIZE)
-        val iPad = ByteArray(SHA256_BLOCK_SIZE)
+        val oPad = ByteArray(SHA512_BLOCK_SIZE)
+        val iPad = ByteArray(SHA512_BLOCK_SIZE)
 
-        for (i in 0 until SHA256_BLOCK_SIZE) {
+        for (i in 0 until SHA512_BLOCK_SIZE) {
             oPad[i] = (paddedKey[i].toInt() xor 0x5c).toByte()
             iPad[i] = (paddedKey[i].toInt() xor 0x36).toByte()
         }
@@ -69,18 +70,21 @@ object SafeHkdf {
     }
 
     /**
-     * A function completely compatible with Tink's Hkdf.computeHkdf
+     * A function completely compatible with Tink's Hkdf.computeHkdf (using HMAC-SHA512).
+     *
+     * The PRK from HKDF-Extract is the full, untruncated 64-byte HMAC-SHA512 output.
+     * Only the final output keying material is truncated to [length] bytes (e.g., 32 bytes for AES-256).
      */
     fun computeHkdf(ikm: ByteArray, salt: ByteArray?, info: ByteArray, length: Int): ByteArray {
-        val actualSalt = if (salt == null || salt.isEmpty()) ByteArray(SHA256_HASH_SIZE) else salt
+        val actualSalt = if (salt == null || salt.isEmpty()) ByteArray(SHA512_HASH_SIZE) else salt
 
         // 1. HKDF-Extract
-        val prk = hmacSha256(actualSalt, ikm)
+        val prk = hmacSha512(actualSalt, ikm)
 
         // 2. HKDF-Expand
         val result = ByteArrayOutputStream()
         var t = ByteArray(0)
-        val iterations = ceil(length.toDouble() / SHA256_HASH_SIZE).toInt()
+        val iterations = ceil(length.toDouble() / SHA512_HASH_SIZE).toInt()
 
         require(iterations <= 255) { "Requested length is too large" }
 
@@ -92,7 +96,7 @@ object SafeHkdf {
 
             if (t.isNotEmpty()) t.fill(0) // Clear previous T
 
-            t = hmacSha256(prk, input)
+            t = hmacSha512(prk, input)
             result.write(t)
 
             input.fill(0) // Clear temporary loop buffer

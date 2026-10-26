@@ -25,6 +25,5 @@ build_error.txt
 firebase-debug.log
 *.hprof
 *.img
-/memory-test/*.img
-/memory-test/*.dump
 /.kotlin
+.agent/

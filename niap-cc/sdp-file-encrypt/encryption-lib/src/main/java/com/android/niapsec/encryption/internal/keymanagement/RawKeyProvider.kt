@@ -52,22 +52,28 @@ class RawKeyProvider(
         override fun encrypt(plaintext: ByteArray, associatedData: ByteArray): ByteArray {
             val keyAlias = KEY_ALIAS_PREFIX + UUID.randomUUID().toString()
             val cipher = Cipher.getInstance(TRANSFORMATION)
-            val secretKey: SecretKey = generateEphemeralSoftwareKey(keyAlias)
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+            var secretKey: SecretKey? = null
+            try {
+                secretKey = generateEphemeralSoftwareKey(keyAlias)
+                cipher.init(Cipher.ENCRYPT_MODE, secretKey)
 
-            val spec = cipher.parameters.getParameterSpec(IvParameterSpec::class.java)
-            val iv = spec.iv
-            val aliasBytes = keyAlias.toByteArray(Charsets.UTF_8)
+                val spec = cipher.parameters.getParameterSpec(IvParameterSpec::class.java)
+                val iv = spec.iv
+                val aliasBytes = keyAlias.toByteArray(Charsets.UTF_8)
 
-            val header = ByteBuffer.allocate(4 + aliasBytes.size + 4 + iv.size)
-                .putInt(aliasBytes.size)
-                .put(aliasBytes)
-                .putInt(iv.size)
-                .put(iv)
-                .array()
+                val header = ByteBuffer.allocate(4 + aliasBytes.size + 4 + iv.size)
+                    .putInt(aliasBytes.size)
+                    .put(aliasBytes)
+                    .putInt(iv.size)
+                    .put(iv)
+                    .array()
 
-            val ciphertext = cipher.doFinal(plaintext)
-            return header + ciphertext
+                val ciphertext = cipher.doFinal(plaintext)
+                return header + ciphertext
+            } finally {
+                // Step 4: Explicitly zeroize the original software key material in memory
+                zeroizeSecretKey(secretKey)
+            }
         }
 
         override fun decrypt(ciphertext: ByteArray, associatedData: ByteArray): ByteArray {
@@ -116,6 +122,34 @@ class RawKeyProvider(
 
     private fun getSecretKey(keyAlias: String): SecretKey {
         return keyStore.getKey(keyAlias, null) as SecretKey
+    }
+
+    /**
+     * Deterministically zeroizes the internal byte[] backing a software SecretKey (e.g. SecretKeySpec).
+     */
+    private fun zeroizeSecretKey(secretKey: SecretKey?) {
+        if (secretKey == null) return
+        try {
+            var clazz: Class<*>? = secretKey.javaClass
+            while (clazz != null) {
+                for (field in clazz.declaredFields) {
+                    if (field.type == ByteArray::class.java) {
+                        field.isAccessible = true
+                        val bytes = field.get(secretKey) as? ByteArray
+                        bytes?.fill(0)
+                    }
+                }
+                clazz = clazz.superclass
+            }
+        } catch (e: Exception) {
+            Log.w("RawKeyProvider", "Failed to zeroize SecretKey internal bytes", e)
+        }
+        try {
+            if (secretKey is javax.security.auth.Destroyable && !secretKey.isDestroyed) {
+                secretKey.destroy()
+            }
+        } catch (_: Exception) {
+        }
     }
 
     override fun getUnlockDeviceRequired(): Boolean {

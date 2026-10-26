@@ -16,9 +16,9 @@ This library is designed to meet the strict security requirements of the **NIAP 
 ### Key Implementation: `RawHybridKeyProvider`
 Unlike standard high-level wrappers, our `RawHybridKeyProvider` uses raw JCA primitives to ensure full control over the key lifecycle, specifically addressing memory zeroization requirements.
 
-* **Algorithm**: Hybrid Encryption Scheme (EC-DH + HKDF + AES-GCM).
+* **Algorithm**: Hybrid Encryption Scheme (ECDH P-521 + HKDF-SHA512 + AES-256-GCM).
 * **Compliance Features**:
-    * **FCS_CKM_EXT.4 (Key Destruction)**: Explicitly zeroes out (overwrites) plain-text DEKs and shared secrets in volatile memory immediately after use via `finally` blocks. Standard high-level libraries often rely on Garbage Collection, which is insufficient for PP compliance.
+    * **FCS_CKM_EXT.4 (Key Destruction)**: Explicitly zeroes out (overwrites) plain-text DEKs and shared secrets in volatile memory immediately after use via `finally` blocks, and flushes residual Keystore Binder IPC buffers. Standard high-level libraries often rely on Garbage Collection, which is insufficient for PP compliance.
     * **FDP_DAR_EXT.2 (Locked State Operation / Data at Rest)**: Fully and correctly implemented. Supports encryption even when the device is locked (AFU/BFU) by leveraging a cached public key configuration, while keeping the private key securely hardware-backed in the TEE. It also includes an automatic `FDP_DAR_EXT.2.4` sweep-and-rewrap mechanism that transitions files encrypted via asymmetric keys back to a more efficient symmetric encryption as soon as the device is unlocked.
     * **FCS_CKM_EXT.2 (Key Generation)**: Uses `SecureRandom` for generating ephemeral Data Encryption Keys (DEKs).
     * **FCS_STG_EXT.2 (Key Storage)**: Implements Envelope Encryption where DEKs are wrapped by a TEE-backed Key Encryption Key (KEK).
@@ -44,7 +44,7 @@ Unlike standard high-level wrappers, our `RawHybridKeyProvider` uses raw JCA pri
 
 #### `RawKeyProvider` (JCA Adapter)
 - **Strategy**: A manual implementation wrapping standard Android JCA APIs (`Cipher`, `AndroidKeyStore`) into the Tink `Aead` interface.
-- **Algorithm**: `AES/CBC/PKCS7Padding`.
+- **Algorithm**: `AES/GCM/NoPadding`.
 - **Behavior**: Generates software-backed keys and imports them into the Keystore.
 - **Purpose**: Demonstrates how to adapt raw platform APIs to a common interface without using the full Tink library features. It was an earlier candidate for the final implementation, but structural challenges in meeting strict compliance requirements mean a complete, NIAP-compliant version is not provided.
 
@@ -145,7 +145,7 @@ Check the log output for the following verification points:
     * `SUCCESS: Decryption succeeded and data matches.` -> **PASS** (Normal operation restored).
 
 
-## 6.Testing Guide
+## 6. Testing Guide
 
 ### 1. Symmetric Encrypt → Symmetric Decrypt
 

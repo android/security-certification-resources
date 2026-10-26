@@ -90,7 +90,7 @@ class HybridKeyProvider(
             val demParams = EciesAeadDemParams.newBuilder().setAeadDem(demKeyTemplate).build()
             val kemParams = EciesHkdfKemParams.newBuilder()
                 .setCurveType(EllipticCurveType.NIST_P521)
-                .setHkdfHashType(HashType.SHA256)
+                .setHkdfHashType(HashType.SHA512)
                 .build()
             val eciesParams = EciesAeadHkdfParams.newBuilder()
                 .setKemParams(kemParams)
@@ -250,7 +250,14 @@ class HybridKeyProvider(
     }
 
     override fun destroy() {
-        // Clear the private keyset preference file
+        // Clear the private keyset preference file.
+        // NOTE: Tink's SharedPrefKeysetReader/Writer internally call Context.getApplicationContext(),
+        // so the private keyset is actually stored in credential-encrypted (CE) storage even though
+        // a device-protected context is passed to AndroidKeysetManager. Clear both locations so that
+        // no stale keyset (encrypted under a deleted master key) survives.
+        context.applicationContext.getSharedPreferences(keysetPrefName, Context.MODE_PRIVATE).edit(commit = true) {
+            clear()
+        }
         deviceProtectedContext.getSharedPreferences(keysetPrefName, Context.MODE_PRIVATE).edit(commit = true) {
             clear()
         }
@@ -272,5 +279,6 @@ class HybridKeyProvider(
         }
     }
 }
+
 
 
