@@ -541,6 +541,57 @@
             android:permission="android.permission.BIND_DEPENDENCY_INSTALLER"
             android:enabled="true" android:exported="true" />
 
+        <!-- for api 37 -->
+        <service android:name=".services.TestBindInsightSurfaceVisualizerServiceService"
+            android:permission="android.permission.BIND_INSIGHT_SURFACE_VISUALIZER_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindContextComponentServiceService"
+            android:permission="android.permission.BIND_CONTEXT_COMPONENT_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindAppSearchIsolatedStorageServiceService"
+            android:permission="android.permission.BIND_APP_SEARCH_ISOLATED_STORAGE_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindTrustTokenServiceService"
+            android:permission="android.permission.BIND_TRUST_TOKEN_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindInsightRendererServiceService"
+            android:permission="android.permission.BIND_INSIGHT_RENDERER_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindDeveloperVerificationAgentService"
+            android:permission="android.permission.BIND_DEVELOPER_VERIFICATION_AGENT" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindMotionCuesServiceService"
+            android:permission="android.permission.BIND_MOTION_CUES_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindSettingsContentSafetyServiceService"
+            android:permission="android.permission.BIND_SETTINGS_CONTENT_SAFETY_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindAllowlistProviderServiceService"
+            android:permission="android.permission.BIND_ALLOWLIST_PROVIDER_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindSupervisionAppServiceService"
+            android:permission="android.permission.BIND_SUPERVISION_APP_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindContentSafetyServiceService"
+            android:permission="android.permission.BIND_CONTENT_SAFETY_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindToTapToShareServiceService"
+            android:permission="android.permission.BIND_TO_TAP_TO_SHARE_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindSandboxedContentSafetyServiceService"
+            android:permission="android.permission.BIND_SANDBOXED_CONTENT_SAFETY_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindAlternativeMessageTransportServiceService"
+            android:permission="android.permission.BIND_ALTERNATIVE_MESSAGE_TRANSPORT_SERVICE" 
+            android:enabled="true" android:exported="true" />
+        <service android:name=".services.TestBindContentRestrictionServiceService"
+            android:permission="android.permission.BIND_CONTENT_RESTRICTION_SERVICE" 
+            android:enabled="true" android:exported="true" />
+
+        <service android:name=".services.TestBindDataMigrationForPrivatecomputeService"
+            android:permission="android.permission.BIND_DATA_MIGRATION_FOR_PRIVATECOMPUTE" 
+            android:enabled="true" android:exported="true" />
+
     </application>
 
 </manifest>

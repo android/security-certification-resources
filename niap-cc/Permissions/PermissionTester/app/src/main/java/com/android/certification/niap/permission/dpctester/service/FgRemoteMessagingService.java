@@ -19,9 +19,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_REMOTE_MESSAGING;
 
 public class FgRemoteMessagingService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_REMOTE_MESSAGING;
-       mId = mServiceType+1;
+    public FgRemoteMessagingService() {
+        super(FOREGROUND_SERVICE_TYPE_REMOTE_MESSAGING, FOREGROUND_SERVICE_TYPE_REMOTE_MESSAGING + 1);
     }
 }

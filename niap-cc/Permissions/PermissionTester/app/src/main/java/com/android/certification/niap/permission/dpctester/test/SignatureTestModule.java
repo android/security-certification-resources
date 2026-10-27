@@ -833,7 +833,7 @@ public class SignatureTestModule extends SignaturePermissionTestModuleBase {
 		// The BluetoothAdapter class indicates that the hidden DEFAULT_MAC_ADDRESS
 		// field's value will be returned to apps that do not have the LOCAL_MAC_ADDRESS
 		// permission.
-		if (macAddress.equals("02:00:00:00:00:00")) {
+		if (macAddress == null || macAddress.equals("02:00:00:00:00:00")) {
 			throw new SecurityException(
 					"Received the default MAC address for apps without the "
 							+ "LOCAL_MAC_ADDRESS permission");

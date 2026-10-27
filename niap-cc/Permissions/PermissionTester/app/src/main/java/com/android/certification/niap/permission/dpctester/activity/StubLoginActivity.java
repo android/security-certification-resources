@@ -32,12 +32,12 @@ public class StubLoginActivity extends AppCompatActivity {
         login("dummy","password");
     }
 
-    // ログイン処理
+    // Login process
     public void login(final String name, final String password) {
         loginSuccess(name, password);
     }
 
-    // ログイン処理のコールバック
+    // Callback for the login process
     public void loginSuccess(final String name, final String password) {
 
         Account account = new Account(name, "com.dpctester.stub");

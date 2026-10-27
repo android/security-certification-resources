@@ -102,9 +102,6 @@ class PermissionTestRunner {
                     // Check Android Version
 
                     var SDK_INT = Build.VERSION.SDK_INT
-                    if(TesterUtils.isAtLeastBaklava()){
-                        SDK_INT = 36
-                    }
 
                     if(SDK_INT<testCase.sdkMin){
                         throw BypassTestException(
@@ -122,7 +119,7 @@ class PermissionTestRunner {
                         )
                     }
 
-                    //StaticLogger.debug("running=>"+testCase.methodName)
+                    StaticLogger.info("running=>"+testCase.methodName)
                     ReflectionUtil.invoke(root, testCase.methodName)
 
 
@@ -195,7 +192,7 @@ class PermissionTestRunner {
                 success = B_FAILURE
                 apisuccess=false
                 bypassed=false
-                message = ex.cause?.message!!
+                message = ex.cause?.message ?: ex.cause?.toString() ?: "Unknown unexpected failure"
             } catch (ex:Exception){
                 //Unexpected Failures
 

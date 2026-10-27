@@ -19,6 +19,7 @@ import com.android.certification.niap.permission.dpctester.test.RuntimeTestModul
 import com.android.certification.niap.permission.dpctester.test.SignatureTestModule
 import com.android.certification.niap.permission.dpctester.test.SignatureTestModuleBaklava
 import com.android.certification.niap.permission.dpctester.test.SignatureTestModuleBinder
+import com.android.certification.niap.permission.dpctester.test.SignatureTestModuleCinnamonBun
 import com.android.certification.niap.permission.dpctester.test.SignatureTestModuleP
 import com.android.certification.niap.permission.dpctester.test.SignatureTestModuleQ
 import com.android.certification.niap.permission.dpctester.test.SignatureTestModuleR
@@ -34,7 +35,6 @@ class SignatureTestSuite(activity: Activity): PermissionTestSuiteBase(
     async = false,
     activity = activity,
     values = arrayOf(
-    RuntimeTestModule(activity),
     SignatureTestModule(activity),
     SignatureTestModuleP(activity),
     SignatureTestModuleQ(activity),
@@ -44,8 +44,9 @@ class SignatureTestSuite(activity: Activity): PermissionTestSuiteBase(
     SignatureTestModuleU(activity),
     SignatureTestModuleV(activity),
     SignatureTestModuleBaklava(activity),
-    SignatureTestModuleBinder(activity)
-        )
+    SignatureTestModuleBinder(activity),
+    SignatureTestModuleCinnamonBun(activity)
+    )
 ){
 
 }

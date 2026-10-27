@@ -112,7 +112,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-@PermissionTestModule(name="Runtime Test Cases",prflabel = "Runtime Permissions")
+@PermissionTestModule(name="Runtime Test Cases",prflabel = "Runtime Permissions", label = "Run Runtime Tests")
 public class RuntimeTestModule extends PermissionTestModuleBase {
 	public RuntimeTestModule(@NonNull Activity activity){ super(activity);}
 
@@ -790,6 +790,54 @@ public class RuntimeTestModule extends PermissionTestModuleBase {
 		session.stop();
 		//reconfigureRangingInterval(100); <= this method crashes device
 	}
+
+	//**** method template for target runtime SDK37
+	@PermissionTest(permission="ACCESS_LOCAL_NETWORK",sdkMin=37)
+	public void testAccessLocalNetwork() throws Exception {
+        android.net.nsd.NsdManager nsdManager = systemService(android.net.nsd.NsdManager.class);
+        CountDownLatch latch = new CountDownLatch(1);
+        java.util.concurrent.atomic.AtomicBoolean failed = new java.util.concurrent.atomic.AtomicBoolean(false);
+        nsdManager.discoverServices("_http._tcp", android.net.nsd.NsdManager.PROTOCOL_DNS_SD, new android.net.nsd.NsdManager.DiscoveryListener() {
+            @Override
+            public void onStartDiscoveryFailed(String serviceType, int errorCode) {
+                logger.debug("onStartDiscoveryFailed: " + errorCode);
+                failed.set(true);
+                latch.countDown();
+            }
+            @Override
+            public void onStopDiscoveryFailed(String serviceType, int errorCode) {
+                logger.debug("onStopDiscoveryFailed: " + errorCode);
+            }
+            @Override
+            public void onDiscoveryStarted(String serviceType) {
+                logger.debug("onDiscoveryStarted: " + serviceType);
+                nsdManager.stopServiceDiscovery(this);
+                latch.countDown();
+            }
+            @Override
+            public void onDiscoveryStopped(String serviceType) {
+                logger.debug("onDiscoveryStopped: " + serviceType);
+            }
+            @Override
+            public void onServiceFound(android.net.nsd.NsdServiceInfo serviceInfo) {
+                logger.debug("onServiceFound: " + serviceInfo);
+            }
+            @Override
+            public void onServiceLost(android.net.nsd.NsdServiceInfo serviceInfo) {
+                logger.debug("onServiceLost: " + serviceInfo);
+            }
+        });
+        
+        if (!latch.await(5, TimeUnit.SECONDS)) {
+            throw new BypassTestException("Discovery timed out. Permission might be missing or network issue.");
+        }
+        
+        if (failed.get()) {
+            throw new SecurityException("Discovery failed!");
+        }
+	}
+
+
 	/* Could not find implementations...
 	@PermissionTest(permission="EYE_TRACKING_COARSE",sdkMin=36)
 	public void testEyeTrackingCoarse(){

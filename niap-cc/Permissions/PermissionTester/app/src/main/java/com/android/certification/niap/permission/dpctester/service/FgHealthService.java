@@ -19,9 +19,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH;
 
 public class FgHealthService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_HEALTH;
-       mId = mServiceType+1;
+    public FgHealthService() {
+        super(FOREGROUND_SERVICE_TYPE_HEALTH, FOREGROUND_SERVICE_TYPE_HEALTH + 1);
     }
 }

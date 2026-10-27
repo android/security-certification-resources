@@ -73,3 +73,6 @@ You should reboot the device and try uninstall from shell.
 ```console
 adb uninstall com.android.certification.niap.permission.dpctester
 ```
+
+## Special Permission Tests
+- `CAPTURE_KEYBOARD`: This test verifies the `CAPTURE_KEYBOARD` permission enforcement using UI and key injection. It is executed as an instrumentation test because it requires UI interaction and key injection that cannot be done via standard unit tests.

@@ -417,7 +417,7 @@ public class InternalPermissionJUnitTest {
                     Transacts.VIRTUAL_DEVICE_MANAGER_DESCRIPTOR,
                     "createVirtualDevice",
                     binder,ats,0 ,
-                    vdpParams,null,null);
+                    vdpParams, new android.os.Binder(), new android.os.Binder());
 
 
         } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
@@ -706,7 +706,69 @@ public class InternalPermissionJUnitTest {
                 Transacts.DEVICE_POLICY_SERVICE,
                 Transacts.DEVICE_POLICY_DESCRIPTOR,
                 "isDevicePotentiallyStolen",mContext.getPackageName());
-
     }
 
+    @Test
+    @PermissionTest(permission="INITIATE_BUGREPORT_AS_NON_ADMIN", sdkMin=37)
+    public void testInitiateBugreportAsNonAdmin(){
+        try {
+            android.os.BugreportManager bugreportManager = mContext.getSystemService(android.os.BugreportManager.class);
+            if (bugreportManager == null) {
+                logline("BugreportManager not available");
+                return;
+            }
+            
+            java.lang.reflect.Method method = null;
+            for (java.lang.reflect.Method m : android.os.BugreportManager.class.getDeclaredMethods()) {
+                if (m.getName().equals("startBugreport") && m.getParameterCount() == 5) {
+                    method = m;
+                    break;
+                }
+            }
+            
+            if (method == null) {
+                logline("startBugreport method with 5 params not found");
+                return;
+            }
+            
+            method.setAccessible(true);
+            
+            android.os.BugreportManager.BugreportCallback callback = new android.os.BugreportManager.BugreportCallback() {
+                @Override
+                public void onProgress(float progress) {}
+                @Override
+                public void onError(int errorCode) {}
+                @Override
+                public void onFinished() {}
+            };
+            
+            // Create dummy file descriptors to avoid NPE in BugreportManager
+            java.io.File bugreportFile = new java.io.File(mContext.getCacheDir(), "dummy_bugreport");
+            android.os.ParcelFileDescriptor bugreportFd = android.os.ParcelFileDescriptor.open(
+                    bugreportFile, android.os.ParcelFileDescriptor.MODE_WRITE_ONLY | android.os.ParcelFileDescriptor.MODE_CREATE);
+            
+            java.io.File screenshotFile = new java.io.File(mContext.getCacheDir(), "dummy_screenshot");
+            android.os.ParcelFileDescriptor screenshotFd = android.os.ParcelFileDescriptor.open(
+                    screenshotFile, android.os.ParcelFileDescriptor.MODE_WRITE_ONLY | android.os.ParcelFileDescriptor.MODE_CREATE);
+            
+            // Instantiate BugreportParams via reflection
+            Class<?> bugreportParamsClass = Class.forName("android.os.BugreportParams");
+            java.lang.reflect.Constructor<?> bpConstructor = bugreportParamsClass.getConstructor(int.class);
+            Object params = bpConstructor.newInstance(0); // 0 is BUGREPORT_MODE_FULL
+            
+            method.invoke(bugreportManager, bugreportFd, screenshotFd, params, mContext.getMainExecutor(), callback);
+            logline("startBugreport called successfully");
+            
+            bugreportFile.deleteOnExit();
+            screenshotFile.deleteOnExit();
+            
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof SecurityException) {
+                throw (SecurityException) e.getCause();
+            }
+            throw new UnexpectedTestFailureException(e);
+        } catch (Exception e) {
+            throw new UnexpectedTestFailureException(e);
+        }
+    }
 }

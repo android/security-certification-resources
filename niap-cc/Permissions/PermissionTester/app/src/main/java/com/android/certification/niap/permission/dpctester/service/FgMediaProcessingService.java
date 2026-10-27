@@ -18,9 +18,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING;
 
 public class FgMediaProcessingService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING;
-       mId = mServiceType+1;
+    public FgMediaProcessingService() {
+        super(FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING, FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING + 1);
     }
 }

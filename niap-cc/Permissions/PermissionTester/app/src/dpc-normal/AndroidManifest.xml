@@ -158,4 +158,8 @@
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_APP_EXEMPTIONS"/>
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_USB_DATA_SIGNALLING"/>
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_USB_FILE_TRANSFER"/>
+    <!-- New DPC permissions as of Android 37 -->
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_CONTENT_RESTRICTION_APPS" />
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_KEYGUARD_STATUS" />
+    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_LOCKSCREEN_MESSAGE" />
 </manifest>

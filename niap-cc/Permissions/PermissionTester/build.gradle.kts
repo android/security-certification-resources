@@ -93,15 +93,15 @@ tasks.register("methodTemplate"){
         val json = Json.parseToJsonElement(input)
         println(version)
 
-        jsonToPlaceHolder(json,"36","install")
-        jsonToPlaceHolder(json,"36","runtime")
-        jsonToPlaceHolder(json,"36","internal")
-        jsonToPlaceHolder(json,"36","signature")
+        jsonToPlaceHolder(json,"37","install")
+        jsonToPlaceHolder(json,"37","runtime")
+        jsonToPlaceHolder(json,"37","internal")
+        jsonToPlaceHolder(json,"37","signature")
 
-        jsonToManifestTags(json,"36","install")
-        jsonToManifestTags(json,"36","runtime")
-        jsonToManifestTags(json,"36","internal")
-        jsonToManifestTags(json,"36","signature")
+        jsonToManifestTags(json,"37","install")
+        jsonToManifestTags(json,"37","runtime")
+        jsonToManifestTags(json,"37","internal")
+        jsonToManifestTags(json,"37","signature")
 
     }
 }

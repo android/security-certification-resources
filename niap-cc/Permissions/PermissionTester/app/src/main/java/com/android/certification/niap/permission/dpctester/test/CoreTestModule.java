@@ -107,6 +107,8 @@ public class CoreTestModule extends SignaturePermissionTestModuleBase {
     SignatureTestModuleT signatureTestModuleT;
     SignatureTestModuleU signatureTestModuleU;
     SignatureTestModuleV signatureTestModuleV;
+    SignatureTestModuleBaklava signatureTestModuleBaklava;
+    SignatureTestModuleCinnamonBun signatureTestModuleCinnamonBun;
     SignatureTestModuleBinder signatureTestModuleBinder;// = new SignatureTestModule(mActivity);
 
     RuntimeTestModule   runtimeTestModule;// = new SignatureTestModuleR(mActivity);
@@ -121,6 +123,8 @@ public class CoreTestModule extends SignaturePermissionTestModuleBase {
         signatureTestModuleT  = new SignatureTestModuleT(activity);
         signatureTestModuleU  = new SignatureTestModuleU(activity);
         signatureTestModuleV  = new SignatureTestModuleV(activity);
+        signatureTestModuleBaklava = new SignatureTestModuleBaklava(activity);
+        signatureTestModuleCinnamonBun = new SignatureTestModuleCinnamonBun(activity);
 
         signatureTestModuleBinder  = new SignatureTestModuleBinder(activity);
 
@@ -267,7 +271,11 @@ public class CoreTestModule extends SignaturePermissionTestModuleBase {
 
     @PermissionTest(permission="MODIFY_AUDIO_SETTINGS_PRIVILEGED", sdkMin=34)
     public void testModifyAudioSettingsPrivileged(){
-        signatureTestModuleU.testModifyAudioSettingsPrivileged();
+        if (Build.VERSION.SDK_INT >= 37) {
+            signatureTestModuleCinnamonBun.testModifyAudioSettingsPrivileged();
+        } else {
+            signatureTestModuleU.testModifyAudioSettingsPrivileged();
+        }
     }
 
     //3. Location / GPS
@@ -434,7 +442,11 @@ public class CoreTestModule extends SignaturePermissionTestModuleBase {
 
     @PermissionTest(permission="ACCESS_LAST_KNOWN_CELL_ID", sdkMin=35)
     public void testAccessLastKnownCellId(){
-        signatureTestModuleV.testAccessLastKnownCellId();
+        if (Build.VERSION.SDK_INT >= 37) {
+            signatureTestModuleCinnamonBun.testAccessLastKnownCellId();
+        } else {
+            signatureTestModuleV.testAccessLastKnownCellId();
+        }
     }
 
 

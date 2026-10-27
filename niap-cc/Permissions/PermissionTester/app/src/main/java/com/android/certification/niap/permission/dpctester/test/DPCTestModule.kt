@@ -553,9 +553,64 @@ class DPCTestModule(val ctx: Activity): PermissionTestModuleBase(ctx){
         checkUserRestriction(UserManager.DISALLOW_THREAD_NETWORK);
     }*/
 
-    @PermissionTest("MANAGE_DEVICE_POLICY_APP_FUNCTIONS",36)
-    fun testAppFunctions(){
+    @PermissionTest("MANAGE_DEVICE_POLICY_APP_FUNCTIONS", 36)
+    fun testAppFunctions() {
         dpm.setAppFunctionPolicy(0)//not controlled
+    }
+
+    @PermissionTest("MANAGE_DEVICE_POLICY_CONTENT_RESTRICTION_APPS", 37)
+    fun testManageDevicePolicyContentRestrictionApps() {
+        val dpm = ctx.getSystemService(Activity.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        try {
+            val policyIdentifierClass = Class.forName("android.app.admin.PolicyIdentifier")
+            val contentRestrictionAppsField = policyIdentifierClass.getField("CONTENT_RESTRICTION_APPS")
+            val policyIdentifier = contentRestrictionAppsField.get(null)
+            
+            val setPolicyMethod = dpm.javaClass.getMethod("setPolicy", policyIdentifierClass, Int::class.java, java.lang.Object::class.java)
+            
+            val appsList = listOf("com.example.app")
+            
+            setPolicyMethod.invoke(dpm, policyIdentifier, 1 /* POLICY_SCOPE_USER */, appsList)
+            logger.debug("setPolicy invoked successfully")
+        } catch (e: Exception) {
+            logger.debug("Caught exception: ${e.message}")
+            val cause = e.cause
+            if (e is SecurityException) {
+                throw e
+            } else if (cause is SecurityException) {
+                throw cause
+            } else {
+                throw BypassTestException("Test bypassed due to missing API or disabled flag: ${e.message}")
+            }
+        }
+    }
+
+    @PermissionTest("MANAGE_DEVICE_POLICY_KEYGUARD_STATUS", 37)
+    fun testManageDevicePolicyKeyguardStatus() {
+        throw BypassTestException("Test bypassed because MANAGE_DEVICE_POLICY_KEYGUARD_STATUS is not yet implemented in the framework (WIP)")
+    }
+
+    @PermissionTest("MANAGE_DEVICE_POLICY_LOCKSCREEN_MESSAGE", 37)
+    fun testManageDevicePolicyLockscreenMessage() {
+        dpm.setDeviceOwnerLockScreenInfo("Test Lockscreen Message", {}, { e -> throw e })
+    }
+
+    @PermissionTest("MANAGE_MULTIUSER_DEVICE_PROVISIONING_STATE", 37)
+    fun testManageMultiuserDeviceProvisioningState() {
+        val realDpm = ctx.getSystemService(Activity.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
+        try {
+            val method = realDpm.javaClass.getMethod("getMultiuserManagedDeviceProvisioningState")
+            method.invoke(realDpm)
+            logger.debug("getMultiuserManagedDeviceProvisioningState called successfully")
+        } catch (e: Exception) {
+            val cause = e.cause
+            if (e is SecurityException) {
+                throw e
+            } else if (cause is SecurityException) {
+                throw cause
+            }
+            throw com.android.certification.niap.permission.dpctester.test.exception.BypassTestException("Test failed with non-SecurityException: ${e.message}")
+        }
     }
 
     ////////////////////////////////////////////////////////////

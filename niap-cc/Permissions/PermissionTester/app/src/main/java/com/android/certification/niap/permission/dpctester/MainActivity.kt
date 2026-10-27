@@ -48,6 +48,7 @@ import com.android.certification.niap.permission.dpctester.test.GmsTestModule
 import com.android.certification.niap.permission.dpctester.test.InstallTestModule
 import com.android.certification.niap.permission.dpctester.test.NonPlatformTestModule
 import com.android.certification.niap.permission.dpctester.test.RuntimeDependentTestModule
+import com.android.certification.niap.permission.dpctester.test.RuntimeTestModule
 import com.android.certification.niap.permission.dpctester.test.SpecificDependentTestModule
 import com.android.certification.niap.permission.dpctester.test.log.ActivityLogger
 import com.android.certification.niap.permission.dpctester.test.log.Logger
@@ -78,7 +79,7 @@ class MainViewAdapter(private val list: List<LogBox>,
         )
     }
 
-    // ViewHolder内に表示するデータを指定。
+    // Bind data to the ViewHolder.
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
         fun textView(resId:Int):TextView {
             return holder.itemView.findViewById(resId)
@@ -108,7 +109,7 @@ class MainViewAdapter(private val list: List<LogBox>,
         }
     }
 
-    // 表示したいリストの数を指定
+    // Return the number of items in the list
     override fun getItemCount(): Int {
         return list.size
     }
@@ -137,6 +138,7 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
     //Change the test modules here by resource settings
     lateinit var suites:MutableList<PermissionTestSuiteBase>
     lateinit var mCurrentModule: PermissionTestModuleBase
+    val receivedKeyCodes = java.util.concurrent.CopyOnWriteArrayList<Int>()
     //
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -185,10 +187,11 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
             mutableListOf(SingleModuleTestSuite(this, CoreTestModule(this)))
         } else {
             val defaults = mutableListOf(
-                SignatureTestSuite(this),
                 SingleModuleTestSuite(this, InstallTestModule(this)),
+                SignatureTestSuite(this),
                 SingleModuleTestSuite(this, NonPlatformTestModule(this)),
                 SingleModuleTestSuite(this, GmsTestModule(this)),
+                SingleModuleTestSuite(this, RuntimeTestModule(this)),
             )
             //four setting patterns
             //if(SignatureUtils.hasSameSigningCertificateAsPackage(this, Constants.PLATFORM_PACKAGE)){
@@ -203,6 +206,19 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
             defaults
         }
 
+        val enableModule = intent.getStringExtra("enable_module")
+        if (enableModule != null) {
+            suites.forEach { suite ->
+                val iterator = suite.modules.iterator()
+                while (iterator.hasNext()) {
+                    val module = iterator.next()
+                    if (module.javaClass.simpleName != enableModule && module.title != enableModule) {
+                        iterator.remove()
+                    }
+                }
+            }
+        }
+
         //val layout = findViewById<LinearLayout>(R.id.mainLayout)
         val mStatusTextView = findViewById<TextView>(R.id.bsArrow)
         mBottomSheet = BottomSheetBehavior.from(binding.mainLayout)
@@ -212,6 +228,12 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
                 mBottomSheet!!.setState(BottomSheetBehavior.STATE_EXPANDED)
             } else if (mBottomSheet!!.state == BottomSheetBehavior.STATE_EXPANDED) {
                 mBottomSheet!!.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+        // Add click listener to the bottom sheet layout to make it easier to expand
+        binding.mainLayout.setOnClickListener {
+            if (mBottomSheet!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                mBottomSheet!!.setState(BottomSheetBehavior.STATE_EXPANDED)
             }
         }
         // let the tester know the test result should be inverse or not
@@ -299,7 +321,7 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
                     val box = LogBox(Random.nextLong(), "Finish module", desc
                         , childs = info.moduleLog);
                     if(info.count_errors>0){
-                        box.type="error"
+                        box.type = "error"
                     } else if(info.count_bypassed>0){
                         box.type="bypassed"
                     } else if(info.skipped){
@@ -332,6 +354,16 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
         }
         progressAlertDialog= createProgressDialog( this )
 
+        // Enable launching tests via Intent
+        val suiteLabel = intent.getStringExtra("suite_label")
+        if (suiteLabel != null) {
+            val button = mTestButtons.find { it.text.toString().equals(suiteLabel, ignoreCase = true) }
+            button?.performClick()
+        } else if (intent.getBooleanExtra("auto_run", false)) {
+            if (mTestButtons.isNotEmpty()) {
+                mTestButtons[0].performClick()
+            }
+        }
     }
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -353,13 +385,13 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
                 val l = ArrayList<Pair<String,String>>() // we can't use kotlin map for this purpose
                 //TODO: generate preference data from actual data
                 for(s in suites){
-                    //s.add()
                     if(s is SingleModuleTestSuite){
                         l.add(Pair("suite",s.key!!))
-                        s.modules.get(0).prefList.forEach{
-                            l.add(it)
+                        if (s.modules.isNotEmpty()) {
+                            s.modules.get(0).prefList.forEach{
+                                l.add(it)
+                            }
                         }
-
                     } else if(s is SignatureTestSuite){
                         l.add(Pair("suite",s.key!!))
                         for(mm in s.modules){
@@ -607,5 +639,10 @@ class MainActivity : AppCompatActivity(), ActivityLogger.LogListAdaptable {
         runOnUiThread {
             this.recyclerView?.adapter?.notifyDataSetChanged()
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: android.view.KeyEvent?): Boolean {
+        receivedKeyCodes.add(keyCode)
+        return super.onKeyDown(keyCode, event)
     }
 }

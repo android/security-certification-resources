@@ -728,6 +728,7 @@ public class Transacts {
     public static final String getEnhancedConfirmationTrustedPackages = "getEnhancedConfirmationTrustedPackages";
     public static final String startObservingDevicePresence ="startObservingDevicePresence";
     public static final String getAllAssociationsForUser = "getAllAssociationsForUser";
+    public static final String getAssociationByDeviceId = "getAssociationByDeviceId";
     public static final String addOnTransportsChangedListener = "addOnTransportsChangedListener";
     public static final String removeOnTransportsChangedListener = "removeOnTransportsChangedListener";
     public static final String sendMessage = "sendMessage";
@@ -745,8 +746,11 @@ public class Transacts {
     public static final String CONTEXTUAL_SEARCH_SERVICE = "contextual_search";//PersistentDataBlockService
     public static final String CONTEXTUAL_SEARCH_DESCRIPTOR = "android.app.contextualsearch.IContextualSearchManager";
     public static final String startContextualSearch = "startContextualSearch";
-    //IInputManager
     public static final String registerStickyModifierStateListener = "registerStickyModifierStateListener";
+    
+    public static final String TRUST_TOKEN_SERVICE = "trust_token";
+    public static final String TRUST_TOKEN_DESCRIPTOR = "android.security.trusttoken.ITrustTokenManager";
+    public static final String acquirePreparedIdentitySet = "acquirePreparedIdentitySet";
     public static final String unregisterStickyModifierStateListener = "unregisterStickyModifierStateListener";
 
     public static final String ON_DEVICE_INTELLIGENCE_SERVICE = "on_device_intelligence";//PersistentDataBlockService

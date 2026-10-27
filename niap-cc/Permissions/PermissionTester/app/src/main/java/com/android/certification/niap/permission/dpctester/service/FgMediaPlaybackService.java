@@ -19,9 +19,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK;
 
 public class FgMediaPlaybackService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK;
-       mId = mServiceType+1;
+    public FgMediaPlaybackService() {
+        super(FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK, FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK + 1);
     }
 }

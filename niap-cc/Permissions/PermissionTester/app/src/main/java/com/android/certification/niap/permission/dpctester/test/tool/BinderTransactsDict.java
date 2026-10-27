@@ -61,7 +61,9 @@ public class BinderTransactsDict {
             //Change suffix depends on system version
 
             var SDK_INT = Build.VERSION.SDK_INT;
-            if(TesterUtils.isAtLeastBaklava()){
+            if (SDK_INT >= 37) {
+                // Keep actual SDK_INT for 37 and above
+            } else if (TesterUtils.isAtLeastBaklava()) {
                 SDK_INT = 36;
             }
 
@@ -109,6 +111,17 @@ public class BinderTransactsDict {
     }
 
     public int getTransactId(String descriptor, String methodName){
-        return indexDb.get(descriptor).get(methodName);
+        Map<String, Integer> methods = indexDb.get(descriptor);
+        if (methods != null && methods.containsKey(methodName)) {
+            return methods.get(methodName);
+        }
+        try {
+            java.lang.reflect.Field field = Class.forName(descriptor + "$Stub")
+                    .getDeclaredField("TRANSACTION_" + methodName);
+            field.setAccessible(true);
+            return field.getInt(null);
+        } catch (Exception e) {
+            throw new RuntimeException("Transaction ID not found for " + descriptor + "." + methodName, e);
+        }
     }
 }

@@ -18,9 +18,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC;
 
 public class FgDataSyncService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_DATA_SYNC;
-       mId = mServiceType+1;
+    public FgDataSyncService() {
+        super(FOREGROUND_SERVICE_TYPE_DATA_SYNC, FOREGROUND_SERVICE_TYPE_DATA_SYNC + 1);
     }
 }

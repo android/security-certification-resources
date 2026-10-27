@@ -19,9 +19,7 @@ package com.android.certification.niap.permission.dpctester.service;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION;
 
 public class FgMediaProjectionService extends FgServiceTypeService{
-    static
-    {
-       mServiceType = FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION;
-       mId = mServiceType+1;
+    public FgMediaProjectionService() {
+        super(FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION, FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION + 1);
     }
 }
