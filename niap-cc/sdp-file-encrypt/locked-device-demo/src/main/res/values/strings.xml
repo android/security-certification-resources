@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">File Encryption Demo</string>
+    <string name="enable_sweep">Enable DAR_EXT.2.4 sweep</string>
+    <string name="enable_logging">Enable logging</string>
+</resources>

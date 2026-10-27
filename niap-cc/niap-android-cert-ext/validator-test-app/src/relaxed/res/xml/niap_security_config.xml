@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2026 The Android Open Source Project
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<niap-security-config>
+    <!-- Disable strict signature algorithm constraints for testing -->
+    <niap-rfc8603-strict-sigalg>false</niap-rfc8603-strict-sigalg>
+    
+    <!-- Empty list of prohibited TLDs -->
+    <prohibited-tld-wildcards>
+    </prohibited-tld-wildcards>
+    
+    <allowed-cipher-suites>
+        <cipher>TLS_AES_128_GCM_SHA256</cipher>
+        <cipher>TLS_AES_256_GCM_SHA384</cipher>
+        <cipher>TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</cipher>
+        <cipher>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</cipher>
+        <cipher>TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</cipher>
+        <cipher>TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</cipher>
+    </allowed-cipher-suites>
+    
+    <trust-anchor-policy>BOTH_CA</trust-anchor-policy>
+    
+    <enforce-tls-1-2>true</enforce-tls-1-2>
+    <enforce-mandatory-extensions>true</enforce-mandatory-extensions>
+    <enforce-eku>true</enforce-eku>
+    <required-eku>serverAuth</required-eku>
+    <enforce-ca-constraints>true</enforce-ca-constraints>
+</niap-security-config>
